@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Executive Dashboard</title>
+    <style>
+        :root{
+            --bg:#ffffff; --card:#f8fafc; --muted:#64748b; --accent:#0ea5e9;
+            --danger:#dc2626; --warning:#ea580c; --success:#059669;
+            --text:#1e293b; --text-light:#475569; --border:#e2e8f0; --shadow:rgba(0,0,0,0.1);
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        }
+        html,body{height:100%; margin:0; background:linear-gradient(180deg,#f1f5f9 0%, #ffffff 100%); color:var(--text)}
+        .container{max-width:1200px; margin:28px auto; padding:20px}
+        header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+        h1{font-size:20px;margin:0;color:var(--text)}
+        .subtitle{color:var(--muted);font-size:13px}
+        .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+        @media (max-width:800px){.grid{grid-template-columns:1fr}}
+        .card{
+            background:linear-gradient(135deg, rgba(255,255,255,0.9), rgba(248,250,252,0.8)); 
+            padding:16px;
+            border-radius:10px;
+            box-shadow:0 4px 6px -1px var(--shadow), 0 2px 4px -1px var(--shadow); 
+            min-height:160px;
+            border:1px solid var(--border);
+        }
+        .card h2{margin:0 0 8px 0;font-size:15px;display:flex;align-items:center;justify-content:space-between;color:var(--text)}
+        .meta{color:var(--muted); font-size:13px}
+        .row{display:flex;gap:12px;align-items:center}
+        .big{font-size:28px;font-weight:600;color:var(--text)}
+        .progress{height:10px;background:var(--border);border-radius:8px;overflow:hidden;margin-top:8px}
+        .bar{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--accent),#60a5fa);width:0%}
+        .pill{
+            padding:6px 10px;
+            border-radius:999px;
+            background:rgba(14,165,233,0.1);
+            font-size:13px;
+            color:var(--accent);
+            border:1px solid rgba(14,165,233,0.2);
+        }
+        .list{margin:8px 0 0 0;padding:0;list-style:none}
+        .list li{
+            padding:8px 0;
+            border-bottom:1px dashed var(--border);
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            font-size:14px;
+            color:var(--text)
+        }
+        .indicator{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:8px}
+        .kpi{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+        .kpi .item{
+            min-width:140px;
+            background:rgba(248,250,252,0.8);
+            padding:8px;
+            border-radius:8px;
+            border:1px solid var(--border)
+        }
+        footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:right}
+
+        /* Status indicators and core systems styles */
+        .status-pill {
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            padding:6px 8px;
+            border-radius:999px;
+            font-size:12px;
+            background:rgba(248,250,252,0.8);
+            border:1px solid var(--border);
+        }
+        .status-dot { width:10px;height:10px;border-radius:50%;display:inline-block; }
+        .core-systems { 
+            margin-top:12px; 
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:8px;
+            font-size:13px 
+        }
+        .core-systems .sys { 
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            background:rgba(248,250,252,0.6);
+            padding:8px;
+            border-radius:8px;
+            border:1px solid var(--border);
+        }
+        .sys .sys-left { display:flex;align-items:center;gap:8px }
+
+        /* New styles for call center sub-panels */
+        .call-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px }
+        /* responsive: 3 cols desktop -> 2 cols tablet -> 1 col mobile */
+        @media (max-width:1000px) { .call-grid { grid-template-columns:repeat(2,1fr) } }
+        @media (max-width:600px)  { .call-grid { grid-template-columns:1fr } }
+        .call-card { 
+            background:rgba(248,250,252,0.6); 
+            padding:12px; 
+            border-radius:8px; 
+            display:flex;
+            flex-direction:column; 
+            justify-content:space-between; 
+            min-height:100px;
+            border:1px solid var(--border);
+        }
+        .call-card .meta { color:var(--muted); font-size:12px }
+        .call-card .value { font-size:20px; font-weight:700; margin-top:6px; color:var(--text) }
+        .call-card .small { font-size:13px; color:var(--muted); margin-top:6px }
+        
+        /* Enhanced hover effects for light theme */
+        .card:hover {
+            box-shadow:0 10px 15px -3px var(--shadow), 0 4px 6px -2px var(--shadow);
+            transform:translateY(-1px);
+            transition:all 0.2s ease;
+        }
+        
+        .call-card:hover, .sys:hover {
+            background:rgba(248,250,252,0.9);
+            transition:background 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>Executive Dashboard</h1>
+                <div class="subtitle" id="lastUpdated">Last updated: --</div>
+            </div>
+            <div class="pill" id="envTag">Production</div>
+        </header>
+
+        <main class="grid">
+            <!-- System Health -->
+            <section class="card" id="systemHealthCard">
+                <h2>
+                    <span>System Health <span class="meta"> — overall status</span></span>
+                    <span class="status-pill" id="systemStatus"><span class="status-dot" style="background:var(--success)"></span><span id="systemStatusText">Operational</span></span>
+                </h2>
+
+                <!-- simplified layout: removed percentage and progress bar,
+                     place core systems directly under the header -->
+                <div style="display:flex;flex-direction:column;gap:12px">
+                    <!-- removed percentage display -->
+                    <!-- 6 Core Systems (now aligned full width beneath the header) -->
+                    <div class="core-systems" id="coreSystemsList" aria-live="polite" style="margin-top:6px">
+                        <!-- populated by JS with 6 systems -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Workforce Readiness -->
+            <section class="card" id="workforceCard">
+                <h2>
+                    <span>Workforce Readiness <span class="meta"> — capacity & availability</span></span>
+                    <span class="status-pill" id="workforceStatus"><span class="status-dot" style="background:var(--success)"></span><span id="workforceStatusText">Good</span></span>
+                </h2>
+                <div class="row">
+                    <div style="flex:1">
+                        <div style="display:flex;align-items:center;justify-content:space-between">
+                            <div>
+                                <div class="big" id="readinessPercent">--%</div>
+                                <div class="meta">Overall readiness</div>
+                            </div>
+                            <div style="min-width:140px">
+                                <div class="meta">On Shift</div>
+                                <div class="big" id="onShift">--</div>
+                            </div>
+                        </div>
+                        <div class="progress"><div class="bar" id="readinessBar" style="width:0%"></div></div>
+                        <ul class="list" id="lobList" style="margin-top:10px">
+                            <!-- populated by JS with LOB readiness -->
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Active Issues -->
+            <section class="card" id="issuesCard">
+                <h2>
+                    <span>Active Issues <span class="meta"> — open & critical (ServiceNow)</span></span>
+                    <span class="status-pill" id="issuesStatus"><span class="status-dot" style="background:var(--success)"></span><span id="issuesStatusText">No P0s</span></span>
+                </h2>
+                <div style="display:flex;gap:12px;align-items:center;justify-content:space-between">
+                    <div style="flex:1">
+                        <div style="display:flex;align-items:center;justify-content:space-between">
+                            <div>
+                                <div class="big" id="openIssues">--</div>
+                                <div class="meta">Open issues</div>
+                            </div>
+                            <div style="text-align:right;display:flex;gap:12px">
+                                <div style="text-align:center">
+                                    <div class="meta">P0</div>
+                                    <div class="big" id="p0Count">--</div>
+                                </div>
+                                <div style="text-align:center">
+                                    <div class="meta">P1</div>
+                                    <div class="big" id="p1Count">--</div>
+                                </div>
+                                <div style="text-align:right">
+                                    <div class="meta">Critical</div>
+                                    <div class="big" id="criticalIssues">--</div>
+                                </div>
+                            </div>
+                        </div>
+                        <ul class="list" id="issuesList" style="margin-top:12px;max-height:160px;overflow:auto">
+                            <!-- populated by JS -->
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Call Center Performance -->
+            <section class="card" id="callsCard">
+                <h2>
+                    <span>Call Center Performance <span class="meta"> — SLAs & throughput</span></span>
+                    <span class="status-pill" id="callsStatus"><span class="status-dot" style="background:var(--success)"></span><span id="callsStatusText">Healthy</span></span>
+                </h2>
+
+                <!-- replaced single-row layout with two-column sub-panels similar to System Health -->
+                <div class="call-grid" id="callGrid" aria-live="polite">
+                    <!-- populated by JS with cards:
+                         Calls / hr, Avg Handle Time, Service Level, Abandon Rate, Avg Wait, FCR -->
+                </div>
+            </section>
+        </main>
+
+        <footer>Static demo — refreshes simulated metrics every 5 seconds</footer>
+    </div>
+
+    <script>
+        // static demo data + periodic updates
+        function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min}
+        function formatTS(){return new Date().toLocaleString()}
+        function setText(id,val){document.getElementById(id).textContent = val}
+
+        function timeElapsed(iso){
+            if(!iso) return '--'
+            const diff = Date.now() - new Date(iso).getTime()
+            const mins = Math.floor(diff / 60000)
+            if(mins < 60) return mins + 'm'
+            const hrs = Math.floor(mins / 60)
+            if(hrs < 24) return hrs + 'h ' + (mins % 60) + 'm'
+            const days = Math.floor(hrs / 24)
+            return days + 'd ' + (hrs % 24) + 'h'
+        }
+
+        // Helper to set a status pill color/text
+        function setStatus(pillId, textId, status) {
+            const pill = document.getElementById(pillId)
+            const text = document.getElementById(textId)
+            const dot = pill.querySelector('.status-dot')
+            if (!dot || !text) return
+            if (status === 'good') {
+                dot.style.background = 'var(--success)'
+                text.textContent = 'Good'
+            } else if (status === 'warning') {
+                dot.style.background = 'var(--warning)'
+                text.textContent = 'At risk'
+            } else {
+                dot.style.background = 'var(--danger)'
+                text.textContent = 'Critical'
+            }
+        }
+
+        // Evaluate a core system's health using system-specific rules and thresholds.
+        function evaluateCoreSystem(sys) {
+            // default health scored 0..100
+            let health = 100
+            let note = ''
+
+            // threshold logic depends on type/name
+            if (sys.type === 'IVR') {
+                // IVR: monitor error/failure rate; threshold scales with number of apps
+                // more apps -> lower tolerated error rate
+                const apps = sys.appsCount || 1
+                const tolerated = apps > 4 ? 2.5 : (apps > 2 ? 4 : 6) // percent
+                const errorRate = sys.errorRate ?? rand(0,8)
+                sys.errorRate = errorRate
+                health = Math.max(20, Math.round(100 - errorRate * 6)) // penalize by error rate
+                note = `errors ${errorRate}% (tolerated ${tolerated}%)`
+                if (errorRate > tolerated * 2) sys.severity = 'critical'
+                else if (errorRate > tolerated) sys.severity = 'warning'
+                else sys.severity = 'good'
+            } else if (sys.type === 'Genesys') {
+                // Genesys: if any services down -> critical
+                const servicesDown = sys.servicesDown ?? rand(0,2)
+                sys.servicesDown = servicesDown
+                health = servicesDown > 0 ? 60 : 98
+                note = servicesDown > 0 ? `${servicesDown} services down` : 'all services up'
+                sys.severity = servicesDown > 0 ? 'critical' : 'good'
+            } else if (sys.type === 'DB') {
+                // DB: monitor replication lag and error counts
+                const lag = sys.replicationLag ?? rand(0,300) // seconds
+                sys.replicationLag = lag
+                health = Math.max(30, Math.round(100 - (lag / 300) * 40))
+                note = `lag ${lag}s`
+                sys.severity = lag > 180 ? 'critical' : lag > 60 ? 'warning' : 'good'
+            } else if (sys.type === 'API') {
+                // API Gateway: error rate and availability by appsCount
+                const apps = sys.appsCount ?? rand(1,6)
+                sys.appsCount = apps
+                const errorRate = sys.errorRate ?? rand(0,6)
+                sys.errorRate = errorRate
+                health = Math.max(25, Math.round(100 - errorRate * 7 - (apps-1)*2))
+                note = `${apps} apps · errors ${errorRate}%`
+                sys.severity = errorRate > 5 ? 'critical' : errorRate > 3 ? 'warning' : 'good'
+            } else {
+                // generic: use a simulated health %
+                const h = sys.health ?? rand(75,100)
+                health = h
+                note = `health ${health}%`
+                sys.severity = health >= 95 ? 'good' : health >= 88 ? 'warning' : 'critical'
+            }
+
+            sys.computedHealth = health
+            sys.note = note
+            return sys
+        }
+
+        function updateDashboard(){
+            // Core systems list (6 systems) and simulated inputs
+            const coreSystems = [
+                { name: 'Auth', type: 'API', appsCount: rand(1,6) },
+                { name: 'Payments', type: 'API', appsCount: rand(1,5) },
+                { name: 'API Gateway', type: 'API', appsCount: rand(3,8) },
+                { name: 'IVR', type: 'IVR', appsCount: rand(1,6) },
+                { name: 'Genesys', type: 'Genesys' },
+                { name: 'DB', type: 'DB' }
+            ].map(s => evaluateCoreSystem(s))
+
+            // overall aggregation: average of computedHealth, but escalate if any critical
+            const avgHealth = Math.floor(coreSystems.reduce((s,c)=>s+c.computedHealth,0)/coreSystems.length)
+            const anyCritical = coreSystems.some(s => s.severity === 'critical')
+            const anyWarning = coreSystems.some(s => s.severity === 'warning')
+
+            // removed percentage and progress bar DOM updates (no #healthPercent or #healthBar)
+            // update overall status pill only
+            if (anyCritical) {
+                setStatus('systemStatus','systemStatusText','critical')
+            } else if (anyWarning) {
+                setStatus('systemStatus','systemStatusText','warning')
+            } else {
+                setStatus('systemStatus','systemStatusText','good')
+            }
+
+            // render core systems with their own indicator, apps count and note
+            const coreList = document.getElementById('coreSystemsList')
+            coreList.innerHTML = ''
+            coreSystems.forEach(s => {
+                const el = document.createElement('div')
+                el.className = 'sys'
+                const color = s.severity === 'good' ? 'var(--success)' : s.severity === 'warning' ? 'var(--warning)' : 'var(--danger)'
+                const appsInfo = s.appsCount ? `<div class="meta">${s.appsCount} apps</div>` : ''
+                const rightInfo = `<div style="font-weight:600">${s.computedHealth}%</div>`
+                el.innerHTML = `<div class="sys-left"><span class="status-dot" style="background:${color}"></span><div><div style="font-weight:600">${s.name}</div>${appsInfo}<div class="meta">${s.note}</div></div></div>${rightInfo}`
+                coreList.appendChild(el)
+            })
+
+            // Workforce (unchanged)
+            const ready = rand(70,98)
+            setText('readinessPercent', ready + '%')
+            document.getElementById('readinessBar').style.width = ready + '%'
+            setText('onShift', rand(120,320))
+            const lobs = [
+                {name:'Retail', ready: rand(70,99)},
+                {name:'Corporate', ready: rand(60,98)},
+                {name:'Partner', ready: rand(65,98)},
+                {name:'Field Ops', ready: rand(60,95)}
+            ]
+            const lobList = document.getElementById('lobList')
+            lobList.innerHTML = ''
+            lobs.forEach(l=>{
+                const li = document.createElement('li')
+                li.innerHTML = '<div>'+l.name+'</div><div><strong>'+l.ready+'%</strong></div>'
+                lobList.appendChild(li)
+            })
+            if (ready >= 90) setStatus('workforceStatus','workforceStatusText','good')
+            else if (ready >= 80) setStatus('workforceStatus','workforceStatusText','warning')
+            else setStatus('workforceStatus','workforceStatusText','critical')
+
+            // Active Issues (unchanged behavior)
+            const incidents = []
+            const open = rand(3,18)
+            const sevOptions = ['P0','P1','P2']
+            const services = ['Payments','Authentication','API Platform','Queueing','Customer Portal']
+            for(let i=0;i<Math.min(open,10);i++){
+                const sev = sevOptions[rand(0,2)]
+                const minutesAgo = rand(5, 24*60)
+                incidents.push({
+                    number: 'INC' + (100000 + rand(0,899999)),
+                    severity: sev,
+                    business_service: services[rand(0,services.length-1)],
+                    short_description: ['Payment gateway down','API 500 errors','Auth failure','Queue backlog','Data lag'][rand(0,4)],
+                    sys_created_on: new Date(Date.now() - minutesAgo * 60000).toISOString()
+                })
+            }
+            const p0 = incidents.filter(i=>i.severity === 'P0').length
+            const p1 = incidents.filter(i=>i.severity === 'P1').length
+            const critical = p0 + p1
+            setText('openIssues', incidents.length)
+            setText('p0Count', p0)
+            setText('p1Count', p1)
+            setText('criticalIssues', critical)
+            if (p0 > 0) setStatus('issuesStatus','issuesStatusText','critical')
+            else if (p1 > 3) setStatus('issuesStatus','issuesStatusText','warning')
+            else setStatus('issuesStatus','issuesStatusText','good')
+            const sevOrder = {'P0':0,'P1':1,'P2':2}
+            incidents.sort((a,b)=>{
+                const s = (sevOrder[a.severity] ?? 9) - (sevOrder[b.severity] ?? 9)
+                if(s !== 0) return s
+                return new Date(b.sys_created_on) - new Date(a.sys_created_on)
+            })
+            const issuesList = document.getElementById('issuesList'); issuesList.innerHTML = ''
+            incidents.slice(0,6).forEach(it=>{
+                const li = document.createElement('li')
+                const color = it.severity === 'P0' ? 'var(--danger)' : it.severity === 'P1' ? 'var(--warning)' : 'var(--success)'
+                li.innerHTML = `
+                    <div style="max-width:65%;overflow:hidden">
+                        <div style="font-weight:600">${it.number}</div>
+                        <div class="meta" style="white-space:nowrap;text-overflow:ellipsis;overflow:hidden">${it.short_description}</div>
+                    </div>
+                    <div style="text-align:right;min-width:160px">
+                        <div style="margin-bottom:6px">
+                            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${color};margin-right:8px"></span>
+                            <strong>${it.severity}</strong>
+                        </div>
+                        <div class="meta">${it.business_service || '—'}</div>
+                        <div class="meta">${timeElapsed(it.sys_created_on)}</div>
+                    </div>
+                `
+                issuesList.appendChild(li)
+            })
+
+            // Call Center — render as sub-panels (two-column)
+            const calls = {
+                cph: rand(300,620),
+                aht: rand(120,420), // seconds
+                sl: rand(78,98), // percent
+                abandon: (Math.random()*5).toFixed(1), // percent
+                avgWait: rand(12,80), // seconds
+                fcr: rand(65,90) // percent
+            }
+
+            // determine calls status
+            if (calls.sl >= 90) setStatus('callsStatus','callsStatusText','good')
+            else if (calls.sl >= 80) setStatus('callsStatus','callsStatusText','warning')
+            else setStatus('callsStatus','callsStatusText','critical')
+
+            // render call cards
+            const callGrid = document.getElementById('callGrid')
+            callGrid.innerHTML = ''
+
+            const callCards = [
+                { title: 'Calls / hr', value: calls.cph, small: 'Throughput' },
+                { title: 'Avg Handle Time', value: calls.aht + 's', small: 'Average handling time' },
+                { title: 'Service Level (≤30s)', value: calls.sl + '%', small: 'Pct answered within 30s' },
+                { title: 'Abandon Rate', value: calls.abandon + '%', small: 'Calls abandoned' },
+                { title: 'Avg Wait', value: calls.avgWait + 's', small: 'Average queue wait' },
+                { title: 'FCR', value: calls.fcr + '%', small: 'First Call Resolution' }
+            ]
+
+            callCards.forEach(c => {
+                const card = document.createElement('div')
+                card.className = 'call-card'
+                card.innerHTML = `<div><div class="meta">${c.title}</div><div class="value">${c.value}</div></div><div class="small">${c.small}</div>`
+                callGrid.appendChild(card)
+            })
+
+            setText('lastUpdated', 'Last updated: ' + formatTS())
+        }
+
+        // initial
+        updateDashboard()
+        // periodic refresh (simulated)
+        setInterval(updateDashboard, 5000)
+    </script>
+</body>
+</html>

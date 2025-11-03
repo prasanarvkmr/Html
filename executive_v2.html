@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Executive Status Dashboard</title>
+    <style>
+        :root{
+            --bg:#ffffff; --card:#f8fafc; --muted:#64748b; --accent:#0ea5e9;
+            --danger:#dc2626; --warning:#ea580c; --success:#059669;
+            --text:#1e293b; --text-light:#475569; --border:#e2e8f0;
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        }
+        html,body{height:100vh; margin:0; background:linear-gradient(180deg,#f1f5f9 0%, #ffffff 100%); color:var(--text); overflow:hidden}
+        .container{max-width:1200px; margin:0 auto; padding:40px; height:100vh; display:flex; flex-direction:column; box-sizing:border-box}
+        
+        /* Header */
+        header{text-align:center; margin-bottom:40px}
+        h1{font-size:32px; margin:0; font-weight:300; letter-spacing:1px; color:var(--text)}
+        .subtitle{color:var(--muted); font-size:16px; margin-top:8px}
+        .timestamp{color:var(--muted); font-size:12px; margin-top:16px}
+        
+        /* Status Grid - 2x2 layout */
+        .status-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:30px; flex:1; align-items:center}
+        
+        /* Status Panel */
+        .status-panel{
+            background:linear-gradient(135deg, rgba(255,255,255,0.9), rgba(248,250,252,0.8));
+            border-radius:20px; 
+            padding:40px; 
+            text-align:center; 
+            position:relative;
+            border:2px solid var(--border);
+            transition:all 0.3s ease;
+            min-height:200px;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            cursor:pointer;
+            box-shadow:0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+        }
+        
+        .status-panel:hover{
+            transform:translateY(-2px);
+            box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            border-color:var(--accent);
+        }
+        
+        .status-panel.operational{border-color:var(--success); background:linear-gradient(135deg, rgba(5,150,105,0.05), rgba(16,185,129,0.02))}
+        .status-panel.at-risk{border-color:var(--warning); background:linear-gradient(135deg, rgba(234,88,12,0.05), rgba(245,158,11,0.02))}
+        .status-panel.critical{border-color:var(--danger); background:linear-gradient(135deg, rgba(220,38,38,0.05), rgba(239,68,68,0.02))}
+        
+        /* Status Indicator - positioned at top-right */
+        .status-indicator{
+            font-weight:700;
+            text-transform:uppercase;
+            letter-spacing:1px;
+            position:absolute;
+            top:20px;
+            right:20px;
+            padding:8px 12px;
+            border-radius:8px;
+            font-size:12px;
+            color:#ffffff;
+        }
+        
+        .operational .status-indicator{background:var(--success)}
+        .at-risk .status-indicator{background:var(--warning)}
+        .critical .status-indicator{background:var(--danger)}
+        
+        /* Panel Content */
+        .panel-title{font-size:20px; font-weight:600; margin-bottom:16px; text-transform:uppercase; letter-spacing:1px; color:var(--text)}
+        .panel-status{font-size:48px; font-weight:700; margin:20px 0; text-transform:uppercase; letter-spacing:2px}
+        .panel-details{font-size:14px; color:var(--muted); line-height:1.6}
+        
+        /* Status Colors */
+        .operational .panel-status{color:var(--success)}
+        .at-risk .panel-status{color:var(--warning)}
+        .critical .panel-status{color:var(--danger)}
+        
+        /* Click indicator */
+        .click-hint{
+            position:absolute;
+            bottom:15px;
+            right:20px;
+            font-size:10px;
+            color:var(--muted);
+            opacity:0.7;
+        }
+        
+        /* Modal Styles */
+        .modal-overlay{
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.5);
+            display:none;
+            justify-content:center;
+            align-items:center;
+            z-index:1000;
+        }
+        
+        .modal-content{
+            background:linear-gradient(135deg, rgba(255,255,255,0.98), rgba(248,250,252,0.95));
+            border-radius:20px;
+            padding:30px;
+            max-width:800px;
+            width:90%;
+            max-height:80vh;
+            overflow-y:auto;
+            border:1px solid var(--border);
+            position:relative;
+            box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        
+        .modal-header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:20px;
+            padding-bottom:15px;
+            border-bottom:1px solid var(--border);
+        }
+        
+        .modal-title{
+            font-size:24px;
+            font-weight:600;
+            margin:0;
+            color:var(--text);
+        }
+        
+        .close-btn{
+            background:none;
+            border:none;
+            color:var(--muted);
+            font-size:24px;
+            cursor:pointer;
+            padding:5px;
+            border-radius:5px;
+            transition:background 0.2s;
+        }
+        
+        .close-btn:hover{
+            background:var(--border);
+            color:var(--text);
+        }
+        
+        .modal-body{
+            display:grid;
+            gap:20px;
+        }
+        
+        .detail-section{
+            background:rgba(248,250,252,0.6);
+            padding:20px;
+            border-radius:12px;
+            border-left:4px solid var(--accent);
+            border:1px solid var(--border);
+        }
+        
+        .detail-title{
+            font-size:16px;
+            font-weight:600;
+            margin-bottom:12px;
+            color:var(--accent);
+        }
+        
+        .detail-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+            gap:15px;
+        }
+        
+        .detail-item{
+            background:rgba(255,255,255,0.8);
+            padding:15px;
+            border-radius:8px;
+            border:1px solid var(--border);
+        }
+        
+        .detail-label{
+            font-size:12px;
+            color:var(--muted);
+            text-transform:uppercase;
+            letter-spacing:0.5px;
+            margin-bottom:5px;
+        }
+        
+        .detail-value{
+            font-size:18px;
+            font-weight:600;
+            color:var(--text);
+        }
+        
+        .detail-trend{
+            font-size:12px;
+            margin-top:5px;
+        }
+        
+        .trend-up{color:var(--success)}
+        .trend-down{color:var(--danger)}
+        .trend-neutral{color:var(--muted)}
+        
+        /* Mini Chart Container */
+        .chart-container{
+            height:100px;
+            background:rgba(248,250,252,0.6);
+            border-radius:8px;
+            margin-top:15px;
+            padding:10px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:var(--muted);
+            font-size:12px;
+            border:1px solid var(--border);
+        }
+        
+        /* Action Items */
+        .action-items{
+            margin-top:20px;
+        }
+        
+        .action-item{
+            background:rgba(234,88,12,0.1);
+            border-left:4px solid var(--warning);
+            padding:12px;
+            margin-bottom:10px;
+            border-radius:0 8px 8px 0;
+            border:1px solid rgba(234,88,12,0.2);
+            color:var(--text);
+        }
+        
+        .action-item.critical{
+            background:rgba(220,38,38,0.1);
+            border-left-color:var(--danger);
+            border-color:rgba(220,38,38,0.2);
+        }
+        
+        .action-item.completed{
+            background:rgba(5,150,105,0.1);
+            border-left-color:var(--success);
+            border-color:rgba(5,150,105,0.2);
+            opacity:0.7;
+        }
+        
+        /* Responsive */
+        @media (max-width:900px){
+            .status-grid{grid-template-columns:1fr; gap:20px}
+            .status-panel{padding:30px; min-height:150px}
+            .panel-status{font-size:36px}
+            .container{padding:20px}
+            .detail-grid{grid-template-columns:1fr}
+            .modal-content{padding:20px; width:95%}
+        }
+        
+        /* Footer */
+        .footer{text-align:center; margin-top:30px; padding-top:20px; border-top:1px solid var(--border)}
+        .footer-text{color:var(--muted); font-size:12px}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Executive Status Dashboard</h1>
+            <div class="subtitle">Real-time operational overview</div>
+            <div class="timestamp" id="lastUpdated">Last updated: --</div>
+        </header>
+
+        <main class="status-grid">
+            <!-- System Health Panel -->
+            <div class="status-panel operational" id="systemPanel" onclick="openModal('system')">
+                <div class="status-indicator" id="systemIndicator">OPERATIONAL</div>
+                <div class="panel-title">System Health</div>
+                <div class="panel-status" id="systemStatus">6/6</div>
+                <div class="panel-details" id="systemDetails">
+                    Core systems operational<br>
+                    All services running normally
+                </div>
+                <div class="click-hint">Click for details</div>
+            </div>
+
+            <!-- Workforce Panel -->
+            <div class="status-panel operational" id="workforcePanel" onclick="openModal('workforce')">
+                <div class="status-indicator" id="workforceIndicator">OPERATIONAL</div>
+                <div class="panel-title">Workforce Readiness</div>
+                <div class="panel-status" id="workforceStatus">FULLY STAFFED</div>
+                <div class="panel-details" id="workforceDetails">
+                    Adequate staffing levels<br>
+                    -- employees on shift
+                </div>
+                <div class="click-hint">Click for details</div>
+            </div>
+
+            <!-- Issues Panel -->
+            <div class="status-panel operational" id="issuesPanel" onclick="openModal('issues')">
+                <div class="status-indicator" id="issuesIndicator">OPERATIONAL</div>
+                <div class="panel-title">Active Issues</div>
+                <div class="panel-status" id="issuesStatus">0</div>
+                <div class="panel-details" id="issuesDetails">
+                    P0/P1 incidents<br>
+                    <span id="dailyTrend">↓ 25% vs yesterday</span>
+                </div>
+                <div class="click-hint">Click for details</div>
+            </div>
+
+            <!-- Service Performance Panel -->
+            <div class="status-panel operational" id="servicePanel" onclick="openModal('service')">
+                <div class="status-indicator" id="serviceIndicator">OPERATIONAL</div>
+                <div class="panel-title">Call Center Performance</div>
+                <div class="panel-status" id="serviceStatus">MEETING SLA</div>
+                <div class="panel-details" id="serviceDetails">
+                    Meeting SLA targets<br>
+                    --% service level
+                </div>
+                <div class="click-hint">Click for details</div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-text">Auto-refreshes every 15 seconds • Production Environment • Click panels for detailed views</div>
+        </footer>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Detail View</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables to store current data
+        let currentSystemData = {};
+        let currentWorkforceData = {};
+        let currentIssuesData = {};
+        let currentServiceData = {};
+
+        function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min}
+        function formatTS(){return new Date().toLocaleString()}
+
+        function updatePanelStatus(panelId, statusId, detailsId, indicatorId, status, statusText, details, indicatorText) {
+            const panel = document.getElementById(panelId)
+            const statusEl = document.getElementById(statusId)
+            const detailsEl = document.getElementById(detailsId)
+            const indicatorEl = document.getElementById(indicatorId)
+            
+            if (!panel || !statusEl || !detailsEl || !indicatorEl) return
+            
+            // Remove existing status classes
+            panel.classList.remove('operational', 'at-risk', 'critical')
+            
+            // Add new status class
+            panel.classList.add(status)
+            
+            // Update text
+            statusEl.textContent = statusText
+            detailsEl.innerHTML = details
+            indicatorEl.textContent = indicatorText
+        }
+
+        function evaluateSystemHealth() {
+            const systems = [
+                { name: 'Auth', health: rand(85, 100), responseTime: rand(50, 200), errorRate: rand(0, 5) },
+                { name: 'Payments', health: rand(80, 100), responseTime: rand(80, 300), errorRate: rand(0, 3) },
+                { name: 'API Gateway', health: rand(85, 100), responseTime: rand(40, 150), errorRate: rand(0, 4) },
+                { name: 'IVR', health: rand(75, 100), responseTime: rand(100, 400), errorRate: rand(0, 8) },
+                { name: 'Genesys', health: rand(80, 100), responseTime: rand(200, 600), errorRate: rand(0, 6) },
+                { name: 'Database', health: rand(85, 100), responseTime: rand(20, 100), errorRate: rand(0, 2) }
+            ]
+
+            const avgHealth = systems.reduce((sum, s) => sum + s.health, 0) / systems.length
+            const criticalSystems = systems.filter(s => s.health < 75).length
+            const degradedSystems = systems.filter(s => s.health >= 75 && s.health < 90).length
+            const operationalSystems = systems.filter(s => s.health >= 90).length
+            const totalSystems = systems.length
+
+            // Store detailed data for modal
+            currentSystemData = {
+                systems,
+                avgHealth: Math.round(avgHealth),
+                criticalSystems,
+                degradedSystems,
+                operationalSystems,
+                totalSystems,
+                totalRequests: rand(50000, 100000),
+                avgResponseTime: Math.round(systems.reduce((sum, s) => sum + s.responseTime, 0) / systems.length),
+                uptime: rand(995, 1000) / 10
+            }
+
+            let status, statusText, details, indicatorText
+            
+            if (criticalSystems > 0) {
+                status = 'critical'
+                statusText = `${operationalSystems}/${totalSystems}`
+                details = `${criticalSystems} critical system(s)<br>Immediate attention required`
+                indicatorText = 'CRITICAL'
+            } else if (degradedSystems > 2) {
+                status = 'at-risk'
+                statusText = `${operationalSystems}/${totalSystems}`
+                details = `${degradedSystems} systems degraded<br>Performance below optimal`
+                indicatorText = 'AT RISK'
+            } else {
+                status = 'operational'
+                statusText = `${operationalSystems}/${totalSystems}`
+                details = `Core systems operational<br>All services running normally`
+                indicatorText = 'OPERATIONAL'
+            }
+
+            return { status, statusText, details, indicatorText }
+        }
+
+        function evaluateWorkforce() {
+            const readiness = rand(70, 95)
+            const onShift = rand(180, 350)
+            const coverage = rand(85, 100)
+
+            // Store detailed data for modal
+            currentWorkforceData = {
+                readiness,
+                onShift,
+                coverage,
+                departments: [
+                    { name: 'Support', staff: rand(40, 80), capacity: rand(85, 100) },
+                    { name: 'Operations', staff: rand(30, 60), capacity: rand(80, 95) },
+                    { name: 'Engineering', staff: rand(25, 50), capacity: rand(75, 90) },
+                    { name: 'QA', staff: rand(15, 30), capacity: rand(85, 95) }
+                ],
+                absenteeism: rand(2, 8),
+                overtime: rand(5, 15),
+                satisfaction: rand(75, 90)
+            }
+
+            let status, statusText, details, indicatorText
+
+            if (readiness < 75 || coverage < 85) {
+                status = 'critical'
+                statusText = 'UNDER STAFFED'
+                details = `Insufficient staffing<br>${onShift} employees on shift`
+                indicatorText = 'CRITICAL'
+            } else if (readiness < 85 || coverage < 90) {
+                status = 'at-risk'
+                statusText = 'UNDER STAFFED'
+                details = `Below optimal staffing<br>${onShift} employees on shift`
+                indicatorText = 'AT RISK'
+            } else {
+                status = 'operational'
+                statusText = 'FULLY STAFFED'
+                details = `Adequate staffing levels<br>${onShift} employees on shift`
+                indicatorText = 'OPERATIONAL'
+            }
+
+            return { status, statusText, details, indicatorText }
+        }
+
+        function evaluateIssues() {
+            const p0Count = rand(0, 2)
+            const p1Count = rand(0, 5)
+            const p2Count = rand(2, 10)
+            const totalIssues = p0Count + p1Count + p2Count
+            const criticalIncidents = p0Count + p1Count
+            
+            // Generate daily trend (simulated)
+            const trendChange = rand(-50, 30)
+            const trendDirection = trendChange < 0 ? '↓' : '↑'
+            const trendText = `${trendDirection} ${Math.abs(trendChange)}% vs yesterday`
+
+            // Store detailed data for modal
+            currentIssuesData = {
+                p0Count,
+                p1Count,
+                p2Count,
+                totalIssues,
+                criticalIncidents,
+                trendChange,
+                trendDirection,
+                avgResolutionTime: rand(2, 8),
+                escalatedIssues: rand(0, 3),
+                recentIncidents: [
+                    { id: 'INC001234', severity: 'P0', title: 'Payment gateway down', age: '15m', status: 'Active' },
+                    { id: 'INC001235', severity: 'P1', title: 'API response slow', age: '1h 20m', status: 'In Progress' },
+                    { id: 'INC001236', severity: 'P2', title: 'UI rendering issue', age: '3h 45m', status: 'Assigned' }
+                ].slice(0, p0Count + p1Count + Math.min(p2Count, 3))
+            }
+
+            let status, statusText, details, indicatorText
+
+            if (p0Count > 0) {
+                status = 'critical'
+                statusText = criticalIncidents.toString()
+                details = `P0/P1 incidents<br><span id="dailyTrend">${trendText}</span>`
+                indicatorText = 'CRITICAL'
+            } else if (p1Count > 3) {
+                status = 'at-risk'
+                statusText = criticalIncidents.toString()
+                details = `P0/P1 incidents<br><span id="dailyTrend">${trendText}</span>`
+                indicatorText = 'AT RISK'
+            } else {
+                status = 'operational'
+                statusText = criticalIncidents.toString()
+                details = `P0/P1 incidents<br><span id="dailyTrend">${trendText}</span>`
+                indicatorText = 'OPERATIONAL'
+            }
+
+            return { status, statusText, details, indicatorText }
+        }
+
+        function evaluateService() {
+            const serviceLevel = rand(75, 98)
+            const callsPerHour = rand(400, 650)
+            const avgWaitTime = rand(15, 120)
+
+            // Store detailed data for modal
+            currentServiceData = {
+                serviceLevel,
+                callsPerHour,
+                avgWaitTime,
+                abandonRate: rand(2, 8),
+                avgHandleTime: rand(180, 420),
+                fcr: rand(65, 85),
+                agents: {
+                    available: rand(45, 85),
+                    busy: rand(15, 35),
+                    total: rand(60, 120)
+                },
+                queues: [
+                    { name: 'General Support', wait: rand(10, 60), calls: rand(20, 50) },
+                    { name: 'Technical Support', wait: rand(30, 90), calls: rand(15, 40) },
+                    { name: 'Billing', wait: rand(5, 30), calls: rand(10, 25) },
+                    { name: 'Sales', wait: rand(15, 45), calls: rand(25, 60) }
+                ]
+            }
+
+            let status, statusText, details, indicatorText
+
+            if (serviceLevel < 80 || avgWaitTime > 90) {
+                status = 'critical'
+                statusText = 'SLA BREACH'
+                details = `SLA breach: ${serviceLevel}%<br>Avg wait: ${avgWaitTime}s`
+                indicatorText = 'CRITICAL'
+            } else if (serviceLevel < 90 || avgWaitTime > 60) {
+                status = 'at-risk'
+                statusText = 'BELOW TARGET'
+                details = `Below target: ${serviceLevel}%<br>Avg wait: ${avgWaitTime}s`
+                indicatorText = 'AT RISK'
+            } else {
+                status = 'operational'
+                statusText = 'MEETING SLA'
+                details = `Meeting SLA targets<br>${serviceLevel}% service level`
+                indicatorText = 'OPERATIONAL'
+            }
+
+            return { status, statusText, details, indicatorText }
+        }
+
+        function openModal(type) {
+            const modal = document.getElementById('modalOverlay')
+            const title = document.getElementById('modalTitle')
+            const body = document.getElementById('modalBody')
+            
+            let content = ''
+            
+            switch(type) {
+                case 'system':
+                    title.textContent = 'System Health Details'
+                    content = generateSystemModal()
+                    break
+                case 'workforce':
+                    title.textContent = 'Workforce Readiness Details'
+                    content = generateWorkforceModal()
+                    break
+                case 'issues':
+                    title.textContent = 'Active Issues Details'
+                    content = generateIssuesModal()
+                    break
+                case 'service':
+                    title.textContent = 'Call Center Performance Details'
+                    content = generateServiceModal()
+                    break
+            }
+            
+            body.innerHTML = content
+            modal.style.display = 'flex'
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').style.display = 'none'
+        }
+
+        function generateSystemModal() {
+            const data = currentSystemData
+            return `
+                <div class="detail-section">
+                    <div class="detail-title">Overall Metrics</div>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Average Health</div>
+                            <div class="detail-value">${data.avgHealth}%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">System Uptime</div>
+                            <div class="detail-value">${data.uptime}%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Total Requests (24h)</div>
+                            <div class="detail-value">${data.totalRequests.toLocaleString()}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Avg Response Time</div>
+                            <div class="detail-value">${data.avgResponseTime}ms</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-title">System Status</div>
+                    <div class="detail-grid">
+                        ${data.systems.map(system => `
+                            <div class="detail-item">
+                                <div class="detail-label">${system.name}</div>
+                                <div class="detail-value" style="color: ${system.health >= 90 ? 'var(--success)' : system.health >= 75 ? 'var(--warning)' : 'var(--danger)'}">${system.health}%</div>
+                                <div class="detail-trend">Response: ${system.responseTime}ms | Errors: ${system.errorRate}%</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                ${data.criticalSystems > 0 || data.degradedSystems > 0 ? `
+                <div class="action-items">
+                    <div class="detail-title">Action Items</div>
+                    ${data.criticalSystems > 0 ? `<div class="action-item critical">• Investigate critical systems immediately</div>` : ''}
+                    ${data.degradedSystems > 0 ? `<div class="action-item">• Monitor degraded systems closely</div>` : ''}
+                    <div class="action-item">• Review system capacity planning</div>
+                </div>
+                ` : ''}
+            `
+        }
+
+        function generateWorkforceModal() {
+            const data = currentWorkforceData
+            return `
+                <div class="detail-section">
+                    <div class="detail-title">Workforce Overview</div>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Overall Readiness</div>
+                            <div class="detail-value">${data.readiness}%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Coverage</div>
+                            <div class="detail-value">${data.coverage}%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">On Shift</div>
+                            <div class="detail-value">${data.onShift}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Absenteeism</div>
+                            <div class="detail-value">${data.absenteeism}%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-title">Department Breakdown</div>
+                    <div class="detail-grid">
+                        ${data.departments.map(dept => `
+                            <div class="detail-item">
+                                <div class="detail-label">${dept.name}</div>
+                                <div class="detail-value">${dept.staff} staff</div>
+                                <div class="detail-trend" style="color: ${dept.capacity >= 90 ? 'var(--success)' : dept.capacity >= 80 ? 'var(--warning)' : 'var(--danger)'}">${dept.capacity}% capacity</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-title">Additional Metrics</div>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Overtime Usage</div>
+                            <div class="detail-value">${data.overtime}%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Employee Satisfaction</div>
+                            <div class="detail-value">${data.satisfaction}%</div>
+                        </div>
+                    </div>
+                </div>
+            `
+        }
+
+        function generateIssuesModal() {
+            const data = currentIssuesData
+            return `
+                <div class="detail-section">
+                    <div class="detail-title">Incident Summary</div>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">P0 Incidents</div>
+                            <div class="detail-value" style="color: var(--danger)">${data.p0Count}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">P1 Incidents</div>
+                            <div class="detail-value" style="color: var(--warning)">${data.p1Count}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">P2 Incidents</div>
+                            <div class="detail-value">${data.p2Count}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Total Open</div>
+                            <div class="detail-value">${data.totalIssues}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-title">Performance Metrics</div>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Daily Trend</div>
+                            <div class="detail-value">${data.trendDirection} ${Math.abs(data.trendChange)}%</div>
+                            <div class="detail-trend">vs yesterday</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Avg Resolution</div>
+                            <div class="detail-value">${data.avgResolutionTime}h</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Escalated</div>
+                            <div class="detail-value">${data.escalatedIssues}</div>
+                        </div>
+                    </div>
+                </div>
+
+                ${data.recentIncidents.length > 0 ? `
+                <div class="detail-section">
+                    <div class="detail-title">Recent Incidents</div>
+                    ${data.recentIncidents.map(incident => `
+                        <div class="detail-item" style="margin-bottom: 10px; border-left: 4px solid ${incident.severity === 'P0' ? 'var(--danger)' : incident.severity === 'P1' ? 'var(--warning)' : 'var(--success)'}">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div class="detail-value" style="font-size: 14px;">${incident.id} - ${incident.title}</div>
+                                    <div class="detail-trend">${incident.severity} • ${incident.status} • ${incident.age}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+            `
+        }
+
+        function generateServiceModal() {
+            const data = currentServiceData
+            return `
+                <div class="detail-section">
+                    <div class="detail-title">Performance Overview</div>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Service Level</div>
+                            <div class="detail-value" style="color: ${data.serviceLevel >= 90 ? 'var(--success)' : data.serviceLevel >= 80 ? 'var(--warning)' : 'var(--danger)'}">${data.serviceLevel}%</div>
+                            <div class="detail-trend">Target: 90%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Calls per Hour</div>
+                            <div class="detail-value">${data.callsPerHour}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Avg Wait Time</div>
+                            <div class="detail-value">${data.avgWaitTime}s</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Abandon Rate</div>
+                            <div class="detail-value">${data.abandonRate}%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-title">Agent Status</div>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Available</div>
+                            <div class="detail-value" style="color: var(--success)">${data.agents.available}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Busy</div>
+                            <div class="detail-value" style="color: var(--warning)">${data.agents.busy}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Total Agents</div>
+                            <div class="detail-value">${data.agents.total}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Utilization</div>
+                            <div class="detail-value">${Math.round((data.agents.busy / data.agents.total) * 100)}%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-title">Queue Status</div>
+                    <div class="detail-grid">
+                        ${data.queues.map(queue => `
+                            <div class="detail-item">
+                                <div class="detail-label">${queue.name}</div>
+                                <div class="detail-value">${queue.calls} calls</div>
+                                <div class="detail-trend">Wait: ${queue.wait}s</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-title">Quality Metrics</div>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Avg Handle Time</div>
+                            <div class="detail-value">${Math.floor(data.avgHandleTime / 60)}m ${data.avgHandleTime % 60}s</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">First Call Resolution</div>
+                            <div class="detail-value">${data.fcr}%</div>
+                        </div>
+                    </div>
+                </div>
+            `
+        }
+
+        function updateDashboard() {
+            // Update each panel
+            const systemHealth = evaluateSystemHealth()
+            updatePanelStatus('systemPanel', 'systemStatus', 'systemDetails', 'systemIndicator',
+                systemHealth.status, systemHealth.statusText, systemHealth.details, systemHealth.indicatorText)
+
+            const workforce = evaluateWorkforce()
+            updatePanelStatus('workforcePanel', 'workforceStatus', 'workforceDetails', 'workforceIndicator',
+                workforce.status, workforce.statusText, workforce.details, workforce.indicatorText)
+
+            const issues = evaluateIssues()
+            updatePanelStatus('issuesPanel', 'issuesStatus', 'issuesDetails', 'issuesIndicator',
+                issues.status, issues.statusText, issues.details, issues.indicatorText)
+
+            const service = evaluateService()
+            updatePanelStatus('servicePanel', 'serviceStatus', 'serviceDetails', 'serviceIndicator',
+                service.status, service.statusText, service.details, service.indicatorText)
+
+            // Update timestamp
+            document.getElementById('lastUpdated').textContent = 'Last updated: ' + formatTS()
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal()
+            }
+        })
+
+        // Initial load
+        updateDashboard()
+        
+        // Auto-refresh every 15 seconds
+        setInterval(updateDashboard, 15000)
+    </script>
+</body>
+</html>

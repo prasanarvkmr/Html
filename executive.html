@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Executive Summary Dashboard</title>
+    <style>
+        :root{
+            --bg:#ffffff; --card:#f8fafc; --muted:#64748b; --accent:#0ea5e9;
+            --danger:#dc2626; --warning:#ea580c; --success:#059669;
+            --text:#1e293b; --text-light:#475569; --border:#e2e8f0; --shadow:rgba(0,0,0,0.1);
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        }
+        html,body{height:100vh; margin:0; background:linear-gradient(180deg,#f1f5f9 0%, #ffffff 100%); color:var(--text)}
+        .container{max-width:1400px; margin:0 auto; padding:20px; height:100vh; display:flex; flex-direction:column}
+        
+        /* Navigation Bar */
+        .navbar{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:12px 20px;
+            background:linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,250,252,0.9));
+            border:1px solid var(--border);
+            border-radius:12px;
+            margin-bottom:8px;
+            box-shadow:0 2px 4px -1px var(--shadow);
+        }
+        .navbar-left{display:flex;align-items:center}
+        .company-logo{
+            background:var(--accent);
+            color:white;
+            padding:8px 12px;
+            border-radius:8px;
+            font-size:12px;
+            font-weight:600;
+            letter-spacing:0.5px;
+        }
+        .navbar-center{flex:1;text-align:center}
+        .dashboard-title{font-size:18px;font-weight:600;color:var(--text);margin:0}
+        .navbar-right{display:flex;align-items:center}
+        .username{font-size:14px;font-weight:600;color:var(--text)}
+        
+        /* Last Updated Section */
+        .last-updated-section{
+            display:flex;
+            justify-content:flex-end;
+            margin-bottom:12px;
+        }
+        .last-updated{
+            font-size:11px;
+            color:var(--muted);
+            background:rgba(248,250,252,0.6);
+            padding:4px 8px;
+            border-radius:6px;
+            border:1px solid var(--border);
+        }
+        
+        /* Header - Simplified */
+        .env-section{display:flex;justify-content:flex-end;margin-bottom:16px}
+        .env-pill{padding:6px 12px;border-radius:16px;background:rgba(14,165,233,0.1);color:var(--accent);font-size:11px;font-weight:600;border:1px solid rgba(14,165,233,0.2)}
+        
+        /* KPI Overview Row */
+        .kpi-overview{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+        .kpi-card{
+            background:linear-gradient(135deg, rgba(255,255,255,0.9), rgba(248,250,252,0.8));
+            padding:20px;
+            border-radius:12px;
+            text-align:center;
+            position:relative;
+            border:1px solid var(--border);
+            box-shadow:0 4px 6px -1px var(--shadow), 0 2px 4px -1px var(--shadow);
+        }
+        .kpi-card .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
+        .kpi-card .value{font-size:32px;font-weight:700;line-height:1;margin-bottom:4px;color:var(--text)}
+        .value-with-change{display:flex;align-items:baseline;justify-content:center;gap:8px;margin-bottom:4px}
+        .value-with-change .value{font-size:32px;font-weight:700;line-height:1;color:var(--text);margin:0}
+        .kpi-card .change{font-size:12px;display:flex;align-items:center;justify-content:center;gap:2px;color:var(--muted)}
+        .change-text{color:var(--muted);font-size:12px}
+        .change-with-percent{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:nowrap}
+        .kpi-card .status-dot{width:8px;height:8px;border-radius:50%;position:absolute;top:16px;right:16px}
+        .daily-change-kpi{
+            font-size:14px !important;
+            font-weight:700 !important;
+            margin:0 !important;
+            display:inline-block !important;
+            padding:4px 8px !important;
+            border-radius:6px !important;
+            background:rgba(255,255,255,0.9) !important;
+            min-width:40px !important;
+            text-align:center !important;
+            white-space:nowrap !important;
+            vertical-align:top !important;
+        }
+        .daily-change-kpi.increase{
+            color:var(--danger);
+            border-color:var(--danger);
+            background:rgba(239,68,68,0.1);
+        }
+        .daily-change-kpi.decrease{
+            color:var(--success);
+            border-color:var(--success);
+            background:rgba(34,197,94,0.1);
+        }
+        .daily-change-kpi.neutral{
+            color:var(--muted);
+            border-color:var(--muted);
+            background:rgba(107,114,128,0.1);
+        }
+        .daily-change-kpi.neutral{color:var(--muted)}
+        
+        /* Threshold Indicators - Now Icons */
+        .threshold-indicator{
+            position:absolute;
+            top:12px;
+            right:12px;
+            width:24px;
+            height:24px;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:14px;
+            font-weight:700;
+            color:white;
+        }
+        .threshold-indicator.good{
+            background-color:var(--success);
+        }
+        .threshold-indicator.good::before{
+            content:'✓';
+        }
+        .threshold-indicator.warning{
+            background-color:var(--warning);
+        }
+        .threshold-indicator.warning::before{
+            content:'!';
+        }
+        .threshold-indicator.critical{
+            background-color:var(--danger);
+        }
+        .threshold-indicator.critical::before{
+            content:'!';
+        }
+        
+        /* Enhanced Workforce Summary */
+        .workforce-summary{display:flex;flex-direction:column;align-items:center;gap:6px}
+        .workforce-status{font-size:24px;font-weight:600;color:var(--text);text-align:center}
+        .workforce-subtitle{font-size:12px;color:var(--muted);text-align:center;font-weight:500}
+        
+        /* Main Grid */
+        .main-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:20px;flex:1}
+        
+        /* Large Cards */
+        .card{
+            background:linear-gradient(135deg, rgba(255,255,255,0.9), rgba(248,250,252,0.8));
+            border-radius:12px;
+            padding:16px;
+            display:flex;
+            flex-direction:column;
+            border:1px solid var(--border);
+            box-shadow:0 4px 6px -1px var(--shadow), 0 2px 4px -1px var(--shadow);
+            max-height:280px;
+        }
+        .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+        .card-title{font-size:16px;font-weight:600;margin:0;color:var(--text)}
+        .card-subtitle{color:var(--muted);font-size:12px;margin-top:2px}
+        
+        /* Status Badge */
+        .status-badge{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            padding:4px 8px;
+            border-radius:12px;
+            font-size:11px;
+            font-weight:600;
+            background:rgba(248,250,252,0.8);
+            border:1px solid var(--border);
+        }
+        .status-badge .dot{width:6px;height:6px;border-radius:50%}
+        
+        /* System Health Grid */
+        .systems-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;flex:1;max-height:180px;overflow-y:auto}
+        .system-item{
+            background:rgba(248,250,252,0.6);
+            padding:6px 8px;
+            border-radius:6px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            border:1px solid var(--border);
+            min-height:36px;
+        }
+        .system-info{display:flex;align-items:center;gap:6px}
+        .system-info .dot{width:6px;height:6px;border-radius:50%}
+        .system-name{font-weight:500;font-size:11px;color:var(--text)}
+        .system-status{color:var(--muted);font-size:9px}
+        .system-value{font-weight:600;font-size:11px;color:var(--text)}
+        
+        /* Issues Summary */
+        .issues-summary{display:flex;gap:12px;margin-bottom:12px}
+        .issue-stat{text-align:center;flex:1}
+        .number-with-change{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:3px}
+        .issue-stat .number{font-size:20px;font-weight:700;line-height:1;color:var(--text)}
+        .issue-stat .label{color:var(--muted);font-size:10px;text-transform:uppercase;margin-top:3px}
+        .issue-stat .daily-change{
+            font-size:10px;
+            font-weight:600;
+            padding:2px 4px;
+            border-radius:3px;
+            background:rgba(255,255,255,0.8);
+        }
+        .daily-change.increase{color:var(--danger);background:rgba(239,68,68,0.1)}
+        .daily-change.decrease{color:var(--success);background:rgba(34,197,94,0.1)}
+        .daily-change.neutral{color:var(--muted);background:rgba(107,114,128,0.1)}
+        
+        /* Recent Issues */
+        .recent-issues{flex:1;overflow:hidden;max-height:140px;overflow-y:auto}
+        .issue-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--border)}
+        .issue-item:last-child{border-bottom:none}
+        .issue-left{display:flex;align-items:center;gap:8px;min-width:0}
+        .issue-left .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+        .issue-text{min-width:0}
+        .issue-id{font-weight:600;font-size:12px;color:var(--text)}
+        .issue-desc{color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .issue-time{color:var(--muted);font-size:10px;white-space:nowrap}
+        
+        /* Workforce & Call Center Metrics */
+        .workforce-metrics, .callcenter-metrics{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:8px;
+            flex:1;
+            max-height:180px;
+            overflow-y:auto;
+        }
+        .metric-card{
+            background:rgba(248,250,252,0.6);
+            border:1px solid var(--border);
+            border-radius:6px;
+            padding:8px;
+            text-align:center;
+            display:flex;
+            flex-direction:column;
+            gap:4px;
+        }
+        .metric-card .metric-label{
+            font-size:10px;
+            color:var(--muted);
+            text-transform:uppercase;
+            font-weight:500;
+            letter-spacing:0.5px;
+        }
+        .metric-card .metric-value{
+            font-size:16px;
+            font-weight:700;
+            color:var(--text);
+            line-height:1;
+        }
+        .metric-card .metric-value.positive{color:var(--success)}
+        .metric-card .metric-value.negative{color:var(--danger)}
+        .metric-card .metric-value.warning{color:var(--warning)}
+        
+        /* Legacy metric row styles - keeping for compatibility */
+        .metric-row{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:6px 0;
+            border-bottom:1px dashed var(--border);
+        }
+        .metric-row:last-child{border-bottom:none}
+        .metric-label{font-size:12px;color:var(--text);font-weight:500}
+        .metric-value{font-size:12px;font-weight:600;color:var(--text)}
+        .metric-value.positive{color:var(--success)}
+        .metric-value.negative{color:var(--danger)}
+        .metric-value.warning{color:var(--warning)}
+        
+        /* Responsive */
+        @media (max-width:1200px){
+            .kpi-overview{grid-template-columns:repeat(2,1fr)}
+            .main-grid{grid-template-columns:1fr;gap:16px}
+            .systems-grid{grid-template-columns:repeat(2,1fr)}
+        }
+        @media (max-width:768px){
+            .kpi-overview{grid-template-columns:1fr}
+            .systems-grid{grid-template-columns:1fr}
+            .issues-summary{flex-direction:column;gap:8px}
+            .navbar{flex-direction:column;gap:8px;text-align:center}
+            .navbar-left, .navbar-right{justify-content:center}
+            .main-grid{grid-template-columns:1fr;grid-template-rows:auto;gap:16px}
+            .last-updated-section{justify-content:center}
+            .workforce-metrics, .callcenter-metrics{grid-template-columns:1fr;gap:6px}
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="navbar-left">
+                <div class="company-logo">ACME CORP</div>
+            </div>
+            <div class="navbar-center">
+                <h1 class="dashboard-title">Executive Dashboard</h1>
+            </div>
+            <div class="navbar-right">
+                <div class="username">John Smith</div>
+            </div>
+        </nav>
+
+        <!-- Last Updated Section -->
+        <div class="last-updated-section">
+            <div class="last-updated" id="lastUpdated">Last updated: --</div>
+        </div>
+
+        <!-- Environment Indicator -->
+        <div class="env-section">
+            <div class="env-pill">Production</div>
+        </div>
+
+        <!-- KPI Overview Row -->
+        <section class="kpi-overview">
+            <div class="kpi-card">
+                <div class="threshold-indicator" id="overallThreshold"></div>
+                <div class="label">Overall Health</div>
+                <div class="value" id="overallHealth">--%</div>
+                <div class="change" id="healthChange">
+                    <span>--</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="threshold-indicator" id="workforceThreshold"></div>
+                <div class="label">Workforce Status</div>
+                <div class="workforce-summary">
+                    <div class="workforce-status" id="workforceStatus">--</div>
+                    <div class="workforce-subtitle">
+                        <span id="agentsOnlineKPI">--</span> / <span id="agentsScheduledKPI">--</span> agents online
+                    </div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="threshold-indicator" id="issuesThreshold"></div>
+                <div class="label">Critical Issues</div>
+                <div class="value-with-change">
+                    <span class="value" id="criticalCount">--</span>
+                    <span class="daily-change-kpi increase" id="criticalDailyChange">+15%</span>
+                </div>
+                <div class="change">
+                    <span class="change-text" id="issuesChange">-- total open</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="threshold-indicator" id="serviceThreshold"></div>
+                <div class="label">Service Level</div>
+                <div class="value" id="serviceLevel">--%</div>
+                <div class="change" id="serviceChange">
+                    <span>-- calls/hr</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content Grid -->
+        <main class="main-grid">
+            <!-- System Health -->
+            <section class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">System Health</div>
+                        <div class="card-subtitle">Core infrastructure status</div>
+                    </div>
+                    <div class="threshold-indicator" id="systemThreshold"></div>
+                </div>
+                <div class="systems-grid" id="systemsGrid">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+            <!-- Issues & Alerts -->
+            <section class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Active Issues</div>
+                        <div class="card-subtitle">Critical & high priority</div>
+                    </div>
+                    <div class="threshold-indicator" id="issuesDetailThreshold"></div>
+                </div>
+                
+                <div class="issues-summary">
+                    <div class="issue-stat">
+                        <div class="number-with-change">
+                            <span class="number" id="p0Issues">--</span>
+                            <span class="daily-change increase" id="p0Change">+12%</span>
+                        </div>
+                        <div class="label">P0</div>
+                    </div>
+                    <div class="issue-stat">
+                        <div class="number-with-change">
+                            <span class="number" id="p1Issues">--</span>
+                            <span class="daily-change decrease" id="p1Change">-5%</span>
+                        </div>
+                        <div class="label">P1</div>
+                    </div>
+                    <div class="issue-stat">
+                        <div class="number-with-change">
+                            <span class="number" id="totalIssues">--</span>
+                            <span class="daily-change increase" id="totalChange">+8%</span>
+                        </div>
+                        <div class="label">Total</div>
+                    </div>
+                </div>
+
+                <div class="recent-issues" id="recentIssues">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+            <!-- Workforce Details -->
+            <section class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Workforce Details</div>
+                        <div class="card-subtitle">Staffing breakdown</div>
+                    </div>
+                    <div class="threshold-indicator" id="workforceDetailThreshold"></div>
+                </div>
+                
+                <div class="workforce-metrics">
+                    <div class="metric-card">
+                        <div class="metric-label">Scheduled</div>
+                        <div class="metric-value" id="agentsScheduled">--</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Online</div>
+                        <div class="metric-value" id="agentsOnline">--</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Variance</div>
+                        <div class="metric-value" id="agentsVariance">--</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Ratio</div>
+                        <div class="metric-value" id="staffingRatio">--</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Call Center Performance -->
+            <section class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Call Center Performance</div>
+                        <div class="card-subtitle">Service metrics</div>
+                    </div>
+                    <div class="threshold-indicator" id="callCenterThreshold"></div>
+                </div>
+                
+                <div class="callcenter-metrics">
+                    <div class="metric-card">
+                        <div class="metric-label">Service Level</div>
+                        <div class="metric-value" id="slaDetail">--</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Avg Wait</div>
+                        <div class="metric-value" id="avgWaitTime">--</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Abandonment</div>
+                        <div class="metric-value" id="abandonmentRate">--</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">FCR</div>
+                        <div class="metric-value" id="firstCallResolution">--</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">In Queue</div>
+                        <div class="metric-value" id="callsInQueue">--</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Utilization</div>
+                        <div class="metric-value" id="agentUtilization">--</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min}
+        function formatTS(){return new Date().toLocaleString()}
+        function setText(id,val){
+            const el = document.getElementById(id)
+            if(el) el.textContent = val
+        }
+
+        function setStatusDot(id, status) {
+            const dot = document.getElementById(id)
+            if (!dot) return
+            const colors = {
+                good: 'var(--success)',
+                warning: 'var(--warning)', 
+                critical: 'var(--danger)'
+            }
+            dot.style.background = colors[status] || colors.good
+        }
+
+        function setBadge(id, status, text) {
+            const badge = document.getElementById(id)
+            if (!badge) return
+            const dot = badge.querySelector('.dot')
+            const span = badge.querySelector('span')
+            
+            const colors = {
+                good: 'var(--success)',
+                warning: 'var(--warning)',
+                critical: 'var(--danger)'
+            }
+            
+            if (dot) dot.style.background = colors[status] || colors.good
+            if (span) span.textContent = text
+        }
+
+        function setThreshold(id, status) {
+            const indicator = document.getElementById(id)
+            if (!indicator) return
+            
+            indicator.className = `threshold-indicator ${status}`
+        }
+
+        function evaluateSystem(name, type) {
+            let health = rand(85, 100)
+            let status = 'good'
+            let note = ''
+
+            if (type === 'IVR') {
+                const errorRate = rand(0, 6)
+                health = Math.max(60, 100 - errorRate * 8)
+                note = `${errorRate}% errors`
+                status = errorRate > 4 ? 'critical' : errorRate > 2 ? 'warning' : 'good'
+            } else if (type === 'Genesys') {
+                const servicesDown = rand(0, 1)
+                health = servicesDown > 0 ? 65 : 98
+                note = servicesDown > 0 ? 'Service down' : 'All up'
+                status = servicesDown > 0 ? 'critical' : 'good'
+            } else if (type === 'DB') {
+                const lag = rand(0, 200)
+                health = Math.max(70, 100 - (lag / 200) * 30)
+                note = `${lag}s lag`
+                status = lag > 120 ? 'critical' : lag > 60 ? 'warning' : 'good'
+            } else {
+                const errorRate = rand(0, 5)
+                health = Math.max(75, 100 - errorRate * 5)
+                note = `${errorRate}% errors`
+                status = errorRate > 3 ? 'critical' : errorRate > 1 ? 'warning' : 'good'
+            }
+
+            return { name, health, status, note }
+        }
+
+        function updateDashboard() {
+            // Generate system data
+            const systems = [
+                evaluateSystem('Auth', 'API'),
+                evaluateSystem('Payments', 'API'), 
+                evaluateSystem('API Gateway', 'API'),
+                evaluateSystem('IVR', 'IVR'),
+                evaluateSystem('Genesys', 'Genesys'),
+                evaluateSystem('Database', 'DB')
+            ]
+
+            // Overall health calculation
+            const avgHealth = Math.round(systems.reduce((sum, s) => sum + s.health, 0) / systems.length)
+            const criticalSystems = systems.filter(s => s.status === 'critical').length
+            const warningSystems = systems.filter(s => s.status === 'warning').length
+            const operationalSystems = systems.filter(s => s.status === 'good').length
+            const totalSystems = systems.length
+            
+            let overallStatus = 'good'
+            if (criticalSystems > 0) overallStatus = 'critical'
+            else if (warningSystems > 1) overallStatus = 'warning'
+
+            // Update KPI cards
+            setText('overallHealth', `${operationalSystems}/${totalSystems}`)
+            setText('healthChange', criticalSystems > 0 ? `${criticalSystems} critical` : 'All systems operational')
+
+            // Workforce
+            const agentsScheduled = rand(220, 280)
+            const agentsOnline = rand(180, 320)
+            const variance = agentsOnline - agentsScheduled
+            const staffingRatio = (agentsOnline / agentsScheduled) * 100
+            
+            let staffingStatus, workforceStatus
+            if (agentsOnline >= agentsScheduled) {
+                staffingStatus = 'Fully Staffed'
+                workforceStatus = 'good'
+            } else {
+                const understaffedPct = Math.round(((agentsScheduled - agentsOnline) / agentsScheduled) * 100)
+                staffingStatus = `Understaffed ${understaffedPct}%`
+                workforceStatus = understaffedPct > 15 ? 'critical' : understaffedPct > 8 ? 'warning' : 'good'
+            }
+            
+            // Update new workforce summary format
+            setText('workforceStatus', staffingStatus)
+            setText('agentsOnlineKPI', agentsOnline)
+            setText('agentsScheduledKPI', agentsScheduled)
+            
+            // Store workforce data for details panel
+            window.workforceData = { agentsScheduled, agentsOnline, variance, staffingRatio }
+
+            // Issues
+            const p0Count = rand(0, 2)
+            const p1Count = rand(1, 5) 
+            const totalIssues = p0Count + p1Count + rand(2, 8)
+            
+            // Calculate daily changes (simulate compared to yesterday)
+            const p0Change = rand(-50, 50) // percentage change
+            const p1Change = rand(-30, 40)
+            const totalChange = rand(-20, 30)
+            const criticalChange = rand(-40, 60) // Combined P0+P1 change
+            
+            setText('criticalCount', p0Count + p1Count)
+            
+            // Update the change text element in the new structure
+            const changeTextEl = document.querySelector('#issuesChange')
+            if (changeTextEl) {
+                changeTextEl.textContent = totalIssues + ' total open'
+            }
+            
+            setText('p0Issues', p0Count)
+            setText('p1Issues', p1Count)
+            setText('totalIssues', totalIssues)
+            
+            // Update KPI daily change for critical issues - simplified approach
+            const sign = criticalChange > 0 ? '+' : ''
+            const changeText = `${sign}${criticalChange}%`
+            const changeClass = criticalChange > 0 ? 'daily-change-kpi increase' : 
+                               criticalChange < 0 ? 'daily-change-kpi decrease' : 
+                               'daily-change-kpi neutral'
+            
+            setText('criticalDailyChange', changeText)
+            const criticalDailyEl = document.getElementById('criticalDailyChange')
+            if (criticalDailyEl) {
+                criticalDailyEl.className = changeClass
+            }
+            
+            // Update daily change indicators
+            const updateChange = (id, change) => {
+                const el = document.getElementById(id)
+                if (el) {
+                    const sign = change > 0 ? '+' : ''
+                    el.textContent = `${sign}${change}%`
+                    el.className = change > 0 ? 'daily-change increase' : 
+                                  change < 0 ? 'daily-change decrease' : 
+                                  'daily-change neutral'
+                }
+            }
+            
+            updateChange('p0Change', p0Change)
+            updateChange('p1Change', p1Change)
+            updateChange('totalChange', totalChange)
+
+            // Service Level - Comprehensive Call Center Metrics
+            const sla = rand(82, 98)
+            const callsPerHour = rand(400, 650)
+            const avgWaitTime = rand(15, 180) // seconds
+            const avgHandleTime = rand(240, 420) // seconds
+            const firstCallResolution = rand(65, 85)
+            const abandonmentRate = rand(2, 12)
+            const callsInQueue = rand(5, 45)
+            const longestWaitTime = rand(60, 300)
+            const agentUtilization = rand(70, 95)
+            
+            let serviceStatus = 'good'
+            if (sla < 80 || abandonmentRate > 8 || avgWaitTime > 120) serviceStatus = 'critical'
+            else if (sla < 90 || abandonmentRate > 5 || avgWaitTime > 60) serviceStatus = 'warning'
+            
+            setText('serviceLevel', sla + '%')
+            setText('serviceChange', callsPerHour + ' calls/hr')
+            
+            // Store call center data for details panel
+            window.callCenterData = { 
+                sla, callsPerHour, avgWaitTime, avgHandleTime, firstCallResolution, 
+                abandonmentRate, callsInQueue, longestWaitTime, agentUtilization 
+            }
+
+            // Update threshold indicators
+            setThreshold('overallThreshold', overallStatus)
+
+            setThreshold('workforceThreshold', workforceStatus)
+
+            const issuesStatus = p0Count > 0 ? 'critical' : p1Count > 3 ? 'warning' : 'good'
+            setThreshold('issuesThreshold', issuesStatus)
+
+            setThreshold('serviceThreshold', serviceStatus)
+
+            // Update detail panel thresholds
+            setThreshold('systemThreshold', overallStatus)
+
+            setThreshold('issuesDetailThreshold', issuesStatus)
+
+            setThreshold('workforceDetailThreshold', workforceStatus)
+
+            setThreshold('callCenterThreshold', serviceStatus)
+
+            // Update workforce details
+            setText('agentsScheduled', agentsScheduled)
+            setText('agentsOnline', agentsOnline)
+            
+            const varianceEl = document.getElementById('agentsVariance')
+            if (varianceEl) {
+                varianceEl.textContent = variance >= 0 ? `+${variance}` : variance
+                varianceEl.className = variance >= 0 ? 'metric-value positive' : 'metric-value negative'
+            }
+            
+            setText('staffingRatio', Math.round(staffingRatio) + '%')
+
+            // Update call center details
+            setText('slaDetail', sla + '%')
+            setText('avgWaitTime', Math.floor(avgWaitTime / 60) + 'm ' + (avgWaitTime % 60) + 's')
+            setText('abandonmentRate', abandonmentRate.toFixed(1) + '%')
+            setText('firstCallResolution', firstCallResolution + '%')
+            setText('callsInQueue', callsInQueue)
+            setText('agentUtilization', agentUtilization + '%')
+
+            // Render systems grid
+            const systemsGrid = document.getElementById('systemsGrid')
+            if (systemsGrid) {
+                systemsGrid.innerHTML = ''
+                systems.forEach(sys => {
+                    const el = document.createElement('div')
+                    el.className = 'system-item'
+                    
+                    const colors = {
+                        good: 'var(--success)',
+                        warning: 'var(--warning)',
+                        critical: 'var(--danger)'
+                    }
+                    
+                    el.innerHTML = `
+                        <div class="system-info">
+                            <div class="dot" style="background:${colors[sys.status]}"></div>
+                            <div>
+                                <div class="system-name">${sys.name}</div>
+                                <div class="system-status">${sys.note}</div>
+                            </div>
+                        </div>
+                        <div class="system-value">${sys.health}%</div>
+                    `
+                    systemsGrid.appendChild(el)
+                })
+            }
+
+            // Render recent issues (top 5)
+            const recentIssues = document.getElementById('recentIssues')
+            if (recentIssues) {
+                recentIssues.innerHTML = ''
+                
+                const issues = []
+                for (let i = 0; i < Math.min(totalIssues, 5); i++) {
+                    const severity = i < p0Count ? 'P0' : i < p0Count + p1Count ? 'P1' : 'P2'
+                    const descriptions = ['Payment gateway errors', 'API timeouts', 'Auth service slow', 'Queue backlog', 'DB connection issues']
+                    issues.push({
+                        id: 'INC' + (100000 + rand(0, 99999)),
+                        severity,
+                        description: descriptions[rand(0, descriptions.length - 1)],
+                        time: rand(5, 240) + 'm'
+                    })
+                }
+
+                issues.forEach(issue => {
+                    const el = document.createElement('div')
+                    el.className = 'issue-item'
+                    
+                    const colors = {
+                        P0: 'var(--danger)',
+                        P1: 'var(--warning)',
+                        P2: 'var(--success)'
+                    }
+                    
+                    el.innerHTML = `
+                        <div class="issue-left">
+                            <div class="dot" style="background:${colors[issue.severity]}"></div>
+                            <div class="issue-text">
+                                <div class="issue-id">${issue.severity} ${issue.id}</div>
+                                <div class="issue-desc">${issue.description}</div>
+                            </div>
+                        </div>
+                        <div class="issue-time">${issue.time}</div>
+                    `
+                    recentIssues.appendChild(el)
+                })
+            }
+
+            setText('lastUpdated', formatTS())
+        }
+
+        // Initial load
+        updateDashboard()
+        // Refresh every 10 seconds
+        setInterval(updateDashboard, 10000)
+    </script>
+</body>
+</html>

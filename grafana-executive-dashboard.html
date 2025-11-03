@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Grafana Executive Dashboard</title>
+    <style>
+        :root{
+            --bg:#ffffff; --card:#f8fafc; --muted:#64748b; --accent:#0ea5e9;
+            --danger:#dc2626; --warning:#ea580c; --success:#059669;
+            --text:#1e293b; --text-light:#475569; --border:#e2e8f0; --shadow:rgba(0,0,0,0.1);
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        }
+        html,body{height:100vh; margin:0; background:linear-gradient(180deg,#f1f5f9 0%, #ffffff 100%); color:var(--text)}
+        .container{max-width:1400px; margin:0 auto; padding:20px; height:100vh; display:flex; flex-direction:column}
+        
+        /* Navigation Bar */
+        .navbar{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:12px 20px;
+            background:linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,250,252,0.9));
+            border:1px solid var(--border);
+            border-radius:8px;
+            margin-bottom:8px;
+            box-shadow:0 2px 4px -1px var(--shadow);
+        }
+        .navbar-left{display:flex;align-items:center}
+        .company-logo{
+            background:var(--accent);
+            color:white;
+            padding:8px 12px;
+            border-radius:8px;
+            font-size:12px;
+            font-weight:600;
+            letter-spacing:0.5px;
+        }
+        .navbar-center{flex:1;text-align:center}
+        .dashboard-title{font-size:20px;font-weight:600;color:var(--text);margin:0}
+        .navbar-right{display:flex;align-items:center}
+        .username{font-size:14px;font-weight:600;color:var(--text)}
+        
+        /* Status Bar */
+        .status-bar{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:8px 20px;
+            background:rgba(248,250,252,0.6);
+            border:1px solid var(--border);
+            border-radius:6px;
+            margin-bottom:16px;
+            font-size:11px;
+            color:var(--muted);
+        }
+        .status-left{display:flex;align-items:center;gap:16px}
+        .status-right{display:flex;align-items:center;gap:12px}
+        .refresh-interval{background:rgba(248,250,252,0.8);padding:4px 8px;border-radius:4px;border:1px solid var(--border)}
+        .last-updated{color:var(--muted)}
+        
+        /* Business Text Plugin Style KPIs */
+        .business-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+        .business-kpi{
+            background:linear-gradient(135deg, rgba(255,255,255,0.9), rgba(248,250,252,0.8));
+            padding:16px;
+            border-radius:8px;
+            text-align:center;
+            position:relative;
+            border:1px solid var(--border);
+            box-shadow:0 2px 4px -1px var(--shadow);
+            min-height:100px;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+        }
+        .business-kpi .metric-label{
+            color:var(--muted);
+            font-size:11px;
+            text-transform:uppercase;
+            letter-spacing:0.8px;
+            margin-bottom:8px;
+            font-weight:600;
+        }
+        .business-kpi .metric-value{
+            font-size:28px;
+            font-weight:700;
+            line-height:1;
+            margin-bottom:6px;
+            color:var(--text);
+        }
+        .business-kpi .metric-change{
+            font-size:11px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:4px;
+            color:var(--muted);
+        }
+        .business-kpi .status-icon{
+            position:absolute;
+            top:12px;
+            right:12px;
+            width:20px;
+            height:20px;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:12px;
+            font-weight:700;
+            color:white;
+        }
+        .status-icon.operational{background-color:var(--success)}
+        .status-icon.operational::before{content:'✓'}
+        .status-icon.warning{background-color:var(--warning)}
+        .status-icon.warning::before{content:'!'}
+        .status-icon.critical{background-color:var(--danger)}
+        .status-icon.critical::before{content:'!'}
+        
+        /* Business Charts Plugin Style Grid */
+        .business-charts{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);gap:20px;flex:1}
+        
+        /* Chart Panel Base Style */
+        .chart-panel{
+            background:linear-gradient(135deg, rgba(255,255,255,0.9), rgba(248,250,252,0.8));
+            border-radius:8px;
+            padding:16px;
+            display:flex;
+            flex-direction:column;
+            border:1px solid var(--border);
+            box-shadow:0 2px 4px -1px var(--shadow);
+            position:relative;
+        }
+        .chart-header{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            margin-bottom:12px;
+            padding-bottom:8px;
+            border-bottom:1px solid var(--border);
+        }
+        .chart-title{font-size:16px;font-weight:600;margin:0;color:var(--text);display:flex;align-items:center;gap:8px}
+        .chart-subtitle{font-size:11px;color:var(--muted);margin-top:2px}
+        .chart-status{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            padding:4px 8px;
+            border-radius:6px;
+            font-size:10px;
+            font-weight:600;
+            background:rgba(248,250,252,0.8);
+            border:1px solid var(--border);
+        }
+        .chart-status .dot{width:6px;height:6px;border-radius:50%}
+        
+        /* Databricks Data Grid */
+        .data-grid{display:grid;gap:8px;flex:1;max-height:200px;overflow-y:auto}
+        .data-grid.systems{grid-template-columns:repeat(3,1fr)}
+        .data-grid.metrics{grid-template-columns:repeat(2,1fr)}
+        .data-item{
+            background:rgba(248,250,252,0.6);
+            padding:8px 12px;
+            border-radius:6px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            border:1px solid var(--border);
+            min-height:40px;
+        }
+        .data-item-left{display:flex;align-items:center;gap:8px}
+        .data-item-left .indicator{width:8px;height:8px;border-radius:50%}
+        .data-item-name{font-weight:500;font-size:12px;color:var(--text)}
+        .data-item-detail{color:var(--muted);font-size:10px}
+        .data-item-value{font-weight:600;font-size:12px;color:var(--text)}
+        
+        /* Issues List with ServiceNow Integration Style */
+        .issues-summary{display:flex;gap:12px;margin-bottom:12px}
+        .issue-stat{text-align:center;flex:1;background:rgba(248,250,252,0.6);padding:8px;border-radius:6px;border:1px solid var(--border)}
+        .issue-stat .number{font-size:18px;font-weight:700;line-height:1;color:var(--text)}
+        .issue-stat .label{color:var(--muted);font-size:9px;text-transform:uppercase;margin-top:3px}
+        .issue-stat .trend{font-size:9px;margin-top:2px;font-weight:600}
+        .trend.positive{color:var(--success)}
+        .trend.negative{color:var(--danger)}
+        .trend.neutral{color:var(--muted)}
+        
+        .issues-list{flex:1;overflow:hidden;max-height:140px;overflow-y:auto}
+        .issue-item{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:6px 0;
+            border-bottom:1px dashed var(--border);
+            font-size:11px;
+        }
+        .issue-item:last-child{border-bottom:none}
+        .issue-left{display:flex;align-items:center;gap:6px;min-width:0}
+        .issue-left .priority-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+        .issue-text{min-width:0}
+        .issue-id{font-weight:600;font-size:11px;color:var(--text)}
+        .issue-desc{color:var(--muted);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .issue-time{color:var(--muted);font-size:9px;white-space:nowrap}
+        
+        /* Grafana Query Simulation - Hidden */
+        .query-info{
+            display:none; /* Hidden from UI as requested */
+            position:absolute;
+            top:8px;
+            right:8px;
+            background:rgba(14,165,233,0.1);
+            color:var(--accent);
+            padding:2px 6px;
+            border-radius:3px;
+            font-size:8px;
+            font-weight:600;
+            opacity:0;
+            transition:opacity 0.2s;
+        }
+        
+        /* Responsive Design */
+        @media (max-width:1200px){
+            .business-kpis{grid-template-columns:repeat(2,1fr)}
+            .business-charts{grid-template-columns:1fr;gap:16px}
+            .data-grid.systems{grid-template-columns:repeat(2,1fr)}
+        }
+        @media (max-width:768px){
+            .business-kpis{grid-template-columns:1fr}
+            .data-grid.systems, .data-grid.metrics{grid-template-columns:1fr}
+            .navbar{flex-direction:column;gap:8px;text-align:center}
+            .navbar-left, .navbar-right{justify-content:center}
+            .status-bar{flex-direction:column;gap:8px;text-align:center}
+            .issues-summary{flex-direction:column;gap:6px}
+        }
+        
+        /* Databricks Connection Indicator */
+        .connection-status{
+            display:flex;
+            align-items:center;
+            gap:6px;
+            font-size:11px;
+            color:var(--muted);
+        }
+        .connection-dot{
+            width:8px;
+            height:8px;
+            border-radius:50%;
+            background:var(--success);
+            animation:pulse 2s infinite;
+        }
+        @keyframes pulse{
+            0%{opacity:1}
+            50%{opacity:0.5}
+            100%{opacity:1}
+        }
+        
+        /* Grafana Panel Hover Effects */
+        .chart-panel:hover{
+            transform:translateY(-1px);
+            box-shadow:0 4px 12px -2px var(--shadow);
+            transition:all 0.2s ease;
+        }
+        
+        /* Business Plugin Color Coding */
+        .metric-value.systems{color:var(--accent)}
+        .metric-value.workforce{color:var(--success)}
+        .metric-value.issues{color:var(--danger)}
+        .metric-value.performance{color:var(--warning)}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="navbar-left">
+                <div class="company-logo">ACME CORP</div>
+            </div>
+            <div class="navbar-center">
+                <h1 class="dashboard-title">Executive Operations Dashboard</h1>
+            </div>
+            <div class="navbar-right">
+                <div class="username">John Smith</div>
+            </div>
+        </nav>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-left">
+                <div class="connection-status">
+                    <span class="connection-dot"></span>
+                    <span>Databricks Connected</span>
+                </div>
+                <div class="refresh-interval">Auto-refresh: 30s</div>
+            </div>
+            <div class="status-right">
+                <div class="last-updated" id="lastUpdated">--</div>
+            </div>
+        </div>
+
+        <!-- Business Text Plugin Style KPIs -->
+        <section class="business-kpis">
+            <div class="business-kpi">
+                <div class="status-icon" id="systemsIcon"></div>
+                <div class="metric-label">System Health</div>
+                <div class="metric-value systems" id="systemsHealth">--</div>
+                <div class="metric-change" id="systemsChange">-- systems operational</div>
+            </div>
+            <div class="business-kpi">
+                <div class="status-icon" id="workforceIcon"></div>
+                <div class="metric-label">Workforce Ready</div>
+                <div class="metric-value workforce" id="workforceReady">--%</div>
+                <div class="metric-change" id="workforceChange">-- agents online</div>
+            </div>
+            <div class="business-kpi">
+                <div class="status-icon" id="issuesIcon"></div>
+                <div class="metric-label">Critical Issues</div>
+                <div class="metric-value issues" id="criticalIssues">--</div>
+                <div class="metric-change" id="issuesChange">-- total incidents</div>
+            </div>
+            <div class="business-kpi">
+                <div class="status-icon" id="performanceIcon"></div>
+                <div class="metric-label">Service Level</div>
+                <div class="metric-value performance" id="serviceLevel">--%</div>
+                <div class="metric-change" id="performanceChange">-- calls/hour</div>
+            </div>
+        </section>
+
+        <!-- Business Charts Plugin Style Grid -->
+        <main class="business-charts">
+            <!-- System Health Chart Panel -->
+            <section class="chart-panel">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">System Health Overview</div>
+                        <div class="chart-subtitle">Core infrastructure monitoring</div>
+                    </div>
+                    <div class="chart-status" id="systemsStatus">
+                        <span class="dot" style="background:var(--success)"></span>
+                        <span id="systemsStatusText">Operational</span>
+                    </div>
+                </div>
+                <div class="data-grid systems" id="systemsGrid">
+                    <!-- Populated by Databricks query simulation -->
+                </div>
+            </section>
+
+            <!-- Workforce Analytics Chart Panel -->
+            <section class="chart-panel">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Workforce Analytics</div>
+                        <div class="chart-subtitle">Staffing levels and capacity</div>
+                    </div>
+                    <div class="chart-status" id="workforceStatus">
+                        <span class="dot" style="background:var(--success)"></span>
+                        <span id="workforceStatusText">Optimal</span>
+                    </div>
+                </div>
+                <div class="data-grid metrics" id="workforceGrid">
+                    <!-- Populated by Databricks query simulation -->
+                </div>
+            </section>
+
+            <!-- ServiceNow Issues Chart Panel -->
+            <section class="chart-panel">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Active Issues</div>
+                        <div class="chart-subtitle">Incident management</div>
+                    </div>
+                    <div class="chart-status" id="issuesStatus">
+                        <span class="dot" style="background:var(--success)"></span>
+                        <span id="issuesStatusText">Controlled</span>
+                    </div>
+                </div>
+                
+                <div class="issues-summary">
+                    <div class="issue-stat">
+                        <div class="number" id="p0Count">--</div>
+                        <div class="label">P0</div>
+                        <div class="trend" id="p0Trend">--</div>
+                    </div>
+                    <div class="issue-stat">
+                        <div class="number" id="p1Count">--</div>
+                        <div class="label">P1</div>
+                        <div class="trend" id="p1Trend">--</div>
+                    </div>
+                    <div class="issue-stat">
+                        <div class="number" id="totalIssuesCount">--</div>
+                        <div class="label">Total</div>
+                        <div class="trend" id="totalTrend">--</div>
+                    </div>
+                </div>
+
+                <div class="issues-list" id="issuesList">
+                    <!-- Populated by ServiceNow integration -->
+                </div>
+            </section>
+
+            <!-- Call Center Performance Chart Panel -->
+            <section class="chart-panel">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Call Center Performance</div>
+                        <div class="chart-subtitle">Service level monitoring</div>
+                    </div>
+                    <div class="chart-status" id="callCenterStatus">
+                        <span class="dot" style="background:var(--success)"></span>
+                        <span id="callCenterStatusText">Meeting SLA</span>
+                    </div>
+                </div>
+                <div class="data-grid metrics" id="callCenterGrid">
+                    <!-- Populated by call center metrics -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Databricks Query Simulation Functions
+        function simulateDatabricksQuery(query, params = {}) {
+            // Simulate connection delay and data processing
+            console.log(`[Databricks] Executing: ${query}`, params)
+            
+            // Return promise to simulate async data fetching
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve(generateMockData(query))
+                }, Math.random() * 500 + 100) // 100-600ms delay
+            })
+        }
+
+        function generateMockData(query) {
+            if (query.includes('systems_health')) {
+                return generateSystemsData()
+            } else if (query.includes('workforce_metrics')) {
+                return generateWorkforceData()
+            } else if (query.includes('servicenow_incidents')) {
+                return generateIncidentsData()
+            } else if (query.includes('call_center_metrics')) {
+                return generateCallCenterData()
+            }
+            return {}
+        }
+
+        // Data Generation Functions (simulating Databricks responses)
+        function generateSystemsData() {
+            const systems = [
+                { name: 'Authentication', type: 'API', health: rand(85, 100), errorRate: rand(0, 5), responseTime: rand(50, 200) },
+                { name: 'Payments', type: 'API', health: rand(80, 100), errorRate: rand(0, 3), responseTime: rand(80, 300) },
+                { name: 'API Gateway', type: 'Gateway', health: rand(85, 100), errorRate: rand(0, 4), responseTime: rand(40, 150) },
+                { name: 'IVR Platform', type: 'IVR', health: rand(75, 100), errorRate: rand(0, 8), responseTime: rand(100, 400) },
+                { name: 'Genesys Cloud', type: 'Contact', health: rand(80, 100), errorRate: rand(0, 6), responseTime: rand(200, 600) },
+                { name: 'Database Cluster', type: 'Database', health: rand(85, 100), errorRate: rand(0, 2), responseTime: rand(20, 100) }
+            ]
+
+            return {
+                systems,
+                overall_health: Math.round(systems.reduce((sum, s) => sum + s.health, 0) / systems.length),
+                operational_count: systems.filter(s => s.health >= 90).length,
+                degraded_count: systems.filter(s => s.health >= 75 && s.health < 90).length,
+                critical_count: systems.filter(s => s.health < 75).length,
+                total_count: systems.length
+            }
+        }
+
+        function generateWorkforceData() {
+            const scheduledAgents = rand(220, 280)
+            const onlineAgents = rand(180, 320)
+            const readiness = Math.round((onlineAgents / scheduledAgents) * 100)
+            
+            return {
+                scheduled_agents: scheduledAgents,
+                online_agents: onlineAgents,
+                readiness_percentage: readiness,
+                variance: onlineAgents - scheduledAgents,
+                utilization: rand(70, 95),
+                departments: [
+                    { name: 'Customer Support', scheduled: rand(80, 120), online: rand(70, 110) },
+                    { name: 'Technical Support', scheduled: rand(40, 80), online: rand(35, 75) },
+                    { name: 'Billing Support', scheduled: rand(30, 60), online: rand(25, 55) },
+                    { name: 'Sales', scheduled: rand(50, 90), online: rand(45, 85) }
+                ]
+            }
+        }
+
+        function generateIncidentsData() {
+            const p0Count = rand(0, 2)
+            const p1Count = rand(0, 5)
+            const p2Count = rand(2, 10)
+            const totalIssues = p0Count + p1Count + p2Count
+            
+            // Generate mock incidents
+            const incidents = []
+            const severities = ['P0', 'P1', 'P2']
+            const services = ['Payment Gateway', 'Authentication Service', 'API Platform', 'IVR System', 'Customer Portal']
+            const descriptions = [
+                'Service unavailable', 'Performance degradation', 'Connection timeout', 
+                'Database lag', 'API rate limiting', 'Queue backlog'
+            ]
+            
+            for (let i = 0; i < Math.min(totalIssues, 8); i++) {
+                const severity = i < p0Count ? 'P0' : i < p0Count + p1Count ? 'P1' : 'P2'
+                const minutesAgo = rand(5, 720) // 5 minutes to 12 hours
+                incidents.push({
+                    number: 'INC' + (100000 + rand(0, 99999)),
+                    severity,
+                    service: services[rand(0, services.length - 1)],
+                    description: descriptions[rand(0, descriptions.length - 1)],
+                    age_minutes: minutesAgo,
+                    status: ['Open', 'In Progress', 'Assigned'][rand(0, 2)]
+                })
+            }
+            
+            return {
+                p0_count: p0Count,
+                p1_count: p1Count,
+                p2_count: p2Count,
+                total_count: totalIssues,
+                critical_count: p0Count + p1Count,
+                incidents: incidents.sort((a, b) => {
+                    const severityOrder = { 'P0': 0, 'P1': 1, 'P2': 2 }
+                    return severityOrder[a.severity] - severityOrder[b.severity]
+                }),
+                daily_trends: {
+                    p0_change: rand(-50, 30),
+                    p1_change: rand(-40, 40),
+                    total_change: rand(-30, 25)
+                }
+            }
+        }
+
+        function generateCallCenterData() {
+            const serviceLevel = rand(75, 98)
+            const callsPerHour = rand(400, 650)
+            const avgWaitTime = rand(15, 120)
+            
+            return {
+                service_level: serviceLevel,
+                calls_per_hour: callsPerHour,
+                avg_wait_time: avgWaitTime,
+                abandon_rate: (Math.random() * 8).toFixed(1),
+                avg_handle_time: rand(180, 420),
+                first_call_resolution: rand(65, 85),
+                agent_utilization: rand(70, 95),
+                queue_depth: rand(5, 45),
+                metrics: [
+                    { name: 'Service Level', value: serviceLevel + '%', target: '90%' },
+                    { name: 'Abandon Rate', value: (Math.random() * 8).toFixed(1) + '%', target: '<5%' },
+                    { name: 'Avg Wait Time', value: avgWaitTime + 's', target: '<60s' },
+                    { name: 'FCR', value: rand(65, 85) + '%', target: '>80%' },
+                    { name: 'Agent Utilization', value: rand(70, 95) + '%', target: '80-85%' },
+                    { name: 'Queue Depth', value: rand(5, 45).toString(), target: '<20' }
+                ]
+            }
+        }
+
+        // Helper Functions
+        function rand(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min
+        }
+
+        function formatTimestamp() {
+            return new Date().toLocaleString()
+        }
+
+        function timeAgo(minutes) {
+            if (minutes < 60) return minutes + 'm'
+            const hours = Math.floor(minutes / 60)
+            if (hours < 24) return hours + 'h ' + (minutes % 60) + 'm'
+            const days = Math.floor(hours / 24)
+            return days + 'd ' + (hours % 24) + 'h'
+        }
+
+        function setStatusIcon(iconId, status) {
+            const icon = document.getElementById(iconId)
+            if (!icon) return
+            
+            icon.className = `status-icon ${status}`
+        }
+
+        function setChartStatus(statusId, textId, status, text) {
+            const statusEl = document.getElementById(statusId)
+            const textEl = document.getElementById(textId)
+            if (!statusEl || !textEl) return
+            
+            const dot = statusEl.querySelector('.dot')
+            if (dot) {
+                const colors = {
+                    operational: 'var(--success)',
+                    warning: 'var(--warning)',
+                    critical: 'var(--danger)'
+                }
+                dot.style.background = colors[status] || colors.operational
+            }
+            
+            textEl.textContent = text
+        }
+
+        // Main Dashboard Update Function
+        async function updateDashboard() {
+            try {
+                // Fetch all data from Databricks (simulated)
+                const [systemsData, workforceData, incidentsData, callCenterData] = await Promise.all([
+                    simulateDatabricksQuery('SELECT * FROM systems_health WHERE environment = "production"'),
+                    simulateDatabricksQuery('SELECT * FROM workforce_metrics WHERE date = CURRENT_DATE()'),
+                    simulateDatabricksQuery('SELECT * FROM servicenow_incidents WHERE status IN ("Open", "In Progress")'),
+                    simulateDatabricksQuery('SELECT * FROM call_center_metrics WHERE timestamp >= NOW() - INTERVAL 1 HOUR')
+                ])
+
+                // Update Business Text Plugin KPIs
+                updateBusinessKPIs(systemsData, workforceData, incidentsData, callCenterData)
+
+                // Update Business Charts Plugin Panels
+                updateSystemsChart(systemsData)
+                updateWorkforceChart(workforceData)
+                updateIssuesChart(incidentsData)
+                updateCallCenterChart(callCenterData)
+
+                // Update timestamp
+                document.getElementById('lastUpdated').textContent = formatTimestamp()
+
+            } catch (error) {
+                console.error('[Dashboard] Update failed:', error)
+                // Handle Databricks connection issues
+                document.querySelector('.connection-dot').style.background = 'var(--danger)'
+                document.querySelector('.connection-status span:last-child').textContent = 'Connection Error'
+            }
+        }
+
+        function updateBusinessKPIs(systemsData, workforceData, incidentsData, callCenterData) {
+            // System Health KPI
+            const systemsOperational = systemsData.operational_count
+            const systemsTotal = systemsData.total_count
+            document.getElementById('systemsHealth').textContent = `${systemsOperational}/${systemsTotal}`
+            document.getElementById('systemsChange').textContent = `${systemsOperational} systems operational`
+            
+            const systemsStatus = systemsData.critical_count > 0 ? 'critical' : 
+                                 systemsData.degraded_count > 2 ? 'warning' : 'operational'
+            setStatusIcon('systemsIcon', systemsStatus)
+
+            // Workforce KPI
+            const workforceReadiness = workforceData.readiness_percentage
+            document.getElementById('workforceReady').textContent = workforceReadiness + '%'
+            document.getElementById('workforceChange').textContent = `${workforceData.online_agents} agents online`
+            
+            const workforceStatus = workforceReadiness < 75 ? 'critical' : 
+                                   workforceReadiness < 85 ? 'warning' : 'operational'
+            setStatusIcon('workforceIcon', workforceStatus)
+
+            // Critical Issues KPI
+            const criticalCount = incidentsData.critical_count
+            document.getElementById('criticalIssues').textContent = criticalCount
+            document.getElementById('issuesChange').textContent = `${incidentsData.total_count} total incidents`
+            
+            const issuesStatus = incidentsData.p0_count > 0 ? 'critical' : 
+                                incidentsData.p1_count > 3 ? 'warning' : 'operational'
+            setStatusIcon('issuesIcon', issuesStatus)
+
+            // Service Level KPI
+            const serviceLevel = callCenterData.service_level
+            document.getElementById('serviceLevel').textContent = serviceLevel + '%'
+            document.getElementById('performanceChange').textContent = `${callCenterData.calls_per_hour} calls/hour`
+            
+            const performanceStatus = serviceLevel < 80 ? 'critical' : 
+                                     serviceLevel < 90 ? 'warning' : 'operational'
+            setStatusIcon('performanceIcon', performanceStatus)
+        }
+
+        function updateSystemsChart(data) {
+            const grid = document.getElementById('systemsGrid')
+            if (!grid) return
+
+            grid.innerHTML = ''
+            
+            data.systems.forEach(system => {
+                const el = document.createElement('div')
+                el.className = 'data-item'
+                
+                const statusColor = system.health >= 90 ? 'var(--success)' : 
+                                   system.health >= 75 ? 'var(--warning)' : 'var(--danger)'
+                
+                el.innerHTML = `
+                    <div class="data-item-left">
+                        <div class="indicator" style="background:${statusColor}"></div>
+                        <div>
+                            <div class="data-item-name">${system.name}</div>
+                            <div class="data-item-detail">${system.type} • ${system.responseTime}ms</div>
+                        </div>
+                    </div>
+                    <div class="data-item-value">${system.health}%</div>
+                `
+                grid.appendChild(el)
+            })
+
+            // Update chart status
+            const status = data.critical_count > 0 ? 'critical' : 
+                          data.degraded_count > 2 ? 'warning' : 'operational'
+            const statusText = data.critical_count > 0 ? 'Critical Issues' : 
+                              data.degraded_count > 2 ? 'Degraded' : 'Operational'
+            setChartStatus('systemsStatus', 'systemsStatusText', status, statusText)
+        }
+
+        function updateWorkforceChart(data) {
+            const grid = document.getElementById('workforceGrid')
+            if (!grid) return
+
+            grid.innerHTML = ''
+            
+            // Add main metrics
+            const metrics = [
+                { name: 'Scheduled', value: data.scheduled_agents, detail: 'Total planned' },
+                { name: 'Online', value: data.online_agents, detail: 'Currently active' },
+                { name: 'Utilization', value: data.utilization + '%', detail: 'Current capacity' },
+                { name: 'Variance', value: (data.variance >= 0 ? '+' : '') + data.variance, detail: 'vs scheduled' }
+            ]
+            
+            metrics.forEach(metric => {
+                const el = document.createElement('div')
+                el.className = 'data-item'
+                
+                const valueColor = metric.name === 'Variance' ? 
+                    (data.variance >= 0 ? 'var(--success)' : 'var(--danger)') : 'var(--text)'
+                
+                el.innerHTML = `
+                    <div class="data-item-left">
+                        <div>
+                            <div class="data-item-name">${metric.name}</div>
+                            <div class="data-item-detail">${metric.detail}</div>
+                        </div>
+                    </div>
+                    <div class="data-item-value" style="color:${valueColor}">${metric.value}</div>
+                `
+                grid.appendChild(el)
+            })
+
+            // Update chart status
+            const status = data.readiness_percentage < 75 ? 'critical' : 
+                          data.readiness_percentage < 85 ? 'warning' : 'operational'
+            const statusText = data.readiness_percentage < 75 ? 'Understaffed' : 
+                              data.readiness_percentage < 85 ? 'Below Target' : 'Optimal'
+            setChartStatus('workforceStatus', 'workforceStatusText', status, statusText)
+        }
+
+        function updateIssuesChart(data) {
+            // Update summary stats
+            document.getElementById('p0Count').textContent = data.p0_count
+            document.getElementById('p1Count').textContent = data.p1_count
+            document.getElementById('totalIssuesCount').textContent = data.total_count
+
+            // Update trends
+            const updateTrend = (id, change) => {
+                const el = document.getElementById(id)
+                if (el) {
+                    el.textContent = (change >= 0 ? '+' : '') + change + '%'
+                    el.className = change > 0 ? 'trend negative' : 
+                                  change < 0 ? 'trend positive' : 'trend neutral'
+                }
+            }
+            
+            updateTrend('p0Trend', data.daily_trends.p0_change)
+            updateTrend('p1Trend', data.daily_trends.p1_change)
+            updateTrend('totalTrend', data.daily_trends.total_change)
+
+            // Update issues list
+            const list = document.getElementById('issuesList')
+            if (list) {
+                list.innerHTML = ''
+                
+                data.incidents.slice(0, 6).forEach(incident => {
+                    const el = document.createElement('div')
+                    el.className = 'issue-item'
+                    
+                    const priorityColor = incident.severity === 'P0' ? 'var(--danger)' : 
+                                         incident.severity === 'P1' ? 'var(--warning)' : 'var(--success)'
+                    
+                    el.innerHTML = `
+                        <div class="issue-left">
+                            <div class="priority-dot" style="background:${priorityColor}"></div>
+                            <div class="issue-text">
+                                <div class="issue-id">${incident.severity} ${incident.number}</div>
+                                <div class="issue-desc">${incident.description}</div>
+                            </div>
+                        </div>
+                        <div class="issue-time">${timeAgo(incident.age_minutes)}</div>
+                    `
+                    list.appendChild(el)
+                })
+            }
+
+            // Update chart status
+            const status = data.p0_count > 0 ? 'critical' : 
+                          data.p1_count > 3 ? 'warning' : 'operational'
+            const statusText = data.p0_count > 0 ? 'Critical Active' : 
+                              data.p1_count > 3 ? 'High Volume' : 'Controlled'
+            setChartStatus('issuesStatus', 'issuesStatusText', status, statusText)
+        }
+
+        function updateCallCenterChart(data) {
+            const grid = document.getElementById('callCenterGrid')
+            if (!grid) return
+
+            grid.innerHTML = ''
+            
+            data.metrics.forEach(metric => {
+                const el = document.createElement('div')
+                el.className = 'data-item'
+                
+                // Determine status color based on metric performance
+                let statusColor = 'var(--success)'
+                if (metric.name === 'Service Level' && parseInt(metric.value) < 90) statusColor = 'var(--warning)'
+                if (metric.name === 'Service Level' && parseInt(metric.value) < 80) statusColor = 'var(--danger)'
+                if (metric.name === 'Abandon Rate' && parseFloat(metric.value) > 5) statusColor = 'var(--warning)'
+                if (metric.name === 'Abandon Rate' && parseFloat(metric.value) > 8) statusColor = 'var(--danger)'
+                
+                el.innerHTML = `
+                    <div class="data-item-left">
+                        <div class="indicator" style="background:${statusColor}"></div>
+                        <div>
+                            <div class="data-item-name">${metric.name}</div>
+                            <div class="data-item-detail">Target: ${metric.target}</div>
+                        </div>
+                    </div>
+                    <div class="data-item-value">${metric.value}</div>
+                `
+                grid.appendChild(el)
+            })
+
+            // Update chart status
+            const status = data.service_level < 80 ? 'critical' : 
+                          data.service_level < 90 ? 'warning' : 'operational'
+            const statusText = data.service_level < 80 ? 'SLA Breach' : 
+                              data.service_level < 90 ? 'Below Target' : 'Meeting SLA'
+            setChartStatus('callCenterStatus', 'callCenterStatusText', status, statusText)
+        }
+
+        // Initialize Dashboard
+        console.log('[Dashboard] Initializing Grafana Executive Dashboard with Databricks integration...')
+        
+        // Initial load
+        updateDashboard()
+        
+        // Auto-refresh every 30 seconds (configurable for Grafana)
+        setInterval(updateDashboard, 30000)
+        
+        console.log('[Dashboard] Connected to Databricks • Auto-refresh: 30s • ServiceNow integration active')
+    </script>
+</body>
+</html>
