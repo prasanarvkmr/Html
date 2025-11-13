@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Performance Dashboard - Agent & Vendor Analytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Simplified Color System */
+            --primary: #2563EB;
+            --secondary: #059669;
+            --error: #DC2626;
+            --warning: #D97706;
+            
+            /* Clean Surfaces */
+            --surface: #FFFFFF;
+            --surface-secondary: #F8FAFC;
+            --border: #E5E7EB;
+            --background: #FAFAFA;
+            
+            /* Professional Text */
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --text-muted: #9CA3AF;
+            
+            /* Clean Shadows */
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+            
+            /* Simple Spacing */
+            --space-2: 0.5rem;
+            --space-4: 1rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            
+            /* Typography */
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            
+            /* Clean Transitions */
+            --transition: 200ms ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-size: var(--text-base);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+
+        /* Clean Header */
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: var(--space-6) 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand h1 {
+            font-size: var(--text-xl);
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .brand p {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin: var(--space-2) 0 0 0;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: var(--space-8);
+        }
+
+        .header-stat {
+            text-align: center;
+        }
+
+        .header-stat-value {
+            font-size: var(--text-xl);
+            font-weight: 600;
+            color: var(--text-primary);
+            display: block;
+        }
+
+        .header-stat-label {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-top: var(--space-2);
+        }
+
+        /* Simple Navigation */
+        .nav-tabs {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            margin-bottom: var(--space-6);
+        }
+
+        .nav-tabs-content {
+            display: flex;
+            padding: 0 var(--space-6);
+        }
+
+        .nav-tab {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-4) var(--space-6);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: var(--text-sm);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all var(--transition);
+            text-decoration: none;
+        }
+
+        .nav-tab:hover {
+            color: var(--primary);
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .nav-tab svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+
+        /* Simple Alert */
+        .alert-bar {
+            background: var(--error);
+            color: white;
+            padding: var(--space-4);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            box-shadow: var(--shadow);
+        }
+
+        .alert-icon {
+            font-size: var(--text-lg);
+        }
+
+        /* Clean KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+
+        .kpi-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: var(--space-6);
+            transition: box-shadow var(--transition);
+        }
+
+        .kpi-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-4);
+        }
+
+        .kpi-title {
+            font-weight: 500;
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .kpi-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .kpi-icon.success { background: var(--secondary); }
+        .kpi-icon.warning { background: var(--warning); }
+        .kpi-icon.error { background: var(--error); }
+        .kpi-icon.info { background: var(--primary); }
+
+        .kpi-value {
+            font-size: var(--text-2xl);
+            font-weight: 600;
+            margin-bottom: var(--space-2);
+            color: var(--text-primary);
+        }
+
+        .kpi-unit {
+            font-size: var(--text-base);
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+
+        .kpi-trend {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2);
+            border-radius: 4px;
+            font-size: var(--text-sm);
+            font-weight: 500;
+        }
+
+        .kpi-trend.up {
+            background: rgba(5, 150, 105, 0.1);
+            color: var(--secondary);
+        }
+
+        .kpi-trend.down {
+            background: rgba(220, 38, 38, 0.1);
+            color: var(--error);
+        }
+
+        .kpi-trend.neutral {
+            background: var(--surface-secondary);
+            color: var(--text-secondary);
+        }
+
+        /* Simple Charts */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: var(--space-4);
+        }
+
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: var(--space-6);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-4);
+            padding-bottom: var(--space-4);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .chart-title {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        .chart-control {
+            padding: var(--space-2) var(--space-4);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--surface);
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .chart-control:hover,
+        .chart-control.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .chart-container {
+            height: 250px;
+            background: var(--surface-secondary);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chart-placeholder {
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+        }
+
+        /* Clean Data Tables */
+        .data-table-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: var(--surface-secondary);
+            padding: var(--space-4);
+            text-align: left;
+            font-weight: 600;
+            font-size: var(--text-sm);
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table td {
+            padding: var(--space-4);
+            border-bottom: 1px solid var(--border);
+            font-size: var(--text-sm);
+            color: var(--text-primary);
+        }
+
+        .data-table tr:hover {
+            background: var(--surface-secondary);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: var(--space-2) var(--space-4);
+            border-radius: 4px;
+            font-size: var(--text-sm);
+            font-weight: 500;
+        }
+
+        .status-badge.active {
+            background: rgba(5, 150, 105, 0.1);
+            color: var(--secondary);
+        }
+
+        .status-badge.warning {
+            background: rgba(217, 119, 6, 0.1);
+            color: var(--warning);
+        }
+
+        .status-badge.critical {
+            background: rgba(220, 38, 38, 0.1);
+            color: var(--error);
+        }
+
+        /* Simple Footer */
+        .footer {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: var(--space-6) 0;
+            margin-top: var(--space-8);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: var(--space-4);
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: var(--space-4);
+            }
+
+            .header-stats {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .nav-tabs-content {
+                flex-wrap: wrap;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Clean Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="brand">
+                    <h1>Performance Dashboard</h1>
+                    <p>Agent & Vendor Analytics</p>
+                </div>
+                <div class="header-stats">
+                    <div class="header-stat">
+                        <span class="header-stat-value" id="totalAgents">205</span>
+                        <span class="header-stat-label">Total Agents</span>
+                    </div>
+                    <div class="header-stat">
+                        <span class="header-stat-value" id="activeVendors">5</span>
+                        <span class="header-stat-label">Active Vendors</span>
+                    </div>
+                    <div class="header-stat">
+                        <span class="header-stat-value" id="uptime">99.2%</span>
+                        <span class="header-stat-label">System Uptime</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <div class="nav-tabs-content">
+                <a href="#overview" class="nav-tab active">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                    </svg>
+                    Overview
+                </a>
+                <a href="#vendors" class="nav-tab">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    Vendors
+                </a>
+                <a href="#agents" class="nav-tab">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M16 7c0 2.21-1.79 4-4 4s-4-1.79-4-4 1.79-4 4-4 4 1.79 4 4zm4 7v2c0 .55-.45 1-1 1H5c-.55 0-1-.45-1-1v-2c0-2.21 3.58-4 8-4s8 1.79 8 4z"/>
+                    </svg>
+                    Agents
+                </a>
+                <a href="#trends" class="nav-tab">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+                    </svg>
+                    Trends
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Critical Alert -->
+            <div class="alert-bar">
+                <div class="alert-icon">⚠️</div>
+                <div>
+                    <strong>Critical Alert:</strong> 23.7% of agents experiencing issues. 
+                    41 out of 205 agents affected by disconnected or degraded calls.
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <section class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Disconnected Calls</div>
+                        <div class="kpi-icon error">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M6.62 10.79C8.06 13.62 10.38 15.94 13.21 17.38L15.41 15.18C15.68 14.91 16.08 14.82 16.43 14.93C17.55 15.3 18.75 15.5 20 15.5C20.55 15.5 21 15.95 21 16.5V20C21 20.55 20.55 21 20 21C10.61 21 3 13.39 3 4C3 3.45 3.45 3 4 3H7.5C8.05 3 8.5 3.45 8.5 4C8.5 5.25 8.7 6.45 9.07 7.57C9.18 7.92 9.09 8.32 8.82 8.59L6.62 10.79Z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="kpi-value">640 <span class="kpi-unit">calls</span></div>
+                    <div class="kpi-trend down">↗ +5.2% vs yesterday</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Degraded Calls</div>
+                        <div class="kpi-icon warning">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M11 7H13V13H11V7ZM11 15H13V17H11V15Z"/>
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="kpi-value">557 <span class="kpi-unit">calls</span></div>
+                    <div class="kpi-trend up">↘ -2.1% vs yesterday</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Quality Score</div>
+                        <div class="kpi-icon success">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="kpi-value">91.2<span class="kpi-unit">%</span></div>
+                    <div class="kpi-trend neutral">→ +0.3% vs yesterday</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Impacted Agents</div>
+                        <div class="kpi-icon info">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M16 4C18.2 4 20 5.8 20 8C20 10.2 18.2 12 16 12C13.8 12 12 10.2 12 8C12 5.8 13.8 4 16 4ZM16 14C20.42 14 24 15.79 24 18V20H8V18C8 15.79 11.58 14 16 14Z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="kpi-value">41 <span class="kpi-unit">agents</span></div>
+                    <div class="kpi-trend down">↗ +8.1% vs yesterday</div>
+                </div>
+            </section>
+
+            <!-- Chart Section -->
+            <section class="chart-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Call Quality Trends</h3>
+                        <div class="chart-controls">
+                            <button class="chart-control active">24H</button>
+                            <button class="chart-control">7D</button>
+                            <button class="chart-control">30D</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-placeholder">
+                            Call Quality Trends Chart
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Agent Performance</h3>
+                        <div class="chart-controls">
+                            <button class="chart-control active">Current</button>
+                            <button class="chart-control">Yesterday</button>
+                            <button class="chart-control">Week Avg</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-placeholder">
+                            Agent Performance Distribution
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vendor Performance Table -->
+            <section class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Vendor</th>
+                            <th>Status</th>
+                            <th>Total Agents</th>
+                            <th>Disconnected Calls</th>
+                            <th>Degraded Calls</th>
+                            <th>Quality Score</th>
+                            <th>Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>TechSupport Pro</strong></td>
+                            <td><span class="status-badge active">Active</span></td>
+                            <td>45</td>
+                            <td>127</td>
+                            <td>89</td>
+                            <td>92.4%</td>
+                            <td><div class="kpi-trend up">↗ +0.7%</div></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Global Connect</strong></td>
+                            <td><span class="status-badge warning">Warning</span></td>
+                            <td>38</td>
+                            <td>203</td>
+                            <td>156</td>
+                            <td>87.8%</td>
+                            <td><div class="kpi-trend down">↘ -1.5%</div></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Premium Solutions</strong></td>
+                            <td><span class="status-badge active">Active</span></td>
+                            <td>52</td>
+                            <td>89</td>
+                            <td>67</td>
+                            <td>95.1%</td>
+                            <td><div class="kpi-trend up">↗ +0.2%</div></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Rapid Response</strong></td>
+                            <td><span class="status-badge critical">Critical</span></td>
+                            <td>29</td>
+                            <td>145</td>
+                            <td>234</td>
+                            <td>83.2%</td>
+                            <td><div class="kpi-trend down">↘ -2.2%</div></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Elite Support</strong></td>
+                            <td><span class="status-badge active">Active</span></td>
+                            <td>41</td>
+                            <td>76</td>
+                            <td>45</td>
+                            <td>96.8%</td>
+                            <td><div class="kpi-trend up">↗ +0.6%</div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div>
+                    <p>&copy; 2025 Performance Dashboard. Analytics platform.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#docs">Documentation</a>
+                    <a href="#api">API</a>
+                    <a href="#support">Support</a>
+                    <a href="#settings">Settings</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Update real-time data
+        function updateMetrics() {
+            const timestamp = new Date().toLocaleString();
+            console.log('Metrics updated at:', timestamp);
+            
+            // Add any dynamic updates here
+            // Example: Update agent counts, quality scores, etc.
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            updateMetrics();
+            
+            // Update every 30 seconds
+            setInterval(updateMetrics, 30000);
+            
+            // Tab navigation
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all tabs
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                });
+            });
+            
+            // Chart controls
+            document.querySelectorAll('.chart-control').forEach(control => {
+                control.addEventListener('click', function() {
+                    // Remove active class from siblings
+                    this.parentNode.querySelectorAll('.chart-control').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked control
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

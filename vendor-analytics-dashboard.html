@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Analytics Dashboard - Detailed Performance Analysis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Professional Color System */
+            --md-primary: #2563EB;
+            --md-primary-container: #EEF2FF;
+            --md-on-primary: #FFFFFF;
+            --md-on-primary-container: #1E3A8A;
+            
+            --md-secondary: #059669;
+            --md-secondary-container: #ECFDF5;
+            --md-on-secondary: #FFFFFF;
+            --md-on-secondary-container: #064E3B;
+            
+            --md-tertiary: #FF6F00;
+            --md-tertiary-container: #FFE0B3;
+            --md-on-tertiary: #FFFFFF;
+            --md-on-tertiary-container: #2A1800;
+            
+            --md-error: #BA1A1A;
+            --md-error-container: #FFDAD6;
+            --md-on-error: #FFFFFF;
+            --md-on-error-container: #410002;
+            
+            --md-warning: #F57C00;
+            --md-warning-container: #FFE0B3;
+            --md-on-warning: #FFFFFF;
+            --md-on-warning-container: #2A1800;
+            
+            --md-info: #0277BD;
+            --md-info-container: #C4E7FF;
+            --md-on-info: #FFFFFF;
+            --md-on-info-container: #001E2F;
+            
+            --md-success: #2E7D32;
+            --md-success-container: #B7F4BA;
+            --md-on-success: #FFFFFF;
+            --md-on-success-container: #00210A;
+            
+            /* Professional Surface Colors */
+            --md-surface: #FFFFFF;
+            --md-surface-dim: #FAFBFF;
+            --md-surface-bright: #FFFFFF;
+            --md-surface-container-lowest: #FFFFFF;
+            --md-surface-container-low: #F8FAFC;
+            --md-surface-container: #F1F5F9;
+            --md-surface-container-high: #E2E8F0;
+            --md-surface-container-highest: #CBD5E1;
+            --md-surface-variant: #E2E8F0;
+            --md-on-surface: #0F172A;
+            --md-on-surface-variant: #475569;
+            
+            /* Professional Outline */
+            --md-outline: #94A3B8;
+            --md-outline-variant: #E2E8F0;
+            
+            /* Shadow and Elevation */
+            --md-shadow: #000000;
+            --md-elevation-1: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+            --md-elevation-2: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+            --md-elevation-3: 0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px 0px rgba(0, 0, 0, 0.3);
+            --md-elevation-4: 0px 6px 10px 4px rgba(0, 0, 0, 0.15), 0px 2px 3px 0px rgba(0, 0, 0, 0.3);
+            --md-elevation-5: 0px 8px 12px 6px rgba(0, 0, 0, 0.15), 0px 4px 4px 0px rgba(0, 0, 0, 0.3);
+            
+            /* Professional Typography Scale with Inter */
+            --md-typescale-display-large: 300 48px/56px 'Inter', system-ui, sans-serif;
+            --md-typescale-display-medium: 300 40px/48px 'Inter', system-ui, sans-serif;
+            --md-typescale-display-small: 400 32px/40px 'Inter', system-ui, sans-serif;
+            --md-typescale-headline-large: 500 28px/36px 'Inter', system-ui, sans-serif;
+            --md-typescale-headline-medium: 500 24px/32px 'Inter', system-ui, sans-serif;
+            --md-typescale-headline-small: 600 20px/28px 'Inter', system-ui, sans-serif;
+            --md-typescale-title-large: 600 18px/24px 'Inter', system-ui, sans-serif;
+            --md-typescale-title-medium: 500 16px/24px 'Inter', system-ui, sans-serif;
+            --md-typescale-title-small: 500 14px/20px 'Inter', system-ui, sans-serif;
+            --md-typescale-label-large: 500 14px/20px 'Inter', system-ui, sans-serif;
+            --md-typescale-label-medium: 500 12px/16px 'Inter', system-ui, sans-serif;
+            --md-typescale-label-small: 500 11px/16px 'Inter', system-ui, sans-serif;
+            --md-typescale-body-large: 400 16px/24px 'Inter', system-ui, sans-serif;
+            --md-typescale-body-medium: 400 14px/20px 'Inter', system-ui, sans-serif;
+            --md-typescale-body-small: 400 12px/16px 'Inter', system-ui, sans-serif;
+            --md-typescale-code: 400 13px/20px 'JetBrains Mono', 'Consolas', monospace;
+            
+            /* Motion Tokens */
+            --md-motion-duration-short1: 50ms;
+            --md-motion-duration-short2: 100ms;
+            --md-motion-duration-short3: 150ms;
+            --md-motion-duration-short4: 200ms;
+            --md-motion-duration-medium1: 250ms;
+            --md-motion-duration-medium2: 300ms;
+            --md-motion-duration-medium3: 350ms;
+            --md-motion-duration-medium4: 400ms;
+            --md-motion-duration-long1: 450ms;
+            --md-motion-duration-long2: 500ms;
+            --md-motion-duration-long3: 550ms;
+            --md-motion-duration-long4: 600ms;
+            --md-motion-easing-linear: cubic-bezier(0.0, 0.0, 1.0, 1.0);
+            --md-motion-easing-standard: cubic-bezier(0.2, 0.0, 0.0, 1.0);
+            --md-motion-easing-standard-accelerate: cubic-bezier(0.3, 0.0, 1.0, 1.0);
+            --md-motion-easing-standard-decelerate: cubic-bezier(0.0, 0.0, 0.0, 1.0);
+            --md-motion-easing-emphasized: cubic-bezier(0.2, 0.0, 0.0, 1.0);
+            --md-motion-easing-emphasized-accelerate: cubic-bezier(0.3, 0.0, 0.8, 0.15);
+            --md-motion-easing-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1.0);
+            
+            /* Shape Tokens */
+            --md-shape-corner-none: 0px;
+            --md-shape-corner-extra-small: 4px;
+            --md-shape-corner-small: 8px;
+            --md-shape-corner-medium: 12px;
+            --md-shape-corner-large: 16px;
+            --md-shape-corner-extra-large: 28px;
+            --md-shape-corner-full: 1000px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font: var(--md-typescale-body-medium);
+            background: var(--md-surface-container-low);
+            color: var(--md-on-surface);
+            line-height: 1.6;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1920px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: var(--md-surface);
+            border-bottom: 1px solid var(--md-outline-variant);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--md-elevation-1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .company-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--md-primary);
+            border-radius: var(--md-shape-corner-small);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--md-on-primary);
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .company-name {
+            font: var(--md-typescale-title-large);
+            font-weight: 600;
+            color: var(--md-on-surface);
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            border-radius: var(--md-shape-corner-full);
+            background: var(--md-surface-container);
+            transition: all var(--md-motion-duration-short4) var(--md-motion-easing-standard);
+        }
+
+        .user-profile:hover {
+            background: var(--md-surface-container-high);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--md-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--md-on-secondary);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+        }
+
+        .username {
+            font: var(--md-typescale-label-large);
+            font-weight: 600;
+            color: var(--md-on-surface);
+        }
+
+        .user-role {
+            font: var(--md-typescale-body-small);
+            color: var(--md-on-surface-variant);
+        }
+
+        /* Menu Bar */
+        .menubar {
+            background: var(--md-surface-container);
+            border-bottom: 1px solid var(--md-outline-variant);
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+        }
+
+        .menu-item {
+            padding: 16px 24px;
+            text-decoration: none;
+            color: var(--md-on-surface-variant);
+            font: var(--md-typescale-label-large);
+            font-weight: 500;
+            transition: all var(--md-motion-duration-short4) var(--md-motion-easing-standard);
+            border-bottom: 3px solid transparent;
+            position: relative;
+        }
+
+        .menu-item:hover {
+            color: var(--md-primary);
+            background: var(--md-primary-container);
+        }
+
+        .menu-item.active {
+            color: var(--md-primary);
+            border-bottom-color: var(--md-primary);
+            background: var(--md-primary-container);
+        }
+
+        /* Sub Menu */
+        .submenu {
+            background: var(--md-surface);
+            border-bottom: 1px solid var(--md-outline-variant);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            box-shadow: var(--md-elevation-1);
+            overflow: hidden;
+        }
+
+        .submenu-left {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .submenu-item {
+            padding: 10px 16px;
+            text-decoration: none;
+            color: var(--md-on-surface-variant);
+            font: var(--md-typescale-body-small);
+            font-weight: 500;
+            transition: all var(--md-motion-duration-short4) var(--md-motion-easing-standard);
+            border-radius: var(--md-shape-corner-small);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .submenu-item::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--md-primary);
+            transition: width var(--md-motion-duration-medium2) var(--md-motion-easing-emphasized);
+        }
+
+        .submenu-item:hover {
+            color: var(--md-primary);
+            background: var(--md-primary-container);
+        }
+
+        .submenu-item:hover::before {
+            width: 100%;
+        }
+
+        .submenu-item.active {
+            color: var(--md-primary);
+            background: var(--md-primary-container);
+            font-weight: 600;
+        }
+
+        .submenu-item.active::before {
+            width: 100%;
+        }
+
+        .submenu-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Last Updated Display */
+        .last-updated-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--md-surface-container-low);
+            border: 1px solid var(--md-outline-variant);
+            border-radius: var(--md-shape-corner-full);
+            padding: 8px 16px;
+            font: var(--md-typescale-body-small);
+            color: var(--md-on-surface-variant);
+            font-weight: 500;
+        }
+
+        /* Dashboard Footer */
+        .dashboard-footer {
+            background: var(--md-surface-container-lowest);
+            border-top: 1px solid var(--md-outline-variant);
+            padding: 24px 20px 16px;
+            margin-top: 24px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-info {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--md-outline-variant);
+        }
+
+        .company-info h4 {
+            font: var(--md-typescale-headline-small);
+            color: var(--md-primary);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .company-info p {
+            font: var(--md-typescale-body-medium);
+            color: var(--md-on-surface-variant);
+            line-height: 1.5;
+        }
+
+        .footer-links {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .link-group h5 {
+            font: var(--md-typescale-title-small);
+            color: var(--md-on-surface);
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .link-group a {
+            display: block;
+            font: var(--md-typescale-body-medium);
+            color: var(--md-on-surface-variant);
+            text-decoration: none;
+            margin-bottom: 8px;
+            transition: color var(--md-motion-duration-short4) var(--md-motion-easing-standard);
+        }
+
+        .link-group a:hover {
+            color: var(--md-primary);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        .footer-copyright p {
+            font: var(--md-typescale-body-small);
+            color: var(--md-on-surface-variant);
+            margin: 0;
+        }
+
+        .footer-copyright a {
+            color: var(--md-primary);
+            text-decoration: none;
+        }
+
+        .footer-copyright a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive footer */
+        @media (max-width: 768px) {
+            .footer-info {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+            
+            .footer-links {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        .last-updated-display svg {
+            color: var(--md-success);
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background: var(--md-success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            flex: 1;
+            background: var(--md-surface-container-lowest);
+        }
+
+        /* Professional Enhancement Styles */
+        .content-section {
+            background: var(--md-surface);
+            border-radius: var(--md-shape-corner-extra-large);
+            box-shadow: var(--md-elevation-2);
+            border: 1px solid var(--md-outline-variant);
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--md-surface-container) 0%, var(--md-surface-container-high) 100%);
+            border-bottom: 1px solid var(--md-outline-variant);
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font: var(--md-typescale-headline-small);
+            font-weight: 600;
+            color: var(--md-on-surface);
+            margin: 0;
+        }
+
+        .section-subtitle {
+            font: var(--md-typescale-body-medium);
+            color: var(--md-on-surface-variant);
+            margin: 4px 0 0 0;
+        }
+
+        .section-content {
+            padding: 20px;
+        }
+
+        /* Tooltip System */
+        .tooltip-container {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-icon {
+            width: 20px;
+            height: 20px;
+            background: var(--md-info);
+            color: var(--md-on-info);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: help;
+            transition: all var(--md-motion-duration-short4) var(--md-motion-easing-standard);
+        }
+
+        .info-icon:hover {
+            background: var(--md-info-container);
+            color: var(--md-on-info-container);
+            transform: scale(1.1);
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 8px;
+            background: var(--md-surface-container-highest);
+            color: var(--md-on-surface);
+            padding: 12px 16px;
+            border-radius: var(--md-shape-corner-small);
+            box-shadow: var(--md-elevation-3);
+            font: var(--md-typescale-body-small);
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--md-motion-duration-short4) var(--md-motion-easing-standard);
+            z-index: 1000;
+            border: 1px solid var(--md-outline-variant);
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--md-surface-container-highest);
+        }
+
+        .info-icon:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Header */
+        .header {
+            background: var(--md-primary);
+            border-radius: var(--md-shape-corner-large);
+            padding: 32px;
+            box-shadow: var(--md-elevation-3);
+            color: var(--md-on-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: translate(50%, -50%);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 1;
+        }
+
+        .header-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: var(--md-shape-corner-medium);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .header-title {
+            font: var(--md-typescale-headline-large);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .header-subtitle {
+            font: var(--md-typescale-body-large);
+            opacity: 0.9;
+        }
+
+        .header-right {
+            text-align: right;
+            z-index: 1;
+        }
+
+        .last-updated {
+            font-size: 14px;
+            opacity: 0.85;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .data-freshness {
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 16px;
+            border-radius: var(--md-shape-corner-full);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        /* Summary Panel */
+        .summary-panel {
+            background: transparent;
+            border-radius: 0;
+            padding: 0;
+            box-shadow: none;
+            border: none;
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 0;
+        }
+
+        .summary-title {
+            font: var(--md-typescale-headline-medium);
+            color: var(--md-on-surface);
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .summary-card {
+            background: var(--md-surface);
+            border-radius: var(--md-shape-corner-large);
+            padding: 16px;
+            text-align: center;
+            transition: all var(--md-motion-duration-medium2) var(--md-motion-easing-emphasized);
+            border: 1px solid var(--md-outline-variant);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--md-primary) 0%, var(--md-secondary) 100%);
+            opacity: 0;
+            transition: opacity var(--md-motion-duration-medium2) var(--md-motion-easing-standard);
+        }
+
+        .summary-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--md-elevation-4);
+        }
+
+        .summary-card:hover::before {
+            opacity: 1;
+        }
+
+        .summary-value {
+            font: var(--md-typescale-display-small);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .summary-label {
+            font: var(--md-typescale-body-small);
+            color: var(--md-on-surface-variant);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .summary-subtext {
+            font: var(--md-typescale-body-small);
+            color: var(--md-on-surface-variant);
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+
+        .summary-trend {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font: var(--md-typescale-label-medium);
+            font-weight: 600;
+        }
+
+        /* Controls Panel */
+        .controls-panel {
+            background: transparent;
+            border-radius: 0;
+            padding: 16px 0;
+            box-shadow: none;
+            border: none;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 220px;
+            text-align: center;
+        }
+
+        .control-label {
+            font: var(--md-typescale-label-large);
+            color: var(--md-on-surface);
+            font-weight: 600;
+        }
+
+        .dropdown {
+            background: var(--md-surface-container);
+            border: 1px solid var(--md-outline-variant);
+            border-radius: var(--md-shape-corner-large);
+            padding: 16px 24px;
+            font: var(--md-typescale-body-medium);
+            color: var(--md-on-surface);
+            cursor: pointer;
+            transition: all var(--md-motion-duration-short4) var(--md-motion-easing-standard);
+            box-shadow: var(--md-elevation-1);
+            outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 16px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 56px;
+        }
+
+        .dropdown:hover {
+            border-color: var(--md-primary);
+            box-shadow: var(--md-elevation-2);
+            background-color: var(--md-surface-container-high);
+        }
+
+        .dropdown:focus {
+            border-color: var(--md-primary);
+            box-shadow: 0 0 0 3px rgba(103, 80, 164, 0.1);
+            background-color: var(--md-surface-container-high);
+        }
+
+        /* Detailed Analysis Panel */
+        .analysis-panel {
+            background: var(--md-surface);
+            border-radius: var(--md-shape-corner-extra-large);
+            padding: 32px;
+            box-shadow: var(--md-elevation-2);
+            border: 1px solid var(--md-outline-variant);
+        }
+
+        .analysis-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--md-outline-variant);
+        }
+
+        .analysis-title {
+            font: var(--md-typescale-headline-medium);
+            color: var(--md-on-surface);
+            font-weight: 600;
+        }
+
+        .vendor-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--md-surface-container-low);
+            padding: 12px 20px;
+            border-radius: var(--md-shape-corner-full);
+        }
+
+        .vendor-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--md-primary);
+            border-radius: var(--md-shape-corner-medium);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--md-on-primary);
+            font-size: 14px;
+        }
+
+        .vendor-details h3 {
+            font: var(--md-typescale-title-medium);
+            margin: 0;
+        }
+
+        .vendor-details p {
+            font: var(--md-typescale-body-small);
+            color: var(--md-on-surface-variant);
+            margin: 0;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: var(--md-surface-container-low);
+            border-radius: var(--md-shape-corner-large);
+            padding: 16px;
+            border: 1px solid var(--md-outline-variant);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .metric-title {
+            font: var(--md-typescale-title-medium);
+            color: var(--md-on-surface);
+        }
+
+        .metric-value {
+            font: var(--md-typescale-display-small);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .metric-trend {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font: var(--md-typescale-body-medium);
+            font-weight: 600;
+        }
+
+        /* Trend Charts */
+        .trend-charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 16px;
+        }
+
+        .chart-card {
+            background: var(--md-surface-container-low);
+            border-radius: var(--md-shape-corner-large);
+            padding: 16px;
+            border: 1px solid var(--md-outline-variant);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .chart-title {
+            font: var(--md-typescale-title-medium);
+            color: var(--md-on-surface);
+        }
+
+        .chart-container {
+            height: 160px;
+            position: relative;
+            background: var(--md-surface);
+            border-radius: var(--md-shape-corner-small);
+            padding: 12px;
+            border: 1px solid var(--md-outline-variant);
+        }
+
+        .chart-line {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            right: 12px;
+            height: 2px;
+            background: var(--md-primary);
+            border-radius: 1px;
+        }
+
+        .chart-points {
+            position: absolute;
+            bottom: 11px;
+            left: 12px;
+            right: 16px;
+            height: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-point {
+            width: 8px;
+            height: 8px;
+            background: var(--md-primary);
+            border-radius: 50%;
+            box-shadow: var(--md-elevation-1);
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 12px;
+            font: var(--md-typescale-body-small);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        /* Status Indicators */
+        .status-good {
+            color: var(--md-success);
+        }
+
+        .status-warning {
+            color: var(--md-warning);
+        }
+
+        .status-error {
+            color: var(--md-error);
+        }
+
+        .status-info {
+            color: var(--md-info);
+        }
+
+        /* Metric Focus Filtering */
+        .metric-filter-active {
+            transition: all var(--md-motion-duration-medium2) var(--md-motion-easing-standard);
+        }
+
+        .metric-filter-hidden {
+            opacity: 0.3;
+            transform: scale(0.98);
+            filter: grayscale(50%);
+        }
+
+        .metric-filter-highlighted {
+            transform: scale(1.02);
+            box-shadow: var(--md-elevation-4);
+            border: 2px solid var(--md-primary);
+        }
+
+        .chart-filter-hidden {
+            opacity: 0.3;
+            filter: grayscale(70%);
+        }
+
+        .chart-filter-highlighted {
+            border: 2px solid var(--md-primary);
+            box-shadow: var(--md-elevation-3);
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .slide-up {
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 8px 16px;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .navbar-left, .navbar-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .company-name {
+                font-size: 16px;
+            }
+
+            .menubar, .submenu {
+                padding: 0 16px;
+                overflow-x: auto;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                justify-content: flex-start;
+            }
+
+            .submenu-left {
+                gap: 2px;
+            }
+
+            .submenu-right {
+                display: none;
+            }
+
+            .menubar::-webkit-scrollbar, .submenu::-webkit-scrollbar {
+                display: none;
+            }
+
+            .controls-panel {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .trend-charts {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="navbar-left">
+                <a href="#" class="company-logo">
+                    <div class="logo-icon">TC</div>
+                    <span class="company-name">TechCorp Analytics</span>
+                </a>
+            </div>
+            <div class="navbar-right">
+                <div class="user-profile">
+                    <div class="user-avatar">JD</div>
+                    <div class="user-info">
+                        <span class="username">John Doe</span>
+                        <span class="user-role">Analytics Manager</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Menu Bar -->
+        <nav class="menubar">
+            <a href="#" class="menu-item active">Dashboard</a>
+            <a href="executive.html" class="menu-item">Executive Summary</a>
+            <a href="agent-vendor-scorecard.html" class="menu-item">Vendor Scorecard</a>
+            <a href="grafana-executive-dashboard.html" class="menu-item">Grafana Integration</a>
+            <a href="#" class="menu-item">Reports</a>
+            <a href="#" class="menu-item">Settings</a>
+        </nav>
+
+        <!-- Sub Menu -->
+        <nav class="submenu">
+            <div class="submenu-left">
+                <a href="#" class="submenu-item active">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3,3H21V5H19V19H17V5H15V9H13V5H11V15H9V5H7V11H5V5H3V3M9,17V23H7V17H9M13,11V23H11V11H13M17,21V23H15V21H17Z"/>
+                    </svg>
+                    Vendor Analytics
+                </a>
+                <a href="#" class="submenu-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                    </svg>
+                    Agent Performance
+                </a>
+                <a href="#" class="submenu-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6.62,10.79C8.06,13.62 10.38,15.94 13.21,17.38L15.41,15.18C15.68,14.91 16.08,14.82 16.43,14.93C17.55,15.3 18.75,15.5 20,15.5A1,1 0 0,1 21,16.5V20A1,1 0 0,1 20,21C10.61,21 3,13.39 3,4A1,1 0 0,1 4,3H7.5A1,1 0 0,1 8.5,4C8.5,5.25 8.7,6.45 9.07,7.57C9.18,7.92 9.09,8.32 8.82,8.59L6.62,10.79Z"/>
+                    </svg>
+                    Call Quality
+                </a>
+                <a href="#" class="submenu-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M16,6L18.29,8.29L13.41,13.17L9.41,9.17L2,16.59L3.41,18L9.41,12L13.41,16L19.71,9.71L22,12V6H16Z"/>
+                    </svg>
+                    Trending Analysis
+                </a>
+                <a href="#" class="submenu-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M10,21H14A2,2 0 0,1 12,23A2,2 0 0,1 10,21M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M17,11A5,5 0 0,0 12,6A5,5 0 0,0 7,11V18H17V11Z"/>
+                    </svg>
+                    Alerts
+                </a>
+                <a href="#" class="submenu-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                    </svg>
+                    Export Data
+                </a>
+            </div>
+            <div class="submenu-right">
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Summary Panel -->
+            <section class="content-section summary-panel slide-up">
+                <div class="section-content">
+                    <div class="summary-grid">
+                    <div class="summary-card metric-filter-active" data-metric="agents">
+                        <div class="tooltip-container">
+                            <div class="summary-label">% of Agents Having Issues</div>
+                            <div class="info-icon">
+                                i
+                                <div class="tooltip">Percentage of agents experiencing disconnected or degraded calls</div>
+                            </div>
+                        </div>
+                        <div class="summary-value status-warning" id="summaryAgentsWithIssues">23.7%</div>
+                        <div class="summary-subtext" id="summaryAgentsWithIssuesCount">41 of 205 agents</div>
+                        <div class="summary-trend status-error">
+                            <span>↗</span>
+                            <span>+5.2%</span>
+                        </div>
+                    </div>
+                    <div class="summary-card metric-filter-active" data-metric="disconnected">
+                        <div class="tooltip-container">
+                            <div class="summary-label">Total Disconnected Calls</div>
+                            <div class="info-icon">
+                                i
+                                <div class="tooltip">Total number of calls that were disconnected across all vendors</div>
+                            </div>
+                        </div>
+                        <div class="summary-value status-error" id="summaryDisconnected">640</div>
+                        <div class="summary-subtext" id="summaryDisconnectedSubtext">12.4 calls per agent avg</div>
+                        <div class="summary-trend status-error">
+                            <span>↗</span>
+                            <span>+3.5%</span>
+                        </div>
+                    </div>
+                    <div class="summary-card metric-filter-active" data-metric="disconnected">
+                        <div class="tooltip-container">
+                            <div class="summary-label">% of Disconnected Agents</div>
+                            <div class="info-icon">
+                                i
+                                <div class="tooltip">Percentage of agents who experienced disconnected calls</div>
+                            </div>
+                        </div>
+                        <div class="summary-value status-error" id="summaryDisconnectedAgents">18.5%</div>
+                        <div class="summary-subtext" id="summaryDisconnectedAgentsCount">38 of 205 agents</div>
+                        <div class="summary-trend status-error">
+                            <span>↗</span>
+                            <span>+4.1%</span>
+                        </div>
+                    </div>
+                    <div class="summary-card metric-filter-active" data-metric="degraded">
+                        <div class="tooltip-container">
+                            <div class="summary-label">Total Degraded Calls</div>
+                            <div class="info-icon">
+                                i
+                                <div class="tooltip">Total number of calls with quality degradation across all vendors</div>
+                            </div>
+                        </div>
+                        <div class="summary-value status-warning" id="summaryDegraded">557</div>
+                        <div class="summary-subtext" id="summaryDegradedSubtext">10.8 calls per agent avg</div>
+                        <div class="summary-trend status-good">
+                            <span>↘</span>
+                            <span>-1.8%</span>
+                        </div>
+                    </div>
+                    <div class="summary-card metric-filter-active" data-metric="degraded">
+                        <div class="tooltip-container">
+                            <div class="summary-label">% of Degraded Agents</div>
+                            <div class="info-icon">
+                                i
+                                <div class="tooltip">Percentage of agents who experienced degraded call quality</div>
+                            </div>
+                        </div>
+                        <div class="summary-value status-warning" id="summaryDegradedAgents">21.9%</div>
+                        <div class="summary-subtext" id="summaryDegradedAgentsCount">45 of 205 agents</div>
+                        <div class="summary-trend status-warning">
+                            <span>↗</span>
+                            <span>+2.3%</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Controls Panel -->
+            <section class="content-section controls-panel fade-in">
+                <div class="section-content">
+                    <div class="controls-panel">
+                <div class="control-group">
+                    <label class="control-label">Select Vendor</label>
+                    <select class="dropdown" id="vendorSelect">
+                        <option value="all">All Vendors</option>
+                        <option value="TSP">TechSupport Pro</option>
+                        <option value="GCN">Global Connect</option>
+                        <option value="PSL">Premium Solutions</option>
+                        <option value="RRP">Rapid Response</option>
+                        <option value="ESP">Elite Support</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Time Interval</label>
+                    <select class="dropdown" id="timeInterval">
+                        <option value="1h">Last 1 Hour</option>
+                        <option value="4h">Last 4 Hours</option>
+                        <option value="24h" selected>Last 24 Hours</option>
+                        <option value="7d">Last 7 Days</option>
+                        <option value="30d">Last 30 Days</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Metric Focus</label>
+                    <select class="dropdown" id="metricFocus">
+                        <option value="all">All Metrics</option>
+                        <option value="disconnected">Disconnected Calls</option>
+                        <option value="degraded">Degraded Calls</option>
+                        <option value="agents">Impacted Agents</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Detailed Analysis Panel -->
+            <section class="content-section analysis-panel slide-up">
+                <div class="section-header">
+                    <div>
+                        <h3 class="section-title">Detailed Analysis</h3>
+                        <p class="section-subtitle">Comprehensive performance metrics and trending data</p>
+                    </div>
+                    <div class="vendor-info" id="vendorInfo">
+                        <div class="vendor-logo" id="vendorLogo">ALL</div>
+                        <div class="vendor-details">
+                            <h3 id="vendorName">All Vendors</h3>
+                            <p id="vendorStatus">System-wide Performance</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-content">
+
+                <!-- Metrics Grid -->
+                <div class="metrics-grid">
+                    <div class="metric-card metric-filter-active" data-metric="disconnected">
+                        <div class="metric-header">
+                            <div class="tooltip-container">
+                                <h3 class="metric-title">Disconnected Calls</h3>
+                                <div class="info-icon">
+                                    i
+                                    <div class="tooltip">Total number of calls that were unexpectedly disconnected</div>
+                                </div>
+                            </div>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color: var(--md-error);">
+                                <path d="M6.62 10.79C8.06 13.62 10.38 15.94 13.21 17.38L15.41 15.18C15.68 14.91 16.08 14.82 16.43 14.93C17.55 15.3 18.75 15.5 20 15.5C20.55 15.5 21 15.95 21 16.5V20C21 20.55 20.55 21 20 21C10.61 21 3 13.39 3 4C3 3.45 3.45 3 4 3H7.5C8.05 3 8.5 3.45 8.5 4C8.5 5.25 8.7 6.45 9.07 7.57C9.18 7.92 9.09 8.32 8.82 8.59L6.62 10.79Z"/>
+                            </svg>
+                        </div>
+                        <div class="metric-value status-error" id="detailDisconnected">640</div>
+                        <div class="metric-trend status-warning">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7 14L12 9L17 14H7Z"/>
+                            </svg>
+                            <span id="disconnectedTrend">+3.5%</span>
+                        </div>
+                    </div>
+
+                    <div class="metric-card metric-filter-active" data-metric="degraded">
+                        <div class="metric-header">
+                            <div class="tooltip-container">
+                                <h3 class="metric-title">Degraded Calls</h3>
+                                <div class="info-icon">
+                                    i
+                                    <div class="tooltip">Calls with poor quality including audio issues, delays, or distortion</div>
+                                </div>
+                            </div>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color: var(--md-warning);">
+                                <path d="M11 7H13V13H11V7ZM11 15H13V17H11V15Z"/>
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                            </svg>
+                        </div>
+                        <div class="metric-value status-warning" id="detailDegraded">557</div>
+                        <div class="metric-trend status-good">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7 10L12 15L17 10H7Z"/>
+                            </svg>
+                            <span id="degradedTrend">-1.8%</span>
+                        </div>
+                    </div>
+
+                    <div class="metric-card metric-filter-active" data-metric="agents">
+                        <div class="metric-header">
+                            <div class="tooltip-container">
+                                <h3 class="metric-title">Impacted Agents</h3>
+                                <div class="info-icon">
+                                    i
+                                    <div class="tooltip">Percentage of agents experiencing call issues or quality problems</div>
+                                </div>
+                            </div>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color: var(--md-info);">
+                                <path d="M16 4C18.2 4 20 5.8 20 8C20 10.2 18.2 12 16 12C13.8 12 12 10.2 12 8C12 5.8 13.8 4 16 4ZM16 14C20.42 14 24 15.79 24 18V20H8V18C8 15.79 11.58 14 16 14Z"/>
+                                <path d="M8 4C10.2 4 12 5.8 12 8C12 10.2 10.2 12 8 12C5.8 12 4 10.2 4 8C4 5.8 5.8 4 8 4ZM8 14C12.42 14 16 15.79 16 18V20H0V18C0 15.79 3.58 14 8 14Z"/>
+                            </svg>
+                        </div>
+                        <div class="metric-value status-warning" id="detailImpactedAgents">23.7%</div>
+                        <div class="metric-trend status-error">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7 14L12 9L17 14H7Z"/>
+                            </svg>
+                            <span id="agentsTrend">+5.2%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trend Charts -->
+                <div class="trend-charts">
+                    <div class="chart-card metric-filter-active" data-metric="disconnected">
+                        <div class="chart-header">
+                            <div class="tooltip-container">
+                                <h3 class="chart-title">Disconnected Calls Trend</h3>
+                                <div class="info-icon">
+                                    i
+                                    <div class="tooltip">Hourly trend of disconnected calls over the selected time period</div>
+                                </div>
+                            </div>
+                            <span class="status-error">24H View</span>
+                        </div>
+                        <div class="chart-container" id="disconnectedChart">
+                            <div class="chart-line"></div>
+                            <div class="chart-points">
+                                <div class="chart-point"></div>
+                                <div class="chart-point"></div>
+                                <div class="chart-point"></div>
+                                <div class="chart-point"></div>
+                                <div class="chart-point"></div>
+                                <div class="chart-point"></div>
+                            </div>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--md-error);"></div>
+                                <span>Disconnected Calls</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-card metric-filter-active" data-metric="degraded">
+                        <div class="chart-header">
+                            <div class="tooltip-container">
+                                <h3 class="chart-title">Degraded Calls Trend</h3>
+                                <div class="info-icon">
+                                    i
+                                    <div class="tooltip">Hourly trend of degraded call quality over the selected time period</div>
+                                </div>
+                            </div>
+                            <span class="status-warning">24H View</span>
+                        </div>
+                        <div class="chart-container" id="degradedChart">
+                            <div class="chart-line" style="background: var(--md-warning);"></div>
+                            <div class="chart-points">
+                                <div class="chart-point" style="background: var(--md-warning);"></div>
+                                <div class="chart-point" style="background: var(--md-warning);"></div>
+                                <div class="chart-point" style="background: var(--md-warning);"></div>
+                                <div class="chart-point" style="background: var(--md-warning);"></div>
+                                <div class="chart-point" style="background: var(--md-warning);"></div>
+                                <div class="chart-point" style="background: var(--md-warning);"></div>
+                            </div>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--md-warning);"></div>
+                                <span>Degraded Calls</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-card metric-filter-active" data-metric="agents">
+                        <div class="chart-header">
+                            <div class="tooltip-container">
+                                <h3 class="chart-title">Impacted Agents % Trend</h3>
+                                <div class="info-icon">
+                                    i
+                                    <div class="tooltip">Hourly trend of percentage of agents experiencing issues</div>
+                                </div>
+                            </div>
+                            <span class="status-info">24H View</span>
+                        </div>
+                        <div class="chart-container" id="agentsChart">
+                            <div class="chart-line" style="background: var(--md-info);"></div>
+                            <div class="chart-points">
+                                <div class="chart-point" style="background: var(--md-info);"></div>
+                                <div class="chart-point" style="background: var(--md-info);"></div>
+                                <div class="chart-point" style="background: var(--md-info);"></div>
+                                <div class="chart-point" style="background: var(--md-info);"></div>
+                                <div class="chart-point" style="background: var(--md-info);"></div>
+                                <div class="chart-point" style="background: var(--md-info);"></div>
+                            </div>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--md-info);"></div>
+                                <span>Impacted Agents %</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Footer with Last Updated -->
+    <footer class="dashboard-footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <div class="company-info">
+                    <h4>Analytics Dashboard</h4>
+                    <p>Comprehensive vendor performance monitoring and analytics platform</p>
+                </div>
+                <div class="footer-links">
+                    <div class="link-group">
+                        <h5>Resources</h5>
+                        <a href="#">Documentation</a>
+                        <a href="#">API Reference</a>
+                        <a href="#">Support</a>
+                    </div>
+                    <div class="link-group">
+                        <h5>Analytics</h5>
+                        <a href="#">Performance Reports</a>
+                        <a href="#">Vendor Metrics</a>
+                        <a href="#">Agent Insights</a>
+                    </div>
+                    <div class="link-group">
+                        <h5>Account</h5>
+                        <a href="#">Settings</a>
+                        <a href="#">Preferences</a>
+                        <a href="#">Export Data</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="last-updated-display">
+                    <div class="status-indicator"></div>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
+                    </svg>
+                    <span id="lastUpdatedBanner">Last Updated: Loading...</span>
+                </div>
+                <div class="footer-copyright">
+                    <p>&copy; 2025 Analytics Platform. All rights reserved. | Privacy Policy | Terms of Service</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Sample data structure with comprehensive vendor and trending data
+        const vendorAnalyticsData = {
+            TSP: {
+                name: "TechSupport Pro",
+                code: "TSP",
+                status: "Active - Technical Support",
+                totalAgents: 45,
+                impactedAgents: 8,
+                impactedAgentsPercent: 17.8,
+                disconnectedCalls: 127,
+                degradedCalls: 89,
+                qualityScore: 92.4,
+                trends: {
+                    disconnectedCalls: { current: 127, yesterday: 142, change: -10.6 },
+                    degradedCalls: { current: 89, yesterday: 95, change: -6.3 },
+                    impactedAgents: { current: 17.8, yesterday: 16.2, change: 9.9 },
+                    qualityScore: { current: 92.4, yesterday: 91.8, change: 0.7 }
+                },
+                hourlyData: {
+                    disconnectedCalls: [15, 18, 12, 22, 19, 14, 16, 21, 17, 13, 20, 18, 15, 19, 16, 14, 22, 17, 19, 15, 18, 16, 20, 17],
+                    degradedCalls: [8, 12, 9, 15, 11, 7, 10, 13, 9, 8, 14, 10, 9, 11, 8, 7, 12, 9, 11, 8, 10, 9, 13, 10],
+                    impactedAgents: [15.6, 17.8, 16.2, 20.0, 18.9, 15.5, 16.7, 21.1, 17.8, 15.6, 19.5, 17.2, 16.1, 18.3, 16.7, 15.2, 20.1, 17.9, 18.5, 16.3, 17.8, 16.9, 19.2, 17.8],
+                    qualityScore: [91.2, 92.1, 91.8, 90.5, 91.3, 92.7, 92.0, 90.2, 91.9, 92.5, 90.8, 91.6, 92.3, 91.1, 92.0, 92.8, 90.3, 91.7, 91.4, 92.2, 91.8, 92.1, 90.9, 92.4]
+                }
+            },
+            GCN: {
+                name: "Global Connect",
+                code: "GCN",
+                status: "Active - Customer Support",
+                totalAgents: 38,
+                impactedAgents: 11,
+                impactedAgentsPercent: 28.9,
+                disconnectedCalls: 203,
+                degradedCalls: 156,
+                qualityScore: 87.8,
+                trends: {
+                    disconnectedCalls: { current: 203, yesterday: 189, change: 7.4 },
+                    degradedCalls: { current: 156, yesterday: 143, change: 9.1 },
+                    impactedAgents: { current: 28.9, yesterday: 26.3, change: 9.9 },
+                    qualityScore: { current: 87.8, yesterday: 89.1, change: -1.5 }
+                },
+                hourlyData: {
+                    disconnectedCalls: [18, 22, 16, 28, 24, 19, 21, 26, 23, 17, 25, 22, 19, 24, 21, 18, 27, 23, 25, 20, 22, 21, 26, 23],
+                    degradedCalls: [14, 18, 13, 22, 19, 15, 17, 21, 18, 14, 20, 17, 15, 19, 16, 14, 21, 18, 20, 16, 18, 17, 22, 19],
+                    impactedAgents: [26.3, 28.9, 27.1, 31.6, 29.5, 26.8, 28.2, 32.1, 29.1, 26.5, 30.7, 28.4, 27.3, 29.8, 28.0, 26.2, 31.2, 28.7, 30.1, 27.6, 28.9, 27.8, 30.5, 28.9],
+                    qualityScore: [88.1, 87.8, 88.5, 86.2, 87.4, 89.1, 88.3, 85.9, 87.6, 88.9, 86.5, 87.9, 88.7, 87.2, 88.0, 89.2, 86.1, 87.7, 87.9, 88.4, 87.8, 88.2, 86.8, 87.8]
+                }
+            },
+            PSL: {
+                name: "Premium Solutions",
+                code: "PSL",
+                status: "Active - Premium Support",
+                totalAgents: 52,
+                impactedAgents: 7,
+                impactedAgentsPercent: 13.5,
+                disconnectedCalls: 89,
+                degradedCalls: 67,
+                qualityScore: 95.1,
+                trends: {
+                    disconnectedCalls: { current: 89, yesterday: 91, change: -2.2 },
+                    degradedCalls: { current: 67, yesterday: 69, change: -2.9 },
+                    impactedAgents: { current: 13.5, yesterday: 13.0, change: 3.8 },
+                    qualityScore: { current: 95.1, yesterday: 94.9, change: 0.2 }
+                },
+                hourlyData: {
+                    disconnectedCalls: [8, 12, 6, 15, 11, 7, 9, 14, 10, 6, 13, 9, 7, 12, 8, 6, 15, 10, 12, 8, 11, 9, 14, 10],
+                    degradedCalls: [5, 8, 4, 11, 7, 4, 6, 9, 7, 4, 10, 6, 5, 8, 6, 4, 11, 7, 9, 5, 7, 6, 10, 7],
+                    impactedAgents: [12.5, 13.5, 11.5, 15.4, 13.8, 11.8, 12.7, 15.0, 13.3, 12.0, 14.6, 13.1, 12.2, 13.7, 12.8, 11.5, 15.2, 13.5, 14.1, 12.6, 13.5, 12.9, 14.8, 13.5],
+                    qualityScore: [94.5, 95.1, 94.8, 93.2, 94.6, 95.4, 94.9, 93.0, 94.7, 95.3, 93.5, 94.8, 95.2, 94.4, 94.9, 95.5, 93.1, 94.8, 94.6, 95.0, 95.1, 95.3, 93.4, 95.1]
+                }
+            },
+            RRP: {
+                name: "Rapid Response",
+                code: "RRP",
+                status: "Active - Emergency Support",
+                totalAgents: 29,
+                impactedAgents: 12,
+                impactedAgentsPercent: 41.4,
+                disconnectedCalls: 145,
+                degradedCalls: 234,
+                qualityScore: 83.2,
+                trends: {
+                    disconnectedCalls: { current: 145, yesterday: 132, change: 9.8 },
+                    degradedCalls: { current: 234, yesterday: 218, change: 7.3 },
+                    impactedAgents: { current: 41.4, yesterday: 37.9, change: 9.2 },
+                    qualityScore: { current: 83.2, yesterday: 85.1, change: -2.2 }
+                },
+                hourlyData: {
+                    disconnectedCalls: [12, 16, 10, 22, 18, 13, 15, 21, 17, 11, 20, 16, 13, 19, 15, 12, 23, 18, 20, 14, 17, 16, 22, 17],
+                    degradedCalls: [18, 24, 16, 32, 28, 20, 22, 30, 26, 17, 29, 23, 19, 27, 22, 18, 33, 27, 30, 21, 25, 23, 31, 26],
+                    impactedAgents: [37.9, 41.4, 34.5, 48.3, 44.8, 37.2, 41.4, 48.3, 44.8, 34.5, 48.3, 41.4, 37.9, 44.8, 41.4, 34.5, 51.7, 44.8, 48.3, 37.9, 41.4, 41.4, 48.3, 41.4],
+                    qualityScore: [84.1, 83.2, 85.5, 80.3, 82.4, 84.8, 83.6, 80.1, 82.7, 85.2, 80.7, 83.1, 84.9, 82.3, 83.5, 85.5, 79.8, 82.8, 82.1, 84.6, 83.2, 84.0, 81.2, 83.2]
+                }
+            },
+            ESP: {
+                name: "Elite Support",
+                code: "ESP",
+                status: "Active - Elite Support",
+                totalAgents: 41,
+                impactedAgents: 5,
+                impactedAgentsPercent: 12.2,
+                disconnectedCalls: 76,
+                degradedCalls: 45,
+                qualityScore: 96.8,
+                trends: {
+                    disconnectedCalls: { current: 76, yesterday: 82, change: -7.3 },
+                    degradedCalls: { current: 45, yesterday: 51, change: -11.8 },
+                    impactedAgents: { current: 12.2, yesterday: 12.8, change: -4.7 },
+                    qualityScore: { current: 96.8, yesterday: 96.2, change: 0.6 }
+                },
+                hourlyData: {
+                    disconnectedCalls: [6, 9, 5, 12, 8, 5, 7, 11, 8, 5, 10, 7, 6, 9, 7, 5, 12, 8, 10, 6, 8, 7, 11, 8],
+                    degradedCalls: [3, 6, 2, 8, 5, 3, 4, 7, 5, 2, 7, 4, 3, 6, 4, 2, 8, 5, 7, 3, 5, 4, 7, 5],
+                    impactedAgents: [12.2, 12.2, 9.8, 17.1, 14.6, 9.8, 12.2, 17.1, 14.6, 9.8, 17.1, 12.2, 12.2, 14.6, 12.2, 9.8, 19.5, 14.6, 17.1, 12.2, 14.6, 12.2, 17.1, 12.2],
+                    qualityScore: [96.2, 96.8, 97.2, 95.1, 96.5, 97.0, 96.7, 95.0, 96.4, 97.3, 95.4, 96.6, 97.1, 96.3, 96.8, 97.4, 94.9, 96.5, 96.2, 96.9, 96.8, 97.0, 95.2, 96.8]
+                }
+            }
+        };
+
+        // Utility functions
+        function formatNumber(num) {
+            return new Intl.NumberFormat().format(num);
+        }
+
+        function formatTrendPercentage(percentage) {
+            const sign = percentage >= 0 ? '+' : '';
+            return `${sign}${percentage.toFixed(1)}%`;
+        }
+
+        function getTrendIcon(percentage) {
+            if (percentage > 0) return '↗';
+            if (percentage < 0) return '↘';
+            return '→';
+        }
+
+        function getTrendClass(percentage, isNegativeGood = false) {
+            if (isNegativeGood) {
+                if (percentage < 0) return 'status-good';
+                if (percentage > 5) return 'status-error';
+                return 'status-warning';
+            } else {
+                if (percentage > 0) return 'status-good';
+                if (percentage < -5) return 'status-error';
+                return 'status-warning';
+            }
+        }
+
+        // Calculate system-wide summaries with agent-focused metrics
+        function calculateSystemSummary() {
+            const vendors = Object.values(vendorAnalyticsData);
+            
+            const totalAgents = vendors.reduce((sum, v) => sum + v.totalAgents, 0);
+            const totalImpactedAgents = vendors.reduce((sum, v) => sum + v.impactedAgents, 0);
+            const totalDisconnected = vendors.reduce((sum, v) => sum + v.disconnectedCalls, 0);
+            const totalDegraded = vendors.reduce((sum, v) => sum + v.degradedCalls, 0);
+            
+            // Calculate agents with disconnected calls
+            const agentsWithDisconnected = Math.round(totalAgents * 0.185); // 18.5%
+            const agentsWithDegraded = Math.round(totalAgents * 0.219); // 21.9%
+            
+            const agentsWithIssuesPercent = (totalImpactedAgents / totalAgents) * 100;
+            const disconnectedAgentsPercent = (agentsWithDisconnected / totalAgents) * 100;
+            const degradedAgentsPercent = (agentsWithDegraded / totalAgents) * 100;
+
+            return {
+                totalAgents,
+                totalImpactedAgents,
+                agentsWithIssuesPercent,
+                disconnected: totalDisconnected,
+                degraded: totalDegraded,
+                agentsWithDisconnected,
+                agentsWithDegraded,
+                disconnectedAgentsPercent,
+                degradedAgentsPercent,
+                avgCallsPerAgent: (totalDisconnected / totalAgents).toFixed(1),
+                avgDegradedPerAgent: (totalDegraded / totalAgents).toFixed(1)
+            };
+        }
+
+        // Update summary panel with agent-focused metrics
+        function updateSummaryPanel() {
+            const summary = calculateSystemSummary();
+            
+            // Update agents with issues
+            document.getElementById('summaryAgentsWithIssues').textContent = summary.agentsWithIssuesPercent.toFixed(1) + '%';
+            document.getElementById('summaryAgentsWithIssuesCount').textContent = `${summary.totalImpactedAgents} of ${summary.totalAgents} agents`;
+            
+            // Update total disconnected calls
+            document.getElementById('summaryDisconnected').textContent = formatNumber(summary.disconnected);
+            document.getElementById('summaryDisconnectedSubtext').textContent = `${summary.avgCallsPerAgent} calls per agent avg`;
+            
+            // Update disconnected agents percentage
+            document.getElementById('summaryDisconnectedAgents').textContent = summary.disconnectedAgentsPercent.toFixed(1) + '%';
+            document.getElementById('summaryDisconnectedAgentsCount').textContent = `${summary.agentsWithDisconnected} of ${summary.totalAgents} agents`;
+            
+            // Update total degraded calls
+            document.getElementById('summaryDegraded').textContent = formatNumber(summary.degraded);
+            document.getElementById('summaryDegradedSubtext').textContent = `${summary.avgDegradedPerAgent} calls per agent avg`;
+            
+            // Update degraded agents percentage
+            document.getElementById('summaryDegradedAgents').textContent = summary.degradedAgentsPercent.toFixed(1) + '%';
+            document.getElementById('summaryDegradedAgentsCount').textContent = `${summary.agentsWithDegraded} of ${summary.totalAgents} agents`;
+        }
+
+        // Update vendor info display
+        function updateVendorInfo(vendorCode) {
+            const vendorLogo = document.getElementById('vendorLogo');
+            const vendorName = document.getElementById('vendorName');
+            const vendorStatus = document.getElementById('vendorStatus');
+
+            if (vendorCode === 'all') {
+                vendorLogo.textContent = 'ALL';
+                vendorName.textContent = 'All Vendors';
+                vendorStatus.textContent = 'System-wide Performance';
+            } else {
+                const vendor = vendorAnalyticsData[vendorCode];
+                vendorLogo.textContent = vendor.code;
+                vendorName.textContent = vendor.name;
+                vendorStatus.textContent = vendor.status;
+            }
+        }
+
+        // Update detailed metrics with simplified trend display
+        function updateDetailedMetrics(vendorCode) {
+            if (vendorCode === 'all') {
+                const summary = calculateSystemSummary();
+                document.getElementById('detailDisconnected').textContent = formatNumber(summary.disconnected);
+                document.getElementById('detailDegraded').textContent = formatNumber(summary.degraded);
+                document.getElementById('detailImpactedAgents').textContent = summary.agentsWithIssuesPercent.toFixed(1) + '%';
+
+                // Update trends for system-wide (simplified - just percentage)
+                document.getElementById('disconnectedTrend').textContent = '+3.5%';
+                document.getElementById('degradedTrend').textContent = '-1.8%';
+                document.getElementById('agentsTrend').textContent = '+5.2%';
+            } else {
+                const vendor = vendorAnalyticsData[vendorCode];
+                const trends = vendor.trends;
+
+                document.getElementById('detailDisconnected').textContent = formatNumber(vendor.disconnectedCalls);
+                document.getElementById('detailDegraded').textContent = formatNumber(vendor.degradedCalls);
+                document.getElementById('detailImpactedAgents').textContent = vendor.impactedAgentsPercent.toFixed(1) + '%';
+
+                // Update individual vendor trends (simplified - just percentage)
+                document.getElementById('disconnectedTrend').textContent = formatTrendPercentage(trends.disconnectedCalls.change);
+                document.getElementById('degradedTrend').textContent = formatTrendPercentage(trends.degradedCalls.change);
+                document.getElementById('agentsTrend').textContent = formatTrendPercentage(trends.impactedAgents.change);
+            }
+        }
+
+        // Event listeners
+        document.getElementById('vendorSelect').addEventListener('change', function() {
+            const selectedVendor = this.value;
+            updateVendorInfo(selectedVendor);
+            updateDetailedMetrics(selectedVendor);
+        });
+
+        document.getElementById('timeInterval').addEventListener('change', function() {
+            const selectedInterval = this.value;
+            // Update chart time labels
+            const chartTitles = document.querySelectorAll('.chart-card .chart-header span');
+            chartTitles.forEach(title => {
+                if (selectedInterval === '1h') title.textContent = '1H View';
+                else if (selectedInterval === '4h') title.textContent = '4H View';
+                else if (selectedInterval === '24h') title.textContent = '24H View';
+                else if (selectedInterval === '7d') title.textContent = '7D View';
+                else if (selectedInterval === '30d') title.textContent = '30D View';
+            });
+        });
+
+        document.getElementById('metricFocus').addEventListener('change', function() {
+            const selectedMetric = this.value;
+            applyMetricFilter(selectedMetric);
+        });
+
+        // Apply metric filtering functionality
+        function applyMetricFilter(metricType) {
+            const summaryCards = document.querySelectorAll('.summary-card');
+            const metricCards = document.querySelectorAll('.metric-card');
+            const chartCards = document.querySelectorAll('.chart-card');
+            
+            // Remove all existing filter classes
+            summaryCards.forEach(card => {
+                card.classList.remove('metric-filter-hidden', 'metric-filter-highlighted');
+            });
+            metricCards.forEach(card => {
+                card.classList.remove('metric-filter-hidden', 'metric-filter-highlighted');
+            });
+            chartCards.forEach(card => {
+                card.classList.remove('chart-filter-hidden', 'chart-filter-highlighted');
+            });
+            
+            if (metricType === 'all') {
+                // Show all metrics normally
+                return;
+            }
+            
+            // Apply filtering based on selected metric
+            summaryCards.forEach(card => {
+                const cardMetric = card.getAttribute('data-metric');
+                if (cardMetric === metricType) {
+                    card.classList.add('metric-filter-highlighted');
+                } else {
+                    card.classList.add('metric-filter-hidden');
+                }
+            });
+            
+            metricCards.forEach(card => {
+                const cardMetric = card.getAttribute('data-metric');
+                if (cardMetric === metricType) {
+                    card.classList.add('metric-filter-highlighted');
+                } else {
+                    card.classList.add('metric-filter-hidden');
+                }
+            });
+            
+            chartCards.forEach(card => {
+                const cardMetric = card.getAttribute('data-metric');
+                if (cardMetric === metricType) {
+                    card.classList.add('chart-filter-highlighted');
+                } else {
+                    card.classList.add('chart-filter-hidden');
+                }
+            });
+            
+            // Log the filtering action
+            console.log('Metric focus applied:', metricType);
+        }
+
+        // Update timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            const timeString = now.toLocaleString();
+            document.getElementById('lastUpdatedBanner').textContent = `Last Updated: ${timeString}`;
+        }
+
+        // Initialize dashboard
+        function initializeDashboard() {
+            updateSummaryPanel();
+            updateVendorInfo('all');
+            updateDetailedMetrics('all');
+            updateTimestamp();
+
+            // Auto-refresh every 2 minutes
+            setInterval(() => {
+                updateTimestamp();
+                // In a real implementation, this would also refresh data
+            }, 2 * 60 * 1000);
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+    </script>
+</body>
+</html>

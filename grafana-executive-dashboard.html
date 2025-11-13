@@ -97,6 +97,470 @@
             gap:4px;
             color:var(--muted);
         }
+        /* Small sparkline inside KPI */
+        .sparkline{
+            width:100%;
+            height:32px;
+            display:block;
+            margin-top:8px;
+        }
+        .kpi-graphic{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+            margin-top:6px;
+        }
+        
+        /* Enhanced Chart Components */
+        /* Gauge Charts */
+        .gauge-chart {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+        
+        .gauge-bg {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border);
+            border-radius: 50%;
+            position: absolute;
+            top: -30px;
+            clip: rect(0, 60px, 30px, 0);
+        }
+        
+        .gauge-fill {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--accent);
+            border-radius: 50%;
+            position: absolute;
+            top: -30px;
+            clip: rect(0, 60px, 30px, 0);
+            transform: rotate(180deg);
+            transition: transform 0.6s ease;
+        }
+        
+        .gauge-text {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        /* Mini Donut Charts */
+        .mini-donut {
+            width: 45px;
+            height: 45px;
+            position: relative;
+            margin: 0 auto;
+        }
+        
+        .donut-svg {
+            width: 45px;
+            height: 45px;
+            transform: rotate(-90deg);
+        }
+        
+        .donut-bg {
+            fill: none;
+            stroke: var(--border);
+            stroke-width: 4;
+        }
+        
+        .donut-progress {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 4;
+            stroke-linecap: round;
+            transition: stroke-dasharray 0.6s ease;
+        }
+        
+        .donut-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        /* Horizontal Bar Charts */
+        .mini-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            width: 80px;
+            margin: 0 auto;
+        }
+        
+        .mini-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mini-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+        }
+        
+        .mini-bar-label {
+            font-size: 8px;
+            color: var(--muted);
+            margin-bottom: 2px;
+            text-align: center;
+        }
+        
+        /* Status Indicators */
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-text {
+            font-size: 9px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        /* Multi-metric visualization */
+        .metric-bars {
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            gap: 2px;
+            height: 25px;
+            margin: 8px 0 4px 0;
+        }
+        
+        .metric-bar {
+            width: 6px;
+            background: var(--accent);
+            border-radius: 3px 3px 0 0;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            min-height: 4px;
+        }
+        
+        .metric-bar:hover {
+            opacity: 1;
+            transform: scaleY(1.1);
+        }
+        
+        /* Progress Rings */
+        .progress-ring {
+            width: 50px;
+            height: 50px;
+            position: relative;
+            margin: 0 auto;
+        }
+        
+        .progress-ring svg {
+            width: 50px;
+            height: 50px;
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-bg {
+            fill: none;
+            stroke: var(--border);
+            stroke-width: 5;
+        }
+        
+        .progress-ring-progress {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 5;
+            stroke-linecap: round;
+            transition: stroke-dasharray 0.6s ease;
+        }
+        
+        .progress-ring-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text);
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        /* Chart type indicators */
+        .chart-type-label {
+            font-size: 8px;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Trend arrows and visual indicators */
+        .trend-arrow{
+            display:inline-flex;
+            align-items:center;
+            font-size:12px;
+            font-weight:600;
+            padding:2px 6px;
+            border-radius:4px;
+            margin-left:8px;
+        }
+        .trend-up{background:rgba(220,38,38,0.1);color:var(--danger)}
+        .trend-down{background:rgba(5,150,105,0.1);color:var(--success)}
+        .trend-neutral{background:rgba(100,116,139,0.1);color:var(--muted)}
+        
+        /* Progress bars for KPIs - REMOVED as requested */
+        .kpi-progress{
+            display: none; /* Hidden per user request */
+        }
+        .kpi-progress-bar{
+            display: none; /* Hidden per user request */
+        }
+        
+        /* Drilldown functionality */
+        .drilldown-btn{
+            position:absolute;
+            top:12px;
+            left:12px;
+            background:rgba(255,255,255,0.9);
+            border:1px solid var(--border);
+            border-radius:6px;
+            padding:4px 8px;
+            font-size:10px;
+            font-weight:600;
+            color:var(--accent);
+            cursor:pointer;
+            opacity:0;
+            transition:all 0.2s ease;
+            text-transform:uppercase;
+            letter-spacing:0.5px;
+        }
+        .business-kpi:hover .drilldown-btn,
+        .chart-panel:hover .drilldown-btn{
+            opacity:1;
+        }
+        .drilldown-btn:hover{
+            background:var(--accent);
+            color:white;
+            transform:scale(1.05);
+        }
+        
+        /* Modal for drilldown */
+        .drilldown-modal{
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.6);
+            display:none;
+            justify-content:center;
+            align-items:center;
+            z-index:2000;
+        }
+        .drilldown-content{
+            background:linear-gradient(135deg, rgba(255,255,255,0.98), rgba(248,250,252,0.95));
+            border-radius:12px;
+            padding:24px;
+            max-width:900px;
+            width:90%;
+            max-height:80vh;
+            overflow-y:auto;
+            border:1px solid var(--border);
+            box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);
+            position:relative;
+        }
+        .drilldown-header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:20px;
+            padding-bottom:12px;
+            border-bottom:2px solid var(--border);
+        }
+        .drilldown-title{
+            font-size:24px;
+            font-weight:600;
+            color:var(--text);
+            margin:0;
+        }
+        .drilldown-close{
+            background:none;
+            border:none;
+            color:var(--muted);
+            font-size:24px;
+            cursor:pointer;
+            padding:8px;
+            border-radius:6px;
+            transition:all 0.2s;
+        }
+        .drilldown-close:hover{
+            background:var(--border);
+            color:var(--text);
+        }
+        .drilldown-body{
+            display:grid;
+            gap:20px;
+        }
+        
+        /* Drilldown sections and items */
+        .drilldown-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(248,250,252,0.9) 100%);
+        }
+        
+        .drilldown-section-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 15px;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+        }
+        
+        .drilldown-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .drilldown-item {
+            padding: 12px;
+            background: rgba(255,255,255,0.6);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        
+        .drilldown-item:hover {
+            background: rgba(255,255,255,0.9);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .drilldown-item-label {
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .drilldown-item-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 3px;
+        }
+        
+        .drilldown-item-detail {
+            font-size: 10px;
+            color: var(--muted);
+            font-style: italic;
+        }
+        }
+        .drilldown-section{
+            background:rgba(248,250,252,0.6);
+            padding:16px;
+            border-radius:8px;
+            border:1px solid var(--border);
+        }
+        .drilldown-section-title{
+            font-size:16px;
+            font-weight:600;
+            margin-bottom:12px;
+            color:var(--accent);
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+        .drilldown-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+            gap:12px;
+        }
+        .drilldown-item{
+            background:rgba(255,255,255,0.8);
+            padding:12px;
+            border-radius:6px;
+            border:1px solid var(--border);
+        }
+        .drilldown-item-label{
+            font-size:11px;
+            color:var(--muted);
+            text-transform:uppercase;
+            letter-spacing:0.5px;
+            margin-bottom:4px;
+        }
+        .drilldown-item-value{
+            font-size:18px;
+            font-weight:700;
+            color:var(--text);
+        }
+        .drilldown-item-detail{
+            font-size:10px;
+            color:var(--muted);
+            margin-top:4px;
+        }
+        
+        /* Mini status badges */
+        .status-mini-badge{
+            display:inline-flex;
+            align-items:center;
+            gap:4px;
+            padding:2px 6px;
+            border-radius:8px;
+            font-size:9px;
+            font-weight:600;
+            text-transform:uppercase;
+            letter-spacing:0.5px;
+        }
+        .status-mini-badge.good{background:rgba(5,150,105,0.15);color:var(--success)}
+        .status-mini-badge.warning{background:rgba(234,88,12,0.15);color:var(--warning)}
+        .status-mini-badge.critical{background:rgba(220,38,38,0.15);color:var(--danger)}
+        
+        /* Mini donut chart */
+        .mini-donut{
+            width:24px;
+            height:24px;
+            position:relative;
+            display:inline-block;
+            margin-left:8px;
+        }
+        .mini-donut svg{
+            width:100%;
+            height:100%;
+            transform:rotate(-90deg);
+        }
         .business-kpi .status-icon{
             position:absolute;
             top:12px;
@@ -168,12 +632,36 @@
             justify-content:space-between;
             border:1px solid var(--border);
             min-height:40px;
+            position:relative;
         }
         .data-item-left{display:flex;align-items:center;gap:8px}
         .data-item-left .indicator{width:8px;height:8px;border-radius:50%}
         .data-item-name{font-weight:500;font-size:12px;color:var(--text)}
         .data-item-detail{color:var(--muted);font-size:10px}
         .data-item-value{font-weight:600;font-size:12px;color:var(--text)}
+        
+        /* Enhanced data item visuals */
+        .data-item-progress{
+            position:absolute;
+            bottom:0;
+            left:0;
+            height:3px;
+            background:var(--success);
+            border-radius:0 0 6px 6px;
+            transition:width 0.3s ease;
+        }
+        .data-item-icon{
+            width:16px;
+            height:16px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border-radius:4px;
+            font-size:10px;
+            font-weight:600;
+            color:white;
+            margin-right:4px;
+        }
         
         /* Issues List with ServiceNow Integration Style */
         .issues-summary{display:flex;gap:12px;margin-bottom:12px}
@@ -299,29 +787,111 @@
 
         <!-- Business Text Plugin Style KPIs -->
         <section class="business-kpis">
-            <div class="business-kpi">
+            <div class="business-kpi" onclick="openDrilldown('systems')">
+                <div class="drilldown-btn">Drill Down</div>
                 <div class="status-icon" id="systemsIcon"></div>
                 <div class="metric-label">System Health</div>
                 <div class="metric-value systems" id="systemsHealth">--</div>
                 <div class="metric-change" id="systemsChange">-- systems operational</div>
+                <div class="kpi-graphic">
+                    <!-- Mini Donut Chart for Health Percentage -->
+                    <div class="mini-donut" id="systems-donut">
+                        <svg class="donut-svg" viewBox="0 0 50 50">
+                            <circle class="donut-bg" cx="25" cy="25" r="20"></circle>
+                            <circle class="donut-progress" cx="25" cy="25" r="20" 
+                                stroke-dasharray="0 125.6" id="systems-donut-progress"></circle>
+                        </svg>
+                        <div class="donut-text" id="systems-donut-text">--</div>
+                    </div>
+                    <!-- Sparkline for Trend -->
+                    <svg id="spark-systems" class="sparkline" viewBox="0 0 120 32" preserveAspectRatio="none"></svg>
+                    <!-- Status Indicator -->
+                    <div class="status-indicator">
+                        <div class="status-dot" id="systems-status-dot"></div>
+                    </div>
+                </div>
+                <div class="chart-type-label">Health • Trend • Status</div>
             </div>
-            <div class="business-kpi">
+            <div class="business-kpi" onclick="openDrilldown('workforce')">
+                <div class="drilldown-btn">Drill Down</div>
                 <div class="status-icon" id="workforceIcon"></div>
                 <div class="metric-label">Workforce Ready</div>
                 <div class="metric-value workforce" id="workforceReady">--%</div>
-                <div class="metric-change" id="workforceChange">-- agents online</div>
+                <div class="metric-change" id="workforceChange">-- agents online<span class="trend-arrow" id="workforceTrend">--</span></div>
+                <div class="kpi-graphic">
+                    <!-- Gauge Chart for Readiness Percentage -->
+                    <div class="gauge-chart" id="workforce-gauge">
+                        <div class="gauge-bg"></div>
+                        <div class="gauge-fill" id="workforce-gauge-fill"></div>
+                        <div class="gauge-text" id="workforce-gauge-text">--%</div>
+                    </div>
+                    <!-- Horizontal Bars for Department Breakdown -->
+                    <div class="mini-bars" id="workforce-bars">
+                        <div class="mini-bar-label">Depts</div>
+                        <div class="mini-bar"><div class="mini-bar-fill" style="width: 0%" id="dept-bar-1"></div></div>
+                        <div class="mini-bar"><div class="mini-bar-fill" style="width: 0%" id="dept-bar-2"></div></div>
+                        <div class="mini-bar"><div class="mini-bar-fill" style="width: 0%" id="dept-bar-3"></div></div>
+                    </div>
+                    <!-- Sparkline for Trend -->
+                    <svg id="spark-workforce" class="sparkline" viewBox="0 0 120 32" preserveAspectRatio="none"></svg>
+                </div>
+                <div class="chart-type-label">Gauge • Depts • Trend</div>
             </div>
-            <div class="business-kpi">
+            <div class="business-kpi" onclick="openDrilldown('issues')">
+                <div class="drilldown-btn">Drill Down</div>
                 <div class="status-icon" id="issuesIcon"></div>
                 <div class="metric-label">Critical Issues</div>
                 <div class="metric-value issues" id="criticalIssues">--</div>
-                <div class="metric-change" id="issuesChange">-- total incidents</div>
+                <div class="metric-change" id="issuesChange">-- total incidents<span class="trend-arrow" id="issuesTrend">--</span></div>
+                <div class="kpi-graphic">
+                    <!-- Metric Bars for Issue Priority Distribution -->
+                    <div class="metric-bars" id="issues-bars">
+                        <div class="metric-bar" style="height: 20%" id="p0-bar" title="P0 Critical"></div>
+                        <div class="metric-bar" style="height: 40%" id="p1-bar" title="P1 High"></div>
+                        <div class="metric-bar" style="height: 60%" id="p2-bar" title="P2 Medium"></div>
+                        <div class="metric-bar" style="height: 30%" id="p3-bar" title="P3 Low"></div>
+                        <div class="metric-bar" style="height: 10%" id="resolved-bar" title="Resolved Today"></div>
+                    </div>
+                    <!-- Sparkline for Trend -->
+                    <svg id="spark-issues" class="sparkline" viewBox="0 0 120 32" preserveAspectRatio="none"></svg>
+                    <!-- Status Indicator -->
+                    <div class="status-indicator">
+                        <div class="status-dot" id="issues-status-dot"></div>
+                        <div class="status-text" id="issues-status-text">--</div>
+                    </div>
+                </div>
+                <div class="chart-type-label">Priority • Trend • Status</div>
             </div>
-            <div class="business-kpi">
+            <div class="business-kpi" onclick="openDrilldown('performance')">
+                <div class="drilldown-btn">Drill Down</div>
                 <div class="status-icon" id="performanceIcon"></div>
                 <div class="metric-label">Service Level</div>
                 <div class="metric-value performance" id="serviceLevel">--%</div>
-                <div class="metric-change" id="performanceChange">-- calls/hour</div>
+                <div class="metric-change" id="performanceChange">-- calls/hour<span class="trend-arrow" id="performanceTrend">--</span></div>
+                <div class="kpi-graphic">
+                    <!-- Progress Ring for SLA Achievement -->
+                    <div class="progress-ring" id="performance-ring">
+                        <svg viewBox="0 0 50 50">
+                            <circle class="progress-ring-bg" cx="25" cy="25" r="20"></circle>
+                            <circle class="progress-ring-progress" cx="25" cy="25" r="20" 
+                                stroke-dasharray="0 125.6" id="performance-ring-progress"></circle>
+                        </svg>
+                        <div class="progress-ring-text" id="performance-ring-text">
+                            <div>--</div>
+                            <div style="font-size: 8px; color: var(--muted);">SLA</div>
+                        </div>
+                    </div>
+                    <!-- Mini Bars for Call Metrics -->
+                    <div class="mini-bars" id="performance-bars">
+                        <div class="mini-bar-label">Metrics</div>
+                        <div class="mini-bar"><div class="mini-bar-fill" style="width: 0%" id="wait-time-bar"></div></div>
+                        <div class="mini-bar"><div class="mini-bar-fill" style="width: 0%" id="fcr-bar"></div></div>
+                        <div class="mini-bar"><div class="mini-bar-fill" style="width: 0%" id="abandon-bar"></div></div>
+                    </div>
+                    <!-- Sparkline for Trend -->
+                    <svg id="spark-performance" class="sparkline" viewBox="0 0 120 32" preserveAspectRatio="none"></svg>
+                </div>
+                <div class="chart-type-label">SLA Ring • Metrics • Trend</div>
             </div>
         </section>
 
@@ -329,6 +899,7 @@
         <main class="business-charts">
             <!-- System Health Chart Panel -->
             <section class="chart-panel">
+                <div class="drilldown-btn" onclick="openDrilldown('systems-detail')">Drill Down</div>
                 <div class="chart-header">
                     <div>
                         <div class="chart-title">System Health Overview</div>
@@ -342,10 +913,34 @@
                 <div class="data-grid systems" id="systemsGrid">
                     <!-- Populated by Databricks query simulation -->
                 </div>
+                <!-- Visual Summary Chart -->
+                <div style="margin-top: 12px; padding: 12px; background: rgba(248,250,252,0.4); border-radius: 6px; border: 1px solid var(--border);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 11px; color: var(--muted); font-weight: 600;">HEALTH DISTRIBUTION</span>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <div style="width: 8px; height: 8px; background: var(--success); border-radius: 50%;"></div>
+                                <span style="font-size: 9px; color: var(--muted);">Optimal</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <div style="width: 8px; height: 8px; background: var(--warning); border-radius: 50%;"></div>
+                                <span style="font-size: 9px; color: var(--muted);">Degraded</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <div style="width: 8px; height: 8px; background: var(--danger); border-radius: 50%;"></div>
+                                <span style="font-size: 9px; color: var(--muted);">Critical</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 4px; align-items: end; height: 40px;" id="systems-health-bars">
+                        <!-- Health bars will be populated by JavaScript -->
+                    </div>
+                </div>
             </section>
 
             <!-- Workforce Analytics Chart Panel -->
             <section class="chart-panel">
+                <div class="drilldown-btn" onclick="openDrilldown('workforce-detail')">Drill Down</div>
                 <div class="chart-header">
                     <div>
                         <div class="chart-title">Workforce Analytics</div>
@@ -359,10 +954,18 @@
                 <div class="data-grid metrics" id="workforceGrid">
                     <!-- Populated by Databricks query simulation -->
                 </div>
+                <!-- Department Utilization Chart -->
+                <div style="margin-top: 12px; padding: 12px; background: rgba(248,250,252,0.4); border-radius: 6px; border: 1px solid var(--border);">
+                    <div style="font-size: 11px; color: var(--muted); font-weight: 600; margin-bottom: 8px;">DEPARTMENT UTILIZATION</div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;" id="workforce-utilization-chart">
+                        <!-- Department bars will be populated by JavaScript -->
+                    </div>
+                </div>
             </section>
 
             <!-- ServiceNow Issues Chart Panel -->
             <section class="chart-panel">
+                <div class="drilldown-btn" onclick="openDrilldown('issues-detail')">Drill Down</div>
                 <div class="chart-header">
                     <div>
                         <div class="chart-title">Active Issues</div>
@@ -395,10 +998,21 @@
                 <div class="issues-list" id="issuesList">
                     <!-- Populated by ServiceNow integration -->
                 </div>
+                <!-- Priority Distribution Visualization -->
+                <div style="margin-top: 12px; padding: 12px; background: rgba(248,250,252,0.4); border-radius: 6px; border: 1px solid var(--border);">
+                    <div style="font-size: 11px; color: var(--muted); font-weight: 600; margin-bottom: 8px;">INCIDENT PRIORITY BREAKDOWN</div>
+                    <div style="display: flex; gap: 8px; align-items: end; height: 60px;" id="issues-priority-chart">
+                        <!-- Priority distribution chart will be populated by JavaScript -->
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 9px; color: var(--muted);">
+                        <span>P0</span><span>P1</span><span>P2</span><span>P3</span><span>Resolved</span>
+                    </div>
+                </div>
             </section>
 
             <!-- Call Center Performance Chart Panel -->
             <section class="chart-panel">
+                <div class="drilldown-btn" onclick="openDrilldown('performance-detail')">Drill Down</div>
                 <div class="chart-header">
                     <div>
                         <div class="chart-title">Call Center Performance</div>
@@ -412,8 +1026,28 @@
                 <div class="data-grid metrics" id="callCenterGrid">
                     <!-- Populated by call center metrics -->
                 </div>
+                <!-- Performance Trends Chart -->
+                <div style="margin-top: 12px; padding: 12px; background: rgba(248,250,252,0.4); border-radius: 6px; border: 1px solid var(--border);">
+                    <div style="font-size: 11px; color: var(--muted); font-weight: 600; margin-bottom: 8px;">PERFORMANCE TRENDS</div>
+                    <div style="display: flex; gap: 12px; align-items: center;" id="performance-trends-chart">
+                        <!-- Performance trends will be populated by JavaScript -->
+                    </div>
+                </div>
             </section>
         </main>
+
+        <!-- Drilldown Modal -->
+        <div class="drilldown-modal" id="drilldownModal" onclick="closeDrilldown()">
+            <div class="drilldown-content" onclick="event.stopPropagation()">
+                <div class="drilldown-header">
+                    <h2 class="drilldown-title" id="drilldownTitle">Detailed View</h2>
+                    <button class="drilldown-close" onclick="closeDrilldown()">&times;</button>
+                </div>
+                <div class="drilldown-body" id="drilldownBody">
+                    <!-- Dynamic content will be inserted here -->
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -665,6 +1299,490 @@
             const performanceStatus = serviceLevel < 80 ? 'critical' : 
                                      serviceLevel < 90 ? 'warning' : 'operational'
             setStatusIcon('performanceIcon', performanceStatus)
+            
+            // Update enhanced charts and visualizations
+            updateEnhancedCharts(systemsData, workforceData, incidentsData, callCenterData)
+            
+            // Update chart panel visualizations
+            updateChartPanelVisualizations(systemsData, workforceData, incidentsData, callCenterData)
+            
+            // Render small sparklines for each KPI
+            try {
+                // Systems: use each system health as points
+                const sysPoints = (systemsData.systems || []).map(s => s.health || s.computedHealth || 0)
+                drawSparkline('spark-systems', sysPoints, performanceStatusColor(performanceStatus))
+
+                // Workforce: use departments online ratios + overall readiness
+                const wfPoints = []
+                if (workforceData.departments) {
+                    workforceData.departments.forEach(d => {
+                        const pct = d.scheduled && d.scheduled > 0 ? Math.round((d.online / d.scheduled) * 100) : Math.round(workforceData.readiness_percentage || 0)
+                        wfPoints.push(pct)
+                    })
+                }
+                wfPoints.push(workforceData.readiness_percentage || 0)
+                drawSparkline('spark-workforce', wfPoints, performanceStatusColor(workforceStatus))
+
+                // Issues: trend based on daily changes and counts
+                const issuesPoints = [
+                    incidentsData.p0_count || 0,
+                    incidentsData.p1_count || 0,
+                    incidentsData.p2_count || 0,
+                    Math.max(0, incidentsData.total_count - ((incidentsData.p0_count || 0) + (incidentsData.p1_count || 0)))
+                ]
+                drawSparkline('spark-issues', issuesPoints, performanceStatusColor(issuesStatus || 'operational'))
+
+                // Performance: use key call center metrics
+                const perfPoints = (callCenterData.metrics || []).slice(0,6).map(m => {
+                    // extract numeric portion
+                    const num = parseFloat((m.value || '').toString().replace(/[^0-9.\-]/g, ''))
+                    return isNaN(num) ? 0 : num
+                })
+                if (perfPoints.length === 0 && callCenterData.service_level) perfPoints.push(callCenterData.service_level)
+                drawSparkline('spark-performance', perfPoints, performanceStatusColor(performanceStatus))
+            } catch (e) {
+                console.warn('Sparkline render failed', e)
+            }
+        }
+
+        // Update enhanced charts and visualizations
+        function updateEnhancedCharts(systemsData, workforceData, incidentsData, callCenterData) {
+            // Systems Health - Mini Donut Chart
+            if (systemsData && systemsData.overall_health) {
+                const healthPercent = systemsData.overall_health
+                updateDonutChart('systems-donut-progress', 'systems-donut-text', healthPercent, healthPercent + '%')
+                
+                // Update status dot
+                const statusDot = document.getElementById('systems-status-dot')
+                if (statusDot) {
+                    statusDot.style.background = healthPercent >= 95 ? 'var(--success)' : 
+                                                healthPercent >= 85 ? 'var(--warning)' : 'var(--danger)'
+                }
+            }
+            
+            // Workforce - Gauge Chart and Department Bars
+            if (workforceData && workforceData.readiness_percentage) {
+                const readiness = workforceData.readiness_percentage
+                updateGaugeChart('workforce-gauge-fill', 'workforce-gauge-text', readiness)
+                
+                // Update department bars
+                if (workforceData.departments && workforceData.departments.length >= 3) {
+                    const depts = workforceData.departments.slice(0, 3)
+                    depts.forEach((dept, index) => {
+                        const pct = dept.scheduled > 0 ? (dept.online / dept.scheduled) * 100 : 0
+                        updateBarChart(`dept-bar-${index + 1}`, pct)
+                    })
+                }
+            }
+            
+            // Issues - Priority Distribution Bars
+            if (incidentsData) {
+                const total = incidentsData.total_count || 24
+                const p0 = (incidentsData.p0_count || 0) / total * 100
+                const p1 = (incidentsData.p1_count || 0) / total * 100  
+                const p2 = (incidentsData.p2_count || 0) / total * 100
+                const p3 = (incidentsData.p3_count || 0) / total * 100
+                const resolved = Math.max(0, 100 - p0 - p1 - p2 - p3)
+                
+                updateMetricBar('p0-bar', p0 * 0.8, 'var(--danger)')
+                updateMetricBar('p1-bar', p1 * 0.8, 'var(--warning)')
+                updateMetricBar('p2-bar', p2 * 0.8, 'var(--accent)')
+                updateMetricBar('p3-bar', p3 * 0.8, 'var(--muted)')
+                updateMetricBar('resolved-bar', resolved * 0.8, 'var(--success)')
+                
+                // Update status indicator
+                const statusText = document.getElementById('issues-status-text')
+                const statusDot = document.getElementById('issues-status-dot')
+                if (statusText && statusDot) {
+                    statusText.textContent = (incidentsData.p0_count || 0) > 0 ? 'Critical' : 
+                                           (incidentsData.p1_count || 0) > 2 ? 'Warning' : 'Normal'
+                    statusDot.style.background = (incidentsData.p0_count || 0) > 0 ? 'var(--danger)' : 
+                                                (incidentsData.p1_count || 0) > 2 ? 'var(--warning)' : 'var(--success)'
+                }
+            }
+            
+            // Performance - Progress Ring and Metric Bars
+            if (callCenterData && callCenterData.service_level) {
+                const sla = callCenterData.service_level
+                updateProgressRing('performance-ring-progress', 'performance-ring-text', sla, sla + '%')
+                
+                // Update metric bars
+                const metrics = callCenterData.metrics || []
+                const waitTime = metrics.find(m => m.name === 'Avg Wait Time')
+                const fcr = metrics.find(m => m.name === 'FCR')
+                const abandon = metrics.find(m => m.name === 'Abandon Rate')
+                
+                if (waitTime) {
+                    const waitSeconds = parseFloat(waitTime.value.replace(/[^0-9.]/g, ''))
+                    const waitPercent = Math.max(0, Math.min(100, 100 - (waitSeconds / 60 * 100))) // Invert - lower wait time is better
+                    updateBarChart('wait-time-bar', waitPercent)
+                }
+                
+                if (fcr) {
+                    const fcrPercent = parseFloat(fcr.value.replace(/[^0-9.]/g, ''))
+                    updateBarChart('fcr-bar', fcrPercent)
+                }
+                
+                if (abandon) {
+                    const abandonPercent = parseFloat(abandon.value.replace(/[^0-9.]/g, ''))
+                    const abandonInverted = Math.max(0, 100 - abandonPercent) // Invert - lower abandon is better
+                    updateBarChart('abandon-bar', abandonInverted)
+                }
+            }
+        }
+        
+        // Chart Helper Functions
+        function updateDonutChart(progressId, textId, percentage, displayText) {
+            const progressElement = document.getElementById(progressId)
+            const textElement = document.getElementById(textId)
+            if (progressElement && textElement) {
+                const circumference = 2 * Math.PI * 20 // radius = 20
+                const offset = circumference - (percentage / 100) * circumference
+                progressElement.style.strokeDasharray = `${circumference - offset} ${circumference}`
+                textElement.textContent = displayText
+                
+                // Color coding
+                progressElement.style.stroke = percentage >= 95 ? 'var(--success)' : 
+                                              percentage >= 85 ? 'var(--warning)' : 'var(--danger)'
+            }
+        }
+        
+        function updateGaugeChart(fillId, textId, percentage) {
+            const fillElement = document.getElementById(fillId)
+            const textElement = document.getElementById(textId)
+            if (fillElement && textElement) {
+                const rotation = (percentage / 100) * 180 // 0-180 degrees for half circle
+                fillElement.style.transform = `rotate(${180 + rotation}deg)`
+                textElement.textContent = percentage + '%'
+                
+                // Color coding
+                fillElement.style.borderColor = percentage >= 90 ? 'var(--success)' : 
+                                               percentage >= 75 ? 'var(--warning)' : 'var(--danger)'
+            }
+        }
+        
+        function updateProgressRing(progressId, textId, percentage, displayText) {
+            const progressElement = document.getElementById(progressId)
+            const textElement = document.getElementById(textId)
+            if (progressElement && textElement) {
+                const circumference = 2 * Math.PI * 20
+                const offset = circumference - (percentage / 100) * circumference
+                progressElement.style.strokeDasharray = `${circumference - offset} ${circumference}`
+                textElement.innerHTML = `<div>${percentage}%</div><div style="font-size: 8px; color: var(--muted);">SLA</div>`
+                
+                // Color coding
+                progressElement.style.stroke = percentage >= 95 ? 'var(--success)' : 
+                                              percentage >= 85 ? 'var(--warning)' : 'var(--danger)'
+            }
+        }
+        
+        function updateBarChart(barId, percentage) {
+            const barElement = document.getElementById(barId)
+            if (barElement) {
+                barElement.style.width = Math.max(2, percentage) + '%'
+                
+                // Color coding based on performance
+                if (percentage >= 90) {
+                    barElement.style.background = 'linear-gradient(90deg, var(--success), #10b981)'
+                } else if (percentage >= 75) {
+                    barElement.style.background = 'linear-gradient(90deg, var(--warning), #f59e0b)'
+                } else {
+                    barElement.style.background = 'linear-gradient(90deg, var(--danger), #ef4444)'
+                }
+            }
+        }
+        
+        function updateMetricBar(barId, percentage, color = 'var(--accent)') {
+            const barElement = document.getElementById(barId)
+            if (barElement) {
+                const height = Math.max(8, percentage) + '%'
+                barElement.style.height = height
+                barElement.style.background = color
+            }
+        }
+
+        // Update KPI visual elements (progress bars, trends, mini charts)
+        function updateKPIVisuals(systemsData, workforceData, incidentsData, callCenterData) {
+            // Remove progress bar updates since they're hidden
+            // Systems health - no progress bar update needed
+            
+            // Workforce trend
+            const workforceTrend = workforceData.variance || rand(-20, 15)
+            updateTrendArrow('workforceTrend', workforceTrend)
+
+            // Issues trend from daily change
+            const issuesTrendChange = incidentsData.daily_trends ? incidentsData.daily_trends.total_change : rand(-30, 20)
+            updateTrendArrow('issuesTrend', issuesTrendChange)
+
+            // Performance trend (simulate daily change)
+            const perfTrend = rand(-10, 15)
+            updateTrendArrow('performanceTrend', perfTrend)
+        }
+
+        // Update progress bar width and color
+        function updateProgressBar(barId, percentage, color) {
+            const bar = document.getElementById(barId)
+            if (bar) {
+                bar.style.width = Math.min(100, Math.max(0, percentage)) + '%'
+                bar.style.background = color
+            }
+        }
+
+        // Update trend arrow direction and color
+        function updateTrendArrow(arrowId, changePercent) {
+            const arrow = document.getElementById(arrowId)
+            if (!arrow) return
+            
+            if (changePercent > 2) {
+                arrow.textContent = '↗ +' + Math.round(Math.abs(changePercent)) + '%'
+                arrow.className = 'trend-arrow trend-up'
+            } else if (changePercent < -2) {
+                arrow.textContent = '↘ -' + Math.round(Math.abs(changePercent)) + '%'
+                arrow.className = 'trend-arrow trend-down'
+            } else {
+                arrow.textContent = '→ ' + Math.round(Math.abs(changePercent)) + '%'
+                arrow.className = 'trend-arrow trend-neutral'
+            }
+        }
+
+        // Create mini donut chart
+        function createMiniDonut(containerId, percentage, color) {
+            const container = document.getElementById(containerId)
+            if (!container) return
+            
+            const radius = 10
+            const circumference = 2 * Math.PI * radius
+            const strokeDasharray = circumference
+            const strokeDashoffset = circumference - (percentage / 100) * circumference
+            
+            container.innerHTML = `
+                <svg class="mini-donut" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="${radius}" fill="none" stroke="rgba(226,232,240,0.3)" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="${radius}" fill="none" stroke="${color}" stroke-width="2" 
+                            stroke-dasharray="${strokeDasharray}" stroke-dashoffset="${strokeDashoffset}" stroke-linecap="round"/>
+                    <text x="12" y="16" text-anchor="middle" font-size="6" fill="${color}" font-weight="600">${Math.round(percentage)}</text>
+                </svg>
+            `
+        }
+
+        // Helper: map status to color hex for sparkline
+        function performanceStatusColor(status) {
+            if (!status) return 'var(--accent)'
+            return status === 'operational' ? '#059669' : status === 'warning' ? '#ea580c' : '#dc2626'
+        }
+
+        // Draw a simple sparkline into an SVG element
+        function drawSparkline(svgId, dataPoints, strokeColor) {
+            const svg = document.getElementById(svgId)
+            if (!svg) return
+            const w = 120
+            const h = 32
+            svg.setAttribute('viewBox', `0 0 ${w} ${h}`)
+            // normalize points
+            const max = Math.max(...dataPoints, 1)
+            const min = Math.min(...dataPoints, 0)
+            const range = max - min || 1
+            const step = dataPoints.length > 1 ? w / (dataPoints.length - 1) : w
+
+            const coords = dataPoints.map((v, i) => {
+                const x = i * step
+                const y = h - ((v - min) / range) * (h - 6) - 3 // padding
+                return `${x.toFixed(2)},${y.toFixed(2)}`
+            })
+
+            const pathData = coords.map((c, i) => (i === 0 ? `M ${c}` : `L ${c}`)).join(' ')
+
+            // clear existing
+            while (svg.firstChild) svg.removeChild(svg.firstChild)
+
+            // area fill (subtle)
+            const area = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+            const areaPath = `${pathData} L ${w},${h} L 0,${h} Z`
+            area.setAttribute('d', areaPath)
+            area.setAttribute('fill', strokeColor)
+            area.setAttribute('opacity', '0.08')
+            svg.appendChild(area)
+
+            // stroke path
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+            path.setAttribute('d', pathData)
+            path.setAttribute('fill', 'none')
+            path.setAttribute('stroke', strokeColor)
+            path.setAttribute('stroke-width', '2')
+            path.setAttribute('stroke-linecap', 'round')
+            path.setAttribute('stroke-linejoin', 'round')
+            svg.appendChild(path)
+        }
+
+        // Update chart panel visualizations
+        function updateChartPanelVisualizations(systemsData, workforceData, incidentsData, callCenterData) {
+            // Systems Health Distribution Chart
+            if (systemsData && systemsData.systems) {
+                const healthBarsContainer = document.getElementById('systems-health-bars')
+                if (healthBarsContainer) {
+                    healthBarsContainer.innerHTML = ''
+                    systemsData.systems.forEach((system, index) => {
+                        const health = system.health || system.computedHealth || 0
+                        const color = health >= 95 ? 'var(--success)' : 
+                                     health >= 85 ? 'var(--warning)' : 'var(--danger)'
+                        
+                        const bar = document.createElement('div')
+                        bar.style.cssText = `
+                            width: ${100 / systemsData.systems.length}%;
+                            height: ${Math.max(8, (health / 100) * 40)}px;
+                            background: ${color};
+                            border-radius: 2px 2px 0 0;
+                            position: relative;
+                            transition: all 0.3s ease;
+                            opacity: 0.8;
+                        `
+                        bar.title = `${system.name}: ${health}%`
+                        bar.addEventListener('mouseenter', () => {
+                            bar.style.transform = 'scaleY(1.1)'
+                            bar.style.opacity = '1'
+                        })
+                        bar.addEventListener('mouseleave', () => {
+                            bar.style.transform = 'scaleY(1)'
+                            bar.style.opacity = '0.8'
+                        })
+                        healthBarsContainer.appendChild(bar)
+                    })
+                }
+            }
+            
+            // Workforce Department Utilization Chart
+            if (workforceData && workforceData.departments) {
+                const utilizationContainer = document.getElementById('workforce-utilization-chart')
+                if (utilizationContainer) {
+                    utilizationContainer.innerHTML = ''
+                    workforceData.departments.forEach(dept => {
+                        const utilization = dept.scheduled > 0 ? (dept.online / dept.scheduled) * 100 : 0
+                        const color = utilization >= 90 ? 'var(--success)' : 
+                                     utilization >= 75 ? 'var(--warning)' : 'var(--danger)'
+                        
+                        const row = document.createElement('div')
+                        row.style.cssText = 'display: flex; align-items: center; gap: 8px;'
+                        
+                        const label = document.createElement('div')
+                        label.style.cssText = 'font-size: 10px; color: var(--muted); min-width: 80px; text-align: right;'
+                        label.textContent = dept.name.slice(0, 12)
+                        
+                        const barContainer = document.createElement('div')
+                        barContainer.style.cssText = 'flex: 1; height: 12px; background: var(--border); border-radius: 6px; overflow: hidden;'
+                        
+                        const barFill = document.createElement('div')
+                        barFill.style.cssText = `
+                            height: 100%;
+                            width: ${Math.max(2, utilization)}%;
+                            background: ${color};
+                            border-radius: 6px;
+                            transition: width 0.6s ease;
+                        `
+                        
+                        const percent = document.createElement('div')
+                        percent.style.cssText = 'font-size: 10px; color: var(--text); min-width: 35px; text-align: right; font-weight: 600;'
+                        percent.textContent = Math.round(utilization) + '%'
+                        
+                        barContainer.appendChild(barFill)
+                        row.appendChild(label)
+                        row.appendChild(barContainer)
+                        row.appendChild(percent)
+                        utilizationContainer.appendChild(row)
+                    })
+                }
+            }
+            
+            // Issues Priority Distribution Chart
+            if (incidentsData) {
+                const priorityContainer = document.getElementById('issues-priority-chart')
+                if (priorityContainer) {
+                    priorityContainer.innerHTML = ''
+                    const total = incidentsData.total_count || 24
+                    const priorities = [
+                        { name: 'P0', count: incidentsData.p0_count || 0, color: 'var(--danger)' },
+                        { name: 'P1', count: incidentsData.p1_count || 0, color: 'var(--warning)' },
+                        { name: 'P2', count: incidentsData.p2_count || 0, color: 'var(--accent)' },
+                        { name: 'P3', count: incidentsData.p3_count || 0, color: 'var(--muted)' },
+                        { name: 'Resolved', count: Math.max(0, total - ((incidentsData.p0_count || 0) + (incidentsData.p1_count || 0) + (incidentsData.p2_count || 0) + (incidentsData.p3_count || 0))), color: 'var(--success)' }
+                    ]
+                    
+                    priorities.forEach(priority => {
+                        const height = total > 0 ? Math.max(8, (priority.count / total) * 60) : 8
+                        const bar = document.createElement('div')
+                        bar.style.cssText = `
+                            flex: 1;
+                            height: ${height}px;
+                            background: ${priority.color};
+                            border-radius: 3px 3px 0 0;
+                            position: relative;
+                            transition: all 0.3s ease;
+                            opacity: 0.8;
+                        `
+                        bar.title = `${priority.name}: ${priority.count} incidents`
+                        bar.addEventListener('mouseenter', () => {
+                            bar.style.opacity = '1'
+                            bar.style.transform = 'scaleY(1.05)'
+                        })
+                        bar.addEventListener('mouseleave', () => {
+                            bar.style.opacity = '0.8'
+                            bar.style.transform = 'scaleY(1)'
+                        })
+                        priorityContainer.appendChild(bar)
+                    })
+                }
+            }
+            
+            // Performance Trends Chart
+            if (callCenterData && callCenterData.metrics) {
+                const trendsContainer = document.getElementById('performance-trends-chart')
+                if (trendsContainer) {
+                    trendsContainer.innerHTML = ''
+                    
+                    // Create mini trend indicators for key metrics
+                    const keyMetrics = ['Service Level', 'FCR', 'Avg Wait Time', 'Abandon Rate'].slice(0, 4)
+                    keyMetrics.forEach(metricName => {
+                        const metric = callCenterData.metrics.find(m => m.name === metricName)
+                        if (metric) {
+                            const value = parseFloat(metric.value.replace(/[^0-9.-]/g, ''))
+                            const isGood = (metricName === 'Service Level' && value >= 80) ||
+                                          (metricName === 'FCR' && value >= 70) ||
+                                          (metricName === 'Avg Wait Time' && value <= 60) ||
+                                          (metricName === 'Abandon Rate' && value <= 5)
+                            
+                            const trendItem = document.createElement('div')
+                            trendItem.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1;'
+                            
+                            const indicator = document.createElement('div')
+                            indicator.style.cssText = `
+                                width: 24px;
+                                height: 24px;
+                                border-radius: 50%;
+                                background: ${isGood ? 'var(--success)' : 'var(--warning)'};
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 12px;
+                                color: white;
+                                font-weight: 600;
+                            `
+                            indicator.textContent = isGood ? '✓' : '!'
+                            
+                            const label = document.createElement('div')
+                            label.style.cssText = 'font-size: 8px; color: var(--muted); text-align: center; line-height: 1.2;'
+                            label.textContent = metricName.replace(' ', '\\n')
+                            
+                            const valueDiv = document.createElement('div')
+                            valueDiv.style.cssText = 'font-size: 10px; color: var(--text); font-weight: 600;'
+                            valueDiv.textContent = metric.value
+                            
+                            trendItem.appendChild(indicator)
+                            trendItem.appendChild(label)
+                            trendItem.appendChild(valueDiv)
+                            trendsContainer.appendChild(trendItem)
+                        }
+                    })
+                }
+            }
         }
 
         function updateSystemsChart(data) {
@@ -680,8 +1798,14 @@
                 const statusColor = system.health >= 90 ? 'var(--success)' : 
                                    system.health >= 75 ? 'var(--warning)' : 'var(--danger)'
                 
+                // Add system type icon
+                const typeIcon = getSystemTypeIcon(system.type)
+                const iconColor = system.health >= 90 ? 'var(--success)' : 
+                                 system.health >= 75 ? 'var(--warning)' : 'var(--danger)'
+                
                 el.innerHTML = `
                     <div class="data-item-left">
+                        <div class="data-item-icon" style="background:${iconColor}">${typeIcon}</div>
                         <div class="indicator" style="background:${statusColor}"></div>
                         <div>
                             <div class="data-item-name">${system.name}</div>
@@ -689,6 +1813,7 @@
                         </div>
                     </div>
                     <div class="data-item-value">${system.health}%</div>
+                    <div class="data-item-progress" style="width:${system.health}%;background:${statusColor}"></div>
                 `
                 grid.appendChild(el)
             })
@@ -707,12 +1832,12 @@
 
             grid.innerHTML = ''
             
-            // Add main metrics
+            // Add main metrics with mini donut charts
             const metrics = [
-                { name: 'Scheduled', value: data.scheduled_agents, detail: 'Total planned' },
-                { name: 'Online', value: data.online_agents, detail: 'Currently active' },
-                { name: 'Utilization', value: data.utilization + '%', detail: 'Current capacity' },
-                { name: 'Variance', value: (data.variance >= 0 ? '+' : '') + data.variance, detail: 'vs scheduled' }
+                { name: 'Scheduled', value: data.scheduled_agents, detail: 'Total planned', percentage: 100 },
+                { name: 'Online', value: data.online_agents, detail: 'Currently active', percentage: (data.online_agents / data.scheduled_agents) * 100 },
+                { name: 'Utilization', value: data.utilization + '%', detail: 'Current capacity', percentage: data.utilization },
+                { name: 'Variance', value: (data.variance >= 0 ? '+' : '') + data.variance, detail: 'vs scheduled', percentage: Math.min(100, Math.abs(data.variance) * 2) }
             ]
             
             metrics.forEach(metric => {
@@ -722,14 +1847,27 @@
                 const valueColor = metric.name === 'Variance' ? 
                     (data.variance >= 0 ? 'var(--success)' : 'var(--danger)') : 'var(--text)'
                 
+                const donutColor = metric.name === 'Variance' ? 
+                    (data.variance >= 0 ? 'var(--success)' : 'var(--danger)') : 
+                    metric.percentage >= 80 ? 'var(--success)' : 
+                    metric.percentage >= 60 ? 'var(--warning)' : 'var(--danger)'
+                
                 el.innerHTML = `
                     <div class="data-item-left">
+                        <div class="mini-donut" style="width:20px;height:20px;">
+                            <svg viewBox="0 0 24 24" style="width:100%;height:100%;transform:rotate(-90deg)">
+                                <circle cx="12" cy="12" r="8" fill="none" stroke="rgba(226,232,240,0.3)" stroke-width="2"/>
+                                <circle cx="12" cy="12" r="8" fill="none" stroke="${donutColor}" stroke-width="2" 
+                                        stroke-dasharray="${2 * Math.PI * 8}" stroke-dashoffset="${2 * Math.PI * 8 - (metric.percentage / 100) * 2 * Math.PI * 8}" stroke-linecap="round"/>
+                            </svg>
+                        </div>
                         <div>
                             <div class="data-item-name">${metric.name}</div>
                             <div class="data-item-detail">${metric.detail}</div>
                         </div>
                     </div>
                     <div class="data-item-value" style="color:${valueColor}">${metric.value}</div>
+                    <div class="data-item-progress" style="width:${metric.percentage}%;background:${donutColor}"></div>
                 `
                 grid.appendChild(el)
             })
@@ -808,13 +1946,32 @@
                 
                 // Determine status color based on metric performance
                 let statusColor = 'var(--success)'
-                if (metric.name === 'Service Level' && parseInt(metric.value) < 90) statusColor = 'var(--warning)'
-                if (metric.name === 'Service Level' && parseInt(metric.value) < 80) statusColor = 'var(--danger)'
-                if (metric.name === 'Abandon Rate' && parseFloat(metric.value) > 5) statusColor = 'var(--warning)'
-                if (metric.name === 'Abandon Rate' && parseFloat(metric.value) > 8) statusColor = 'var(--danger)'
+                let progress = 50
+                
+                if (metric.name === 'Service Level') {
+                    const val = parseInt(metric.value)
+                    progress = val
+                    statusColor = val >= 90 ? 'var(--success)' : val >= 80 ? 'var(--warning)' : 'var(--danger)'
+                } else if (metric.name === 'Abandon Rate') {
+                    const val = parseFloat(metric.value)
+                    progress = Math.max(0, 100 - val * 10) // invert for display
+                    statusColor = val <= 3 ? 'var(--success)' : val <= 6 ? 'var(--warning)' : 'var(--danger)'
+                } else if (metric.name === 'FCR') {
+                    const val = parseInt(metric.value)
+                    progress = val
+                    statusColor = val >= 80 ? 'var(--success)' : val >= 70 ? 'var(--warning)' : 'var(--danger)'
+                } else {
+                    // For other metrics, simulate progress
+                    progress = rand(60, 95)
+                    statusColor = progress >= 80 ? 'var(--success)' : progress >= 60 ? 'var(--warning)' : 'var(--danger)'
+                }
+                
+                // Add metric type icon
+                const metricIcon = getMetricIcon(metric.name)
                 
                 el.innerHTML = `
                     <div class="data-item-left">
+                        <div class="data-item-icon" style="background:${statusColor}">${metricIcon}</div>
                         <div class="indicator" style="background:${statusColor}"></div>
                         <div>
                             <div class="data-item-name">${metric.name}</div>
@@ -822,6 +1979,7 @@
                         </div>
                     </div>
                     <div class="data-item-value">${metric.value}</div>
+                    <div class="data-item-progress" style="width:${progress}%;background:${statusColor}"></div>
                 `
                 grid.appendChild(el)
             })
@@ -833,6 +1991,357 @@
                               data.service_level < 90 ? 'Below Target' : 'Meeting SLA'
             setChartStatus('callCenterStatus', 'callCenterStatusText', status, statusText)
         }
+
+        // Helper functions for icons
+        function getSystemTypeIcon(type) {
+            const icons = {
+                'API': '🔌',
+                'Gateway': '🚪', 
+                'IVR': '📞',
+                'Contact': '👥',
+                'Database': '💾',
+                'Auth': '🔐'
+            }
+            return icons[type] || '⚙️'
+        }
+
+        function getMetricIcon(metricName) {
+            const icons = {
+                'Service Level': '📊',
+                'Abandon Rate': '📉',
+                'FCR': '✅',
+                'Agent Utilization': '👤',
+                'Queue Depth': '📋',
+                'Avg Wait Time': '⏱️'
+            }
+            return icons[metricName] || '📈'
+        }
+
+        // Drilldown functionality
+        function openDrilldown(type) {
+            const modal = document.getElementById('drilldownModal')
+            const title = document.getElementById('drilldownTitle')
+            const body = document.getElementById('drilldownBody')
+            
+            let content = ''
+            
+            switch(type) {
+                case 'systems':
+                case 'systems-detail':
+                    title.textContent = 'System Health - Detailed Analysis'
+                    content = generateSystemsDrilldown()
+                    break
+                case 'workforce':
+                case 'workforce-detail':
+                    title.textContent = 'Workforce Analytics - Detailed Breakdown'
+                    content = generateWorkforceDrilldown()
+                    break
+                case 'issues':
+                case 'issues-detail':
+                    title.textContent = 'Incident Management - Detailed View'
+                    content = generateIssuesDrilldown()
+                    break
+                case 'performance':
+                case 'performance-detail':
+                    title.textContent = 'Call Center Performance - Detailed Metrics'
+                    content = generatePerformanceDrilldown()
+                    break
+            }
+            
+            body.innerHTML = content
+            modal.style.display = 'flex'
+        }
+
+        function closeDrilldown() {
+            document.getElementById('drilldownModal').style.display = 'none'
+        }
+
+        function generateSystemsDrilldown() {
+            return `
+                <div class="drilldown-section">
+                    <div class="drilldown-section-title">🔧 Infrastructure Overview</div>
+                    <div class="drilldown-grid">
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Total Systems</div>
+                            <div class="drilldown-item-value">6</div>
+                            <div class="drilldown-item-detail">Core infrastructure components</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Average Uptime</div>
+                            <div class="drilldown-item-value">99.2%</div>
+                            <div class="drilldown-item-detail">Last 30 days</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Critical Alerts</div>
+                            <div class="drilldown-item-value">0</div>
+                            <div class="drilldown-item-detail">Active monitoring alerts</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Response Time</div>
+                            <div class="drilldown-item-value">142ms</div>
+                            <div class="drilldown-item-detail">Average across all systems</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="drilldown-section">
+                    <div class="drilldown-section-title">📊 Performance Trends</div>
+                    <div class="drilldown-grid">
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">CPU Utilization</div>
+                            <div class="drilldown-item-value">67%</div>
+                            <div class="drilldown-item-detail">Peak: 89% at 2:15 PM</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Memory Usage</div>
+                            <div class="drilldown-item-value">54%</div>
+                            <div class="drilldown-item-detail">8.6GB of 16GB used</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Network I/O</div>
+                            <div class="drilldown-item-value">2.3 Gbps</div>
+                            <div class="drilldown-item-detail">Peak throughput today</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Error Rate</div>
+                            <div class="drilldown-item-value">0.02%</div>
+                            <div class="drilldown-item-detail">Within acceptable limits</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="drilldown-section">
+                    <div class="drilldown-section-title">🔍 Recent Events</div>
+                    <div style="font-size:12px;color:var(--muted);line-height:1.6;">
+                        • 14:32 - Database connection pool optimized (+15% performance)<br>
+                        • 13:45 - Authentication service auto-scaled (3→5 instances)<br>
+                        • 12:20 - Routine maintenance completed on API Gateway<br>
+                        • 11:10 - IVR platform health check passed<br>
+                        • 09:30 - Payment service deployed version 2.1.4
+                    </div>
+                </div>
+            `
+        }
+
+        function generateWorkforceDrilldown() {
+            return `
+                <div class="drilldown-section">
+                    <div class="drilldown-section-title">👥 Staffing Overview</div>
+                    <div class="drilldown-grid">
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Total Employees</div>
+                            <div class="drilldown-item-value">287</div>
+                            <div class="drilldown-item-detail">Across all departments</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">On Shift Now</div>
+                            <div class="drilldown-item-value">243</div>
+                            <div class="drilldown-item-detail">84.7% attendance rate</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Overtime Hours</div>
+                            <div class="drilldown-item-value">127</div>
+                            <div class="drilldown-item-detail">This week so far</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Training Hours</div>
+                            <div class="drilldown-item-value">89</div>
+                            <div class="drilldown-item-detail">Completed this month</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="drilldown-section">
+                    <div class="drilldown-section-title">🏢 Department Breakdown</div>
+                    <div class="drilldown-grid">
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Customer Support</div>
+                            <div class="drilldown-item-value">94/105</div>
+                            <div class="drilldown-item-detail">89.5% staffed</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Technical Support</div>
+                            <div class="drilldown-item-value">67/72</div>
+                            <div class="drilldown-item-detail">93.1% staffed</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Sales</div>
+                            <div class="drilldown-item-value">51/58</div>
+                            <div class="drilldown-item-detail">87.9% staffed</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Operations</div>
+                            <div class="drilldown-item-value">31/35</div>
+                            <div class="drilldown-item-detail">88.6% staffed</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="drilldown-section">
+                    <div class="drilldown-section-title">📈 Performance Metrics</div>
+                    <div class="drilldown-grid">
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Productivity Score</div>
+                            <div class="drilldown-item-value">87%</div>
+                            <div class="drilldown-item-detail">+3% vs last week</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Employee Satisfaction</div>
+                            <div class="drilldown-item-value">4.2/5</div>
+                            <div class="drilldown-item-detail">Latest survey results</div>
+                        </div>
+                    </div>
+                </div>
+            `
+        }
+
+        function generateIssuesDrilldown() {
+            return `
+                <div class="drilldown-section">
+                    <div class="drilldown-section-title">🚨 Incident Summary</div>
+                    <div class="drilldown-grid">
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">P0 Critical</div>
+                            <div class="drilldown-item-value">0</div>
+                            <div class="drilldown-item-detail">System outages</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">P1 High</div>
+                            <div class="drilldown-item-value">2</div>
+                            <div class="drilldown-item-detail">Major incidents</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">P2 Medium</div>
+                            <div class="drilldown-item-value">7</div>
+                            <div class="drilldown-item-detail">Service degradation</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">P3 Low</div>
+                            <div class="drilldown-item-value">15</div>
+                            <div class="drilldown-item-detail">Minor issues</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="drilldown-section">
+                    <div class="drilldown-section-title">📊 Resolution Metrics</div>
+                    <div class="drilldown-grid">
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">MTTR (P0)</div>
+                            <div class="drilldown-item-value">N/A</div>
+                            <div class="drilldown-item-detail">No P0 incidents today</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">MTTR (P1)</div>
+                            <div class="drilldown-item-value">2.4h</div>
+                            <div class="drilldown-item-detail">Target: <4h</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">First Contact Resolution</div>
+                            <div class="drilldown-item-value">73%</div>
+                            <div class="drilldown-item-detail">Target: >70%</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Escalation Rate</div>
+                            <div class="drilldown-item-value">8%</div>
+                            <div class="drilldown-item-detail">Target: <10%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="drilldown-section">
+                    <div class="drilldown-section-title">🔍 Top Issues</div>
+                    <div style="font-size:12px;color:var(--muted);line-height:1.6;">
+                        • <strong>INC001245</strong> - API Gateway intermittent timeouts (P1, 45m old)<br>
+                        • <strong>INC001243</strong> - Database query performance degradation (P1, 2h 15m old)<br>
+                        • <strong>INC001241</strong> - Authentication service slow response (P2, 4h 30m old)<br>
+                        • <strong>INC001240</strong> - Payment processing delays (P2, 6h 10m old)<br>
+                        • <strong>INC001238</strong> - IVR menu navigation issues (P2, 8h 25m old)
+                    </div>
+                </div>
+            `
+        }
+
+        function generatePerformanceDrilldown() {
+            return `
+                <div class="drilldown-section">
+                    <div class="drilldown-section-title">📞 Call Volume Analytics</div>
+                    <div class="drilldown-grid">
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Calls Today</div>
+                            <div class="drilldown-item-value">2,847</div>
+                            <div class="drilldown-item-detail">+12% vs yesterday</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Peak Hour</div>
+                            <div class="drilldown-item-value">14:00</div>
+                            <div class="drilldown-item-detail">487 calls handled</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Current Queue</div>
+                            <div class="drilldown-item-value">23</div>
+                            <div class="drilldown-item-detail">Calls waiting</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Longest Wait</div>
+                            <div class="drilldown-item-value">2m 45s</div>
+                            <div class="drilldown-item-detail">Current maximum</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="drilldown-section">
+                    <div class="drilldown-section-title">📊 Quality Metrics</div>
+                    <div class="drilldown-grid">
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">CSAT Score</div>
+                            <div class="drilldown-item-value">4.3/5</div>
+                            <div class="drilldown-item-detail">Customer satisfaction</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">FCR Rate</div>
+                            <div class="drilldown-item-value">78%</div>
+                            <div class="drilldown-item-detail">First call resolution</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Call Quality</div>
+                            <div class="drilldown-item-value">91%</div>
+                            <div class="drilldown-item-detail">QA score average</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Compliance</div>
+                            <div class="drilldown-item-value">98%</div>
+                            <div class="drilldown-item-detail">Regulatory adherence</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="drilldown-section">
+                    <div class="drilldown-section-title">👥 Agent Performance</div>
+                    <div class="drilldown-grid">
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Agents Online</div>
+                            <div class="drilldown-item-value">67/72</div>
+                            <div class="drilldown-item-detail">93% availability</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Average AHT</div>
+                            <div class="drilldown-item-value">4m 32s</div>
+                            <div class="drilldown-item-detail">Handle time</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Occupancy Rate</div>
+                            <div class="drilldown-item-value">82%</div>
+                            <div class="drilldown-item-detail">Talk + hold time</div>
+                        </div>
+                        <div class="drilldown-item">
+                            <div class="drilldown-item-label">Adherence</div>
+                            <div class="drilldown-item-value">94%</div>
+                            <div class="drilldown-item-detail">Schedule compliance</div>
+                        </div>
+                    </div>
+                </div>
+            `
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeDrilldown()
+            }
+        })
 
         // Initialize Dashboard
         console.log('[Dashboard] Initializing Grafana Executive Dashboard with Databricks integration...')
