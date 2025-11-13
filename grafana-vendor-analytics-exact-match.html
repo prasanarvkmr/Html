@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Analytics Dashboard - Grafana</title>
+    <style>
+        /* Grafana Business Text Plugin Compatible Styles - NO CSS Custom Properties */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fefbff;
+            color: #1d1b20;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: linear-gradient(135deg, #2563EB 0%, #1E40AF 100%);
+            color: white;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .company-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .company-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: #059669;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+        }
+
+        .username {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .user-role {
+            font-size: 12px;
+            opacity: 0.9;
+            line-height: 1;
+        }
+
+        /* Menu Bar */
+        .menubar {
+            background: #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            overflow-x: auto;
+        }
+
+        .menu-item {
+            padding: 16px 24px;
+            text-decoration: none;
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+
+        .menu-item:hover {
+            color: #2563EB;
+            background: #eef2ff;
+        }
+
+        .menu-item.active {
+            color: #2563EB;
+            border-bottom-color: #2563EB;
+            background: #eef2ff;
+        }
+
+        /* Sub Menu */
+        .submenu {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        .submenu-left {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .submenu-item {
+            padding: 10px 16px;
+            text-decoration: none;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .submenu-item:hover {
+            color: #2563EB;
+            background: #eef2ff;
+        }
+
+        .submenu-item.active {
+            color: #2563EB;
+            background: #eef2ff;
+            font-weight: 600;
+        }
+
+        .submenu-item svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 24px 32px;
+            display: grid;
+            gap: 24px;
+        }
+
+        /* Content Section */
+        .content-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border: 1px solid #f1f5f9;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.6s ease forwards;
+        }
+
+        .content-section.slide-up {
+            animation-delay: 0.2s;
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-content {
+            padding: 32px;
+        }
+
+        /* Summary Grid */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid #f1f5f9;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #2563EB 0%, #7c3aed 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-color: #e2e8f0;
+        }
+
+        .summary-card:hover::before {
+            opacity: 1;
+        }
+
+        .tooltip-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .summary-label {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .info-icon {
+            width: 16px;
+            height: 16px;
+            background: #e2e8f0;
+            color: #64748b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: help;
+            position: relative;
+        }
+
+        .tooltip {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 1000;
+            margin-top: 8px;
+        }
+
+        .info-icon:hover .tooltip {
+            opacity: 1;
+        }
+
+        .summary-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1;
+        }
+
+        .summary-subtext {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .summary-trend {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Status Colors */
+        .status-error {
+            color: #dc2626;
+        }
+
+        .status-warning {
+            color: #ea580c;
+        }
+
+        .status-good {
+            color: #16a34a;
+        }
+
+        .status-info {
+            color: #2563eb;
+        }
+
+        /* Controls Panel */
+        .controls-panel {
+            background: transparent;
+            border-radius: 0;
+            padding: 24px 0;
+            box-shadow: none;
+            border: none;
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .control-label {
+            font-size: 14px;
+            color: #374151;
+            font-weight: 600;
+        }
+
+        .dropdown {
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-family: inherit;
+            color: #374151;
+            appearance: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        .dropdown:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .dropdown:hover {
+            border-color: #2563eb;
+        }
+
+        /* Detailed Analysis Panel */
+        .analysis-panel {
+            margin-top: 24px;
+        }
+
+        .section-header {
+            padding: 0 0 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #1e293b;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .section-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .vendor-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .vendor-logo {
+            width: 60px;
+            height: 60px;
+            background: #2563eb;
+            color: white;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .vendor-details {
+            text-align: left;
+        }
+
+        .vendor-details h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #1e293b;
+        }
+
+        .vendor-details p {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #f1f5f9;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #2563eb 0%, #7c3aed 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-card:hover::before {
+            opacity: 1;
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .metric-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .metric-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .metric-trend {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Trend Charts */
+        .trend-charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #f1f5f9;
+            transition: all 0.3s ease;
+        }
+
+        .chart-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .chart-container {
+            height: 200px;
+            position: relative;
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .chart-line {
+            position: absolute;
+            bottom: 20%;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: #dc2626;
+            border-radius: 2px;
+            opacity: 0.8;
+        }
+
+        .chart-points {
+            position: absolute;
+            bottom: 18%;
+            left: 10%;
+            right: 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-point {
+            width: 8px;
+            height: 8px;
+            background: #dc2626;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-legend {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* Metric Focus Filtering */
+        .metric-filter-hidden {
+            opacity: 0.3;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        .metric-filter-highlighted {
+            opacity: 1;
+            transform: scale(1.02);
+            box-shadow: 0 0 0 2px #2563eb;
+        }
+
+        .chart-filter-hidden {
+            opacity: 0.3;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        .chart-filter-highlighted {
+            opacity: 1;
+            transform: scale(1.02);
+            box-shadow: 0 0 0 2px #2563eb;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0;
+            }
+
+            .navbar {
+                padding: 12px 16px;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .menubar {
+                padding: 0 16px;
+                overflow-x: auto;
+            }
+
+            .submenu {
+                padding: 12px 16px;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls-panel {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .control-group {
+                min-width: auto;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .trend-charts {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="navbar-left">
+                <a href="#" class="company-logo">
+                    <div class="logo-icon">TC</div>
+                    <span class="company-name">TechCorp Analytics</span>
+                </a>
+            </div>
+            <div class="navbar-right">
+                <div class="user-profile">
+                    <div class="user-avatar">JD</div>
+                    <div class="user-info">
+                        <span class="username">John Doe</span>
+                        <span class="user-role">Analytics Manager</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Menu Bar -->
+        <nav class="menubar">
+            <a href="#" class="menu-item active">Dashboard</a>
+            <a href="#" class="menu-item">Executive Summary</a>
+            <a href="#" class="menu-item">Vendor Scorecard</a>
+            <a href="#" class="menu-item">Grafana Integration</a>
+            <a href="#" class="menu-item">Reports</a>
+            <a href="#" class="menu-item">Settings</a>
+        </nav>
+
+        <!-- Sub Menu -->
+        <nav class="submenu">
+            <div class="submenu-left">
+                <a href="#" class="submenu-item active">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3,3H21V5H19V19H17V5H15V9H13V5H11V15H9V5H7V11H5V5H3V3M9,17V23H7V17H9M13,11V23H11V11H13M17,21V23H15V21H17Z"/>
+                    </svg>
+                    Vendor Analytics
+                </a>
+                <a href="#" class="submenu-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                    </svg>
+                    Agent Performance
+                </a>
+                <a href="#" class="submenu-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6.62,10.79C8.06,13.62 10.38,15.94 13.21,17.38L15.41,15.18C15.68,14.91 16.08,14.82 16.43,14.93C17.55,15.3 18.75,15.5 20,15.5A1,1 0 0,1 21,16.5V20A1,1 0 0,1 20,21C10.61,21 3,13.39 3,4A1,1 0 0,1 4,3H7.5A1,1 0 0,1 8.5,4C8.5,5.25 8.7,6.45 9.07,7.57C9.18,7.92 9.09,8.32 8.82,8.59L6.62,10.79Z"/>
+                    </svg>
+                    Call Quality
+                </a>
+                <a href="#" class="submenu-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M16,6L18.29,8.29L13.41,13.17L9.41,9.17L2,16.59L3.41,18L9.41,12L13.41,16L19.71,9.71L22,12V6H16Z"/>
+                    </svg>
+                    Trending Analysis
+                </a>
+                <a href="#" class="submenu-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M10,21H14A2,2 0 0,1 12,23A2,2 0 0,1 10,21M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M17,11A5,5 0 0,0 12,6A5,5 0 0,0 7,11V18H17V11Z"/>
+                    </svg>
+                    Alerts
+                </a>
+                <a href="#" class="submenu-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                    </svg>
+                    Export Data
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Summary Panel -->
+            <section class="content-section summary-panel slide-up">
+                <div class="section-content">
+                    <div class="summary-grid">
+                        <!-- Card 1: % of Agents Having Issues -->
+                        <div class="summary-card metric-filter-active" data-metric="agents">
+                            <div class="tooltip-container">
+                                <div class="summary-label">% of Agents Having Issues</div>
+                                <div class="info-icon">
+                                    i
+                                    <div class="tooltip">Percentage of agents experiencing disconnected or degraded calls</div>
+                                </div>
+                            </div>
+                            <div class="summary-value status-warning" id="summaryAgentsWithIssues">${agents_with_issues_percentage}%</div>
+                            <div class="summary-subtext" id="summaryAgentsWithIssuesCount">${agents_with_issues} of ${total_agents} agents</div>
+                            <div class="summary-trend status-error">
+                                <span>↗</span>
+                                <span>+5.2%</span>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Total Disconnected Calls -->
+                        <div class="summary-card metric-filter-active" data-metric="disconnected">
+                            <div class="tooltip-container">
+                                <div class="summary-label">Total Disconnected Calls</div>
+                                <div class="info-icon">
+                                    i
+                                    <div class="tooltip">Total number of calls that were disconnected across all vendors</div>
+                                </div>
+                            </div>
+                            <div class="summary-value status-error" id="summaryDisconnected">${total_disconnected}</div>
+                            <div class="summary-subtext" id="summaryDisconnectedSubtext">${disconnected_per_agent} calls per agent avg</div>
+                            <div class="summary-trend status-error">
+                                <span>↗</span>
+                                <span>+3.5%</span>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: % of Disconnected Agents -->
+                        <div class="summary-card metric-filter-active" data-metric="disconnected">
+                            <div class="tooltip-container">
+                                <div class="summary-label">% of Disconnected Agents</div>
+                                <div class="info-icon">
+                                    i
+                                    <div class="tooltip">Percentage of agents who experienced disconnected calls</div>
+                                </div>
+                            </div>
+                            <div class="summary-value status-error" id="summaryDisconnectedAgents">${disconnected_agents_percentage}%</div>
+                            <div class="summary-subtext" id="summaryDisconnectedAgentsCount">${disconnected_agents} of ${total_agents} agents</div>
+                            <div class="summary-trend status-error">
+                                <span>↗</span>
+                                <span>+4.1%</span>
+                            </div>
+                        </div>
+
+                        <!-- Card 4: Total Degraded Calls -->
+                        <div class="summary-card metric-filter-active" data-metric="degraded">
+                            <div class="tooltip-container">
+                                <div class="summary-label">Total Degraded Calls</div>
+                                <div class="info-icon">
+                                    i
+                                    <div class="tooltip">Total number of calls with quality degradation across all vendors</div>
+                                </div>
+                            </div>
+                            <div class="summary-value status-warning" id="summaryDegraded">${total_degraded}</div>
+                            <div class="summary-subtext" id="summaryDegradedSubtext">${degraded_per_agent} calls per agent avg</div>
+                            <div class="summary-trend status-good">
+                                <span>↘</span>
+                                <span>-1.8%</span>
+                            </div>
+                        </div>
+
+                        <!-- Card 5: % of Degraded Agents -->
+                        <div class="summary-card metric-filter-active" data-metric="degraded">
+                            <div class="tooltip-container">
+                                <div class="summary-label">% of Degraded Agents</div>
+                                <div class="info-icon">
+                                    i
+                                    <div class="tooltip">Percentage of agents who experienced degraded call quality</div>
+                                </div>
+                            </div>
+                            <div class="summary-value status-warning" id="summaryDegradedAgents">${degraded_agents_percentage}%</div>
+                            <div class="summary-subtext" id="summaryDegradedAgentsCount">${degraded_agents} of ${total_agents} agents</div>
+                            <div class="summary-trend status-error">
+                                <span>↗</span>
+                                <span>+2.3%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Controls Panel -->
+            <section class="content-section controls-panel">
+                <div class="section-content">
+                    <div class="controls-panel">
+                        <div class="control-group">
+                            <label class="control-label">Select Vendor</label>
+                            <select class="dropdown" id="vendorSelect">
+                                <option value="all">All Vendors</option>
+                                <option value="TSP">TechSupport Pro</option>
+                                <option value="GCN">Global Connect</option>
+                                <option value="PSL">Premium Solutions</option>
+                                <option value="RRP">Rapid Response</option>
+                                <option value="ESP">Elite Support</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Time Interval</label>
+                            <select class="dropdown" id="timeInterval">
+                                <option value="1h">Last 1 Hour</option>
+                                <option value="4h">Last 4 Hours</option>
+                                <option value="24h" selected>Last 24 Hours</option>
+                                <option value="7d">Last 7 Days</option>
+                                <option value="30d">Last 30 Days</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Metric Focus</label>
+                            <select class="dropdown" id="metricFocus">
+                                <option value="all">All Metrics</option>
+                                <option value="disconnected">Disconnected Calls</option>
+                                <option value="degraded">Degraded Calls</option>
+                                <option value="agents">Impacted Agents</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Detailed Analysis Panel -->
+            <section class="content-section analysis-panel slide-up">
+                <div class="section-header">
+                    <div>
+                        <h3 class="section-title">Detailed Analysis</h3>
+                        <p class="section-subtitle">Comprehensive performance metrics and trending data</p>
+                    </div>
+                    <div class="vendor-info" id="vendorInfo">
+                        <div class="vendor-logo" id="vendorLogo">ALL</div>
+                        <div class="vendor-details">
+                            <h3 id="vendorName">All Vendors</h3>
+                            <p id="vendorStatus">System-wide Performance</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-content">
+
+                    <!-- Metrics Grid -->
+                    <div class="metrics-grid">
+                        <div class="metric-card metric-filter-active" data-metric="disconnected">
+                            <div class="metric-header">
+                                <div class="tooltip-container">
+                                    <h3 class="metric-title">Disconnected Calls</h3>
+                                    <div class="info-icon">
+                                        i
+                                        <div class="tooltip">Total number of calls that were unexpectedly disconnected</div>
+                                    </div>
+                                </div>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color: #dc2626;">
+                                    <path d="M6.62 10.79C8.06 13.62 10.38 15.94 13.21 17.38L15.41 15.18C15.68 14.91 16.08 14.82 16.43 14.93C17.55 15.3 18.75 15.5 20 15.5C20.55 15.5 21 15.95 21 16.5V20C21 20.55 20.55 21 20 21C10.61 21 3 13.39 3 4C3 3.45 3.45 3 4 3H7.5C8.05 3 8.5 3.45 8.5 4C8.5 5.25 8.7 6.45 9.07 7.57C9.18 7.92 9.09 8.32 8.82 8.59L6.62 10.79Z"/>
+                                </svg>
+                            </div>
+                            <div class="metric-value status-error" id="detailDisconnected">${total_disconnected}</div>
+                            <div class="metric-trend status-error">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M7 14L12 9L17 14H7Z"/>
+                                </svg>
+                                <span id="disconnectedTrend">+3.5%</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card metric-filter-active" data-metric="degraded">
+                            <div class="metric-header">
+                                <div class="tooltip-container">
+                                    <h3 class="metric-title">Degraded Calls</h3>
+                                    <div class="info-icon">
+                                        i
+                                        <div class="tooltip">Calls with poor quality including audio issues, delays, or distortion</div>
+                                    </div>
+                                </div>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color: #ea580c;">
+                                    <path d="M11 7H13V13H11V7ZM11 15H13V17H11V15Z"/>
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                                </svg>
+                            </div>
+                            <div class="metric-value status-warning" id="detailDegraded">${total_degraded}</div>
+                            <div class="metric-trend status-good">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M7 10L12 15L17 10H7Z"/>
+                                </svg>
+                                <span id="degradedTrend">-1.8%</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card metric-filter-active" data-metric="agents">
+                            <div class="metric-header">
+                                <div class="tooltip-container">
+                                    <h3 class="metric-title">Impacted Agents</h3>
+                                    <div class="info-icon">
+                                        i
+                                        <div class="tooltip">Percentage of agents experiencing call issues or quality problems</div>
+                                    </div>
+                                </div>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color: #2563eb;">
+                                    <path d="M16 4C18.2 4 20 5.8 20 8C20 10.2 18.2 12 16 12C13.8 12 12 10.2 12 8C12 5.8 13.8 4 16 4ZM16 14C20.42 14 24 15.79 24 18V20H8V18C8 15.79 11.58 14 16 14Z"/>
+                                    <path d="M8 4C10.2 4 12 5.8 12 8C12 10.2 10.2 12 8 12C5.8 12 4 10.2 4 8C4 5.8 5.8 4 8 4ZM8 14C12.42 14 16 15.79 16 18V20H0V18C0 15.79 3.58 14 8 14Z"/>
+                                </svg>
+                            </div>
+                            <div class="metric-value status-warning" id="detailImpactedAgents">${agents_with_issues_percentage}%</div>
+                            <div class="metric-trend status-error">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M7 14L12 9L17 14H7Z"/>
+                                </svg>
+                                <span id="agentsTrend">+5.2%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trend Charts -->
+                    <div class="trend-charts">
+                        <div class="chart-card metric-filter-active" data-metric="disconnected">
+                            <div class="chart-header">
+                                <div class="tooltip-container">
+                                    <h3 class="chart-title">Disconnected Calls Trend</h3>
+                                    <div class="info-icon">
+                                        i
+                                        <div class="tooltip">Hourly trend of disconnected calls over the selected time period</div>
+                                    </div>
+                                </div>
+                                <span class="status-error">24H View</span>
+                            </div>
+                            <div class="chart-container" id="disconnectedChart">
+                                <div class="chart-line"></div>
+                                <div class="chart-points">
+                                    <div class="chart-point"></div>
+                                    <div class="chart-point"></div>
+                                    <div class="chart-point"></div>
+                                    <div class="chart-point"></div>
+                                    <div class="chart-point"></div>
+                                    <div class="chart-point"></div>
+                                </div>
+                            </div>
+                            <div class="chart-legend">
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background: #dc2626;"></div>
+                                    <span>Disconnected Calls</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card metric-filter-active" data-metric="degraded">
+                            <div class="chart-header">
+                                <div class="tooltip-container">
+                                    <h3 class="chart-title">Degraded Calls Trend</h3>
+                                    <div class="info-icon">
+                                        i
+                                        <div class="tooltip">Hourly trend of degraded call quality over the selected time period</div>
+                                    </div>
+                                </div>
+                                <span class="status-warning">24H View</span>
+                            </div>
+                            <div class="chart-container" id="degradedChart">
+                                <div class="chart-line" style="background: #ea580c;"></div>
+                                <div class="chart-points">
+                                    <div class="chart-point" style="background: #ea580c;"></div>
+                                    <div class="chart-point" style="background: #ea580c;"></div>
+                                    <div class="chart-point" style="background: #ea580c;"></div>
+                                    <div class="chart-point" style="background: #ea580c;"></div>
+                                    <div class="chart-point" style="background: #ea580c;"></div>
+                                    <div class="chart-point" style="background: #ea580c;"></div>
+                                </div>
+                            </div>
+                            <div class="chart-legend">
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background: #ea580c;"></div>
+                                    <span>Degraded Calls</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card metric-filter-active" data-metric="agents">
+                            <div class="chart-header">
+                                <div class="tooltip-container">
+                                    <h3 class="chart-title">Impacted Agents % Trend</h3>
+                                    <div class="info-icon">
+                                        i
+                                        <div class="tooltip">Hourly trend of percentage of agents experiencing issues</div>
+                                    </div>
+                                </div>
+                                <span class="status-info">24H View</span>
+                            </div>
+                            <div class="chart-container" id="agentsChart">
+                                <div class="chart-line" style="background: #2563eb;"></div>
+                                <div class="chart-points">
+                                    <div class="chart-point" style="background: #2563eb;"></div>
+                                    <div class="chart-point" style="background: #2563eb;"></div>
+                                    <div class="chart-point" style="background: #2563eb;"></div>
+                                    <div class="chart-point" style="background: #2563eb;"></div>
+                                    <div class="chart-point" style="background: #2563eb;"></div>
+                                    <div class="chart-point" style="background: #2563eb;"></div>
+                                </div>
+                            </div>
+                            <div class="chart-legend">
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background: #2563eb;"></div>
+                                    <span>Impacted Agents %</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Sample data structure
+        const vendorAnalyticsData = {
+            TSP: {
+                name: "TechSupport Pro",
+                code: "TSP",
+                status: "Active - Technical Support",
+                totalAgents: 45,
+                impactedAgents: 8,
+                impactedAgentsPercent: 17.8,
+                disconnectedCalls: 127,
+                degradedCalls: 89,
+                qualityScore: 92.4
+            },
+            GCN: {
+                name: "Global Connect", 
+                code: "GCN",
+                status: "Active - Customer Support",
+                totalAgents: 38,
+                impactedAgents: 11,
+                impactedAgentsPercent: 28.9,
+                disconnectedCalls: 203,
+                degradedCalls: 156,
+                qualityScore: 87.8
+            },
+            PSL: {
+                name: "Premium Solutions",
+                code: "PSL", 
+                status: "Active - Premium Support",
+                totalAgents: 52,
+                impactedAgents: 6,
+                impactedAgentsPercent: 11.5,
+                disconnectedCalls: 98,
+                degradedCalls: 78,
+                qualityScore: 94.2
+            },
+            RRP: {
+                name: "Rapid Response",
+                code: "RRP",
+                status: "Active - Emergency Support", 
+                totalAgents: 29,
+                impactedAgents: 9,
+                impactedAgentsPercent: 31.0,
+                disconnectedCalls: 156,
+                degradedCalls: 134,
+                qualityScore: 86.1
+            },
+            ESP: {
+                name: "Elite Support",
+                code: "ESP",
+                status: "Active - Elite Tier",
+                totalAgents: 35,
+                impactedAgents: 4, 
+                impactedAgentsPercent: 11.4,
+                disconnectedCalls: 56,
+                degradedCalls: 45,
+                qualityScore: 96.3
+            }
+        };
+
+        // Event listeners for controls
+        document.getElementById('vendorSelect').addEventListener('change', function() {
+            const selectedVendor = this.value;
+            updateVendorInfo(selectedVendor);
+            updateDetailedMetrics(selectedVendor);
+        });
+
+        document.getElementById('timeInterval').addEventListener('change', function() {
+            console.log('Time interval changed to:', this.value);
+        });
+
+        document.getElementById('metricFocus').addEventListener('change', function() {
+            const metricType = this.value;
+            applyMetricFocus(metricType);
+        });
+
+        // Update vendor info section
+        function updateVendorInfo(vendorCode) {
+            const vendorLogo = document.getElementById('vendorLogo');
+            const vendorName = document.getElementById('vendorName');
+            const vendorStatus = document.getElementById('vendorStatus');
+
+            if (vendorCode === 'all') {
+                vendorLogo.textContent = 'ALL';
+                vendorName.textContent = 'All Vendors';
+                vendorStatus.textContent = 'System-wide Performance';
+            } else {
+                const vendor = vendorAnalyticsData[vendorCode];
+                if (vendor) {
+                    vendorLogo.textContent = vendor.code;
+                    vendorName.textContent = vendor.name;
+                    vendorStatus.textContent = vendor.status;
+                }
+            }
+        }
+
+        // Update detailed metrics
+        function updateDetailedMetrics(vendorCode) {
+            if (vendorCode === 'all') {
+                // Show aggregated data
+                let totalDisconnected = 0;
+                let totalDegraded = 0;
+                let totalImpactedAgents = 0;
+                let totalAgents = 0;
+
+                Object.values(vendorAnalyticsData).forEach(vendor => {
+                    totalDisconnected += vendor.disconnectedCalls;
+                    totalDegraded += vendor.degradedCalls;
+                    totalImpactedAgents += vendor.impactedAgents;
+                    totalAgents += vendor.totalAgents;
+                });
+
+                const impactedAgentsPercent = ((totalImpactedAgents / totalAgents) * 100).toFixed(1);
+
+                document.getElementById('detailDisconnected').textContent = totalDisconnected;
+                document.getElementById('detailDegraded').textContent = totalDegraded;
+                document.getElementById('detailImpactedAgents').textContent = impactedAgentsPercent + '%';
+            } else {
+                // Show vendor-specific data
+                const vendor = vendorAnalyticsData[vendorCode];
+                if (vendor) {
+                    document.getElementById('detailDisconnected').textContent = vendor.disconnectedCalls;
+                    document.getElementById('detailDegraded').textContent = vendor.degradedCalls;
+                    document.getElementById('detailImpactedAgents').textContent = vendor.impactedAgentsPercent + '%';
+                }
+            }
+        }
+
+        // Apply metric focus filtering
+        function applyMetricFocus(metricType) {
+            const summaryCards = document.querySelectorAll('.summary-card[data-metric]');
+            const metricCards = document.querySelectorAll('.metric-card[data-metric]');
+            const chartCards = document.querySelectorAll('.chart-card[data-metric]');
+
+            // Reset all filters
+            summaryCards.forEach(card => {
+                card.classList.remove('metric-filter-hidden', 'metric-filter-highlighted');
+            });
+            metricCards.forEach(card => {
+                card.classList.remove('metric-filter-hidden', 'metric-filter-highlighted');
+            });
+            chartCards.forEach(card => {
+                card.classList.remove('chart-filter-hidden', 'chart-filter-highlighted');
+            });
+            
+            if (metricType === 'all') {
+                return;
+            }
+            
+            // Apply filtering based on selected metric
+            summaryCards.forEach(card => {
+                const cardMetric = card.getAttribute('data-metric');
+                if (cardMetric === metricType) {
+                    card.classList.add('metric-filter-highlighted');
+                } else {
+                    card.classList.add('metric-filter-hidden');
+                }
+            });
+            
+            metricCards.forEach(card => {
+                const cardMetric = card.getAttribute('data-metric');
+                if (cardMetric === metricType) {
+                    card.classList.add('metric-filter-highlighted');
+                } else {
+                    card.classList.add('metric-filter-hidden');
+                }
+            });
+            
+            chartCards.forEach(card => {
+                const cardMetric = card.getAttribute('data-metric');
+                if (cardMetric === metricType) {
+                    card.classList.add('chart-filter-highlighted');
+                } else {
+                    card.classList.add('chart-filter-hidden');
+                }
+            });
+        }
+
+        // Initialize dashboard
+        function initializeDashboard() {
+            updateVendorInfo('all');
+            updateDetailedMetrics('all');
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+    </script>
+</body>
+</html>
