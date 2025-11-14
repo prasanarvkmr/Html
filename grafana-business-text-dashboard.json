@@ -1,19 +1,29 @@
 {
-  "dashboard": {
-    "title": "Executive Vendor Scorecard",
-    "tags": ["vendor", "performance", "executive"],
-    "timezone": "browser",
-    "schemaVersion": 38,
-    "version": 1,
-    "refresh": "5m",
-    "time": {
-      "from": "now-7d",
-      "to": "now"
-    },
-    "timepicker": {
-      "refresh_intervals": ["5m", "15m", "30m", "1h", "2h", "1d"]
-    },
-    "templating": {
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "preload": false,
+  "refresh": "5m",
+  "schemaVersion": 42,
+  "tags": ["vendor", "performance", "executive"],
+  "templating": {
       "list": [
         {
           "name": "vendor",
@@ -64,7 +74,7 @@
       {
         "id": 1,
         "type": "marcusolsson-dynamictext-panel",
-        "title": "",
+        "title": "Key Performance Metrics",
         "gridPos": { "x": 0, "y": 0, "w": 24, "h": 3 },
         "options": {
           "content": "<div style=\"background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);\">\n  <div style=\"display: flex; justify-content: space-between; align-items: center;\">\n    <div style=\"display: flex; gap: 40px; flex: 1;\">\n      <div style=\"text-align: center;\">\n        <div style=\"font-size: 32px; font-weight: 700; color: #ffffff; font-family: Calibri, sans-serif;\">2,487</div>\n        <div style=\"font-size: 14px; color: #94a3b8; margin-top: 4px; font-family: Calibri, sans-serif;\">Agents Impacted</div>\n      </div>\n      <div style=\"text-align: center;\">\n        <div style=\"font-size: 32px; font-weight: 700; color: #ffffff; font-family: Calibri, sans-serif;\">1,247</div>\n        <div style=\"font-size: 14px; color: #94a3b8; margin-top: 4px; font-family: Calibri, sans-serif;\">Total Calls</div>\n      </div>\n      <div style=\"text-align: center;\">\n        <div style=\"font-size: 32px; font-weight: 700; color: #dc2626; font-family: Calibri, sans-serif;\">245</div>\n        <div style=\"font-size: 14px; color: #94a3b8; margin-top: 4px; font-family: Calibri, sans-serif;\">Disconnected</div>\n      </div>\n      <div style=\"text-align: center;\">\n        <div style=\"font-size: 32px; font-weight: 700; color: #f59e0b; font-family: Calibri, sans-serif;\">647</div>\n        <div style=\"font-size: 14px; color: #94a3b8; margin-top: 4px; font-family: Calibri, sans-serif;\">Degraded Quality</div>\n      </div>\n    </div>\n  </div>\n</div>",
@@ -193,7 +203,7 @@
       {
         "id": 5,
         "type": "marcusolsson-dynamictext-panel",
-        "title": "",
+        "title": "Footer",
         "gridPos": { "x": 0, "y": 23, "w": 24, "h": 2 },
         "options": {
           "content": "<div style=\"background: #1e293b; padding: 16px; text-align: center; border-radius: 8px; color: #94a3b8; font-family: Calibri, sans-serif;\">\n  <div style=\"font-size: 13px;\">\n    © 2024 VendorScope. All rights reserved. | For support, contact: <a href=\"mailto:support@vendorscope.com\" style=\"color: #2563eb; text-decoration: none;\">support@vendorscope.com</a>\n  </div>\n</div>",
@@ -205,7 +215,16 @@
         },
         "transparent": true
       }
-    ]
+    ],
+  "time": {
+    "from": "now-7d",
+    "to": "now"
   },
-  "overwrite": true
+  "timepicker": {
+    "refresh_intervals": ["5m", "15m", "30m", "1h", "2h", "1d"]
+  },
+  "timezone": "browser",
+  "title": "Executive Vendor Scorecard",
+  "uid": "executive-vendor-scorecard",
+  "version": 1
 }
