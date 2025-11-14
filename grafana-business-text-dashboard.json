@@ -1,0 +1,211 @@
+{
+  "dashboard": {
+    "title": "Executive Vendor Scorecard",
+    "tags": ["vendor", "performance", "executive"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "5m",
+    "time": {
+      "from": "now-7d",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": ["5m", "15m", "30m", "1h", "2h", "1d"]
+    },
+    "templating": {
+      "list": [
+        {
+          "name": "vendor",
+          "type": "custom",
+          "label": "Vendor",
+          "query": "All Vendors,Vendor A - Tech Solutions,Vendor B - Cloud Services,Vendor C - Network Systems,Vendor D - Support Services,Vendor E - Infrastructure",
+          "current": {
+            "text": "All Vendors",
+            "value": "all"
+          },
+          "options": [
+            { "text": "All Vendors", "value": "all", "selected": true },
+            { "text": "Vendor A - Tech Solutions", "value": "vendor1" },
+            { "text": "Vendor B - Cloud Services", "value": "vendor2" },
+            { "text": "Vendor C - Network Systems", "value": "vendor3" },
+            { "text": "Vendor D - Support Services", "value": "vendor4" },
+            { "text": "Vendor E - Infrastructure", "value": "vendor5" }
+          ],
+          "multi": false,
+          "includeAll": false
+        },
+        {
+          "name": "time_period",
+          "type": "custom",
+          "label": "Time Period",
+          "query": "Today,Yesterday,Last 7 Days,Last 30 Days,Last 2 Months,Last 3 Months,Month to Date,Quarter to Date,Year to Date",
+          "current": {
+            "text": "Last 7 Days",
+            "value": "7days"
+          },
+          "options": [
+            { "text": "Today", "value": "today" },
+            { "text": "Yesterday", "value": "yesterday" },
+            { "text": "Last 7 Days", "value": "7days", "selected": true },
+            { "text": "Last 30 Days", "value": "30days" },
+            { "text": "Last 2 Months", "value": "60days" },
+            { "text": "Last 3 Months", "value": "90days" },
+            { "text": "Month to Date", "value": "mtd" },
+            { "text": "Quarter to Date", "value": "qtd" },
+            { "text": "Year to Date", "value": "ytd" }
+          ],
+          "multi": false,
+          "includeAll": false
+        }
+      ]
+    },
+    "panels": [
+      {
+        "id": 1,
+        "type": "marcusolsson-dynamictext-panel",
+        "title": "",
+        "gridPos": { "x": 0, "y": 0, "w": 24, "h": 3 },
+        "options": {
+          "content": "<div style=\"background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);\">\n  <div style=\"display: flex; justify-content: space-between; align-items: center;\">\n    <div style=\"display: flex; gap: 40px; flex: 1;\">\n      <div style=\"text-align: center;\">\n        <div style=\"font-size: 32px; font-weight: 700; color: #ffffff; font-family: Calibri, sans-serif;\">2,487</div>\n        <div style=\"font-size: 14px; color: #94a3b8; margin-top: 4px; font-family: Calibri, sans-serif;\">Agents Impacted</div>\n      </div>\n      <div style=\"text-align: center;\">\n        <div style=\"font-size: 32px; font-weight: 700; color: #ffffff; font-family: Calibri, sans-serif;\">1,247</div>\n        <div style=\"font-size: 14px; color: #94a3b8; margin-top: 4px; font-family: Calibri, sans-serif;\">Total Calls</div>\n      </div>\n      <div style=\"text-align: center;\">\n        <div style=\"font-size: 32px; font-weight: 700; color: #dc2626; font-family: Calibri, sans-serif;\">245</div>\n        <div style=\"font-size: 14px; color: #94a3b8; margin-top: 4px; font-family: Calibri, sans-serif;\">Disconnected</div>\n      </div>\n      <div style=\"text-align: center;\">\n        <div style=\"font-size: 32px; font-weight: 700; color: #f59e0b; font-family: Calibri, sans-serif;\">647</div>\n        <div style=\"font-size: 14px; color: #94a3b8; margin-top: 4px; font-family: Calibri, sans-serif;\">Degraded Quality</div>\n      </div>\n    </div>\n  </div>\n</div>",
+          "defaultContent": "Metrics Loading...",
+          "editor": {
+            "language": "html",
+            "height": 200
+          }
+        },
+        "transparent": true
+      },
+      {
+        "id": 2,
+        "type": "marcusolsson-dynamictext-panel",
+        "title": "Vendor Performance Details - ${vendor:text} - ${time_period:text}",
+        "gridPos": { "x": 0, "y": 3, "w": 24, "h": 12 },
+        "options": {
+          "content": "<style>\n  .vendor-scorecard-table {\n    width: 100%;\n    border-collapse: collapse;\n    font-family: Calibri, sans-serif;\n    background: #ffffff;\n  }\n  .vendor-scorecard-table th {\n    background: #f8fafc;\n    color: #1e293b;\n    font-size: 13px;\n    font-weight: 600;\n    text-align: left;\n    padding: 14px 16px;\n    border-bottom: 2px solid #e2e8f0;\n    text-transform: uppercase;\n    letter-spacing: 0.5px;\n  }\n  .vendor-scorecard-table td {\n    padding: 16px;\n    border-bottom: 1px solid #e2e8f0;\n    font-size: 14px;\n    color: #334155;\n  }\n  .vendor-scorecard-table tr:hover {\n    background: #f8fafc;\n  }\n  .vendor-logo-cell {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n  }\n  .vendor-logo-icon {\n    width: 48px;\n    height: 48px;\n    border-radius: 12px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    font-size: 16px;\n    font-weight: 700;\n    color: #ffffff;\n    flex-shrink: 0;\n  }\n  .vendor-info {\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n  }\n  .vendor-name {\n    font-size: 15px;\n    font-weight: 600;\n    color: #1e293b;\n  }\n  .vendor-category {\n    font-size: 13px;\n    color: #64748b;\n  }\n  .metric-primary {\n    font-size: 18px;\n    font-weight: 700;\n    color: #1e293b;\n  }\n  .metric-secondary {\n    font-size: 12px;\n    color: #64748b;\n    margin-top: 2px;\n  }\n  .trend-up {\n    color: #16a34a;\n    font-weight: 600;\n  }\n  .trend-down {\n    color: #dc2626;\n    font-weight: 600;\n  }\n  .trend-neutral {\n    color: #64748b;\n    font-weight: 600;\n  }\n  .trend-indicator {\n    font-size: 16px;\n    margin-right: 4px;\n  }\n  .comparison-text {\n    font-size: 11px;\n    color: #94a3b8;\n    margin-top: 4px;\n  }\n</style>\n\n<table class=\"vendor-scorecard-table\">\n  <thead>\n    <tr>\n      <th>Vendor</th>\n      <th>Agents Impacted</th>\n      <th>Total Calls</th>\n      <th>Disconnected</th>\n      <th>Degraded Quality</th>\n      <th>Trend</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>\n        <div class=\"vendor-logo-cell\">\n          <div class=\"vendor-logo-icon\" style=\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\">\n            VA\n          </div>\n          <div class=\"vendor-info\">\n            <div class=\"vendor-name\">Vendor A - Tech Solutions</div>\n            <div class=\"vendor-category\">Cloud Infrastructure & Services</div>\n          </div>\n        </div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">28.5%</div>\n        <div class=\"metric-secondary\">2,487 agents</div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">1,247</div>\n        <div class=\"metric-secondary\">Total volume</div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">245</div>\n        <div class=\"metric-secondary\">Calls lost</div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">647</div>\n        <div class=\"metric-secondary\">Quality issues</div>\n      </td>\n      <td>\n        <div class=\"trend-up\">\n          <span class=\"trend-indicator\">↑</span>+18.2%\n        </div>\n        <div class=\"comparison-text\">Nov 8 - Nov 14 vs Nov 1 - Nov 7</div>\n      </td>\n    </tr>\n    <tr>\n      <td>\n        <div class=\"vendor-logo-cell\">\n          <div class=\"vendor-logo-icon\" style=\"background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);\">\n            VB\n          </div>\n          <div class=\"vendor-info\">\n            <div class=\"vendor-name\">Vendor B - Cloud Services</div>\n            <div class=\"vendor-category\">Platform & Communication</div>\n          </div>\n        </div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">19.3%</div>\n        <div class=\"metric-secondary\">1,685 agents</div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">847</div>\n        <div class=\"metric-secondary\">Total volume</div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">156</div>\n        <div class=\"metric-secondary\">Calls lost</div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">467</div>\n        <div class=\"metric-secondary\">Quality issues</div>\n      </td>\n      <td>\n        <div class=\"trend-down\">\n          <span class=\"trend-indicator\">↓</span>-8.5%\n        </div>\n        <div class=\"comparison-text\">Nov 8 - Nov 14 vs Nov 1 - Nov 7</div>\n      </td>\n    </tr>\n    <tr>\n      <td>\n        <div class=\"vendor-logo-cell\">\n          <div class=\"vendor-logo-icon\" style=\"background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);\">\n            VC\n          </div>\n          <div class=\"vendor-info\">\n            <div class=\"vendor-name\">Vendor C - Network Systems</div>\n            <div class=\"vendor-category\">Network Infrastructure</div>\n          </div>\n        </div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">15.7%</div>\n        <div class=\"metric-secondary\">1,372 agents</div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">564</div>\n        <div class=\"metric-secondary\">Total volume</div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">98</div>\n        <div class=\"metric-secondary\">Calls lost</div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">300</div>\n        <div class=\"metric-secondary\">Quality issues</div>\n      </td>\n      <td>\n        <div class=\"trend-up\">\n          <span class=\"trend-indicator\">↑</span>+5.3%\n        </div>\n        <div class=\"comparison-text\">Nov 8 - Nov 14 vs Nov 1 - Nov 7</div>\n      </td>\n    </tr>\n    <tr>\n      <td>\n        <div class=\"vendor-logo-cell\">\n          <div class=\"vendor-logo-icon\" style=\"background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);\">\n            VD\n          </div>\n          <div class=\"vendor-info\">\n            <div class=\"vendor-name\">Vendor D - Support Services</div>\n            <div class=\"vendor-category\">Technical Support & Maintenance</div>\n          </div>\n        </div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">12.4%</div>\n        <div class=\"metric-secondary\">1,083 agents</div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">423</div>\n        <div class=\"metric-secondary\">Total volume</div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">67</div>\n        <div class=\"metric-secondary\">Calls lost</div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">220</div>\n        <div class=\"metric-secondary\">Quality issues</div>\n      </td>\n      <td>\n        <div class=\"trend-down\">\n          <span class=\"trend-indicator\">↓</span>-12.1%\n        </div>\n        <div class=\"comparison-text\">Nov 8 - Nov 14 vs Nov 1 - Nov 7</div>\n      </td>\n    </tr>\n    <tr>\n      <td>\n        <div class=\"vendor-logo-cell\">\n          <div class=\"vendor-logo-icon\" style=\"background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);\">\n            VE\n          </div>\n          <div class=\"vendor-info\">\n            <div class=\"vendor-name\">Vendor E - Infrastructure</div>\n            <div class=\"vendor-category\">Data Center & Hardware</div>\n          </div>\n        </div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">8.9%</div>\n        <div class=\"metric-secondary\">778 agents</div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">289</div>\n        <div class=\"metric-secondary\">Total volume</div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">45</div>\n        <div class=\"metric-secondary\">Calls lost</div>\n      </td>\n      <td>\n        <div class=\"metric-primary\">153</div>\n        <div class=\"metric-secondary\">Quality issues</div>\n      </td>\n      <td>\n        <div class=\"trend-neutral\">\n          <span class=\"trend-indicator\">→</span>-0.2%\n        </div>\n        <div class=\"comparison-text\">Nov 8 - Nov 14 vs Nov 1 - Nov 7</div>\n      </td>\n    </tr>\n  </tbody>\n</table>",
+          "defaultContent": "Loading vendor data...",
+          "editor": {
+            "language": "html",
+            "height": 400
+          }
+        },
+        "transparent": false
+      },
+      {
+        "id": 3,
+        "type": "timeseries",
+        "title": "Agents Impacted Trend (%)",
+        "gridPos": { "x": 0, "y": 15, "w": 12, "h": 8 },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "fixed",
+              "fixedColor": "#2563eb"
+            },
+            "custom": {
+              "lineWidth": 2,
+              "fillOpacity": 10,
+              "spanNulls": false,
+              "showPoints": "always",
+              "pointSize": 5
+            },
+            "unit": "percent"
+          }
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom"
+          },
+          "tooltip": {
+            "mode": "single"
+          }
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "datasource": {
+              "type": "datasource",
+              "uid": "-- Mixed --"
+            }
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "type": "timeseries",
+        "title": "Call Issues Trend",
+        "gridPos": { "x": 12, "y": 15, "w": 12, "h": 8 },
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "lineWidth": 2,
+              "fillOpacity": 30,
+              "spanNulls": false,
+              "showPoints": "always",
+              "pointSize": 5,
+              "stacking": {
+                "mode": "normal"
+              }
+            },
+            "unit": "short"
+          },
+          "overrides": [
+            {
+              "matcher": { "id": "byName", "options": "Disconnected" },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": { "mode": "fixed", "fixedColor": "#dc2626" }
+                }
+              ]
+            },
+            {
+              "matcher": { "id": "byName", "options": "Degraded" },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": { "mode": "fixed", "fixedColor": "#f59e0b" }
+                }
+              ]
+            }
+          ]
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom"
+          },
+          "tooltip": {
+            "mode": "multi"
+          }
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "datasource": {
+              "type": "datasource",
+              "uid": "-- Mixed --"
+            }
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "type": "marcusolsson-dynamictext-panel",
+        "title": "",
+        "gridPos": { "x": 0, "y": 23, "w": 24, "h": 2 },
+        "options": {
+          "content": "<div style=\"background: #1e293b; padding: 16px; text-align: center; border-radius: 8px; color: #94a3b8; font-family: Calibri, sans-serif;\">\n  <div style=\"font-size: 13px;\">\n    © 2024 VendorScope. All rights reserved. | For support, contact: <a href=\"mailto:support@vendorscope.com\" style=\"color: #2563eb; text-decoration: none;\">support@vendorscope.com</a>\n  </div>\n</div>",
+          "defaultContent": "",
+          "editor": {
+            "language": "html",
+            "height": 100
+          }
+        },
+        "transparent": true
+      }
+    ]
+  },
+  "overwrite": true
+}
