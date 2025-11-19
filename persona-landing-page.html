@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Portal - Select Your Persona</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Calibri, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation */
+        .main-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 20px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #667eea;
+        }
+
+        /* Main Content */
+        .container {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 24px;
+            width: 100%;
+        }
+
+        /* Header Section */
+        .header-section {
+            text-align: center;
+            margin-bottom: 60px;
+            color: #ffffff;
+        }
+
+        .main-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .main-subtitle {
+            font-size: 20px;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        /* Persona Cards Grid */
+        .personas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 32px;
+            margin-bottom: 60px;
+        }
+
+        .persona-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .persona-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .persona-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        .persona-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .persona-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+        }
+
+        .persona-card.it .persona-icon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .persona-card.manager .persona-icon {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .persona-card.executive .persona-icon {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .persona-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+
+        .persona-role {
+            font-size: 16px;
+            color: #64748b;
+            margin-bottom: 24px;
+            font-weight: 500;
+        }
+
+        .persona-description {
+            font-size: 15px;
+            color: #475569;
+            line-height: 1.6;
+            margin-bottom: 28px;
+        }
+
+        .dashboards-list {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .dashboards-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .dashboard-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            color: #334155;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .dashboard-item:hover {
+            color: #667eea;
+        }
+
+        .dashboard-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .dashboard-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .dashboard-arrow {
+            color: #cbd5e1;
+            font-size: 18px;
+        }
+
+        .persona-card:hover .dashboard-arrow {
+            color: #667eea;
+            transform: translateX(4px);
+            transition: all 0.2s;
+        }
+
+        /* Features Section */
+        .features-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 48px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            margin-bottom: 40px;
+        }
+
+        .features-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1e293b;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 32px;
+        }
+
+        .feature-item {
+            text-align: center;
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 16px;
+            color: #ffffff;
+        }
+
+        .feature-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .feature-description {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 24px;
+            text-align: center;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .personas-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 36px;
+            }
+
+            .main-subtitle {
+                font-size: 18px;
+            }
+
+            .persona-card {
+                padding: 32px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="logo">
+            <div class="logo-icon">📊</div>
+            <span>Dashboard Portal</span>
+        </div>
+        <div class="nav-right">
+            <a href="#" class="nav-link">Documentation</a>
+            <a href="#" class="nav-link">Support</a>
+            <a href="#" class="nav-link">Settings</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h1 class="main-title">Welcome to Your Dashboard Portal</h1>
+            <p class="main-subtitle">Select your role to access personalized dashboards and insights</p>
+        </div>
+
+        <!-- Persona Cards -->
+        <div class="personas-grid">
+            <!-- IT Operations Persona -->
+            <a href="application-health-dashboard.html" class="persona-card it">
+                <div class="persona-icon">🔧</div>
+                <h2 class="persona-title">IT Operations</h2>
+                <div class="persona-role">Systems & Infrastructure</div>
+                <p class="persona-description">
+                    Monitor system health, infrastructure metrics, and operational performance. 
+                    Access detailed technical dashboards for troubleshooting and optimization.
+                </p>
+                <div class="dashboards-list">
+                    <div class="dashboards-label">Available Dashboards</div>
+                    <div class="dashboard-item">
+                        <div class="dashboard-icon">💚</div>
+                        <div class="dashboard-name">Application Health</div>
+                        <div class="dashboard-arrow">→</div>
+                    </div>
+                    <div class="dashboard-item">
+                        <div class="dashboard-icon">🔌</div>
+                        <div class="dashboard-name">Infrastructure Monitoring</div>
+                        <div class="dashboard-arrow">→</div>
+                    </div>
+                    <div class="dashboard-item">
+                        <div class="dashboard-icon">📡</div>
+                        <div class="dashboard-name">Network Performance</div>
+                        <div class="dashboard-arrow">→</div>
+                    </div>
+                    <div class="dashboard-item">
+                        <div class="dashboard-icon">🚨</div>
+                        <div class="dashboard-name">Alert Management</div>
+                        <div class="dashboard-arrow">→</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Manager Persona -->
+            <a href="executive-vendor-scorecard.html" class="persona-card manager">
+                <div class="persona-icon">📊</div>
+                <h2 class="persona-title">Manager</h2>
+                <div class="persona-role">Team & Operations Management</div>
+                <p class="persona-description">
+                    Track team performance, vendor relationships, and operational metrics. 
+                    Make data-driven decisions with comprehensive analytical insights.
+                </p>
+                <div class="dashboards-list">
+                    <div class="dashboards-label">Available Dashboards</div>
+                    <div class="dashboard-item">
+                        <div class="dashboard-icon">📈</div>
+                        <div class="dashboard-name">Vendor Performance</div>
+                        <div class="dashboard-arrow">→</div>
+                    </div>
+                    <div class="dashboard-item">
+                        <div class="dashboard-icon">👥</div>
+                        <div class="dashboard-name">Team Analytics</div>
+                        <div class="dashboard-arrow">→</div>
+                    </div>
+                    <div class="dashboard-item">
+                        <div class="dashboard-icon">📊</div>
+                        <div class="dashboard-name">Performance Metrics</div>
+                        <div class="dashboard-arrow">→</div>
+                    </div>
+                    <div class="dashboard-item">
+                        <div class="dashboard-icon">💰</div>
+                        <div class="dashboard-name">Cost Analysis</div>
+                        <div class="dashboard-arrow">→</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Executive Persona -->
+            <a href="executive-vendor-scorecard.html" class="persona-card executive">
+                <div class="persona-icon">👔</div>
+                <h2 class="persona-title">Executive</h2>
+                <div class="persona-role">Strategic Leadership</div>
+                <p class="persona-description">
+                    High-level overview of business performance, strategic KPIs, and organizational health. 
+                    Focus on trends and insights for strategic decision-making.
+                </p>
+                <div class="dashboards-list">
+                    <div class="dashboards-label">Available Dashboards</div>
+                    <div class="dashboard-item">
+                        <div class="dashboard-icon">🎯</div>
+                        <div class="dashboard-name">Executive Summary</div>
+                        <div class="dashboard-arrow">→</div>
+                    </div>
+                    <div class="dashboard-item">
+                        <div class="dashboard-icon">📊</div>
+                        <div class="dashboard-name">Business KPIs</div>
+                        <div class="dashboard-arrow">→</div>
+                    </div>
+                    <div class="dashboard-item">
+                        <div class="dashboard-icon">💼</div>
+                        <div class="dashboard-name">Strategic Initiatives</div>
+                        <div class="dashboard-arrow">→</div>
+                    </div>
+                    <div class="dashboard-item">
+                        <div class="dashboard-icon">🌟</div>
+                        <div class="dashboard-name">Organizational Health</div>
+                        <div class="dashboard-arrow">→</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Features Section -->
+        <div class="features-section">
+            <h2 class="features-title">Platform Features</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-title">Real-Time Updates</div>
+                    <div class="feature-description">
+                        Live data streaming with automatic refresh for up-to-the-minute insights
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🎨</div>
+                    <div class="feature-title">Customizable Views</div>
+                    <div class="feature-description">
+                        Personalize your dashboards with drag-and-drop widgets and filters
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📱</div>
+                    <div class="feature-title">Mobile Responsive</div>
+                    <div class="feature-description">
+                        Access your dashboards anywhere, on any device, with optimized layouts
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔔</div>
+                    <div class="feature-title">Smart Alerts</div>
+                    <div class="feature-description">
+                        Intelligent notifications for critical events and threshold breaches
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        © 2025 Dashboard Portal. All rights reserved. | <a href="mailto:support@dashboardportal.com">Contact Support</a>
+    </div>
+</body>
+</html>
