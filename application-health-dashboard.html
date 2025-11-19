@@ -12,83 +12,168 @@
         }
 
         body {
-            font-family: Calibri, sans-serif;
-            background: #f8fafc;
-            color: #1e293b;
+            font-family: 'Calibri', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fafbfc;
+            color: #2d3748;
+            line-height: 1.6;
+            margin: 0;
+            min-height: 100vh;
         }
 
-        /* Navigation */
+        /* Main Navigation */
         .main-nav {
             background: #ffffff;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e5e7eb;
             padding: 0 32px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            height: 64px;
+            height: 56px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .nav-left {
             display: flex;
             align-items: center;
-            gap: 24px;
+            gap: 10px;
         }
 
         .logo {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
-            color: #2563eb;
+            color: #1a202c;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: #2563eb;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
         }
 
         .nav-title {
-            font-size: 18px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
             font-weight: 600;
-            color: #1e293b;
+            color: #374151;
         }
 
         .nav-right {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 8px;
         }
 
         .user-section {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            cursor: pointer;
+        }
+
+        .user-section:hover {
+            background: #f3f4f6;
         }
 
         .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 28px;
+            height: 28px;
+            background: #2563eb;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ffffff;
             font-weight: 600;
-            font-size: 14px;
+            color: white;
+            font-size: 12px;
         }
 
         .user-info {
             display: flex;
             flex-direction: column;
+            align-items: flex-start;
         }
 
         .user-name {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
-            color: #1e293b;
+            color: #2d3748;
+            line-height: 1.2;
         }
 
         .user-role {
-            font-size: 12px;
-            color: #64748b;
+            font-size: 13px;
+            color: #2563eb;
+            line-height: 1.2;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.2s ease;
+        }
+
+        .user-role:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+        }
+
+        /* Sub Navigation */
+        .sub-nav {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0 32px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+        }
+
+        .nav-tabs {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            background: #f3f4f6;
+            padding: 3px;
+            border-radius: 8px;
+        }
+
+        .nav-tab {
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #111827;
+            font-weight: 700;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+        }
+
+        .nav-tab:hover:not(.active) {
+            color: #374151;
+            background: rgba(255, 255, 255, 0.6);
         }
 
         /* Container */
@@ -103,24 +188,24 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .dashboard-title {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
             color: #1e293b;
         }
 
         .last-updated {
-            font-size: 14px;
+            font-size: 13px;
             color: #64748b;
         }
 
-        /* Status Overview Cards */
+        /* Status Overview */
         .status-overview {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
             margin-bottom: 24px;
         }
@@ -128,94 +213,102 @@
         .status-card {
             background: #ffffff;
             border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border-left: 4px solid;
+            padding: 28px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
+            position: relative;
+            overflow: hidden;
         }
 
-        .status-card.healthy {
-            border-left-color: #22c55e;
+        .status-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
         }
 
-        .status-card.warning {
-            border-left-color: #f59e0b;
-        }
-
-        .status-card.critical {
-            border-left-color: #dc2626;
+        .status-card.warning::before {
+            background: linear-gradient(90deg, #f59e0b 0%, #fb923c 100%);
         }
 
         .status-card-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
+            align-items: flex-start;
+            margin-bottom: 20px;
         }
 
         .status-card-title {
             font-size: 14px;
             font-weight: 600;
             color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .status-card-subtitle {
+            font-size: 11px;
+            color: #94a3b8;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .status-badge {
-            padding: 4px 12px;
+        .status-icon {
+            width: 48px;
+            height: 48px;
             border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-badge.healthy {
-            background: rgba(34, 197, 94, 0.1);
-            color: #22c55e;
-        }
-
-        .status-badge.warning {
-            background: rgba(245, 158, 11, 0.1);
-            color: #f59e0b;
-        }
-
-        .status-badge.critical {
-            background: rgba(220, 38, 38, 0.1);
-            color: #dc2626;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
         }
 
         .status-value {
-            font-size: 36px;
+            font-size: 42px;
             font-weight: 700;
             color: #1e293b;
             margin-bottom: 8px;
+            line-height: 1;
         }
 
         .status-label {
-            font-size: 14px;
+            font-size: 13px;
             color: #64748b;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
 
-        .status-details {
+        .status-metrics {
             display: flex;
-            gap: 16px;
-            padding-top: 12px;
-            border-top: 1px solid #e2e8f0;
+            gap: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #f1f5f9;
         }
 
-        .status-detail-item {
+        .status-metric-item {
             flex: 1;
         }
 
-        .status-detail-label {
+        .status-metric-label {
             font-size: 11px;
             color: #94a3b8;
             margin-bottom: 4px;
         }
 
-        .status-detail-value {
-            font-size: 16px;
-            font-weight: 600;
+        .status-metric-value {
+            font-size: 18px;
+            font-weight: 700;
             color: #1e293b;
+        }
+
+        .status-metric-value.good {
+            color: #22c55e;
+        }
+
+        .status-metric-value.warning {
+            color: #f59e0b;
         }
 
         /* Core Systems Section */
@@ -223,8 +316,9 @@
             background: #ffffff;
             border-radius: 12px;
             padding: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 20px;
         }
 
         .section-header {
@@ -233,23 +327,23 @@
             align-items: center;
             margin-bottom: 20px;
             padding-bottom: 16px;
-            border-bottom: 2px solid #e2e8f0;
+            border-bottom: 2px solid #f1f5f9;
         }
 
         .section-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             color: #1e293b;
         }
 
         .section-filter {
             display: flex;
-            gap: 12px;
+            gap: 8px;
         }
 
         .filter-btn {
-            padding: 8px 16px;
-            border: 1px solid #cbd5e1;
+            padding: 6px 14px;
+            border: 1px solid #e5e7eb;
             border-radius: 6px;
             background: #ffffff;
             color: #64748b;
@@ -269,83 +363,96 @@
         /* Core Systems Grid */
         .systems-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 18px;
         }
 
         .system-card {
-            background: #f8fafc;
-            border-radius: 10px;
-            padding: 20px;
-            border: 1px solid #e2e8f0;
-            transition: all 0.2s;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s;
+            position: relative;
         }
 
         .system-card:hover {
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transform: translateY(-4px);
+            border-color: #cbd5e1;
         }
 
         .system-card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .system-name {
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 17px;
+            font-weight: 700;
             color: #1e293b;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         .system-type {
             font-size: 12px;
             color: #64748b;
+            background: #f8fafc;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
         }
 
         .system-status-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 18px;
+            font-weight: 700;
         }
 
         .system-status-icon.healthy {
-            background: rgba(34, 197, 94, 0.15);
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.05) 100%);
             color: #22c55e;
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
         }
 
         .system-status-icon.warning {
-            background: rgba(245, 158, 11, 0.15);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.05) 100%);
             color: #f59e0b;
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
         }
 
         .system-status-icon.critical {
-            background: rgba(220, 38, 38, 0.15);
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.15) 0%, rgba(220, 38, 38, 0.05) 100%);
             color: #dc2626;
+            box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
         }
 
         .system-metrics {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 12px;
+            gap: 16px;
+            margin-bottom: 16px;
         }
 
         .metric-item {
-            display: flex;
-            flex-direction: column;
+            background: #fafbfc;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #f1f5f9;
         }
 
         .metric-label {
             font-size: 11px;
             color: #64748b;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            font-weight: 500;
         }
 
         .metric-value {
@@ -369,37 +476,39 @@
         .threshold-indicator {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-top: 8px;
-            padding: 8px;
-            background: #ffffff;
-            border-radius: 6px;
-            font-size: 11px;
+            gap: 10px;
+            padding: 12px;
+            background: #fafbfc;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 600;
         }
 
         .threshold-bar {
             flex: 1;
-            height: 6px;
-            background: #e2e8f0;
-            border-radius: 3px;
+            height: 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
             overflow: hidden;
         }
 
         .threshold-fill {
             height: 100%;
             transition: width 0.3s;
+            border-radius: 4px;
         }
 
         .threshold-fill.healthy {
-            background: #22c55e;
+            background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
         }
 
         .threshold-fill.warning {
-            background: #f59e0b;
+            background: linear-gradient(90deg, #f59e0b 0%, #ea580c 100%);
         }
 
         .threshold-fill.critical {
-            background: #dc2626;
+            background: linear-gradient(90deg, #dc2626 0%, #b91c1c 100%);
         }
 
         /* Application Health Table */
@@ -409,26 +518,26 @@
         }
 
         .health-table th {
-            background: #f8fafc;
+            background: #fafbfc;
             color: #1e293b;
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 12px;
+            font-weight: 700;
             text-align: left;
-            padding: 14px 16px;
-            border-bottom: 2px solid #e2e8f0;
+            padding: 12px 16px;
+            border-bottom: 2px solid #e5e7eb;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .health-table td {
-            padding: 16px;
-            border-bottom: 1px solid #e2e8f0;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
             font-size: 14px;
             color: #334155;
         }
 
         .health-table tr:hover {
-            background: #f8fafc;
+            background: #fafbfc;
         }
 
         .app-name {
@@ -480,10 +589,10 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 28px;
-            height: 28px;
+            min-width: 26px;
+            height: 26px;
             padding: 0 8px;
-            border-radius: 14px;
+            border-radius: 13px;
             font-size: 12px;
             font-weight: 700;
         }
@@ -504,7 +613,7 @@
         }
 
         .alert-count.zero {
-            background: #e2e8f0;
+            background: #f1f5f9;
             color: #64748b;
         }
 
@@ -555,18 +664,12 @@
         }
 
         /* Responsive */
-        @media (max-width: 1024px) {
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
         @media (max-width: 768px) {
-            .systems-grid {
+            .status-overview {
                 grid-template-columns: 1fr;
             }
 
-            .status-overview {
+            .systems-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -576,102 +679,87 @@
     <!-- Navigation -->
     <nav class="main-nav">
         <div class="nav-left">
-            <div class="logo">HealthScope</div>
-            <div class="nav-title">Application Health Dashboard</div>
+            <div class="logo">
+                <div class="logo-icon">HS</div>
+            </div>
         </div>
+        <div class="nav-title">Application Health Dashboard</div>
         <div class="nav-right">
             <div class="user-section">
                 <div class="user-avatar">JD</div>
                 <div class="user-info">
                     <div class="user-name">John Doe</div>
-                    <div class="user-role">IT Operations</div>
+                    <a href="persona-landing-page.html" class="user-role">
+                        IT Operations
+                        <svg class="user-role-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
                 </div>
             </div>
         </div>
     </nav>
 
+    <!-- Sub Navigation -->
+    <div class="sub-nav">
+        <div class="nav-tabs">
+            <a href="application-health-dashboard.html" class="nav-tab active">Application Health</a>
+            <a href="#" class="nav-tab">Infrastructure</a>
+            <a href="#" class="nav-tab">Network</a>
+            <a href="#" class="nav-tab">Alerts</a>
+        </div>
+    </div>
+
     <!-- Main Container -->
     <div class="container">
         <!-- Dashboard Header -->
         <div class="dashboard-header">
-            <h1 class="dashboard-title">System & Application Health</h1>
+            <h1 class="dashboard-title">System & Application Health Overview</h1>
             <div class="last-updated">Last Updated: Nov 18, 2025 10:45 AM</div>
         </div>
 
         <!-- Status Overview -->
         <div class="status-overview">
-            <div class="status-card healthy">
+            <div class="status-card">
                 <div class="status-card-header">
-                    <div class="status-card-title">Overall Health</div>
-                    <div class="status-badge healthy">Healthy</div>
-                </div>
-                <div class="status-value">98.7%</div>
-                <div class="status-label">Systems Operating Normally</div>
-                <div class="status-details">
-                    <div class="status-detail-item">
-                        <div class="status-detail-label">Core Systems</div>
-                        <div class="status-detail-value">12/12</div>
+                    <div>
+                        <div class="status-card-title">Core Systems Health</div>
+                        <div class="status-card-subtitle">5 Critical Systems</div>
                     </div>
-                    <div class="status-detail-item">
-                        <div class="status-detail-label">Applications</div>
-                        <div class="status-detail-value">47/48</div>
+                    <div class="status-icon">🖥️</div>
+                </div>
+                <div class="status-value">94.4%</div>
+                <div class="status-label">Average Health Score</div>
+                <div class="status-metrics">
+                    <div class="status-metric-item">
+                        <div class="status-metric-label">Healthy</div>
+                        <div class="status-metric-value good">4</div>
+                    </div>
+                    <div class="status-metric-item">
+                        <div class="status-metric-label">Degraded</div>
+                        <div class="status-metric-value warning">1</div>
                     </div>
                 </div>
             </div>
 
-            <div class="status-card warning">
+            <div class="status-card">
                 <div class="status-card-header">
-                    <div class="status-card-title">Active Alerts</div>
-                    <div class="status-badge warning">3 Warnings</div>
-                </div>
-                <div class="status-value">3</div>
-                <div class="status-label">Requires Attention</div>
-                <div class="status-details">
-                    <div class="status-detail-item">
-                        <div class="status-detail-label">Critical</div>
-                        <div class="status-detail-value">0</div>
+                    <div>
+                        <div class="status-card-title">Applications Health</div>
+                        <div class="status-card-subtitle">10 Applications</div>
                     </div>
-                    <div class="status-detail-item">
-                        <div class="status-detail-label">Warning</div>
-                        <div class="status-detail-value">3</div>
-                    </div>
+                    <div class="status-icon">📱</div>
                 </div>
-            </div>
-
-            <div class="status-card healthy">
-                <div class="status-card-header">
-                    <div class="status-card-title">Service Uptime</div>
-                    <div class="status-badge healthy">Excellent</div>
-                </div>
-                <div class="status-value">99.95%</div>
-                <div class="status-label">Last 30 Days</div>
-                <div class="status-details">
-                    <div class="status-detail-item">
-                        <div class="status-detail-label">Downtime</div>
-                        <div class="status-detail-value">21m</div>
+                <div class="status-value">99.1%</div>
+                <div class="status-label">Avg Synthetic Health</div>
+                <div class="status-metrics">
+                    <div class="status-metric-item">
+                        <div class="status-metric-label">Healthy</div>
+                        <div class="status-metric-value good">9</div>
                     </div>
-                    <div class="status-detail-item">
-                        <div class="status-detail-label">Incidents</div>
-                        <div class="status-detail-value">2</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="status-card healthy">
-                <div class="status-card-header">
-                    <div class="status-card-title">Response Time</div>
-                    <div class="status-badge healthy">Optimal</div>
-                </div>
-                <div class="status-value">127ms</div>
-                <div class="status-label">Average Response Time</div>
-                <div class="status-details">
-                    <div class="status-detail-item">
-                        <div class="status-detail-label">P95</div>
-                        <div class="status-detail-value">285ms</div>
-                    </div>
-                    <div class="status-detail-item">
-                        <div class="status-detail-label">P99</div>
-                        <div class="status-detail-value">542ms</div>
+                    <div class="status-metric-item">
+                        <div class="status-metric-label">Degraded</div>
+                        <div class="status-metric-value warning">1</div>
                     </div>
                 </div>
             </div>
@@ -690,67 +778,67 @@
             </div>
 
             <div class="systems-grid">
-                <!-- Database System -->
+                <!-- IVR 1 - Google IVR -->
                 <div class="system-card">
                     <div class="system-card-header">
                         <div>
-                            <div class="system-name">Primary Database</div>
-                            <div class="system-type">PostgreSQL 15.2</div>
+                            <div class="system-name">IVR 1 - Google IVR</div>
+                            <div class="system-type">Interactive Voice Response</div>
                         </div>
                         <div class="system-status-icon healthy">✓</div>
                     </div>
                     <div class="system-metrics">
                         <div class="metric-item">
-                            <div class="metric-label">CPU Usage</div>
-                            <div class="metric-value good">42%</div>
+                            <div class="metric-label">Requests/min</div>
+                            <div class="metric-value good">1,245</div>
                         </div>
                         <div class="metric-item">
-                            <div class="metric-label">Memory</div>
+                            <div class="metric-label">Port Usage</div>
                             <div class="metric-value good">67%</div>
                         </div>
                         <div class="metric-item">
-                            <div class="metric-label">Connections</div>
-                            <div class="metric-value">235/500</div>
+                            <div class="metric-label">API Success Rate</div>
+                            <div class="metric-value good">99.2%</div>
                         </div>
                         <div class="metric-item">
-                            <div class="metric-label">Disk I/O</div>
-                            <div class="metric-value good">Normal</div>
+                            <div class="metric-label">Avg Response</div>
+                            <div class="metric-value good">245ms</div>
                         </div>
                     </div>
                     <div class="threshold-indicator">
                         <span>Health:</span>
                         <div class="threshold-bar">
-                            <div class="threshold-fill healthy" style="width: 94%;"></div>
+                            <div class="threshold-fill healthy" style="width: 97%;"></div>
                         </div>
-                        <span>94%</span>
+                        <span>97%</span>
                     </div>
                 </div>
 
-                <!-- Cache System -->
+                <!-- IVR 2 -->
                 <div class="system-card">
                     <div class="system-card-header">
                         <div>
-                            <div class="system-name">Redis Cache</div>
-                            <div class="system-type">Redis 7.0</div>
+                            <div class="system-name">IVR 2</div>
+                            <div class="system-type">Interactive Voice Response</div>
                         </div>
                         <div class="system-status-icon healthy">✓</div>
                     </div>
                     <div class="system-metrics">
                         <div class="metric-item">
-                            <div class="metric-label">Hit Rate</div>
-                            <div class="metric-value good">97.8%</div>
+                            <div class="metric-label">Synthetic Health</div>
+                            <div class="metric-value good">99.5%</div>
                         </div>
                         <div class="metric-item">
-                            <div class="metric-label">Memory</div>
-                            <div class="metric-value good">54%</div>
+                            <div class="metric-label">Host Health</div>
+                            <div class="metric-value good">3/3</div>
                         </div>
                         <div class="metric-item">
-                            <div class="metric-label">Operations/sec</div>
-                            <div class="metric-value">45.2K</div>
+                            <div class="metric-label">Service Failure</div>
+                            <div class="metric-value good">0.15%</div>
                         </div>
                         <div class="metric-item">
-                            <div class="metric-label">Latency</div>
-                            <div class="metric-value good">0.8ms</div>
+                            <div class="metric-label">Uptime</div>
+                            <div class="metric-value good">99.8%</div>
                         </div>
                     </div>
                     <div class="threshold-indicator">
@@ -762,103 +850,67 @@
                     </div>
                 </div>
 
-                <!-- Message Queue -->
+                <!-- Citrix -->
                 <div class="system-card">
                     <div class="system-card-header">
                         <div>
-                            <div class="system-name">Message Queue</div>
-                            <div class="system-type">RabbitMQ 3.11</div>
-                        </div>
-                        <div class="system-status-icon healthy">✓</div>
-                    </div>
-                    <div class="system-metrics">
-                        <div class="metric-item">
-                            <div class="metric-label">Messages/sec</div>
-                            <div class="metric-value">1,245</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Queue Depth</div>
-                            <div class="metric-value good">127</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Consumers</div>
-                            <div class="metric-value">18/20</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Publish Rate</div>
-                            <div class="metric-value good">Normal</div>
-                        </div>
-                    </div>
-                    <div class="threshold-indicator">
-                        <span>Health:</span>
-                        <div class="threshold-bar">
-                            <div class="threshold-fill healthy" style="width: 96%;"></div>
-                        </div>
-                        <span>96%</span>
-                    </div>
-                </div>
-
-                <!-- API Gateway -->
-                <div class="system-card">
-                    <div class="system-card-header">
-                        <div>
-                            <div class="system-name">API Gateway</div>
-                            <div class="system-type">Kong 3.2</div>
+                            <div class="system-name">Citrix</div>
+                            <div class="system-type">Virtual Infrastructure</div>
                         </div>
                         <div class="system-status-icon warning">⚠</div>
                     </div>
                     <div class="system-metrics">
                         <div class="metric-item">
-                            <div class="metric-label">Requests/sec</div>
-                            <div class="metric-value">8,567</div>
+                            <div class="metric-label">Critical Events</div>
+                            <div class="metric-value warning">3</div>
                         </div>
                         <div class="metric-item">
-                            <div class="metric-label">Error Rate</div>
-                            <div class="metric-value warning">2.3%</div>
+                            <div class="metric-label">Warning Events</div>
+                            <div class="metric-value">12</div>
                         </div>
                         <div class="metric-item">
-                            <div class="metric-label">Latency (P95)</div>
-                            <div class="metric-value warning">245ms</div>
+                            <div class="metric-label">Active Sessions</div>
+                            <div class="metric-value">1,567</div>
                         </div>
                         <div class="metric-item">
-                            <div class="metric-label">Active Routes</div>
-                            <div class="metric-value">156</div>
+                            <div class="metric-label">Infrastructure</div>
+                            <div class="metric-value warning">Degraded</div>
                         </div>
                     </div>
                     <div class="threshold-indicator">
                         <span>Health:</span>
                         <div class="threshold-bar">
-                            <div class="threshold-fill warning" style="width: 78%;"></div>
+                            <div class="threshold-fill warning" style="width: 76%;"></div>
                         </div>
-                        <span>78%</span>
+                        <span>76%</span>
                     </div>
                 </div>
 
-                <!-- Load Balancer -->
+                <!-- Salesforce -->
                 <div class="system-card">
                     <div class="system-card-header">
                         <div>
-                            <div class="system-name">Load Balancer</div>
-                            <div class="system-type">NGINX Plus</div>
+                            <div class="system-name">Salesforce</div>
+                            <div class="system-type">CRM Platform</div>
                         </div>
                         <div class="system-status-icon healthy">✓</div>
                     </div>
                     <div class="system-metrics">
                         <div class="metric-item">
-                            <div class="metric-label">Active Connections</div>
-                            <div class="metric-value">2,345</div>
+                            <div class="metric-label">Synthetic Health</div>
+                            <div class="metric-value good">99.7%</div>
                         </div>
                         <div class="metric-item">
-                            <div class="metric-label">Healthy Nodes</div>
-                            <div class="metric-value good">12/12</div>
+                            <div class="metric-label">Host Health</div>
+                            <div class="metric-value good">4/4</div>
                         </div>
                         <div class="metric-item">
-                            <div class="metric-label">Throughput</div>
-                            <div class="metric-value">1.2 GB/s</div>
+                            <div class="metric-label">Service Failure</div>
+                            <div class="metric-value good">0.08%</div>
                         </div>
                         <div class="metric-item">
-                            <div class="metric-label">SSL/TLS</div>
-                            <div class="metric-value good">Active</div>
+                            <div class="metric-label">API Response</div>
+                            <div class="metric-value good">187ms</div>
                         </div>
                     </div>
                     <div class="threshold-indicator">
@@ -870,39 +922,39 @@
                     </div>
                 </div>
 
-                <!-- Storage System -->
+                <!-- Genesys Pure Cloud -->
                 <div class="system-card">
                     <div class="system-card-header">
                         <div>
-                            <div class="system-name">Object Storage</div>
-                            <div class="system-type">MinIO S3</div>
+                            <div class="system-name">Genesys Pure Cloud</div>
+                            <div class="system-type">Contact Center Platform</div>
                         </div>
                         <div class="system-status-icon healthy">✓</div>
                     </div>
                     <div class="system-metrics">
                         <div class="metric-item">
-                            <div class="metric-label">Storage Used</div>
-                            <div class="metric-value">4.7 TB</div>
+                            <div class="metric-label">Services Health</div>
+                            <div class="metric-value good">Optimal</div>
                         </div>
                         <div class="metric-item">
-                            <div class="metric-label">Capacity</div>
-                            <div class="metric-value good">47%</div>
+                            <div class="metric-label">Platform Health</div>
+                            <div class="metric-value good">99.6%</div>
                         </div>
                         <div class="metric-item">
-                            <div class="metric-label">I/O Operations</div>
-                            <div class="metric-value">12.5K/s</div>
+                            <div class="metric-label">Active Agents</div>
+                            <div class="metric-value">456</div>
                         </div>
                         <div class="metric-item">
-                            <div class="metric-label">Replication</div>
-                            <div class="metric-value good">3x</div>
+                            <div class="metric-label">Queue Status</div>
+                            <div class="metric-value good">Normal</div>
                         </div>
                     </div>
                     <div class="threshold-indicator">
                         <span>Health:</span>
                         <div class="threshold-bar">
-                            <div class="threshold-fill healthy" style="width: 95%;"></div>
+                            <div class="threshold-fill healthy" style="width: 96%;"></div>
                         </div>
-                        <span>95%</span>
+                        <span>96%</span>
                     </div>
                 </div>
             </div>
@@ -918,17 +970,19 @@
                 <thead>
                     <tr>
                         <th>Application</th>
+                        <th>Synthetic Health</th>
                         <th>Host Health</th>
-                        <th>Synthetic Monitoring</th>
                         <th>Service Failure Rate</th>
-                        <th>Active Alerts</th>
                         <th>Overall Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>
-                            <div class="app-name">Customer Portal</div>
+                            <div class="app-name">Customer Portal Web</div>
+                        </td>
+                        <td>
+                            <div class="percentage good">99.8%</div>
                         </td>
                         <td>
                             <div class="health-indicator">
@@ -937,13 +991,7 @@
                             </div>
                         </td>
                         <td>
-                            <div class="percentage good">99.8%</div>
-                        </td>
-                        <td>
                             <div class="percentage good">0.12%</div>
-                        </td>
-                        <td>
-                            <span class="alert-count zero">0</span>
                         </td>
                         <td>
                             <span class="status-badge healthy">Healthy</span>
@@ -954,19 +1002,16 @@
                             <div class="app-name">Admin Dashboard</div>
                         </td>
                         <td>
+                            <div class="percentage good">99.5%</div>
+                        </td>
+                        <td>
                             <div class="health-indicator">
                                 <span class="health-dot healthy"></span>
                                 <span>2/2 Healthy</span>
                             </div>
                         </td>
                         <td>
-                            <div class="percentage good">99.5%</div>
-                        </td>
-                        <td>
                             <div class="percentage good">0.08%</div>
-                        </td>
-                        <td>
-                            <span class="alert-count zero">0</span>
                         </td>
                         <td>
                             <span class="status-badge healthy">Healthy</span>
@@ -974,7 +1019,10 @@
                     </tr>
                     <tr>
                         <td>
-                            <div class="app-name">Payment Service</div>
+                            <div class="app-name">Payment Processing Service</div>
+                        </td>
+                        <td>
+                            <div class="percentage good">99.9%</div>
                         </td>
                         <td>
                             <div class="health-indicator">
@@ -983,13 +1031,7 @@
                             </div>
                         </td>
                         <td>
-                            <div class="percentage good">99.9%</div>
-                        </td>
-                        <td>
                             <div class="percentage good">0.05%</div>
-                        </td>
-                        <td>
-                            <span class="alert-count zero">0</span>
                         </td>
                         <td>
                             <span class="status-badge healthy">Healthy</span>
@@ -997,7 +1039,10 @@
                     </tr>
                     <tr>
                         <td>
-                            <div class="app-name">API Backend</div>
+                            <div class="app-name">API Backend Service</div>
+                        </td>
+                        <td>
+                            <div class="percentage warning">97.2%</div>
                         </td>
                         <td>
                             <div class="health-indicator">
@@ -1006,13 +1051,7 @@
                             </div>
                         </td>
                         <td>
-                            <div class="percentage warning">97.2%</div>
-                        </td>
-                        <td>
                             <div class="percentage warning">2.8%</div>
-                        </td>
-                        <td>
-                            <span class="alert-count warning">2</span>
                         </td>
                         <td>
                             <span class="status-badge warning">Degraded</span>
@@ -1023,19 +1062,16 @@
                             <div class="app-name">Notification Service</div>
                         </td>
                         <td>
+                            <div class="percentage good">99.6%</div>
+                        </td>
+                        <td>
                             <div class="health-indicator">
                                 <span class="health-dot healthy"></span>
                                 <span>3/3 Healthy</span>
                             </div>
                         </td>
                         <td>
-                            <div class="percentage good">99.6%</div>
-                        </td>
-                        <td>
                             <div class="percentage good">0.15%</div>
-                        </td>
-                        <td>
-                            <span class="alert-count zero">0</span>
                         </td>
                         <td>
                             <span class="status-badge healthy">Healthy</span>
@@ -1046,19 +1082,16 @@
                             <div class="app-name">Analytics Engine</div>
                         </td>
                         <td>
+                            <div class="percentage good">99.4%</div>
+                        </td>
+                        <td>
                             <div class="health-indicator">
                                 <span class="health-dot healthy"></span>
                                 <span>8/8 Healthy</span>
                             </div>
                         </td>
                         <td>
-                            <div class="percentage good">99.4%</div>
-                        </td>
-                        <td>
                             <div class="percentage good">0.18%</div>
-                        </td>
-                        <td>
-                            <span class="alert-count info">1</span>
                         </td>
                         <td>
                             <span class="status-badge healthy">Healthy</span>
@@ -1066,7 +1099,10 @@
                     </tr>
                     <tr>
                         <td>
-                            <div class="app-name">File Processing</div>
+                            <div class="app-name">File Processing Service</div>
+                        </td>
+                        <td>
+                            <div class="percentage good">98.9%</div>
                         </td>
                         <td>
                             <div class="health-indicator">
@@ -1075,13 +1111,7 @@
                             </div>
                         </td>
                         <td>
-                            <div class="percentage good">98.9%</div>
-                        </td>
-                        <td>
                             <div class="percentage good">0.22%</div>
-                        </td>
-                        <td>
-                            <span class="alert-count zero">0</span>
                         </td>
                         <td>
                             <span class="status-badge healthy">Healthy</span>
@@ -1092,19 +1122,56 @@
                             <div class="app-name">Search Service</div>
                         </td>
                         <td>
+                            <div class="percentage good">99.7%</div>
+                        </td>
+                        <td>
                             <div class="health-indicator">
                                 <span class="health-dot healthy"></span>
                                 <span>4/4 Healthy</span>
                             </div>
                         </td>
                         <td>
-                            <div class="percentage good">99.7%</div>
-                        </td>
-                        <td>
                             <div class="percentage good">0.09%</div>
                         </td>
                         <td>
-                            <span class="alert-count zero">0</span>
+                            <span class="status-badge healthy">Healthy</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="app-name">Mobile API Gateway</div>
+                        </td>
+                        <td>
+                            <div class="percentage good">99.3%</div>
+                        </td>
+                        <td>
+                            <div class="health-indicator">
+                                <span class="health-dot healthy"></span>
+                                <span>6/6 Healthy</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="percentage good">0.21%</div>
+                        </td>
+                        <td>
+                            <span class="status-badge healthy">Healthy</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="app-name">Reporting Service</div>
+                        </td>
+                        <td>
+                            <div class="percentage good">99.1%</div>
+                        </td>
+                        <td>
+                            <div class="health-indicator">
+                                <span class="health-dot healthy"></span>
+                                <span>3/3 Healthy</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="percentage good">0.19%</div>
                         </td>
                         <td>
                             <span class="status-badge healthy">Healthy</span>
