@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visitor & App Usage Analytics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Calibri', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        /* Navigation */
+        .main-nav {
+            background: #1e293b;
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-brand {
+            font-size: 18px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .sub-nav {
+            background: #ffffff;
+            padding: 0 24px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e5e7eb;
+            gap: 8px;
+        }
+
+        .nav-tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #64748b;
+        }
+
+        .nav-tab.active {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .nav-tab:not(.active):hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 16px 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 20px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .page-subtitle {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        /* Time Range Selector */
+        .time-selector {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .time-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+
+        .time-btn {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #475569;
+            transition: all 0.2s;
+        }
+
+        .time-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+        }
+
+        .time-btn:hover:not(.active) {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        /* Key Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .metric-card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s;
+        }
+
+        .metric-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        .metric-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-trend {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .metric-trend.up {
+            color: #16a34a;
+        }
+
+        .metric-trend.down {
+            color: #dc2626;
+        }
+
+        .metric-trend.neutral {
+            color: #64748b;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .metric-subtext {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .chart-card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .chart-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 16px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .chart-placeholder {
+            height: 280px;
+            background: #f8fafc;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Usage Tables */
+        .tables-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .table-card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .table-header {
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .table-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .usage-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .usage-table th {
+            text-align: left;
+            padding: 10px 12px;
+            background: #f8fafc;
+            font-size: 10px;
+            font-weight: 800;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .usage-table td {
+            padding: 10px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e293b;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .usage-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .usage-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .usage-bar-fill {
+            height: 6px;
+            background: #2563eb;
+            border-radius: 3px;
+            min-width: 2px;
+        }
+
+        .usage-percent {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            min-width: 40px;
+            text-align: right;
+        }
+
+        /* User Journey Section */
+        .journey-section {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 16px;
+        }
+
+        .journey-header {
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .journey-flows {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .flow-card {
+            background: #f8fafc;
+            border-radius: 6px;
+            padding: 14px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .flow-path {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .flow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .flow-arrow {
+            color: #94a3b8;
+            font-size: 10px;
+        }
+
+        .flow-count {
+            margin-left: auto;
+            font-weight: 800;
+            color: #2563eb;
+        }
+
+        /* Device Breakdown */
+        .device-section {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .device-card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .device-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .device-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .device-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .device-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .device-percent {
+            font-size: 14px;
+            font-weight: 700;
+            color: #64748b;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .status-badge.active {
+            background: rgba(34, 197, 94, 0.15);
+            color: #16a34a;
+        }
+
+        .status-badge.inactive {
+            background: rgba(148, 163, 184, 0.15);
+            color: #64748b;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Heatmap Grid */
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin: 16px 0;
+        }
+
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            border: 1px solid #e5e7eb;
+        }
+
+        .heatmap-label {
+            font-size: 9px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        /* Funnel Visualization */
+        .funnel-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 20px;
+        }
+
+        .funnel-stage {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 16px;
+            border: 2px solid #e5e7eb;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .funnel-stage:hover {
+            border-color: #2563eb;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+        }
+
+        .funnel-stage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .funnel-stage-name {
+            font-size: 14px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .funnel-stage-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #2563eb;
+        }
+
+        .funnel-stage-bar {
+            height: 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .funnel-stage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2563eb, #1d4ed8);
+            transition: width 0.3s;
+        }
+
+        .funnel-stage-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .funnel-arrow {
+            text-align: center;
+            color: #cbd5e1;
+            font-size: 16px;
+            padding: 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Navigation -->
+    <nav class="main-nav">
+        <div class="nav-brand">Analytics Dashboard</div>
+    </nav>
+
+    <!-- Sub Navigation -->
+    <div class="sub-nav">
+        <div class="nav-tab active" onclick="showTab('visitor')">Visitor Analytics</div>
+        <div class="nav-tab" onclick="showTab('app')">App Usage</div>
+        <div class="nav-tab" onclick="showTab('behavior')">User Behavior</div>
+        <div class="nav-tab" onclick="showTab('conversion')">Conversion</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title">Visitor & App Usage Analytics</div>
+            <div class="page-subtitle">Real-time insights into user engagement and application performance</div>
+        </div>
+
+        <!-- Time Range Selector -->
+        <div class="time-selector">
+            <div class="time-label">Time Range:</div>
+            <button class="time-btn">Today</button>
+            <button class="time-btn">Yesterday</button>
+            <button class="time-btn active">Last 7 Days</button>
+            <button class="time-btn">Last 30 Days</button>
+            <button class="time-btn">This Month</button>
+            <button class="time-btn">Custom Range</button>
+        </div>
+
+        <!-- Visitor Analytics Tab -->
+        <div id="visitor-tab" class="tab-content active">
+        <!-- Key Metrics -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-label">Total Visitors</div>
+                    <div class="metric-trend up">↑ 12.5%</div>
+                </div>
+                <div class="metric-value">45,892</div>
+                <div class="metric-subtext">32,145 unique visitors</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-label">Page Views</div>
+                    <div class="metric-trend up">↑ 8.3%</div>
+                </div>
+                <div class="metric-value">156,234</div>
+                <div class="metric-subtext">3.4 pages per session</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-label">Avg Session</div>
+                    <div class="metric-trend down">↓ 2.1%</div>
+                </div>
+                <div class="metric-value">4m 32s</div>
+                <div class="metric-subtext">272 seconds average</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-label">Bounce Rate</div>
+                    <div class="metric-trend up">↑ 1.2%</div>
+                </div>
+                <div class="metric-value">42.8%</div>
+                <div class="metric-subtext">19,645 bounced</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-label">Active Users</div>
+                    <div class="metric-trend up">↑ 18.7%</div>
+                </div>
+                <div class="metric-value">2,847</div>
+                <div class="metric-subtext">Live right now</div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Visitor Trends (Last 7 Days)</div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: #2563eb;"></div>
+                            <span>Visitors</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: #16a34a;"></div>
+                            <span>Page Views</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: #f59e0b;"></div>
+                            <span>Sessions</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-placeholder">Visitor trend line chart will be displayed here</div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Traffic Sources</div>
+                </div>
+                <div class="chart-placeholder">Traffic source distribution pie chart</div>
+            </div>
+        </div>
+
+        <!-- Usage Tables -->
+        <div class="tables-grid">
+            <div class="table-card">
+                <div class="table-header">
+                    <div class="table-title">Top Pages by Views</div>
+                </div>
+                <table class="usage-table">
+                    <thead>
+                        <tr>
+                            <th>Page</th>
+                            <th>Views</th>
+                            <th style="width: 150px;">Traffic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>/dashboard</td>
+                            <td>23,456</td>
+                            <td>
+                                <div class="usage-bar">
+                                    <div class="usage-bar-fill" style="width: 85%;"></div>
+                                    <div class="usage-percent">85%</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>/analytics</td>
+                            <td>18,234</td>
+                            <td>
+                                <div class="usage-bar">
+                                    <div class="usage-bar-fill" style="width: 70%;"></div>
+                                    <div class="usage-percent">70%</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>/reports</td>
+                            <td>15,892</td>
+                            <td>
+                                <div class="usage-bar">
+                                    <div class="usage-bar-fill" style="width: 62%;"></div>
+                                    <div class="usage-percent">62%</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>/settings</td>
+                            <td>12,567</td>
+                            <td>
+                                <div class="usage-bar">
+                                    <div class="usage-bar-fill" style="width: 48%;"></div>
+                                    <div class="usage-percent">48%</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>/profile</td>
+                            <td>9,845</td>
+                            <td>
+                                <div class="usage-bar">
+                                    <div class="usage-bar-fill" style="width: 38%;"></div>
+                                    <div class="usage-percent">38%</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-card">
+                <div class="table-header">
+                    <div class="table-title">Top Features Used</div>
+                </div>
+                <table class="usage-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Sessions</th>
+                            <th style="width: 150px;">Usage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Data Export</td>
+                            <td>8,234</td>
+                            <td>
+                                <div class="usage-bar">
+                                    <div class="usage-bar-fill" style="width: 92%;"></div>
+                                    <div class="usage-percent">92%</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Report Builder</td>
+                            <td>7,456</td>
+                            <td>
+                                <div class="usage-bar">
+                                    <div class="usage-bar-fill" style="width: 84%;"></div>
+                                    <div class="usage-percent">84%</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Search</td>
+                            <td>6,892</td>
+                            <td>
+                                <div class="usage-bar">
+                                    <div class="usage-bar-fill" style="width: 78%;"></div>
+                                    <div class="usage-percent">78%</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Notifications</td>
+                            <td>5,234</td>
+                            <td>
+                                <div class="usage-bar">
+                                    <div class="usage-bar-fill" style="width: 65%;"></div>
+                                    <div class="usage-percent">65%</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Collaboration</td>
+                            <td>4,567</td>
+                            <td>
+                                <div class="usage-bar">
+                                    <div class="usage-bar-fill" style="width: 52%;"></div>
+                                    <div class="usage-percent">52%</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- User Journey Section -->
+        <div class="journey-section">
+            <div class="journey-header">
+                <div class="table-title">Common User Journeys</div>
+            </div>
+            <div class="journey-flows">
+                <div class="flow-card">
+                    <div class="flow-path">Journey 1</div>
+                    <div class="flow-steps">
+                        <div class="flow-step">
+                            <span>Landing Page</span>
+                            <span class="flow-count">12.5K</span>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <span>Dashboard</span>
+                            <span class="flow-count">8.2K</span>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <span>Reports</span>
+                            <span class="flow-count">5.6K</span>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <span>Export</span>
+                            <span class="flow-count">3.8K</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-card">
+                    <div class="flow-path">Journey 2</div>
+                    <div class="flow-steps">
+                        <div class="flow-step">
+                            <span>Search</span>
+                            <span class="flow-count">9.4K</span>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <span>Analytics</span>
+                            <span class="flow-count">7.1K</span>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <span>Filter Data</span>
+                            <span class="flow-count">4.9K</span>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <span>Save View</span>
+                            <span class="flow-count">2.7K</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-card">
+                    <div class="flow-path">Journey 3</div>
+                    <div class="flow-steps">
+                        <div class="flow-step">
+                            <span>Profile</span>
+                            <span class="flow-count">7.8K</span>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <span>Settings</span>
+                            <span class="flow-count">6.2K</span>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <span>Preferences</span>
+                            <span class="flow-count">4.5K</span>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <span>Update</span>
+                            <span class="flow-count">3.1K</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-card">
+                    <div class="flow-path">Journey 4</div>
+                    <div class="flow-steps">
+                        <div class="flow-step">
+                            <span>Notifications</span>
+                            <span class="flow-count">6.5K</span>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <span>View Details</span>
+                            <span class="flow-count">5.3K</span>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <span>Take Action</span>
+                            <span class="flow-count">3.6K</span>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <span>Complete</span>
+                            <span class="flow-count">2.9K</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Device Breakdown -->
+        <div class="device-section">
+            <div class="device-card">
+                <div class="device-icon" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">💻</div>
+                <div class="device-name">Desktop</div>
+                <div class="device-stats">
+                    <div class="device-value">24,567</div>
+                    <div class="device-percent">53.5%</div>
+                </div>
+            </div>
+
+            <div class="device-card">
+                <div class="device-icon" style="background: rgba(34, 197, 94, 0.1); color: #16a34a;">📱</div>
+                <div class="device-name">Mobile</div>
+                <div class="device-stats">
+                    <div class="device-value">16,234</div>
+                    <div class="device-percent">35.4%</div>
+                </div>
+            </div>
+
+            <div class="device-card">
+                <div class="device-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">📲</div>
+                <div class="device-name">Tablet</div>
+                <div class="device-stats">
+                    <div class="device-value">5,091</div>
+                    <div class="device-percent">11.1%</div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <!-- End Visitor Analytics Tab -->
+
+        <!-- App Usage Tab -->
+        <div id="app-tab" class="tab-content">
+            <!-- App Usage Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Active Features</div>
+                        <div class="metric-trend up">↑ 15.3%</div>
+                    </div>
+                    <div class="metric-value">48</div>
+                    <div class="metric-subtext">Out of 52 total</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Feature Usage</div>
+                        <div class="metric-trend up">↑ 22.7%</div>
+                    </div>
+                    <div class="metric-value">89,432</div>
+                    <div class="metric-subtext">Total interactions</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Avg Time/Feature</div>
+                        <div class="metric-trend down">↓ 3.2%</div>
+                    </div>
+                    <div class="metric-value">2m 18s</div>
+                    <div class="metric-subtext">138 seconds average</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Feature Adoption</div>
+                        <div class="metric-trend up">↑ 8.4%</div>
+                    </div>
+                    <div class="metric-value">92.3%</div>
+                    <div class="metric-subtext">29,678 users</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Daily Active</div>
+                        <div class="metric-trend up">↑ 12.1%</div>
+                    </div>
+                    <div class="metric-value">18,942</div>
+                    <div class="metric-subtext">Unique daily users</div>
+                </div>
+            </div>
+
+            <!-- Feature Usage Charts -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Feature Usage Over Time</div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <div class="legend-dot" style="background: #2563eb;"></div>
+                                <span>Core Features</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-dot" style="background: #16a34a;"></div>
+                                <span>Premium Features</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-placeholder">Feature usage trend chart will be displayed here</div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Feature Categories</div>
+                    </div>
+                    <div class="chart-placeholder">Feature category breakdown pie chart</div>
+                </div>
+            </div>
+
+            <!-- Feature Usage Table -->
+            <div class="table-card">
+                <div class="table-header">
+                    <div class="table-title">Feature Usage Details</div>
+                </div>
+                <table class="usage-table">
+                    <thead>
+                        <tr>
+                            <th>Feature Name</th>
+                            <th>Category</th>
+                            <th>Usage Count</th>
+                            <th>Unique Users</th>
+                            <th>Avg Duration</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Data Export</td>
+                            <td>Core</td>
+                            <td>8,234</td>
+                            <td>5,678</td>
+                            <td>1m 45s</td>
+                            <td><span class="status-badge active">Active</span></td>
+                        </tr>
+                        <tr>
+                            <td>Report Builder</td>
+                            <td>Premium</td>
+                            <td>7,456</td>
+                            <td>4,892</td>
+                            <td>4m 22s</td>
+                            <td><span class="status-badge active">Active</span></td>
+                        </tr>
+                        <tr>
+                            <td>Search & Filter</td>
+                            <td>Core</td>
+                            <td>6,892</td>
+                            <td>6,234</td>
+                            <td>0m 38s</td>
+                            <td><span class="status-badge active">Active</span></td>
+                        </tr>
+                        <tr>
+                            <td>Real-time Alerts</td>
+                            <td>Premium</td>
+                            <td>5,234</td>
+                            <td>3,456</td>
+                            <td>0m 15s</td>
+                            <td><span class="status-badge active">Active</span></td>
+                        </tr>
+                        <tr>
+                            <td>Team Collaboration</td>
+                            <td>Premium</td>
+                            <td>4,567</td>
+                            <td>2,890</td>
+                            <td>5m 12s</td>
+                            <td><span class="status-badge active">Active</span></td>
+                        </tr>
+                        <tr>
+                            <td>Dashboard Customization</td>
+                            <td>Core</td>
+                            <td>4,123</td>
+                            <td>3,789</td>
+                            <td>3m 05s</td>
+                            <td><span class="status-badge active">Active</span></td>
+                        </tr>
+                        <tr>
+                            <td>Scheduled Reports</td>
+                            <td>Premium</td>
+                            <td>3,892</td>
+                            <td>2,567</td>
+                            <td>2m 28s</td>
+                            <td><span class="status-badge active">Active</span></td>
+                        </tr>
+                        <tr>
+                            <td>API Access</td>
+                            <td>Developer</td>
+                            <td>2,456</td>
+                            <td>892</td>
+                            <td>0m 05s</td>
+                            <td><span class="status-badge active">Active</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- End App Usage Tab -->
+
+        <!-- User Behavior Tab -->
+        <div id="behavior-tab" class="tab-content">
+            <!-- Behavior Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Engagement Score</div>
+                        <div class="metric-trend up">↑ 9.8%</div>
+                    </div>
+                    <div class="metric-value">8.7/10</div>
+                    <div class="metric-subtext">Above average</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Return Rate</div>
+                        <div class="metric-trend up">↑ 14.2%</div>
+                    </div>
+                    <div class="metric-value">67.8%</div>
+                    <div class="metric-subtext">21,789 returning</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Session Depth</div>
+                        <div class="metric-trend up">↑ 5.6%</div>
+                    </div>
+                    <div class="metric-value">5.4</div>
+                    <div class="metric-subtext">Pages per session</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Exit Rate</div>
+                        <div class="metric-trend down">↓ 6.3%</div>
+                    </div>
+                    <div class="metric-value">24.5%</div>
+                    <div class="metric-subtext">7,867 exits</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Time on Page</div>
+                        <div class="metric-trend up">↑ 11.4%</div>
+                    </div>
+                    <div class="metric-value">3m 45s</div>
+                    <div class="metric-subtext">225 seconds avg</div>
+                </div>
+            </div>
+
+            <!-- Behavior Analysis Charts -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">User Engagement Heatmap</div>
+                    </div>
+                    <div class="chart-placeholder">Weekly engagement heatmap visualization</div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Session Duration Distribution</div>
+                    </div>
+                    <div class="chart-placeholder">Session duration histogram</div>
+                </div>
+            </div>
+
+            <!-- Behavior Patterns -->
+            <div class="tables-grid">
+                <div class="table-card">
+                    <div class="table-header">
+                        <div class="table-title">Top Entry Pages</div>
+                    </div>
+                    <table class="usage-table">
+                        <thead>
+                            <tr>
+                                <th>Page</th>
+                                <th>Entries</th>
+                                <th>Bounce Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>/home</td>
+                                <td>15,234</td>
+                                <td>32.4%</td>
+                            </tr>
+                            <tr>
+                                <td>/dashboard</td>
+                                <td>12,567</td>
+                                <td>28.1%</td>
+                            </tr>
+                            <tr>
+                                <td>/features</td>
+                                <td>9,456</td>
+                                <td>45.6%</td>
+                            </tr>
+                            <tr>
+                                <td>/pricing</td>
+                                <td>7,892</td>
+                                <td>52.3%</td>
+                            </tr>
+                            <tr>
+                                <td>/about</td>
+                                <td>5,234</td>
+                                <td>48.9%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-header">
+                        <div class="table-title">Top Exit Pages</div>
+                    </div>
+                    <table class="usage-table">
+                        <thead>
+                            <tr>
+                                <th>Page</th>
+                                <th>Exits</th>
+                                <th>Exit Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>/checkout</td>
+                                <td>4,567</td>
+                                <td>68.7%</td>
+                            </tr>
+                            <tr>
+                                <td>/contact</td>
+                                <td>3,892</td>
+                                <td>72.3%</td>
+                            </tr>
+                            <tr>
+                                <td>/settings</td>
+                                <td>3,234</td>
+                                <td>45.8%</td>
+                            </tr>
+                            <tr>
+                                <td>/reports</td>
+                                <td>2,789</td>
+                                <td>38.2%</td>
+                            </tr>
+                            <tr>
+                                <td>/help</td>
+                                <td>2,456</td>
+                                <td>59.4%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- User Segmentation -->
+            <div class="table-card">
+                <div class="table-header">
+                    <div class="table-title">User Segments by Behavior</div>
+                </div>
+                <table class="usage-table">
+                    <thead>
+                        <tr>
+                            <th>Segment</th>
+                            <th>Users</th>
+                            <th>Avg Session</th>
+                            <th>Pages/Session</th>
+                            <th>Engagement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Power Users</td>
+                            <td>4,567</td>
+                            <td>12m 34s</td>
+                            <td>15.3</td>
+                            <td><span class="status-badge active">High</span></td>
+                        </tr>
+                        <tr>
+                            <td>Regular Users</td>
+                            <td>12,345</td>
+                            <td>6m 45s</td>
+                            <td>7.8</td>
+                            <td><span class="status-badge active">Medium</span></td>
+                        </tr>
+                        <tr>
+                            <td>Casual Visitors</td>
+                            <td>18,234</td>
+                            <td>2m 18s</td>
+                            <td>3.2</td>
+                            <td><span class="status-badge inactive">Low</span></td>
+                        </tr>
+                        <tr>
+                            <td>New Visitors</td>
+                            <td>8,456</td>
+                            <td>3m 05s</td>
+                            <td>4.1</td>
+                            <td><span class="status-badge inactive">Exploring</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- End User Behavior Tab -->
+
+        <!-- Conversion Tab -->
+        <div id="conversion-tab" class="tab-content">
+            <!-- Conversion Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Conversion Rate</div>
+                        <div class="metric-trend up">↑ 7.8%</div>
+                    </div>
+                    <div class="metric-value">3.42%</div>
+                    <div class="metric-subtext">1,567 conversions</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Goal Completions</div>
+                        <div class="metric-trend up">↑ 18.9%</div>
+                    </div>
+                    <div class="metric-value">8,923</div>
+                    <div class="metric-subtext">All goals combined</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Avg Time to Convert</div>
+                        <div class="metric-trend down">↓ 12.3%</div>
+                    </div>
+                    <div class="metric-value">2.8 days</div>
+                    <div class="metric-subtext">67 hours average</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Cart Abandonment</div>
+                        <div class="metric-trend down">↓ 4.2%</div>
+                    </div>
+                    <div class="metric-value">58.3%</div>
+                    <div class="metric-subtext">2,678 abandoned</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Revenue Generated</div>
+                        <div class="metric-trend up">↑ 23.5%</div>
+                    </div>
+                    <div class="metric-value">$284K</div>
+                    <div class="metric-subtext">$181 avg order value</div>
+                </div>
+            </div>
+
+            <!-- Conversion Funnel -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Conversion Funnel Analysis</div>
+                </div>
+                <div class="funnel-container">
+                    <div class="funnel-stage">
+                        <div class="funnel-stage-header">
+                            <div class="funnel-stage-name">1. Landing Page Visit</div>
+                            <div class="funnel-stage-value">45,892</div>
+                        </div>
+                        <div class="funnel-stage-bar">
+                            <div class="funnel-stage-fill" style="width: 100%;"></div>
+                        </div>
+                        <div class="funnel-stage-stats">
+                            <span>100% of visitors</span>
+                            <span>Conversion Rate: 100%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="funnel-arrow">↓</div>
+                    
+                    <div class="funnel-stage">
+                        <div class="funnel-stage-header">
+                            <div class="funnel-stage-name">2. Product/Feature View</div>
+                            <div class="funnel-stage-value">32,145</div>
+                        </div>
+                        <div class="funnel-stage-bar">
+                            <div class="funnel-stage-fill" style="width: 70%;"></div>
+                        </div>
+                        <div class="funnel-stage-stats">
+                            <span>70.0% of visitors</span>
+                            <span>Drop-off: 13,747 (-30.0%)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="funnel-arrow">↓</div>
+                    
+                    <div class="funnel-stage">
+                        <div class="funnel-stage-header">
+                            <div class="funnel-stage-name">3. Add to Cart</div>
+                            <div class="funnel-stage-value">12,567</div>
+                        </div>
+                        <div class="funnel-stage-bar">
+                            <div class="funnel-stage-fill" style="width: 27.4%;"></div>
+                        </div>
+                        <div class="funnel-stage-stats">
+                            <span>27.4% of visitors</span>
+                            <span>Drop-off: 19,578 (-42.8%)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="funnel-arrow">↓</div>
+                    
+                    <div class="funnel-stage">
+                        <div class="funnel-stage-header">
+                            <div class="funnel-stage-name">4. Checkout Initiated</div>
+                            <div class="funnel-stage-value">5,234</div>
+                        </div>
+                        <div class="funnel-stage-bar">
+                            <div class="funnel-stage-fill" style="width: 11.4%;"></div>
+                        </div>
+                        <div class="funnel-stage-stats">
+                            <span>11.4% of visitors</span>
+                            <span>Drop-off: 7,333 (-16.0%)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="funnel-arrow">↓</div>
+                    
+                    <div class="funnel-stage">
+                        <div class="funnel-stage-header">
+                            <div class="funnel-stage-name">5. Purchase Complete</div>
+                            <div class="funnel-stage-value">1,567</div>
+                        </div>
+                        <div class="funnel-stage-bar">
+                            <div class="funnel-stage-fill" style="width: 3.42%;"></div>
+                        </div>
+                        <div class="funnel-stage-stats">
+                            <span>3.42% of visitors</span>
+                            <span>Drop-off: 3,667 (-8.0%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Goals Performance -->
+            <div class="tables-grid">
+                <div class="table-card">
+                    <div class="table-header">
+                        <div class="table-title">Goals Performance</div>
+                    </div>
+                    <table class="usage-table">
+                        <thead>
+                            <tr>
+                                <th>Goal Name</th>
+                                <th>Completions</th>
+                                <th>Conversion Rate</th>
+                                <th style="width: 150px;">Progress</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Sign Up</td>
+                                <td>3,456</td>
+                                <td>7.53%</td>
+                                <td>
+                                    <div class="usage-bar">
+                                        <div class="usage-bar-fill" style="width: 75%;"></div>
+                                        <div class="usage-percent">75%</div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Free Trial Start</td>
+                                <td>2,345</td>
+                                <td>5.11%</td>
+                                <td>
+                                    <div class="usage-bar">
+                                        <div class="usage-bar-fill" style="width: 62%;"></div>
+                                        <div class="usage-percent">62%</div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Purchase</td>
+                                <td>1,567</td>
+                                <td>3.42%</td>
+                                <td>
+                                    <div class="usage-bar">
+                                        <div class="usage-bar-fill" style="width: 52%;"></div>
+                                        <div class="usage-percent">52%</div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Newsletter Subscribe</td>
+                                <td>987</td>
+                                <td>2.15%</td>
+                                <td>
+                                    <div class="usage-bar">
+                                        <div class="usage-bar-fill" style="width: 38%;"></div>
+                                        <div class="usage-percent">38%</div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Contact Form Submit</td>
+                                <td>568</td>
+                                <td>1.24%</td>
+                                <td>
+                                    <div class="usage-bar">
+                                        <div class="usage-bar-fill" style="width: 28%;"></div>
+                                        <div class="usage-percent">28%</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-header">
+                        <div class="table-title">Top Converting Sources</div>
+                    </div>
+                    <table class="usage-table">
+                        <thead>
+                            <tr>
+                                <th>Source</th>
+                                <th>Conversions</th>
+                                <th>Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Organic Search</td>
+                                <td>678</td>
+                                <td>4.82%</td>
+                            </tr>
+                            <tr>
+                                <td>Direct</td>
+                                <td>456</td>
+                                <td>3.91%</td>
+                            </tr>
+                            <tr>
+                                <td>Email Campaign</td>
+                                <td>234</td>
+                                <td>6.45%</td>
+                            </tr>
+                            <tr>
+                                <td>Social Media</td>
+                                <td>123</td>
+                                <td>2.18%</td>
+                            </tr>
+                            <tr>
+                                <td>Referral</td>
+                                <td>76</td>
+                                <td>3.52%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- End Conversion Tab -->
+
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active class from all nav tabs
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab content
+            const selectedTab = document.getElementById(tabName + '-tab');
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+            }
+
+            // Add active class to clicked nav tab
+            event.target.classList.add('active');
+
+            // Update page title and subtitle based on tab
+            const pageTitle = document.querySelector('.page-title');
+            const pageSubtitle = document.querySelector('.page-subtitle');
+            
+            switch(tabName) {
+                case 'visitor':
+                    pageTitle.textContent = 'Visitor & App Usage Analytics';
+                    pageSubtitle.textContent = 'Real-time insights into user engagement and application performance';
+                    break;
+                case 'app':
+                    pageTitle.textContent = 'App Usage Analytics';
+                    pageSubtitle.textContent = 'Detailed insights into feature adoption and application usage patterns';
+                    break;
+                case 'behavior':
+                    pageTitle.textContent = 'User Behavior Analytics';
+                    pageSubtitle.textContent = 'Understanding how users interact with your application';
+                    break;
+                case 'conversion':
+                    pageTitle.textContent = 'Conversion Analytics';
+                    pageSubtitle.textContent = 'Track conversion funnels and optimize your conversion rates';
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>

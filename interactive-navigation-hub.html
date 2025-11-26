@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Hub - Interactive Dashboard Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Calibri', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #0f172a;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-search {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 40px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 2px solid #e5e7eb;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 18px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .header-btn {
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: #ffffff;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 16px;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .hero-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .hero-tab {
+            padding: 12px 28px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: #ffffff;
+        }
+
+        .hero-tab:hover,
+        .hero-tab.active {
+            background: #ffffff;
+            color: #667eea;
+            border-color: #ffffff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Dashboard Cards Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .dashboard-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .dashboard-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .dashboard-card:hover .card-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 10px;
+        }
+
+        .card-description {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 600;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 2px solid #f1f5f9;
+        }
+
+        .card-badge {
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-analytics {
+            background: rgba(37, 99, 235, 0.1);
+            color: #2563eb;
+        }
+
+        .badge-monitoring {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+        }
+
+        .badge-performance {
+            background: rgba(245, 158, 11, 0.1);
+            color: #ea580c;
+        }
+
+        .badge-management {
+            background: rgba(168, 85, 247, 0.1);
+            color: #9333ea;
+        }
+
+        .card-arrow {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 800;
+            color: #64748b;
+            transition: all 0.3s;
+        }
+
+        .dashboard-card:hover .card-arrow {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            transform: translateX(5px);
+        }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .feature-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .feature-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+        /* Quick Links Section */
+        .quick-links {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 24px;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .link-item {
+            padding: 16px 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .link-item:hover {
+            background: #ffffff;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .link-icon {
+            font-size: 24px;
+        }
+
+        .link-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: #ffffff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+            margin-bottom: 8px;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 32px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-search {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">Dashboard Portal</div>
+            <div class="header-search">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="Search dashboards, features, or analytics..." id="searchInput">
+            </div>
+            <div class="header-actions">
+                <button class="header-btn btn-secondary">Help</button>
+                <button class="header-btn btn-primary">Get Started</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1 class="hero-title">Welcome to Your Dashboard Hub</h1>
+            <p class="hero-subtitle">Choose your role or explore features to get started</p>
+            <div class="hero-tabs">
+                <div class="hero-tab active" onclick="showContent('all')">All Dashboards</div>
+                <div class="hero-tab" onclick="showContent('analytics')">Analytics</div>
+                <div class="hero-tab" onclick="showContent('monitoring')">Monitoring</div>
+                <div class="hero-tab" onclick="showContent('performance')">Performance</div>
+                <div class="hero-tab" onclick="showContent('management')">Management</div>
+            </div>
+        </div>
+
+        <!-- All Dashboards Section -->
+        <div id="all-section" class="content-section active">
+            <div class="dashboard-grid">
+                <!-- Application Health Dashboard -->
+                <div class="dashboard-card" onclick="navigateTo('application-health-dashboard.html')">
+                    <div class="card-icon" style="background: rgba(34, 197, 94, 0.1); color: #16a34a;">
+                        ❤️
+                    </div>
+                    <div class="card-title">Application Health</div>
+                    <div class="card-description">Monitor core systems and application health in real-time. Track synthetic health, host status, and service performance metrics.</div>
+                    <div class="card-meta">
+                        <span class="card-badge badge-monitoring">Monitoring</span>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </div>
+
+                <!-- Visitor & Usage Analytics -->
+                <div class="dashboard-card" onclick="navigateTo('visitor-usage-analytics.html')">
+                    <div class="card-icon" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">
+                        📊
+                    </div>
+                    <div class="card-title">Visitor & Usage Analytics</div>
+                    <div class="card-description">Track visitor behavior, app usage metrics, user journeys, and conversion funnels with detailed analytics.</div>
+                    <div class="card-meta">
+                        <span class="card-badge badge-analytics">Analytics</span>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </div>
+
+                <!-- Executive Dashboard -->
+                <div class="dashboard-card" onclick="navigateTo('executive.html')">
+                    <div class="card-icon" style="background: rgba(168, 85, 247, 0.1); color: #9333ea;">
+                        👔
+                    </div>
+                    <div class="card-title">Executive Dashboard</div>
+                    <div class="card-description">High-level overview for executives with key metrics, performance indicators, and strategic insights.</div>
+                    <div class="card-meta">
+                        <span class="card-badge badge-management">Management</span>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </div>
+
+                <!-- Vendor Scorecard -->
+                <div class="dashboard-card" onclick="navigateTo('executive-vendor-scorecard.html')">
+                    <div class="card-icon" style="background: rgba(245, 158, 11, 0.1); color: #ea580c;">
+                        📈
+                    </div>
+                    <div class="card-title">Vendor Scorecard</div>
+                    <div class="card-description">Evaluate vendor performance with comprehensive scorecards, SLA tracking, and quality metrics.</div>
+                    <div class="card-meta">
+                        <span class="card-badge badge-performance">Performance</span>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </div>
+
+                <!-- Vendor Analytics -->
+                <div class="dashboard-card" onclick="navigateTo('vendor-analytics-dashboard.html')">
+                    <div class="card-icon" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">
+                        📉
+                    </div>
+                    <div class="card-title">Vendor Analytics</div>
+                    <div class="card-description">Deep-dive into vendor metrics, cost analysis, and performance trends with advanced analytics.</div>
+                    <div class="card-meta">
+                        <span class="card-badge badge-analytics">Analytics</span>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </div>
+
+                <!-- Unified Performance -->
+                <div class="dashboard-card" onclick="navigateTo('unified-performance-dashboard.html')">
+                    <div class="card-icon" style="background: rgba(34, 197, 94, 0.1); color: #16a34a;">
+                        ⚡
+                    </div>
+                    <div class="card-title">Unified Performance</div>
+                    <div class="card-description">Comprehensive performance monitoring across all systems with unified metrics and alerts.</div>
+                    <div class="card-meta">
+                        <span class="card-badge badge-performance">Performance</span>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </div>
+
+                <!-- Grafana Dashboards -->
+                <div class="dashboard-card" onclick="navigateTo('grafana-executive-dashboard.html')">
+                    <div class="card-icon" style="background: rgba(245, 158, 11, 0.1); color: #ea580c;">
+                        📱
+                    </div>
+                    <div class="card-title">Grafana Integration</div>
+                    <div class="card-description">Access Grafana-powered dashboards with advanced visualization and real-time data streaming.</div>
+                    <div class="card-meta">
+                        <span class="card-badge badge-monitoring">Monitoring</span>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </div>
+
+                <!-- Agent Dashboard -->
+                <div class="dashboard-card" onclick="navigateTo('agent-vendor-scorecard.html')">
+                    <div class="card-icon" style="background: rgba(168, 85, 247, 0.1); color: #9333ea;">
+                        👤
+                    </div>
+                    <div class="card-title">Agent Dashboard</div>
+                    <div class="card-description">Agent-specific metrics, performance tracking, and productivity analytics for team management.</div>
+                    <div class="card-meta">
+                        <span class="card-badge badge-management">Management</span>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div id="analytics-section" class="content-section">
+            <div class="feature-grid">
+                <div class="feature-card" onclick="navigateTo('visitor-usage-analytics.html')">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-title">Visitor Analytics</div>
+                    <div class="feature-desc">Track visitor behavior, page views, and engagement metrics</div>
+                </div>
+                <div class="feature-card" onclick="navigateTo('visitor-usage-analytics.html')">
+                    <div class="feature-icon">📱</div>
+                    <div class="feature-title">App Usage</div>
+                    <div class="feature-desc">Monitor feature adoption and usage patterns</div>
+                </div>
+                <div class="feature-card" onclick="navigateTo('visitor-usage-analytics.html')">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-title">User Behavior</div>
+                    <div class="feature-desc">Understand user journeys and interaction patterns</div>
+                </div>
+                <div class="feature-card" onclick="navigateTo('visitor-usage-analytics.html')">
+                    <div class="feature-icon">💰</div>
+                    <div class="feature-title">Conversion Analytics</div>
+                    <div class="feature-desc">Track conversion funnels and optimize rates</div>
+                </div>
+                <div class="feature-card" onclick="navigateTo('vendor-analytics-dashboard.html')">
+                    <div class="feature-icon">📈</div>
+                    <div class="feature-title">Vendor Analytics</div>
+                    <div class="feature-desc">Comprehensive vendor performance analysis</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monitoring Section -->
+        <div id="monitoring-section" class="content-section">
+            <div class="feature-grid">
+                <div class="feature-card" onclick="navigateTo('application-health-dashboard.html')">
+                    <div class="feature-icon">❤️</div>
+                    <div class="feature-title">Application Health</div>
+                    <div class="feature-desc">Real-time health monitoring for core systems</div>
+                </div>
+                <div class="feature-card" onclick="navigateTo('grafana-executive-dashboard.html')">
+                    <div class="feature-icon">📱</div>
+                    <div class="feature-title">Grafana Monitoring</div>
+                    <div class="feature-desc">Advanced visualization with Grafana integration</div>
+                </div>
+                <div class="feature-card" onclick="navigateTo('application-health-dashboard.html')">
+                    <div class="feature-icon">🔔</div>
+                    <div class="feature-title">System Alerts</div>
+                    <div class="feature-desc">Manage and track system alerts and incidents</div>
+                </div>
+                <div class="feature-card" onclick="navigateTo('application-health-dashboard.html')">
+                    <div class="feature-icon">⚙️</div>
+                    <div class="feature-title">Core Systems</div>
+                    <div class="feature-desc">Monitor IVR, Citrix, Salesforce, and Genesys</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Section -->
+        <div id="performance-section" class="content-section">
+            <div class="feature-grid">
+                <div class="feature-card" onclick="navigateTo('unified-performance-dashboard.html')">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-title">Unified Performance</div>
+                    <div class="feature-desc">All performance metrics in one place</div>
+                </div>
+                <div class="feature-card" onclick="navigateTo('executive-vendor-scorecard.html')">
+                    <div class="feature-icon">📈</div>
+                    <div class="feature-title">Vendor Scorecard</div>
+                    <div class="feature-desc">Track vendor SLAs and performance KPIs</div>
+                </div>
+                <div class="feature-card" onclick="navigateTo('application-health-dashboard.html')">
+                    <div class="feature-icon">🚀</div>
+                    <div class="feature-title">API Performance</div>
+                    <div class="feature-desc">Monitor API response times and success rates</div>
+                </div>
+                <div class="feature-card" onclick="navigateTo('application-health-dashboard.html')">
+                    <div class="feature-icon">💻</div>
+                    <div class="feature-title">System Performance</div>
+                    <div class="feature-desc">Track host health and service uptime</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Management Section -->
+        <div id="management-section" class="content-section">
+            <div class="feature-grid">
+                <div class="feature-card" onclick="navigateTo('executive.html')">
+                    <div class="feature-icon">👔</div>
+                    <div class="feature-title">Executive Dashboard</div>
+                    <div class="feature-desc">High-level strategic insights and KPIs</div>
+                </div>
+                <div class="feature-card" onclick="navigateTo('agent-vendor-scorecard.html')">
+                    <div class="feature-icon">👤</div>
+                    <div class="feature-title">Agent Management</div>
+                    <div class="feature-desc">Track agent performance and productivity</div>
+                </div>
+                <div class="feature-card" onclick="navigateTo('executive-vendor-scorecard.html')">
+                    <div class="feature-icon">📋</div>
+                    <div class="feature-title">Vendor Management</div>
+                    <div class="feature-desc">Manage vendor relationships and contracts</div>
+                </div>
+                <div class="feature-card" onclick="navigateTo('application-health-dashboard.html')">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-title">Resource Planning</div>
+                    <div class="feature-desc">Optimize resource allocation and usage</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="quick-links">
+            <h2 class="section-title">Quick Access</h2>
+            <div class="links-grid">
+                <a href="application-health-dashboard.html" class="link-item">
+                    <span class="link-icon">❤️</span>
+                    <span class="link-text">Health Monitor</span>
+                </a>
+                <a href="visitor-usage-analytics.html" class="link-item">
+                    <span class="link-icon">📊</span>
+                    <span class="link-text">Analytics Hub</span>
+                </a>
+                <a href="executive.html" class="link-item">
+                    <span class="link-icon">👔</span>
+                    <span class="link-text">Executive View</span>
+                </a>
+                <a href="unified-performance-dashboard.html" class="link-item">
+                    <span class="link-icon">⚡</span>
+                    <span class="link-text">Performance</span>
+                </a>
+                <a href="#" class="link-item">
+                    <span class="link-icon">⚙️</span>
+                    <span class="link-text">Settings</span>
+                </a>
+                <a href="#" class="link-item">
+                    <span class="link-icon">❓</span>
+                    <span class="link-text">Help Center</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        function showContent(category) {
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.hero-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+
+            // Show corresponding section
+            const sectionId = category + '-section';
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.add('active');
+            }
+        }
+
+        // Navigation function
+        function navigateTo(url) {
+            window.location.href = url;
+        }
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.dashboard-card, .feature-card');
+            
+            cards.forEach(card => {
+                const title = card.querySelector('.card-title, .feature-title').textContent.toLowerCase();
+                const desc = card.querySelector('.card-description, .feature-desc').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || desc.includes(searchTerm)) {
+                    card.style.display = 'block';
+                    card.style.animation = 'slideIn 0.3s ease-out';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // If search is empty, show all cards
+            if (searchTerm === '') {
+                cards.forEach(card => {
+                    card.style.display = 'block';
+                });
+            }
+        });
+
+        // Add hover effects
+        document.querySelectorAll('.dashboard-card, .feature-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            // Press '/' to focus search
+            if (e.key === '/') {
+                e.preventDefault();
+                searchInput.focus();
+            }
+            
+            // Press 'Escape' to clear search
+            if (e.key === 'Escape') {
+                searchInput.value = '';
+                searchInput.dispatchEvent(new Event('input'));
+            }
+        });
+
+        // Initialize tooltips
+        document.querySelectorAll('[data-tooltip]').forEach(element => {
+            element.classList.add('tooltip');
+        });
+
+        // Add loading animation
+        window.addEventListener('load', function() {
+            document.body.style.animation = 'fadeIn 0.5s ease-out';
+        });
+    </script>
+</body>
+</html>
