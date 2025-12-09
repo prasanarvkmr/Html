@@ -20,132 +20,506 @@
             min-height: 100vh;
         }
 
-        /* Main Navigation */
-        .main-nav {
+        /* Executive Main Navigation - Light Material Theme */
+        .exec-nav {
             background: #ffffff;
-            border-bottom: 1px solid #e5e7eb;
             padding: 0 32px;
-            height: 56px;
+            height: 64px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+            border-top: 3px solid #1976d2;
         }
 
-        .nav-left {
+        .exec-nav-left {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 16px;
         }
 
-        .logo {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1a202c;
+        .exec-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
         }
 
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: #2563eb;
-            border-radius: 6px;
+        .exec-logo-text {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .exec-company-name {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .exec-app-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            padding-left: 8px;
+            border-left: 2px solid #e2e8f0;
+        }
+
+        .exec-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .exec-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .exec-nav-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .exec-nav-btn:hover {
+            background: #f1f5f9;
+            color: #1976d2;
+        }
+
+        .exec-nav-btn .badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+        }
+
+        .exec-user-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 12px 6px 6px;
+            border-radius: 24px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .exec-user-section:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .exec-user-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: 700;
+            color: white;
             font-size: 14px;
         }
 
-        .nav-title {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 16px;
-            font-weight: 600;
-            color: #374151;
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-        }
-
-        .user-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 6px 12px;
-            border-radius: 8px;
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .user-section:hover {
-            background: #f3f4f6;
-        }
-
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            background: #2563eb;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: white;
-            font-size: 13px;
-            flex-shrink: 0;
-        }
-
-        .user-info {
+        .exec-user-info {
             display: flex;
             flex-direction: column;
             gap: 2px;
         }
 
-        .user-name {
+        .exec-user-name {
             font-size: 14px;
             font-weight: 600;
             color: #1e293b;
             line-height: 1;
-            white-space: nowrap;
         }
 
-        .user-role {
-            font-size: 12px;
-            color: #2563eb;
+        .exec-user-role {
+            font-size: 11px;
+            color: #1976d2;
             line-height: 1;
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 3px;
-            transition: color 0.2s ease;
-            white-space: nowrap;
+            gap: 4px;
+            font-weight: 600;
         }
 
-        .user-role:hover {
-            color: #1d4ed8;
+        .exec-user-role:hover {
+            color: #1565c0;
             text-decoration: underline;
         }
 
-        .user-role-icon {
+        .exec-user-role svg {
             width: 10px;
             height: 10px;
         }
 
-        /* Sub Navigation */
+        /* Secondary Navigation - Material Light Theme */
+        .secondary-nav {
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            border-top: 1px solid #e2e8f0;
+            padding: 0 32px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: sticky;
+            top: 64px;
+            z-index: 99;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .secondary-nav-center {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .secondary-nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .secondary-nav-item {
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+        }
+
+        .secondary-nav-item:hover {
+            color: #1e293b;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .secondary-nav-item.active {
+            color: #ffffff;
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+        }
+
+        .secondary-nav-item.active svg {
+            color: #ffffff;
+        }
+
+        .secondary-nav-item svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .secondary-nav-divider {
+            width: 1px;
+            height: 24px;
+            background: #e2e8f0;
+            margin: 0 8px;
+        }
+
+        /* Breadcrumb Navigation - Enhanced with Logo */
+        .breadcrumb-nav {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 32px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        }
+
+        .breadcrumb-left {
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+
+        .breadcrumb-home {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            padding: 6px 12px 6px 0;
+            border-right: 1px solid #e2e8f0;
+            margin-right: 4px;
+        }
+
+        .breadcrumb-logo-text {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .breadcrumb-company {
+            font-size: 15px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .breadcrumb-app {
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+
+        .breadcrumb-list {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .breadcrumb-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .breadcrumb-link {
+            font-size: 13px;
+            font-weight: 500;
+            color: #64748b;
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .breadcrumb-link:hover {
+            color: #1976d2;
+            background: #eff6ff;
+        }
+
+        .breadcrumb-link.active {
+            color: #1e293b;
+            font-weight: 700;
+            background: #f1f5f9;
+            cursor: default;
+        }
+
+        .breadcrumb-link.active:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .breadcrumb-link svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+
+        .breadcrumb-chevron {
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            padding: 0 2px;
+        }
+
+        .breadcrumb-chevron svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .breadcrumb-home-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            margin-right: 12px;
+        }
+
+        .breadcrumb-home-btn:hover {
+            background: #eff6ff;
+            border-color: #1976d2;
+            color: #1976d2;
+        }
+
+        .breadcrumb-home-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Tooltip Styles */
+        .tooltip-container {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tooltip-trigger {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            cursor: help;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .tooltip-trigger:hover {
+            background: #1976d2;
+            border-color: #1976d2;
+            color: #ffffff;
+        }
+
+        .tooltip-trigger svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        .tooltip-content {
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 10px;
+            background: #1e293b;
+            color: #ffffff;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 1.5;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .tooltip-content::before {
+            content: '';
+            position: absolute;
+            right: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 6px solid transparent;
+            border-right-color: #1e293b;
+        }
+
+        .tooltip-container:hover .tooltip-content {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .breadcrumb-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .breadcrumb-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 12px 4px 4px;
+            border-radius: 20px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .breadcrumb-user:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .breadcrumb-user-avatar {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 11px;
+        }
+
+        .breadcrumb-user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .breadcrumb-user-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e293b;
+            line-height: 1;
+        }
+
+        .breadcrumb-user-role {
+            font-size: 10px;
+            color: #64748b;
+            line-height: 1;
+        }
+
+        /* Legacy Sub Navigation (kept for backwards compatibility) */
         .sub-nav {
             background: #ffffff;
             border-bottom: 1px solid #e5e7eb;
             padding: 0 32px;
             height: 44px;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             gap: 0;
@@ -188,7 +562,7 @@
         .container {
             max-width: 1800px;
             margin: 0 auto;
-            padding: 16px;
+            padding: 20px 32px;
         }
 
         /* Dashboard Header */
@@ -352,6 +726,99 @@
             background: #2563eb;
             color: #ffffff;
             border-color: #2563eb;
+        }
+
+        /* Toggle Switch for Details View */
+        .view-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 16px;
+            padding-left: 16px;
+            border-left: 1px solid #e2e8f0;
+        }
+
+        .view-toggle-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+        }
+
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: #ffffff;
+            border-radius: 50%;
+            transition: all 0.3s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active::before {
+            left: 22px;
+        }
+
+        /* Collapsed System Card - Status Only */
+        .system-card.collapsed {
+            padding: 12px 16px;
+            justify-content: space-between;
+        }
+
+        .system-card.collapsed .system-metrics {
+            display: none;
+        }
+
+        .system-card.collapsed .system-info {
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
+            min-width: auto;
+        }
+
+        .system-status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: none;
+        }
+
+        .system-card.collapsed .system-status-badge {
+            display: inline-flex;
+        }
+
+        .system-status-badge.operational {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .system-status-badge.degraded {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .system-status-badge.critical {
+            background: #fee2e2;
+            color: #dc2626;
         }
 
         /* Core Systems Grid */
@@ -531,6 +998,23 @@
             background: #fafbfc;
         }
 
+        /* Collapsed Health Table - Status Only */
+        .health-table.collapsed th:not(:first-child):not(:last-child),
+        .health-table.collapsed td:not(:first-child):not(:last-child) {
+            display: none;
+        }
+
+        .health-table.collapsed th:first-child,
+        .health-table.collapsed td:first-child {
+            width: 70%;
+        }
+
+        .health-table.collapsed th:last-child,
+        .health-table.collapsed td:last-child {
+            width: 30%;
+            text-align: right;
+        }
+
         .app-name {
             font-weight: 600;
             color: #1e293b;
@@ -688,22 +1172,43 @@
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="main-nav">
-        <div class="nav-left">
-            <div class="logo">
-                <div class="logo-icon">HS</div>
-            </div>
+    <!-- Executive Navigation -->
+    <nav class="exec-nav">
+        <div class="exec-nav-left">
+            <a href="../index.html" class="exec-logo">
+                <div class="exec-logo-text">
+                    <span class="exec-company-name">HealthSync</span>
+                    <span class="exec-app-name">Operations Portal</span>
+                </div>
+            </a>
         </div>
-        <div class="nav-title">Application Health Dashboard</div>
-        <div class="nav-right">
-            <div class="user-section">
-                <div class="user-avatar">JD</div>
-                <div class="user-info">
-                    <div class="user-name">John Doe</div>
-                    <a href="persona-landing-page.html" class="user-role">
+        <div class="exec-nav-right">
+            <div class="exec-nav-actions">
+                <button class="exec-nav-btn" title="Search">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </button>
+                <button class="exec-nav-btn" title="Notifications">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                    </svg>
+                    <span class="badge"></span>
+                </button>
+                <button class="exec-nav-btn" title="Settings">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="exec-user-section">
+                <div class="exec-user-avatar">JD</div>
+                <div class="exec-user-info">
+                    <span class="exec-user-name">John Doe</span>
+                    <a href="../persona-landing-page.html" class="exec-user-role">
                         IT Operations
-                        <svg class="user-role-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                         </svg>
                     </a>
@@ -712,13 +1217,92 @@
         </div>
     </nav>
 
-    <!-- Sub Navigation -->
-    <div class="sub-nav">
-        <div class="nav-tabs">
-            <a href="application-health-dashboard.html" class="nav-tab active">Application Health</a>
-            <a href="#" class="nav-tab">Infrastructure</a>
-            <a href="#" class="nav-tab">Network</a>
-            <a href="#" class="nav-tab">Alerts</a>
+    <!-- Secondary Navigation -->
+    <div class="secondary-nav">
+        <div class="secondary-nav-center">
+            <nav class="secondary-nav-menu">
+                <a href="application-health-dashboard.html" class="secondary-nav-item active">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                    Application Health
+                </a>
+                <a href="unified-performance-dashboard.html" class="secondary-nav-item">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    Performance
+                </a>
+                <a href="#" class="secondary-nav-item">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                    </svg>
+                    Infrastructure
+                </a>
+                <a href="#" class="secondary-nav-item">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                    </svg>
+                    Alerts
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Breadcrumb Navigation -->
+    <div class="breadcrumb-nav">
+        <div class="breadcrumb-left">
+            <!-- Home Button -->
+            <a href="../index.html" class="breadcrumb-home-btn" title="Go to Home">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+            </a>
+            <!-- Logo & App Name as Home -->
+            <a href="../index.html" class="breadcrumb-home">
+                <div class="breadcrumb-logo-text">
+                    <span class="breadcrumb-company">HealthSync</span>
+                    <span class="breadcrumb-app">Operations Portal</span>
+                </div>
+            </a>
+            <!-- Breadcrumb Trail -->
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <span class="breadcrumb-chevron">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                    <a href="#" class="breadcrumb-link">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                        Operations
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <span class="breadcrumb-chevron">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </span>
+                    <span class="breadcrumb-link active">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        Application Health
+                    </span>
+                </li>
+            </ol>
+        </div>
+        <div class="breadcrumb-right">
+            <a href="#" class="breadcrumb-user">
+                <div class="breadcrumb-user-avatar">JD</div>
+                <div class="breadcrumb-user-info">
+                    <span class="breadcrumb-user-name">John Doe</span>
+                    <span class="breadcrumb-user-role">IT Operations</span>
+                </div>
+            </a>
         </div>
     </div>
 
@@ -772,16 +1356,30 @@
         <!-- Core Systems Section -->
         <div class="section">
             <div class="section-header">
-                <h2 class="section-title">Core Systems Monitoring</h2>
+                <div class="tooltip-container">
+                    <h2 class="section-title">Core Systems Monitoring</h2>
+                    <span class="tooltip-trigger">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </span>
+                    <div class="tooltip-content">
+                        Real-time monitoring of IVR, API, Database & Integration systems
+                    </div>
+                </div>
                 <div class="section-filter">
                     <button class="filter-btn active">All</button>
                     <button class="filter-btn">Healthy</button>
                     <button class="filter-btn">Warning</button>
                     <button class="filter-btn">Critical</button>
+                    <div class="view-toggle">
+                        <span class="view-toggle-label">Details</span>
+                        <div class="toggle-switch active" id="coreSystemsToggle" onclick="toggleSystemDetails('coreSystemsToggle', 'coreSystemsGrid')"></div>
+                    </div>
                 </div>
             </div>
 
-            <div class="systems-grid">
+            <div class="systems-grid" id="coreSystemsGrid">
                 <!-- IVR 1 - Google IVR -->
                 <div class="system-card healthy">
                     <div class="system-info">
@@ -809,6 +1407,7 @@
                             <div class="metric-label">Response</div>
                         </div>
                     </div>
+                    <span class="system-status-badge operational">Operational</span>
                 </div>
 
                 <!-- IVR 2 -->
@@ -838,6 +1437,7 @@
                             <div class="metric-label">Uptime</div>
                         </div>
                     </div>
+                    <span class="system-status-badge operational">Operational</span>
                 </div>
 
                 <!-- Citrix -->
@@ -867,6 +1467,7 @@
                             <div class="metric-label">Status</div>
                         </div>
                     </div>
+                    <span class="system-status-badge degraded">Degraded</span>
                 </div>
 
                 <!-- Salesforce -->
@@ -896,6 +1497,7 @@
                             <div class="metric-label">API</div>
                         </div>
                     </div>
+                    <span class="system-status-badge operational">Operational</span>
                 </div>
 
                 <!-- Genesys Pure Cloud -->
@@ -925,6 +1527,7 @@
                             <div class="metric-label">Queue</div>
                         </div>
                     </div>
+                    <span class="system-status-badge operational">Operational</span>
                 </div>
             </div>
         </div>
@@ -932,10 +1535,26 @@
         <!-- Application Health Section -->
         <div class="section">
             <div class="section-header">
-                <h2 class="section-title">Application Health Monitoring</h2>
+                <div class="tooltip-container">
+                    <h2 class="section-title">Application Health Monitoring</h2>
+                    <span class="tooltip-trigger">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </span>
+                    <div class="tooltip-content">
+                        Real-time health status of all application services
+                    </div>
+                </div>
+                <div class="section-filter">
+                    <div class="view-toggle">
+                        <span class="view-toggle-label">Details</span>
+                        <div class="toggle-switch active" id="appHealthToggle" onclick="toggleTableDetails('appHealthToggle', 'appHealthTable')"></div>
+                    </div>
+                </div>
             </div>
 
-            <table class="health-table">
+            <table class="health-table" id="appHealthTable">
                 <thead>
                     <tr>
                         <th>Application</th>
@@ -1201,6 +1820,39 @@
     </div>
 
     <script>
+        // Toggle System Details View (for grid cards)
+        function toggleSystemDetails(toggleId, gridId) {
+            const toggle = document.getElementById(toggleId);
+            const grid = document.getElementById(gridId);
+            const cards = grid.querySelectorAll('.system-card');
+            
+            toggle.classList.toggle('active');
+            
+            if (toggle.classList.contains('active')) {
+                // Show details
+                cards.forEach(card => card.classList.remove('collapsed'));
+            } else {
+                // Hide details - show only status
+                cards.forEach(card => card.classList.add('collapsed'));
+            }
+        }
+
+        // Toggle Table Details View (for health table)
+        function toggleTableDetails(toggleId, tableId) {
+            const toggle = document.getElementById(toggleId);
+            const table = document.getElementById(tableId);
+            
+            toggle.classList.toggle('active');
+            
+            if (toggle.classList.contains('active')) {
+                // Show all columns
+                table.classList.remove('collapsed');
+            } else {
+                // Hide middle columns - show only app name and status
+                table.classList.add('collapsed');
+            }
+        }
+
         // Placeholder for chart implementation
         // In production, integrate with Chart.js or similar library
         const healthTrendCtx = document.getElementById('healthTrendChart');
