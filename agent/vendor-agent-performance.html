@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Agent Performance Dashboard</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Calibri', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fafbfc;
+            color: #2d3748;
+            line-height: 1.6;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Executive Main Navigation */
+        .exec-nav {
+            background: #ffffff;
+            padding: 0 8px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            border-top: 3px solid #1976d2;
+        }
+
+        .exec-nav-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .exec-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .exec-logo-text {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .exec-company-name {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .exec-app-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            padding-left: 8px;
+            border-left: 2px solid #e2e8f0;
+        }
+
+        .exec-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .exec-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .exec-nav-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .exec-nav-btn:hover {
+            background: #f1f5f9;
+            color: #1976d2;
+        }
+
+        .exec-nav-btn .glyphicon {
+            font-size: 18px;
+        }
+
+        .badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: #dc2626;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+        }
+
+        /* Secondary Navigation */
+        .secondary-nav {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 64px;
+            z-index: 99;
+        }
+
+        .secondary-nav-center {
+            max-width: 100%;
+            margin: 0;
+            padding: 0 8px;
+        }
+
+        .secondary-nav-menu {
+            display: flex;
+            gap: 8px;
+        }
+
+        .secondary-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .secondary-nav-item:hover {
+            color: #1976d2;
+            background: #f8fafc;
+        }
+
+        .secondary-nav-item.active {
+            color: #1976d2;
+            border-bottom-color: #1976d2;
+            background: #f8fafc;
+        }
+
+        .secondary-nav-item .glyphicon {
+            font-size: 16px;
+        }
+
+        /* Main Container */
+        .container {
+            margin: 0;
+            padding: 16px 8px;
+            max-width: 100%;
+            width: 100%;
+            height: calc(100vh - 128px);
+            overflow-y: auto;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+        }
+
+        .page-title .glyphicon {
+            color: #1976d2;
+        }
+
+        .dashboard-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .last-updated {
+            font-size: 13px;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .filter-section-left {
+            flex-shrink: 0;
+        }
+
+        .filter-section-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-select {
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #2d3748;
+            background: #ffffff;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-select:hover {
+            border-color: #cbd5e1;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        }
+
+        /* KPI Section */
+        .kpi-section {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 0;
+            margin-bottom: 16px;
+            flex-wrap: nowrap;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .kpi-section.dock {
+            padding: 0;
+        }
+
+        .kpi-card {
+            background: #ffffff;
+            border-radius: 0;
+            padding: 16px 24px;
+            box-shadow: none;
+            border: none;
+            border-right: 1px solid #e5e7eb;
+            position: relative;
+            overflow: hidden;
+            min-width: 240px;
+            flex: 1;
+            transition: background 0.2s ease;
+        }
+
+        .kpi-card:last-child {
+            border-right: none;
+        }
+
+        .kpi-card:hover {
+            background: #f8fafc;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #1976d2 0%, #1565c0 100%);
+        }
+
+        .kpi-card.warning::before {
+            background: linear-gradient(90deg, #f59e0b 0%, #fb923c 100%);
+        }
+
+        .kpi-card.error::before {
+            background: linear-gradient(90deg, #dc2626 0%, #ef4444 100%);
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .kpi-comparison {
+            display: flex;
+            flex-direction: row;
+            gap: 16px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .kpi-comparison-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .kpi-comparison-item.hidden {
+            display: none;
+        }
+
+        .kpi-trend {
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .kpi-trend.up {
+            color: #dc2626;
+        }
+
+        .kpi-trend.down {
+            color: #22c55e;
+        }
+
+        .kpi-trend .glyphicon {
+            font-size: 12px;
+        }
+
+        .kpi-comparison-label {
+            font-size: 9px;
+            color: #94a3b8;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-period-label {
+            font-size: 10px;
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Section */
+        .section {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 16px;
+            width: 100%;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .section-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .section-btn:hover {
+            background: #f8fafc;
+            border-color: #1976d2;
+            color: #1976d2;
+        }
+
+        .section-btn .glyphicon {
+            font-size: 14px;
+        }
+
+        /* Chart Cards */
+        .chart-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #1976d2 0%, #1565c0 100%);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .chart-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .chart-header .glyphicon {
+            font-size: 18px;
+            color: #1976d2;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 200px;
+            margin-top: 16px;
+        }
+
+        /* Vendor Table */
+        .vendor-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .vendor-table thead {
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .vendor-table th {
+            padding: 8px 12px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .vendor-table th.left {
+            text-align: left;
+        }
+
+        .vendor-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f1f5f9;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .vendor-table td.left {
+            text-align: left;
+        }
+
+        .vendor-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .vendor-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .vendor-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        .vendor-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            align-items: flex-start;
+        }
+
+        .vendor-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .vendor-location {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .metric-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .metric-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .metric-value.good {
+            color: #22c55e;
+        }
+
+        .metric-value.warning {
+            color: #f59e0b;
+        }
+
+        .metric-value.error {
+            color: #dc2626;
+        }
+
+        .metric-change {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .metric-change.up {
+            color: #dc2626;
+        }
+
+        .metric-change.down {
+            color: #22c55e;
+        }
+
+        .metric-date {
+            font-size: 10px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .percentage {
+            font-size: 16px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .percentage.good {
+            color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .percentage.warning {
+            color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .percentage.error {
+            color: #dc2626;
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.healthy {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .status-badge.warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-badge.critical {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* Sparkline */
+        .sparkline {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 24px;
+            margin-top: 4px;
+        }
+
+        .sparkline-bar {
+            flex: 1;
+            background: #1976d2;
+            border-radius: 2px;
+            min-height: 2px;
+            transition: all 0.3s;
+        }
+
+        .sparkline-bar.good {
+            background: #22c55e;
+        }
+
+        .sparkline-bar.warning {
+            background: #f59e0b;
+        }
+
+        .sparkline-bar.error {
+            background: #dc2626;
+        }
+
+        /* Repeated Offenders Section */
+        .offenders-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .offender-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .offender-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .offender-card.critical::before {
+            background: linear-gradient(90deg, #dc2626 0%, #ef4444 100%);
+        }
+
+        .offender-card.warning::before {
+            background: linear-gradient(90deg, #f59e0b 0%, #fb923c 100%);
+        }
+
+        .offender-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .offender-vendor {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .offender-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .offender-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .offender-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .offender-badge.critical {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .offender-badge.warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .offender-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .offender-stat {
+            text-align: center;
+        }
+
+        .offender-stat-label {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 4px;
+        }
+
+        .offender-stat-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .offender-reason {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.5;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .offender-reason strong {
+            color: #0f172a;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .kpi-section,
+            .offenders-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .kpi-section,
+            .filter-grid,
+            .offenders-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .secondary-nav-menu {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Executive Main Navigation -->
+    <nav class="exec-nav">
+        <div class="exec-nav-left">
+            <a href="../index.html" class="exec-logo">
+                <div class="exec-logo-text">
+                    <span class="exec-company-name">HealthSync</span>
+                    <span class="exec-app-name">Agent Portal</span>
+                </div>
+            </a>
+        </div>
+        <div class="exec-nav-right">
+            <div class="exec-nav-actions">
+                <button class="exec-nav-btn" title="Search">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
+                <button class="exec-nav-btn" title="Notifications">
+                    <span class="glyphicon glyphicon-bell"></span>
+                    <span class="badge"></span>
+                </button>
+                <button class="exec-nav-btn" title="Settings">
+                    <span class="glyphicon glyphicon-cog"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Secondary Navigation -->
+    <div class="secondary-nav">
+        <div class="secondary-nav-center">
+            <nav class="secondary-nav-menu">
+                <a href="agent-vendor-scorecard.html" class="secondary-nav-item">
+                    <span class="glyphicon glyphicon-stats"></span>
+                    Vendor Scorecard
+                </a>
+                <a href="vendor-agent-performance.html" class="secondary-nav-item active">
+                    <span class="glyphicon glyphicon-user"></span>
+                    Agent Performance
+                </a>
+                <a href="#" class="secondary-nav-item">
+                    <span class="glyphicon glyphicon-ok-circle"></span>
+                    Quality Metrics
+                </a>
+                <a href="#" class="secondary-nav-item">
+                    <span class="glyphicon glyphicon-bell"></span>
+                    Alerts
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-section-left">
+                <h1 class="page-title">
+                    <span class="glyphicon glyphicon-stats"></span>
+                    Vendor Agent Performance Dashboard
+                </h1>
+            </div>
+            <div class="filter-section-right">
+                <div class="dashboard-header">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="glyphicon glyphicon-time" style="color: #94a3b8; font-size: 14px;"></span>
+                        <span style="color: #94a3b8; font-size: 12px;">Last Updated: Dec 16, 2025 10:45 AM EST</span>
+                    </div>
+                </div>
+                <div class="filter-grid">
+                <div class="filter-item">
+                    <label class="filter-label">Vendor</label>
+                    <select class="filter-select" id="vendorFilter">
+                        <option value="all">All Vendors</option>
+                        <option value="concentrix">Concentrix</option>
+                        <option value="teleperformance">Teleperformance</option>
+                        <option value="ttec">TTEC</option>
+                        <option value="sitel">Sitel Group</option>
+                        <option value="alorica">Alorica</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label class="filter-label">Continent</label>
+                    <select class="filter-select" id="continentFilter">
+                        <option value="all">All Continents</option>
+                        <option value="north-america">North America</option>
+                        <option value="south-america">South America</option>
+                        <option value="europe">Europe</option>
+                        <option value="asia">Asia</option>
+                        <option value="africa">Africa</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label class="filter-label">Country</label>
+                    <select class="filter-select" id="countryFilter">
+                        <option value="all">All Countries</option>
+                        <option value="usa">United States</option>
+                        <option value="canada">Canada</option>
+                        <option value="uk">United Kingdom</option>
+                        <option value="india">India</option>
+                        <option value="philippines">Philippines</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label class="filter-label">Time Range</label>
+                    <select class="filter-select" id="timeRangeFilter">
+                        <option value="last-24-hours">Last 24 Hours</option>
+                        <option value="last-7-days">Last 7 Days</option>
+                        <option value="last-30-days">Last 30 Days</option>
+                        <option value="custom">Custom Range</option>
+                    </select>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- KPI Section -->
+        <div class="kpi-section dock">
+            <div class="kpi-card">
+                <div class="kpi-label">Total Calls</div>
+                <div class="kpi-value">156,847</div>
+                <div class="kpi-comparison">
+                    <div class="kpi-comparison-item dod-comparison">
+                        <div class="kpi-comparison-label">DoD</div>
+                        <div class="kpi-trend down">
+                            <span class="glyphicon glyphicon-arrow-down"></span>
+                            <span>2.3%</span>
+                        </div>
+                    </div>
+                    <div class="kpi-comparison-item wow-comparison">
+                        <div class="kpi-comparison-label">WoW</div>
+                        <div class="kpi-trend down">
+                            <span class="glyphicon glyphicon-arrow-down"></span>
+                            <span>4.1%</span>
+                        </div>
+                    </div>
+                    <div class="kpi-comparison-item mom-comparison hidden">
+                        <div class="kpi-comparison-label">MoM</div>
+                        <div class="kpi-trend down">
+                            <span class="glyphicon glyphicon-arrow-down"></span>
+                            <span>6.8%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kpi-card error">
+                <div class="kpi-label">Total Errored Calls</div>
+                <div class="kpi-value">4,234</div>
+                <div class="kpi-comparison">
+                    <div class="kpi-comparison-item dod-comparison">
+                        <div class="kpi-comparison-label">DoD</div>
+                        <div class="kpi-trend up">
+                            <span class="glyphicon glyphicon-arrow-up"></span>
+                            <span>12.5%</span>
+                        </div>
+                    </div>
+                    <div class="kpi-comparison-item wow-comparison">
+                        <div class="kpi-comparison-label">WoW</div>
+                        <div class="kpi-trend up">
+                            <span class="glyphicon glyphicon-arrow-up"></span>
+                            <span>18.7%</span>
+                        </div>
+                    </div>
+                    <div class="kpi-comparison-item mom-comparison hidden">
+                        <div class="kpi-comparison-label">MoM</div>
+                        <div class="kpi-trend up">
+                            <span class="glyphicon glyphicon-arrow-up"></span>
+                            <span>24.3%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kpi-card warning">
+                <div class="kpi-label">Agents with Call Issues</div>
+                <div class="kpi-value">87</div>
+                <div class="kpi-comparison">
+                    <div class="kpi-comparison-item dod-comparison">
+                        <div class="kpi-comparison-label">DoD</div>
+                        <div class="kpi-trend up">
+                            <span class="glyphicon glyphicon-arrow-up"></span>
+                            <span>5.4%</span>
+                        </div>
+                    </div>
+                    <div class="kpi-comparison-item wow-comparison">
+                        <div class="kpi-comparison-label">WoW</div>
+                        <div class="kpi-trend up">
+                            <span class="glyphicon glyphicon-arrow-up"></span>
+                            <span>8.8%</span>
+                        </div>
+                    </div>
+                    <div class="kpi-comparison-item mom-comparison hidden">
+                        <div class="kpi-comparison-label">MoM</div>
+                        <div class="kpi-trend up">
+                            <span class="glyphicon glyphicon-arrow-up"></span>
+                            <span>12.1%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vendor Performance Table -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Vendor Performance Breakdown</h2>
+                <div class="section-actions">
+                    <button class="section-btn">
+                        <span class="glyphicon glyphicon-export"></span>
+                        Export
+                    </button>
+                    <button class="section-btn">
+                        <span class="glyphicon glyphicon-refresh"></span>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <table class="vendor-table">
+                <thead>
+                    <tr>
+                        <th class="left">Vendor</th>
+                        <th>Total Calls</th>
+                        <th>Errored Calls</th>
+                        <th>Error %</th>
+                        <th>Degraded Calls</th>
+                        <th>Degraded %</th>
+                        <th>Agents Impacted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="left">
+                            <div class="vendor-info">
+                                <div class="vendor-logo">CX</div>
+                                <div class="vendor-details">
+                                    <div class="vendor-name">Concentrix</div>
+                                    <div class="vendor-location">North America • USA</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="metric-cell">
+                                <span class="metric-value">45,678</span>
+                                <div class="metric-change up">
+                                    <span class="glyphicon glyphicon-arrow-up"></span>
+                                    3.2%
+                                </div>
+                                <div class="metric-date" data-prev-date="vs Previous: 44,234">vs Previous: 44,234</div>
+                                <div class="sparkline">
+                                    <div class="sparkline-bar" style="height: 60%;"></div>
+                                    <div class="sparkline-bar" style="height: 75%;"></div>
+                                    <div class="sparkline-bar" style="height: 55%;"></div>
+                                    <div class="sparkline-bar" style="height: 80%;"></div>
+                                    <div class="sparkline-bar" style="height: 70%;"></div>
+                                    <div class="sparkline-bar" style="height: 85%;"></div>
+                                    <div class="sparkline-bar" style="height: 100%;"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="metric-cell">
+                                <span class="metric-value error">1,823</span>
+                                <div class="metric-change up">
+                                    <span class="glyphicon glyphicon-arrow-up"></span>
+                                    15.7%
+                                </div>
+                                <div class="metric-date" data-prev-date="vs Previous: 1,576">vs Previous: 1,576</div>
+                            </div>
+                        </td>
+                        <td><span class="percentage error">3.99%</span></td>
+                        <td><span class="metric-value warning">2,456</span></td>
+                        <td><span class="percentage warning">5.38%</span></td>
+                        <td><span class="metric-value warning">28</span></td>
+                    </tr>
+                    <tr>
+                        <td class="left">
+                            <div class="vendor-info">
+                                <div class="vendor-logo">TP</div>
+                                <div class="vendor-details">
+                                    <div class="vendor-name">Teleperformance</div>
+                                    <div class="vendor-location">Asia • India</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="metric-cell">
+                                <span class="metric-value">38,912</span>
+                                <div class="metric-change down">
+                                    <span class="glyphicon glyphicon-arrow-down"></span>
+                                    1.4%
+                                </div>
+                                <div class="metric-date" data-prev-date="vs Previous: 39,467">vs Previous: 39,467</div>
+                                <div class="sparkline">
+                                    <div class="sparkline-bar good" style="height: 90%;"></div>
+                                    <div class="sparkline-bar good" style="height: 85%;"></div>
+                                    <div class="sparkline-bar good" style="height: 92%;"></div>
+                                    <div class="sparkline-bar good" style="height: 88%;"></div>
+                                    <div class="sparkline-bar good" style="height: 95%;"></div>
+                                    <div class="sparkline-bar good" style="height: 82%;"></div>
+                                    <div class="sparkline-bar good" style="height: 100%;"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="metric-cell">
+                                <span class="metric-value good">456</span>
+                                <div class="metric-change down">
+                                    <span class="glyphicon glyphicon-arrow-down"></span>
+                                    8.3%
+                                </div>
+                                <div class="metric-date" data-prev-date="vs Previous: 497">vs Previous: 497</div>
+                            </div>
+                        </td>
+                        <td><span class="percentage good">1.17%</span></td>
+                        <td><span class="metric-value good">1,234</span></td>
+                        <td><span class="percentage good">3.17%</span></td>
+                        <td><span class="metric-value good">8</span></td>
+                    </tr>
+                    <tr>
+                        <td class="left">
+                            <div class="vendor-info">
+                                <div class="vendor-logo">TT</div>
+                                <div class="vendor-details">
+                                    <div class="vendor-name">TTEC</div>
+                                    <div class="vendor-location">Asia • Philippines</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="metric-cell">
+                                <span class="metric-value">34,567</span>
+                                <div class="metric-change up">
+                                    <span class="glyphicon glyphicon-arrow-up"></span>
+                                    2.8%
+                                </div>
+                                <div class="metric-date" data-prev-date="vs Previous: 33,625">vs Previous: 33,625</div>
+                                <div class="sparkline">
+                                    <div class="sparkline-bar warning" style="height: 70%;"></div>
+                                    <div class="sparkline-bar warning" style="height: 65%;"></div>
+                                    <div class="sparkline-bar warning" style="height: 78%;"></div>
+                                    <div class="sparkline-bar warning" style="height: 82%;"></div>
+                                    <div class="sparkline-bar warning" style="height: 75%;"></div>
+                                    <div class="sparkline-bar warning" style="height: 88%;"></div>
+                                    <div class="sparkline-bar warning" style="height: 100%;"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="metric-cell">
+                                <span class="metric-value error">1,245</span>
+                                <div class="metric-change up">
+                                    <span class="glyphicon glyphicon-arrow-up"></span>
+                                    11.2%
+                                </div>
+                                <div class="metric-date" data-prev-date="vs Previous: 1,120">vs Previous: 1,120</div>
+                            </div>
+                        </td>
+                        <td><span class="percentage error">3.60%</span></td>
+                        <td><span class="metric-value warning">1,987</span></td>
+                        <td><span class="percentage warning">5.75%</span></td>
+                        <td><span class="metric-value warning">22</span></td>
+                    </tr>
+                    <tr>
+                        <td class="left">
+                            <div class="vendor-info">
+                                <div class="vendor-logo">SG</div>
+                                <div class="vendor-details">
+                                    <div class="vendor-name">Sitel Group</div>
+                                    <div class="vendor-location">North America • Canada</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="metric-cell">
+                                <span class="metric-value">22,890</span>
+                                <div class="metric-change down">
+                                    <span class="glyphicon glyphicon-arrow-down"></span>
+                                    0.8%
+                                </div>
+                                <div class="metric-date" data-prev-date="vs Previous: 23,074">vs Previous: 23,074</div>
+                                <div class="sparkline">
+                                    <div class="sparkline-bar good" style="height: 95%;"></div>
+                                    <div class="sparkline-bar good" style="height: 100%;"></div>
+                                    <div class="sparkline-bar good" style="height: 88%;"></div>
+                                    <div class="sparkline-bar good" style="height: 92%;"></div>
+                                    <div class="sparkline-bar good" style="height: 85%;"></div>
+                                    <div class="sparkline-bar good" style="height: 90%;"></div>
+                                    <div class="sparkline-bar good" style="height: 87%;"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="metric-cell">
+                                <span class="metric-value good">234</span>
+                                <div class="metric-change down">
+                                    <span class="glyphicon glyphicon-arrow-down"></span>
+                                    6.4%
+                                </div>
+                                <div class="metric-date" data-prev-date="vs Previous: 250">vs Previous: 250</div>
+                            </div>
+                        </td>
+                        <td><span class="percentage good">1.02%</span></td>
+                        <td><span class="metric-value good">789</span></td>
+                        <td><span class="percentage good">3.45%</span></td>
+                        <td><span class="metric-value good">5</span></td>
+                    </tr>
+                    <tr>
+                        <td class="left">
+                            <div class="vendor-info">
+                                <div class="vendor-logo">AL</div>
+                                <div class="vendor-details">
+                                    <div class="vendor-name">Alorica</div>
+                                    <div class="vendor-location">Europe • UK</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="metric-cell">
+                                <span class="metric-value">14,800</span>
+                                <div class="metric-change up">
+                                    <span class="glyphicon glyphicon-arrow-up"></span>
+                                    5.3%
+                                </div>
+                                <div class="metric-date" data-prev-date="vs Previous: 14,056">vs Previous: 14,056</div>
+                                <div class="sparkline">
+                                    <div class="sparkline-bar error" style="height: 65%;"></div>
+                                    <div class="sparkline-bar error" style="height: 72%;"></div>
+                                    <div class="sparkline-bar error" style="height: 68%;"></div>
+                                    <div class="sparkline-bar error" style="height: 80%;"></div>
+                                    <div class="sparkline-bar error" style="height: 75%;"></div>
+                                    <div class="sparkline-bar error" style="height: 90%;"></div>
+                                    <div class="sparkline-bar error" style="height: 100%;"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="metric-cell">
+                                <span class="metric-value error">476</span>
+                                <div class="metric-change up">
+                                    <span class="glyphicon glyphicon-arrow-up"></span>
+                                    22.6%
+                                </div>
+                                <div class="metric-date" data-prev-date="vs Previous: 388">vs Previous: 388</div>
+                            </div>
+                        </td>
+                        <td><span class="percentage error">3.22%</span></td>
+                        <td><span class="metric-value warning">1,112</span></td>
+                        <td><span class="percentage warning">7.51%</span></td>
+                        <td><span class="metric-value warning">24</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Repeated Offenders Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Repeated Offenders - Alert Watch</h2>
+                <div class="section-actions">
+                    <button class="section-btn">
+                        <span class="glyphicon glyphicon-filter"></span>
+                        View All
+                    </button>
+                </div>
+            </div>
+
+            <div class="offenders-grid">
+                <div class="offender-card critical">
+                    <div class="offender-header">
+                        <div class="offender-vendor">
+                            <div class="offender-logo">CX</div>
+                            <div class="offender-name">Concentrix</div>
+                        </div>
+                        <span class="offender-badge critical">Critical</span>
+                    </div>
+                    <div class="offender-stats">
+                        <div class="offender-stat">
+                            <div class="offender-stat-label">Total Calls</div>
+                            <div class="offender-stat-value">45,678</div>
+                        </div>
+                        <div class="offender-stat">
+                            <div class="offender-stat-label">Error Rate</div>
+                            <div class="offender-stat-value">3.99%</div>
+                        </div>
+                        <div class="offender-stat">
+                            <div class="offender-stat-label">Degraded Rate</div>
+                            <div class="offender-stat-value">5.38%</div>
+                        </div>
+                        <div class="offender-stat">
+                            <div class="offender-stat-label">Consecutive Issues</div>
+                            <div class="offender-stat-value">8 hrs</div>
+                        </div>
+                    </div>
+                    <div class="offender-reason">
+                        <strong>Reason:</strong> Error rate consistently above 3.5% threshold for 8 consecutive hours. 
+                        Degraded calls increased by 45% in the last 4 hours. Affecting 28 agents primarily on the 
+                        evening shift. Issue appears to be network-related based on error patterns.
+                    </div>
+                </div>
+
+                <div class="offender-card critical">
+                    <div class="offender-header">
+                        <div class="offender-vendor">
+                            <div class="offender-logo">AL</div>
+                            <div class="offender-name">Alorica</div>
+                        </div>
+                        <span class="offender-badge critical">Critical</span>
+                    </div>
+                    <div class="offender-stats">
+                        <div class="offender-stat">
+                            <div class="offender-stat-label">Total Calls</div>
+                            <div class="offender-stat-value">14,800</div>
+                        </div>
+                        <div class="offender-stat">
+                            <div class="offender-stat-label">Error Rate</div>
+                            <div class="offender-stat-value">3.22%</div>
+                        </div>
+                        <div class="offender-stat">
+                            <div class="offender-stat-label">Degraded Rate</div>
+                            <div class="offender-stat-value">7.51%</div>
+                        </div>
+                        <div class="offender-stat">
+                            <div class="offender-stat-label">Consecutive Issues</div>
+                            <div class="offender-stat-value">14 hrs</div>
+                        </div>
+                    </div>
+                    <div class="offender-reason">
+                        <strong>Reason:</strong> Highest degraded rate at 7.51%. Issues persisting for 14 consecutive hours. 
+                        22.6% increase in errors compared to last week. Affecting 24 agents across multiple shifts. 
+                        Suspected VoIP configuration issue under investigation.
+                    </div>
+                </div>
+
+                <div class="offender-card warning">
+                    <div class="offender-header">
+                        <div class="offender-vendor">
+                            <div class="offender-logo">TT</div>
+                            <div class="offender-name">TTEC</div>
+                        </div>
+                        <span class="offender-badge warning">Warning</span>
+                    </div>
+                    <div class="offender-stats">
+                        <div class="offender-stat">
+                            <div class="offender-stat-label">Total Calls</div>
+                            <div class="offender-stat-value">34,567</div>
+                        </div>
+                        <div class="offender-stat">
+                            <div class="offender-stat-label">Error Rate</div>
+                            <div class="offender-stat-value">3.60%</div>
+                        </div>
+                        <div class="offender-stat">
+                            <div class="offender-stat-label">Degraded Rate</div>
+                            <div class="offender-stat-value">5.75%</div>
+                        </div>
+                        <div class="offender-stat">
+                            <div class="offender-stat-label">Consecutive Issues</div>
+                            <div class="offender-stat-value">11 hrs</div>
+                        </div>
+                    </div>
+                    <div class="offender-reason">
+                        <strong>Reason:</strong> Degraded rate exceeded 5% threshold for 11 consecutive hours. 
+                        Error rate approaching critical level at 3.60%. Affecting 22 agents across evening shift. 
+                        Potential infrastructure issue under investigation.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Visualizations -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Performance Trends</h2>
+                <div class="section-actions">
+                    <button class="section-btn" id="trendRangeBtn">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                        <span id="trendRangeText">Last 7 Days</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="kpi-section">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Total Calls Trend</h3>
+                        <span class="glyphicon glyphicon-stats"></span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="callsChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Errored Calls Trend</h3>
+                        <span class="glyphicon glyphicon-warning-sign"></span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="errorsChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Agents with Issues</h3>
+                        <span class="glyphicon glyphicon-user"></span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="agentsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // Initialize Charts
+        function initCharts() {
+            // Calls Chart
+            const callsCtx = document.getElementById('callsChart');
+            if (callsCtx) {
+                const callsGradient = callsCtx.getContext('2d').createLinearGradient(0, 0, 0, 200);
+                callsGradient.addColorStop(0, 'rgba(25, 118, 210, 0.3)');
+                callsGradient.addColorStop(1, 'rgba(25, 118, 210, 0)');
+
+                new Chart(callsCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Dec 10', 'Dec 11', 'Dec 12', 'Dec 13', 'Dec 14', 'Dec 15', 'Dec 16'],
+                        datasets: [{
+                            label: 'Total Calls',
+                            data: [163572, 159234, 161875, 158945, 162341, 160532, 156847],
+                            borderColor: '#1976d2',
+                            backgroundColor: callsGradient,
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#1976d2',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                cornerRadius: 6,
+                                titleFont: { size: 13, weight: 'bold' },
+                                bodyFont: { size: 12 },
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Total Calls: ' + context.parsed.y.toLocaleString();
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                grid: { color: '#f1f5f9' },
+                                ticks: {
+                                    callback: function(value) {
+                                        return (value / 1000).toFixed(0) + 'K';
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Errors Chart
+            const errorsCtx = document.getElementById('errorsChart');
+            if (errorsCtx) {
+                const errorsGradient = errorsCtx.getContext('2d').createLinearGradient(0, 0, 0, 200);
+                errorsGradient.addColorStop(0, 'rgba(220, 38, 38, 0.3)');
+                errorsGradient.addColorStop(1, 'rgba(220, 38, 38, 0)');
+
+                new Chart(errorsCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Dec 10', 'Dec 11', 'Dec 12', 'Dec 13', 'Dec 14', 'Dec 15', 'Dec 16'],
+                        datasets: [{
+                            label: 'Errored Calls',
+                            data: [3568, 3421, 3789, 3654, 3892, 3764, 4234],
+                            borderColor: '#dc2626',
+                            backgroundColor: errorsGradient,
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#dc2626',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                cornerRadius: 6,
+                                titleFont: { size: 13, weight: 'bold' },
+                                bodyFont: { size: 12 },
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Errored Calls: ' + context.parsed.y.toLocaleString();
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                grid: { color: '#f1f5f9' },
+                                ticks: {
+                                    callback: function(value) {
+                                        return (value / 1000).toFixed(1) + 'K';
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Agents Chart
+            const agentsCtx = document.getElementById('agentsChart');
+            if (agentsCtx) {
+                const agentsGradient = agentsCtx.getContext('2d').createLinearGradient(0, 0, 0, 200);
+                agentsGradient.addColorStop(0, 'rgba(245, 158, 11, 0.3)');
+                agentsGradient.addColorStop(1, 'rgba(245, 158, 11, 0)');
+
+                new Chart(agentsCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Dec 10', 'Dec 11', 'Dec 12', 'Dec 13', 'Dec 14', 'Dec 15', 'Dec 16'],
+                        datasets: [{
+                            label: 'Agents with Issues',
+                            data: [80, 75, 82, 78, 84, 82, 87],
+                            borderColor: '#f59e0b',
+                            backgroundColor: agentsGradient,
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#f59e0b',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                cornerRadius: 6,
+                                titleFont: { size: 13, weight: 'bold' },
+                                bodyFont: { size: 12 },
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Agents: ' + context.parsed.y;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                grid: { color: '#f1f5f9' }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Handle time range filter changes
+        function updateComparisonsBasedOnTimeRange(timeRange) {
+            const dodComparisons = document.querySelectorAll('.dod-comparison');
+            const wowComparisons = document.querySelectorAll('.wow-comparison');
+            const momComparisons = document.querySelectorAll('.mom-comparison');
+            const trendRangeText = document.getElementById('trendRangeText');
+            
+            // Hide all comparisons first
+            dodComparisons.forEach(el => el.classList.add('hidden'));
+            wowComparisons.forEach(el => el.classList.add('hidden'));
+            momComparisons.forEach(el => el.classList.add('hidden'));
+            
+            // Show relevant comparisons based on time range
+            switch(timeRange) {
+                case 'last-24-hours':
+                    dodComparisons.forEach(el => el.classList.remove('hidden'));
+                    if (trendRangeText) trendRangeText.textContent = 'Last 24 Hours';
+                    break;
+                case 'last-7-days':
+                    dodComparisons.forEach(el => el.classList.remove('hidden'));
+                    wowComparisons.forEach(el => el.classList.remove('hidden'));
+                    if (trendRangeText) trendRangeText.textContent = 'Last 7 Days';
+                    break;
+                case 'last-30-days':
+                    dodComparisons.forEach(el => el.classList.remove('hidden'));
+                    wowComparisons.forEach(el => el.classList.remove('hidden'));
+                    momComparisons.forEach(el => el.classList.remove('hidden'));
+                    if (trendRangeText) trendRangeText.textContent = 'Last 30 Days';
+                    break;
+                case 'custom':
+                    dodComparisons.forEach(el => el.classList.remove('hidden'));
+                    wowComparisons.forEach(el => el.classList.remove('hidden'));
+                    momComparisons.forEach(el => el.classList.remove('hidden'));
+                    if (trendRangeText) trendRangeText.textContent = 'Custom Range';
+                    break;
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Vendor Agent Performance Dashboard loaded');
+            
+            // Set default time range
+            const timeRange = document.getElementById('timeRangeFilter');
+            if (timeRange) {
+                timeRange.value = 'last-24-hours';
+                
+                // Update comparisons on initial load
+                updateComparisonsBasedOnTimeRange(timeRange.value);
+                
+                // Add event listener for time range changes
+                timeRange.addEventListener('change', (e) => {
+                    updateComparisonsBasedOnTimeRange(e.target.value);
+                });
+            }
+
+            // Initialize charts
+            initCharts();
+        });
+    </script>
+</body>
+</html>

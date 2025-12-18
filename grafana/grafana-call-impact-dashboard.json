@@ -1,0 +1,203 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "preload": false,
+  "refresh": "5m",
+  "schemaVersion": 40,
+  "tags": ["call-impact", "analytics", "operations", "vendor"],
+  "templating": {
+    "list": [
+      {
+        "name": "vendor",
+        "type": "custom",
+        "label": "Vendor",
+        "hide": 0,
+        "query": "All Vendors,Vendor A - TechCorp,Vendor B - CloudNet,Vendor C - DataFlow,Vendor D - ConnectPro",
+        "current": {
+          "text": "All Vendors",
+          "value": "all"
+        },
+        "options": [
+          { "text": "All Vendors", "value": "all", "selected": true },
+          { "text": "Vendor A - TechCorp", "value": "vendor_a" },
+          { "text": "Vendor B - CloudNet", "value": "vendor_b" },
+          { "text": "Vendor C - DataFlow", "value": "vendor_c" },
+          { "text": "Vendor D - ConnectPro", "value": "vendor_d" }
+        ],
+        "multi": false,
+        "includeAll": false
+      },
+      {
+        "name": "date_range",
+        "type": "custom",
+        "label": "Date Range",
+        "hide": 0,
+        "query": "Today (Dec 18),Yesterday (Dec 17),Last 7 Days,Last 14 Days,Last 30 Days,Month to Date,Quarter to Date",
+        "current": {
+          "text": "Last 7 Days",
+          "value": "7days"
+        },
+        "options": [
+          { "text": "Today (Dec 18, 2025)", "value": "today" },
+          { "text": "Yesterday (Dec 17, 2025)", "value": "yesterday" },
+          { "text": "Last 7 Days", "value": "7days", "selected": true },
+          { "text": "Last 14 Days", "value": "14days" },
+          { "text": "Last 30 Days", "value": "30days" },
+          { "text": "Month to Date", "value": "mtd" },
+          { "text": "Quarter to Date", "value": "qtd" }
+        ],
+        "multi": false,
+        "includeAll": false
+      },
+      {
+        "name": "location",
+        "type": "custom",
+        "label": "Location",
+        "hide": 0,
+        "query": "All Locations,North America,Europe,Asia Pacific,Latin America",
+        "current": {
+          "text": "All Locations",
+          "value": "all"
+        },
+        "options": [
+          { "text": "All Locations", "value": "all", "selected": true },
+          { "text": "North America", "value": "na" },
+          { "text": "Europe", "value": "eu" },
+          { "text": "Asia Pacific", "value": "apac" },
+          { "text": "Latin America", "value": "latam" }
+        ],
+        "multi": false,
+        "includeAll": false
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "marcusolsson-dynamictext-panel",
+      "title": "",
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 2 },
+      "options": {
+        "content": "<div class=\"header-bar\">\n  <div class=\"header-brand\">\n    <div class=\"brand-icon\">📞</div>\n    <div class=\"brand-text\">\n      <span class=\"brand-name\">TechCorp</span>\n      <span class=\"brand-tagline\">Operations Center</span>\n    </div>\n  </div>\n  <div class=\"header-title\">Call Impact Analytics</div>\n  <div class=\"header-user\">\n    <div class=\"user-avatar\">JD</div>\n    <div class=\"user-info\">\n      <span class=\"user-name\">John Doe</span>\n      <span class=\"user-role\">Operations Manager</span>\n    </div>\n  </div>\n</div>",
+        "defaultContent": "Loading...",
+        "editor": {
+          "language": "html",
+          "height": 300
+        },
+        "styles": ".header-bar {\n  background: #0d2137;\n  color: white;\n  padding: 12px 24px;\n  border-radius: 8px;\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n.header-brand {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n}\n.brand-icon {\n  width: 36px;\n  height: 36px;\n  background: rgba(255,255,255,0.15);\n  border-radius: 6px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #4fc3f7;\n  font-size: 20px;\n}\n.brand-text {\n  display: flex;\n  flex-direction: column;\n}\n.brand-name {\n  font-size: 16px;\n  font-weight: 600;\n  font-family: 'Roboto', sans-serif;\n}\n.brand-tagline {\n  font-size: 10px;\n  color: rgba(255,255,255,0.6);\n}\n.header-title {\n  font-size: 15px;\n  font-weight: 500;\n  font-family: 'Roboto', sans-serif;\n  letter-spacing: 0.3px;\n}\n.header-user {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  padding: 4px 12px 4px 4px;\n  background: rgba(255,255,255,0.1);\n  border-radius: 20px;\n}\n.user-avatar {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #4fc3f7;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #0d2137;\n  font-weight: 600;\n  font-size: 12px;\n}\n.user-info {\n  display: flex;\n  flex-direction: column;\n  line-height: 1.2;\n}\n.user-name {\n  font-size: 13px;\n  font-weight: 500;\n}\n.user-role {\n  font-size: 10px;\n  color: rgba(255,255,255,0.6);\n}"
+      },
+      "transparent": true
+    },
+    {
+      "id": 2,
+      "type": "marcusolsson-dynamictext-panel",
+      "title": "",
+      "gridPos": { "x": 0, "y": 2, "w": 24, "h": 2 },
+      "options": {
+        "content": "<div class=\"sub-nav\">\n  <div class=\"nav-tabs\">\n    <div class=\"nav-tab active\">📊 Overview</div>\n    <div class=\"nav-tab\">🏢 Vendors</div>\n    <div class=\"nav-tab\">👤 Agents</div>\n    <div class=\"nav-tab\">⚙️ Thresholds</div>\n    <div class=\"nav-tab\">🔄 Repeat Offenders</div>\n  </div>\n  <div class=\"nav-actions\">\n    <div class=\"nav-btn\">📤</div>\n    <div class=\"nav-btn\">⚙️</div>\n  </div>\n</div>",
+        "defaultContent": "Loading...",
+        "editor": {
+          "language": "html",
+          "height": 200
+        },
+        "styles": ".sub-nav {\n  background: #1a3a5c;\n  padding: 0 24px;\n  border-radius: 8px;\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n.nav-tabs {\n  display: flex;\n  gap: 0;\n}\n.nav-tab {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  padding: 14px 20px;\n  color: rgba(255,255,255,0.7);\n  font-size: 13px;\n  font-weight: 500;\n  font-family: 'Roboto', sans-serif;\n  border-bottom: 2px solid transparent;\n  cursor: pointer;\n  transition: all 0.15s;\n}\n.nav-tab:hover {\n  color: white;\n  background: rgba(255,255,255,0.05);\n}\n.nav-tab.active {\n  color: white;\n  border-bottom-color: #4fc3f7;\n  background: rgba(255,255,255,0.08);\n}\n.nav-actions {\n  display: flex;\n  gap: 8px;\n}\n.nav-btn {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: transparent;\n  color: rgba(255,255,255,0.7);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  cursor: pointer;\n  transition: all 0.15s;\n}\n.nav-btn:hover {\n  background: rgba(255,255,255,0.1);\n  color: white;\n}"
+      },
+      "transparent": true
+    },
+    {
+      "id": 3,
+      "type": "marcusolsson-dynamictext-panel",
+      "title": "",
+      "gridPos": { "x": 0, "y": 4, "w": 24, "h": 3 },
+      "options": {
+        "content": "<div class=\"kpi-dock\">\n  <div class=\"kpi-card\">\n    <div class=\"kpi-header\">\n      <span class=\"kpi-label\">Total Calls</span>\n    </div>\n    <div class=\"kpi-value\">47,832</div>\n    <div class=\"kpi-comparisons\">\n      <div class=\"kpi-comp-item\">\n        <span class=\"comp-label\">DoD</span>\n        <span class=\"comp-value positive\">+2.4%</span>\n      </div>\n      <div class=\"kpi-comp-item\">\n        <span class=\"comp-label\">WoW</span>\n        <span class=\"comp-value positive\">+5.1%</span>\n      </div>\n      <div class=\"kpi-comp-item\">\n        <span class=\"comp-label\">MoM</span>\n        <span class=\"comp-value positive\">+8.7%</span>\n      </div>\n    </div>\n  </div>\n  <div class=\"kpi-card\">\n    <div class=\"kpi-header\">\n      <span class=\"kpi-label\">Impacted Calls</span>\n    </div>\n    <div class=\"kpi-value\">1,247</div>\n    <div class=\"kpi-subtext\">\n      <div class=\"kpi-sub-item\">\n        <span class=\"sub-dot errored\"></span>\n        <span class=\"sub-value\">245</span>\n        <span class=\"sub-label\">Errored</span>\n      </div>\n      <div class=\"kpi-sub-item\">\n        <span class=\"sub-dot degraded\"></span>\n        <span class=\"sub-value\">647</span>\n        <span class=\"sub-label\">Degraded</span>\n      </div>\n    </div>\n    <div class=\"kpi-comparisons\">\n      <div class=\"kpi-comp-item\">\n        <span class=\"comp-label\">DoD</span>\n        <span class=\"comp-value negative\">-3.2%</span>\n      </div>\n      <div class=\"kpi-comp-item\">\n        <span class=\"comp-label\">WoW</span>\n        <span class=\"comp-value negative\">-8.5%</span>\n      </div>\n      <div class=\"kpi-comp-item\">\n        <span class=\"comp-label\">MoM</span>\n        <span class=\"comp-value negative\">-12.1%</span>\n      </div>\n    </div>\n  </div>\n  <div class=\"kpi-card\">\n    <div class=\"kpi-header\">\n      <span class=\"kpi-label\">Impacted Agents</span>\n    </div>\n    <div class=\"kpi-value\">2,487</div>\n    <div class=\"kpi-comparisons\">\n      <div class=\"kpi-comp-item\">\n        <span class=\"comp-label\">DoD</span>\n        <span class=\"comp-value negative\">-1.8%</span>\n      </div>\n      <div class=\"kpi-comp-item\">\n        <span class=\"comp-label\">WoW</span>\n        <span class=\"comp-value negative\">-4.2%</span>\n      </div>\n      <div class=\"kpi-comp-item\">\n        <span class=\"comp-label\">MoM</span>\n        <span class=\"comp-value negative\">-9.6%</span>\n      </div>\n    </div>\n  </div>\n</div>",
+        "defaultContent": "Loading KPIs...",
+        "editor": {
+          "language": "html",
+          "height": 300
+        },
+        "styles": ".kpi-dock {\n  display: flex;\n  gap: 0;\n  background: #ffffff;\n  border-radius: 12px;\n  overflow: hidden;\n  box-shadow: 0 1px 3px rgba(0,0,0,0.08);\n}\n.kpi-card {\n  flex: 1;\n  padding: 16px 24px;\n  border-right: 1px solid rgba(0,0,0,0.08);\n  transition: background 0.15s;\n}\n.kpi-card:last-child {\n  border-right: none;\n}\n.kpi-card:hover {\n  background: #f5f6f7;\n}\n.kpi-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  margin-bottom: 4px;\n}\n.kpi-label {\n  font-size: 10px;\n  color: rgba(0,0,0,0.6);\n  font-weight: 500;\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n  font-family: 'Roboto', sans-serif;\n}\n.kpi-value {\n  font-size: 28px;\n  font-weight: 700;\n  color: rgba(0,0,0,0.87);\n  font-family: 'Roboto Mono', monospace;\n  line-height: 1.1;\n}\n.kpi-subtext {\n  display: flex;\n  align-items: center;\n  gap: 16px;\n  margin-top: 4px;\n}\n.kpi-sub-item {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  font-size: 10px;\n}\n.sub-dot {\n  width: 6px;\n  height: 6px;\n  border-radius: 50%;\n}\n.sub-dot.errored { background: #c75050; }\n.sub-dot.degraded { background: #d4a044; }\n.sub-value {\n  font-weight: 600;\n  font-family: 'Roboto Mono', monospace;\n}\n.sub-label {\n  color: rgba(0,0,0,0.6);\n}\n.kpi-comparisons {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  margin-top: 8px;\n  padding-top: 8px;\n  border-top: 1px solid rgba(0,0,0,0.06);\n}\n.kpi-comp-item {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  padding: 3px 8px;\n  background: rgba(0,0,0,0.04);\n  border-radius: 4px;\n  font-size: 11px;\n}\n.comp-label {\n  color: rgba(0,0,0,0.6);\n  font-weight: 500;\n}\n.comp-value {\n  font-weight: 600;\n  font-family: 'Roboto Mono', monospace;\n}\n.comp-value.positive { color: #5a9a5a; }\n.comp-value.negative { color: #c75050; }"
+      },
+      "transparent": true
+    },
+    {
+      "id": 4,
+      "type": "marcusolsson-dynamictext-panel",
+      "title": "Vendor Performance",
+      "gridPos": { "x": 0, "y": 7, "w": 24, "h": 10 },
+      "options": {
+        "content": "<table class=\"vendor-table\">\n  <thead>\n    <tr>\n      <th>Vendor</th>\n      <th>Total Calls</th>\n      <th>Impacted</th>\n      <th>Impact Distribution</th>\n      <th>Agents Affected</th>\n      <th>Trend (WoW)</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>\n        <div class=\"vendor-info\">\n          <div class=\"vendor-logo\" style=\"background: linear-gradient(135deg, #5c7a99, #3d5a73);\">VA</div>\n          <div class=\"vendor-details\">\n            <h4>Vendor A - TechCorp</h4>\n            <span>North America • 12 Locations</span>\n          </div>\n        </div>\n      </td>\n      <td>\n        <div class=\"metric-value\">18,420</div>\n        <div class=\"metric-sub\">38.5% of total</div>\n      </td>\n      <td>\n        <div class=\"metric-value\">486</div>\n        <div class=\"metric-sub\">98 errored • 388 degraded</div>\n      </td>\n      <td>\n        <div class=\"impact-bar\">\n          <div class=\"impact-track\">\n            <div class=\"impact-errored\" style=\"width: 20%;\"></div>\n            <div class=\"impact-degraded\" style=\"width: 32%;\"></div>\n            <div class=\"impact-healthy\" style=\"width: 48%;\"></div>\n          </div>\n          <span class=\"impact-pct\">2.6%</span>\n        </div>\n      </td>\n      <td>\n        <div class=\"metric-value\">892</div>\n        <div class=\"metric-sub\">35.9% of vendor agents</div>\n      </td>\n      <td>\n        <span class=\"trend-badge negative\">↓ -8.2%</span>\n      </td>\n    </tr>\n    <tr>\n      <td>\n        <div class=\"vendor-info\">\n          <div class=\"vendor-logo\" style=\"background: linear-gradient(135deg, #8b7aa8, #6b5a88);\">VB</div>\n          <div class=\"vendor-details\">\n            <h4>Vendor B - CloudNet</h4>\n            <span>Europe • 8 Locations</span>\n          </div>\n        </div>\n      </td>\n      <td>\n        <div class=\"metric-value\">14,256</div>\n        <div class=\"metric-sub\">29.8% of total</div>\n      </td>\n      <td>\n        <div class=\"metric-value\">412</div>\n        <div class=\"metric-sub\">82 errored • 330 degraded</div>\n      </td>\n      <td>\n        <div class=\"impact-bar\">\n          <div class=\"impact-track\">\n            <div class=\"impact-errored\" style=\"width: 18%;\"></div>\n            <div class=\"impact-degraded\" style=\"width: 28%;\"></div>\n            <div class=\"impact-healthy\" style=\"width: 54%;\"></div>\n          </div>\n          <span class=\"impact-pct\">2.9%</span>\n        </div>\n      </td>\n      <td>\n        <div class=\"metric-value\">756</div>\n        <div class=\"metric-sub\">31.2% of vendor agents</div>\n      </td>\n      <td>\n        <span class=\"trend-badge positive\">↑ +3.5%</span>\n      </td>\n    </tr>\n    <tr>\n      <td>\n        <div class=\"vendor-info\">\n          <div class=\"vendor-logo\" style=\"background: linear-gradient(135deg, #5a8abf, #3d6a9f);\">VC</div>\n          <div class=\"vendor-details\">\n            <h4>Vendor C - DataFlow</h4>\n            <span>Asia Pacific • 6 Locations</span>\n          </div>\n        </div>\n      </td>\n      <td>\n        <div class=\"metric-value\">9,847</div>\n        <div class=\"metric-sub\">20.6% of total</div>\n      </td>\n      <td>\n        <div class=\"metric-value\">234</div>\n        <div class=\"metric-sub\">45 errored • 189 degraded</div>\n      </td>\n      <td>\n        <div class=\"impact-bar\">\n          <div class=\"impact-track\">\n            <div class=\"impact-errored\" style=\"width: 15%;\"></div>\n            <div class=\"impact-degraded\" style=\"width: 25%;\"></div>\n            <div class=\"impact-healthy\" style=\"width: 60%;\"></div>\n          </div>\n          <span class=\"impact-pct\">2.4%</span>\n        </div>\n      </td>\n      <td>\n        <div class=\"metric-value\">523</div>\n        <div class=\"metric-sub\">28.4% of vendor agents</div>\n      </td>\n      <td>\n        <span class=\"trend-badge negative\">↓ -2.1%</span>\n      </td>\n    </tr>\n    <tr>\n      <td>\n        <div class=\"vendor-info\">\n          <div class=\"vendor-logo\" style=\"background: linear-gradient(135deg, #d4a044, #b48024);\">VD</div>\n          <div class=\"vendor-details\">\n            <h4>Vendor D - ConnectPro</h4>\n            <span>Latin America • 4 Locations</span>\n          </div>\n        </div>\n      </td>\n      <td>\n        <div class=\"metric-value\">5,309</div>\n        <div class=\"metric-sub\">11.1% of total</div>\n      </td>\n      <td>\n        <div class=\"metric-value\">115</div>\n        <div class=\"metric-sub\">20 errored • 95 degraded</div>\n      </td>\n      <td>\n        <div class=\"impact-bar\">\n          <div class=\"impact-track\">\n            <div class=\"impact-errored\" style=\"width: 12%;\"></div>\n            <div class=\"impact-degraded\" style=\"width: 22%;\"></div>\n            <div class=\"impact-healthy\" style=\"width: 66%;\"></div>\n          </div>\n          <span class=\"impact-pct\">2.2%</span>\n        </div>\n      </td>\n      <td>\n        <div class=\"metric-value\">316</div>\n        <div class=\"metric-sub\">24.8% of vendor agents</div>\n      </td>\n      <td>\n        <span class=\"trend-badge positive\">↑ +5.8%</span>\n      </td>\n    </tr>\n  </tbody>\n</table>",
+        "defaultContent": "Loading vendor data...",
+        "editor": {
+          "language": "html",
+          "height": 400
+        },
+        "styles": ".vendor-table {\n  width: 100%;\n  border-collapse: collapse;\n  font-family: 'Roboto', sans-serif;\n  background: #ffffff;\n}\n.vendor-table th {\n  background: #f8f9fa;\n  color: rgba(0,0,0,0.87);\n  font-size: 11px;\n  font-weight: 600;\n  text-align: left;\n  padding: 12px 16px;\n  border-bottom: 1px solid rgba(0,0,0,0.08);\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n}\n.vendor-table td {\n  padding: 14px 16px;\n  border-bottom: 1px solid rgba(0,0,0,0.06);\n  font-size: 14px;\n  color: rgba(0,0,0,0.87);\n}\n.vendor-table tr:hover {\n  background: #f5f6f7;\n}\n.vendor-info {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n}\n.vendor-logo {\n  width: 40px;\n  height: 40px;\n  border-radius: 8px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: white;\n  font-weight: 700;\n  font-size: 14px;\n  flex-shrink: 0;\n}\n.vendor-details h4 {\n  font-size: 14px;\n  font-weight: 600;\n  color: rgba(0,0,0,0.87);\n  margin: 0 0 2px 0;\n}\n.vendor-details span {\n  font-size: 12px;\n  color: rgba(0,0,0,0.6);\n}\n.metric-value {\n  font-size: 16px;\n  font-weight: 700;\n  font-family: 'Roboto Mono', monospace;\n}\n.metric-sub {\n  font-size: 11px;\n  color: rgba(0,0,0,0.6);\n  margin-top: 2px;\n}\n.impact-bar {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n}\n.impact-track {\n  flex: 1;\n  height: 8px;\n  background: rgba(0,0,0,0.06);\n  border-radius: 4px;\n  overflow: hidden;\n  display: flex;\n}\n.impact-errored {\n  background: #c75050;\n  height: 100%;\n}\n.impact-degraded {\n  background: #d4a044;\n  height: 100%;\n}\n.impact-healthy {\n  background: #5a9a5a;\n  height: 100%;\n}\n.impact-pct {\n  font-size: 12px;\n  font-weight: 600;\n  font-family: 'Roboto Mono', monospace;\n  min-width: 45px;\n}\n.trend-badge {\n  display: inline-flex;\n  align-items: center;\n  gap: 4px;\n  padding: 4px 10px;\n  border-radius: 12px;\n  font-size: 12px;\n  font-weight: 600;\n}\n.trend-badge.positive {\n  background: rgba(90,154,90,0.1);\n  color: #5a9a5a;\n}\n.trend-badge.negative {\n  background: rgba(199,80,80,0.1);\n  color: #c75050;\n}"
+      },
+      "transparent": false
+    },
+    {
+      "id": 5,
+      "type": "marcusolsson-dynamictext-panel",
+      "title": "Repeat Offenders",
+      "gridPos": { "x": 0, "y": 17, "w": 24, "h": 10 },
+      "options": {
+        "content": "<div class=\"offenders-container\">\n  <div class=\"offenders-header\">\n    <div class=\"offenders-title\">\n      🔄 Repeat Offenders\n      <span style=\"font-weight: 400; color: rgba(0,0,0,0.6); font-size: 12px; margin-left: 8px;\">Agents with recurring issues</span>\n    </div>\n    <div class=\"offenders-stats\">\n      <div class=\"offenders-stat\">\n        <div class=\"offenders-stat-value\">8</div>\n        <div class=\"offenders-stat-label\">Total Offenders</div>\n      </div>\n      <div class=\"offenders-stat\">\n        <div class=\"offenders-stat-value\">3</div>\n        <div class=\"offenders-stat-label\">Severe</div>\n      </div>\n    </div>\n  </div>\n  <div class=\"offenders-grid\">\n    <div class=\"offender-card\">\n      <div class=\"offender-card-header\">\n        <div class=\"offender-avatar\">JS</div>\n        <div class=\"offender-info\">\n          <div class=\"offender-name\">John Smith</div>\n          <div class=\"offender-meta\">Vendor A • Chicago, IL</div>\n        </div>\n        <div class=\"offender-severity\">SEVERE</div>\n      </div>\n      <div class=\"offender-timeline\">\n        <div class=\"timeline-label\">📅 Last 7 Days</div>\n        <div class=\"timeline-grid\">\n          <div class=\"timeline-item errored\">E</div>\n          <div class=\"timeline-item errored\">E</div>\n          <div class=\"timeline-item degraded\">D</div>\n          <div class=\"timeline-item errored\">E</div>\n          <div class=\"timeline-item clean\">✓</div>\n          <div class=\"timeline-item degraded\">D</div>\n          <div class=\"timeline-item errored\">E</div>\n        </div>\n      </div>\n      <div class=\"offender-metrics\">\n        <div class=\"offender-metric\">\n          <div class=\"offender-metric-value error\">4</div>\n          <div class=\"offender-metric-label\">Errored</div>\n        </div>\n        <div class=\"offender-metric\">\n          <div class=\"offender-metric-value warning\">2</div>\n          <div class=\"offender-metric-label\">Degraded</div>\n        </div>\n      </div>\n    </div>\n    <div class=\"offender-card\">\n      <div class=\"offender-card-header\">\n        <div class=\"offender-avatar\">MJ</div>\n        <div class=\"offender-info\">\n          <div class=\"offender-name\">Maria Johnson</div>\n          <div class=\"offender-meta\">Vendor B • London, UK</div>\n        </div>\n        <div class=\"offender-severity\">SEVERE</div>\n      </div>\n      <div class=\"offender-timeline\">\n        <div class=\"timeline-label\">📅 Last 7 Days</div>\n        <div class=\"timeline-grid\">\n          <div class=\"timeline-item degraded\">D</div>\n          <div class=\"timeline-item errored\">E</div>\n          <div class=\"timeline-item errored\">E</div>\n          <div class=\"timeline-item degraded\">D</div>\n          <div class=\"timeline-item errored\">E</div>\n          <div class=\"timeline-item clean\">✓</div>\n          <div class=\"timeline-item degraded\">D</div>\n        </div>\n      </div>\n      <div class=\"offender-metrics\">\n        <div class=\"offender-metric\">\n          <div class=\"offender-metric-value error\">3</div>\n          <div class=\"offender-metric-label\">Errored</div>\n        </div>\n        <div class=\"offender-metric\">\n          <div class=\"offender-metric-value warning\">3</div>\n          <div class=\"offender-metric-label\">Degraded</div>\n        </div>\n      </div>\n    </div>\n    <div class=\"offender-card moderate\">\n      <div class=\"offender-card-header\">\n        <div class=\"offender-avatar\" style=\"background: #d4a044;\">RB</div>\n        <div class=\"offender-info\">\n          <div class=\"offender-name\">Robert Brown</div>\n          <div class=\"offender-meta\">Vendor C • Tokyo, JP</div>\n        </div>\n        <div class=\"offender-severity moderate\">MODERATE</div>\n      </div>\n      <div class=\"offender-timeline\">\n        <div class=\"timeline-label\">📅 Last 7 Days</div>\n        <div class=\"timeline-grid\">\n          <div class=\"timeline-item clean\">✓</div>\n          <div class=\"timeline-item degraded\">D</div>\n          <div class=\"timeline-item degraded\">D</div>\n          <div class=\"timeline-item clean\">✓</div>\n          <div class=\"timeline-item degraded\">D</div>\n          <div class=\"timeline-item clean\">✓</div>\n          <div class=\"timeline-item degraded\">D</div>\n        </div>\n      </div>\n      <div class=\"offender-metrics\">\n        <div class=\"offender-metric\">\n          <div class=\"offender-metric-value error\">0</div>\n          <div class=\"offender-metric-label\">Errored</div>\n        </div>\n        <div class=\"offender-metric\">\n          <div class=\"offender-metric-value warning\">4</div>\n          <div class=\"offender-metric-label\">Degraded</div>\n        </div>\n      </div>\n    </div>\n    <div class=\"offender-card moderate\">\n      <div class=\"offender-card-header\">\n        <div class=\"offender-avatar\" style=\"background: #d4a044;\">ED</div>\n        <div class=\"offender-info\">\n          <div class=\"offender-name\">Emily Davis</div>\n          <div class=\"offender-meta\">Vendor D • São Paulo, BR</div>\n        </div>\n        <div class=\"offender-severity moderate\">MODERATE</div>\n      </div>\n      <div class=\"offender-timeline\">\n        <div class=\"timeline-label\">📅 Last 7 Days</div>\n        <div class=\"timeline-grid\">\n          <div class=\"timeline-item degraded\">D</div>\n          <div class=\"timeline-item clean\">✓</div>\n          <div class=\"timeline-item degraded\">D</div>\n          <div class=\"timeline-item errored\">E</div>\n          <div class=\"timeline-item clean\">✓</div>\n          <div class=\"timeline-item degraded\">D</div>\n          <div class=\"timeline-item clean\">✓</div>\n        </div>\n      </div>\n      <div class=\"offender-metrics\">\n        <div class=\"offender-metric\">\n          <div class=\"offender-metric-value error\">1</div>\n          <div class=\"offender-metric-label\">Errored</div>\n        </div>\n        <div class=\"offender-metric\">\n          <div class=\"offender-metric-value warning\">3</div>\n          <div class=\"offender-metric-label\">Degraded</div>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>",
+        "defaultContent": "Loading repeat offenders...",
+        "editor": {
+          "language": "html",
+          "height": 500
+        },
+        "styles": ".offenders-container {\n  background: #ffffff;\n  border-radius: 12px;\n  overflow: hidden;\n}\n.offenders-header {\n  padding: 16px 24px;\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  border-bottom: 1px solid rgba(0,0,0,0.06);\n  background: #ffffff;\n}\n.offenders-title {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  font-size: 16px;\n  font-weight: 700;\n  color: #c75050;\n  font-family: 'Roboto', sans-serif;\n}\n.offenders-stats {\n  display: flex;\n  align-items: center;\n  gap: 24px;\n}\n.offenders-stat {\n  text-align: center;\n}\n.offenders-stat-value {\n  font-size: 20px;\n  font-weight: 800;\n  font-family: 'Roboto Mono', monospace;\n  color: #c75050;\n}\n.offenders-stat-label {\n  font-size: 10px;\n  color: rgba(0,0,0,0.6);\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n}\n.offenders-grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));\n  gap: 16px;\n  padding: 24px;\n}\n.offender-card {\n  background: #f5f6f7;\n  border-radius: 8px;\n  padding: 16px;\n  border-left: 4px solid #c75050;\n  transition: all 0.15s;\n}\n.offender-card:hover {\n  box-shadow: 0 2px 8px rgba(0,0,0,0.08);\n  transform: translateY(-2px);\n}\n.offender-card.moderate {\n  border-left-color: #d4a044;\n}\n.offender-card-header {\n  display: flex;\n  align-items: flex-start;\n  gap: 12px;\n  margin-bottom: 12px;\n}\n.offender-avatar {\n  width: 44px;\n  height: 44px;\n  border-radius: 50%;\n  background: #c75050;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: white;\n  font-weight: 700;\n  font-size: 14px;\n  flex-shrink: 0;\n}\n.offender-info {\n  flex: 1;\n  min-width: 0;\n}\n.offender-name {\n  font-weight: 600;\n  color: rgba(0,0,0,0.87);\n  margin-bottom: 2px;\n  font-family: 'Roboto', sans-serif;\n}\n.offender-meta {\n  font-size: 12px;\n  color: rgba(0,0,0,0.6);\n}\n.offender-severity {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  padding: 4px 10px;\n  border-radius: 12px;\n  font-size: 10px;\n  font-weight: 700;\n  background: transparent;\n  color: #c75050;\n  border: 2px solid #c75050;\n}\n.offender-severity.moderate {\n  color: #d4a044;\n  border-color: #d4a044;\n}\n.offender-timeline {\n  margin-top: 12px;\n  padding-top: 12px;\n  border-top: 1px dashed rgba(0,0,0,0.1);\n}\n.timeline-label {\n  font-size: 10px;\n  color: rgba(0,0,0,0.6);\n  margin-bottom: 6px;\n  display: flex;\n  align-items: center;\n  gap: 4px;\n}\n.timeline-grid {\n  display: flex;\n  gap: 4px;\n}\n.timeline-item {\n  flex: 1;\n  height: 28px;\n  border-radius: 4px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 10px;\n  font-weight: 700;\n  background: transparent;\n}\n.timeline-item.errored {\n  color: #c75050;\n  border: 2px solid #c75050;\n}\n.timeline-item.degraded {\n  color: #d4a044;\n  border: 2px solid #d4a044;\n}\n.timeline-item.clean {\n  color: #5a9a5a;\n  border: 2px solid #5a9a5a;\n}\n.timeline-item.no-data {\n  background: rgba(0,0,0,0.06);\n  color: rgba(0,0,0,0.38);\n}\n.offender-metrics {\n  display: flex;\n  gap: 16px;\n  margin-top: 12px;\n}\n.offender-metric {\n  flex: 1;\n  text-align: center;\n  padding: 8px;\n  background: #ffffff;\n  border-radius: 4px;\n}\n.offender-metric-value {\n  font-size: 14px;\n  font-weight: 800;\n  font-family: 'Roboto Mono', monospace;\n}\n.offender-metric-value.error {\n  color: #c75050;\n}\n.offender-metric-value.warning {\n  color: #d4a044;\n}\n.offender-metric-label {\n  font-size: 10px;\n  color: rgba(0,0,0,0.6);\n}"
+      },
+      "transparent": false
+    },
+    {
+      "id": 6,
+      "type": "marcusolsson-dynamictext-panel",
+      "title": "Agent Performance Table",
+      "gridPos": { "x": 0, "y": 27, "w": 24, "h": 10 },
+      "options": {
+        "content": "<table class=\"agent-table\">\n  <thead>\n    <tr>\n      <th>Agent</th>\n      <th>Vendor</th>\n      <th>Location</th>\n      <th>Status</th>\n      <th>Total Calls</th>\n      <th>Errored</th>\n      <th>Degraded</th>\n      <th>Impact Rate</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>\n        <div class=\"agent-info\">\n          <div class=\"agent-avatar\">JS</div>\n          <div>\n            <div class=\"agent-name\">John Smith</div>\n            <div class=\"agent-id\">AGT-001234</div>\n          </div>\n        </div>\n      </td>\n      <td>Vendor A - TechCorp</td>\n      <td>Chicago, IL</td>\n      <td><span class=\"status-badge errored\">Errored</span></td>\n      <td class=\"metric-mono\">156</td>\n      <td class=\"metric-mono metric-error\">12</td>\n      <td class=\"metric-mono metric-warning\">8</td>\n      <td class=\"metric-mono metric-error\">12.8%</td>\n    </tr>\n    <tr>\n      <td>\n        <div class=\"agent-info\">\n          <div class=\"agent-avatar\" style=\"background: #8b7aa8;\">MJ</div>\n          <div>\n            <div class=\"agent-name\">Maria Johnson</div>\n            <div class=\"agent-id\">AGT-001456</div>\n          </div>\n        </div>\n      </td>\n      <td>Vendor B - CloudNet</td>\n      <td>London, UK</td>\n      <td><span class=\"status-badge errored\">Errored</span></td>\n      <td class=\"metric-mono\">142</td>\n      <td class=\"metric-mono metric-error\">9</td>\n      <td class=\"metric-mono metric-warning\">11</td>\n      <td class=\"metric-mono metric-error\">14.1%</td>\n    </tr>\n    <tr>\n      <td>\n        <div class=\"agent-info\">\n          <div class=\"agent-avatar\" style=\"background: #5a8abf;\">RB</div>\n          <div>\n            <div class=\"agent-name\">Robert Brown</div>\n            <div class=\"agent-id\">AGT-001789</div>\n          </div>\n        </div>\n      </td>\n      <td>Vendor C - DataFlow</td>\n      <td>Tokyo, JP</td>\n      <td><span class=\"status-badge degraded\">Degraded</span></td>\n      <td class=\"metric-mono\">198</td>\n      <td class=\"metric-mono metric-error\">2</td>\n      <td class=\"metric-mono metric-warning\">15</td>\n      <td class=\"metric-mono metric-warning\">8.6%</td>\n    </tr>\n    <tr>\n      <td>\n        <div class=\"agent-info\">\n          <div class=\"agent-avatar\" style=\"background: #d4a044;\">ED</div>\n          <div>\n            <div class=\"agent-name\">Emily Davis</div>\n            <div class=\"agent-id\">AGT-002012</div>\n          </div>\n        </div>\n      </td>\n      <td>Vendor D - ConnectPro</td>\n      <td>São Paulo, BR</td>\n      <td><span class=\"status-badge degraded\">Degraded</span></td>\n      <td class=\"metric-mono\">167</td>\n      <td class=\"metric-mono metric-error\">3</td>\n      <td class=\"metric-mono metric-warning\">12</td>\n      <td class=\"metric-mono metric-warning\">9.0%</td>\n    </tr>\n    <tr>\n      <td>\n        <div class=\"agent-info\">\n          <div class=\"agent-avatar\" style=\"background: #5a9a5a;\">AW</div>\n          <div>\n            <div class=\"agent-name\">Alex Wilson</div>\n            <div class=\"agent-id\">AGT-002345</div>\n          </div>\n        </div>\n      </td>\n      <td>Vendor A - TechCorp</td>\n      <td>New York, NY</td>\n      <td><span class=\"status-badge healthy\">Healthy</span></td>\n      <td class=\"metric-mono\">203</td>\n      <td class=\"metric-mono\">0</td>\n      <td class=\"metric-mono metric-warning\">4</td>\n      <td class=\"metric-mono\">2.0%</td>\n    </tr>\n  </tbody>\n</table>",
+        "defaultContent": "Loading agent data...",
+        "editor": {
+          "language": "html",
+          "height": 400
+        },
+        "styles": ".agent-table {\n  width: 100%;\n  border-collapse: collapse;\n  font-family: 'Roboto', sans-serif;\n  background: #ffffff;\n}\n.agent-table th {\n  background: #f8f9fa;\n  color: rgba(0,0,0,0.87);\n  font-size: 11px;\n  font-weight: 600;\n  text-align: left;\n  padding: 12px 16px;\n  border-bottom: 1px solid rgba(0,0,0,0.08);\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n}\n.agent-table td {\n  padding: 12px 16px;\n  border-bottom: 1px solid rgba(0,0,0,0.06);\n  font-size: 13px;\n  color: rgba(0,0,0,0.87);\n}\n.agent-table tr:hover {\n  background: #f5f6f7;\n}\n.agent-info {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n}\n.agent-avatar {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background: #5c7a99;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: white;\n  font-weight: 600;\n  font-size: 11px;\n  flex-shrink: 0;\n}\n.agent-name {\n  font-weight: 500;\n}\n.agent-id {\n  font-size: 11px;\n  color: rgba(0,0,0,0.6);\n}\n.status-badge {\n  display: inline-flex;\n  align-items: center;\n  padding: 4px 10px;\n  border-radius: 12px;\n  font-size: 11px;\n  font-weight: 600;\n}\n.status-badge.errored {\n  background: rgba(199,80,80,0.1);\n  color: #c75050;\n}\n.status-badge.degraded {\n  background: rgba(212,160,68,0.1);\n  color: #d4a044;\n}\n.status-badge.healthy {\n  background: rgba(90,154,90,0.1);\n  color: #5a9a5a;\n}\n.metric-mono {\n  font-family: 'Roboto Mono', monospace;\n  font-weight: 600;\n}\n.metric-error { color: #c75050; }\n.metric-warning { color: #d4a044; }"
+      },
+      "transparent": false
+    }
+  ],
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"],
+    "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
+  },
+  "timezone": "browser",
+  "title": "Call Impact Analytics Dashboard",
+  "uid": "call-impact-analytics-v1",
+  "version": 1,
+  "weekStart": ""
+}

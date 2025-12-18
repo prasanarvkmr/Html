@@ -1,0 +1,4373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call Impact Analytics Dashboard</title>
+    
+    <!-- Google Fonts - Roboto -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Round" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        /* ============================================
+           CSS CUSTOM PROPERTIES (Design Tokens)
+           ============================================ */
+        :root {
+            /* Material Design Color Palette - Subtle Tones */
+            --md-primary: #5c7a99;
+            --md-primary-light: #7a9bb8;
+            --md-primary-dark: #3d5a73;
+            --md-secondary: #8b7aa8;
+            --md-secondary-light: #a899c2;
+            --md-secondary-dark: #6b5a88;
+            
+            /* Semantic Colors - Muted */
+            --md-error: #c75050;
+            --md-error-light: #d97070;
+            --md-warning: #d4a044;
+            --md-warning-light: #e0b76a;
+            --md-success: #5a9a5a;
+            --md-success-light: #7ab87a;
+            --md-info: #5a8abf;
+            
+            /* Impact Colors - Subtle */
+            --impact-errored: #c75050;
+            --impact-errored-light: rgba(199, 80, 80, 0.08);
+            --impact-degraded: #d4a044;
+            --impact-degraded-light: rgba(212, 160, 68, 0.08);
+            --impact-healthy: #5a9a5a;
+            --impact-healthy-light: rgba(90, 154, 90, 0.08);
+            
+            /* Surface Colors */
+            --md-surface: #ffffff;
+            --md-background: #f8f9fa;
+            --md-surface-variant: #f5f6f7;
+            
+            /* Text Colors */
+            --text-primary: rgba(0, 0, 0, 0.87);
+            --text-secondary: rgba(0, 0, 0, 0.6);
+            --text-disabled: rgba(0, 0, 0, 0.38);
+            --text-inverse: #ffffff;
+            
+            /* Elevation Shadows - Subtle */
+            --md-elevation-1: 0 1px 2px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.08);
+            --md-elevation-2: 0 2px 4px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.06);
+            --md-elevation-3: 0 4px 8px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+            --md-elevation-4: 0 8px 16px rgba(0,0,0,0.08), 0 4px 8px rgba(0,0,0,0.04);
+            
+            /* Spacing Scale (8dp grid) */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-xxl: 48px;
+            
+            /* Border Radius */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --radius-full: 9999px;
+            
+            /* Typography */
+            --font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'Roboto Mono', monospace;
+            --font-size-xs: 10px;
+            --font-size-sm: 12px;
+            --font-size-body: 14px;
+            --font-size-lg: 16px;
+            --font-size-xl: 20px;
+            --font-size-h1: 32px;
+            --font-size-h2: 28px;
+            --font-size-h3: 24px;
+            --font-size-h4: 20px;
+            --font-size-h5: 18px;
+            
+            /* Transitions */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Layout */
+            --header-height: 64px;
+            --filter-bar-height: 72px;
+        }
+
+        /* ============================================
+           BASE STYLES & RESET
+           ============================================ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font-family);
+            font-size: var(--font-size-body);
+            line-height: 1.5;
+            color: var(--text-primary);
+            background: var(--md-background);
+            min-height: 100vh;
+        }
+
+        /* ============================================
+           APP BAR (TOP NAVIGATION) - Dark Blue Theme
+           ============================================ */
+        .app-bar {
+            background: #0d2137;
+            color: white;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--spacing-lg);
+            position: sticky;
+            top: 0;
+            z-index: 1100;
+        }
+
+        .app-bar-section {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .app-bar-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4fc3f7;
+        }
+
+        .brand-icon .material-icons-outlined {
+            font-size: 22px;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            line-height: 1.2;
+        }
+
+        .brand-tagline {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 400;
+        }
+
+        .app-bar-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .portal-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: white;
+            letter-spacing: 0.3px;
+        }
+
+        .app-bar-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            border: none;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-fast);
+        }
+
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: 4px 8px 4px 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            margin-left: var(--spacing-sm);
+        }
+
+        .user-profile:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-full);
+            background: #4fc3f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d2137;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: white;
+        }
+
+        .user-role {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Sub Navigation Bar */
+        .sub-nav-bar {
+            background: #1a3a5c;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--spacing-lg);
+            position: sticky;
+            top: 56px;
+            z-index: 1000;
+        }
+
+        .sub-nav-tabs {
+            display: flex;
+            gap: 0;
+        }
+
+        .sub-nav-tab {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-md) var(--spacing-lg);
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            border: none;
+            background: transparent;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .sub-nav-tab:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sub-nav-tab.active {
+            color: white;
+            border-bottom-color: #4fc3f7;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .sub-nav-tab .material-icons-outlined {
+            font-size: 18px;
+        }
+
+        .sub-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .sub-nav-actions .icon-btn {
+            width: 32px;
+            height: 32px;
+        }
+
+        .sub-nav-actions .icon-btn .material-icons-outlined {
+            font-size: 20px;
+        }
+
+        /* ============================================
+           LAYOUT STRUCTURE
+           ============================================ */
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: var(--spacing-lg);
+            max-width: 1920px;
+            margin: 0 auto;
+            width: 100%;
+            overflow-y: auto;
+        }
+
+        /* ============================================
+           COMMON COMPONENTS
+           ============================================ */
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-family);
+            font-size: var(--font-size-body);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--md-primary);
+            color: var(--text-inverse);
+        }
+
+        .btn-primary:hover {
+            background: var(--md-primary-dark);
+        }
+
+        .btn-outlined {
+            background: transparent;
+            border: 1px solid rgba(0, 0, 0, 0.23);
+            color: var(--text-primary);
+        }
+
+        .btn-outlined:hover {
+            background: rgba(0, 0, 0, 0.04);
+            border-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-text {
+            background: transparent;
+            color: var(--md-primary);
+        }
+
+        .btn-text:hover {
+            background: rgba(25, 118, 210, 0.08);
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border-radius: var(--radius-full);
+        }
+
+        .btn-icon-sm {
+            width: 32px;
+            height: 32px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        .form-label {
+            font-size: var(--font-size-xs);
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-select {
+            appearance: none;
+            background: var(--md-surface);
+            border: 1px solid rgba(0, 0, 0, 0.23);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-sm) var(--spacing-xl) var(--spacing-sm) var(--spacing-sm);
+            font-family: var(--font-family);
+            font-size: var(--font-size-body);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='rgba(0,0,0,0.54)' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 4px center;
+            min-width: 140px;
+        }
+
+        .form-select:hover {
+            border-color: rgba(0, 0, 0, 0.87);
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--md-primary);
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--md-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--md-elevation-1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: var(--font-size-lg);
+            font-weight: 500;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .card-title .material-icons-outlined {
+            font-size: 22px;
+            color: var(--md-primary);
+        }
+
+        .card-body {
+            padding: var(--spacing-lg);
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .section-title {
+            font-size: var(--font-size-lg);
+            font-weight: 500;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .section-title .material-icons-outlined {
+            color: var(--md-primary);
+        }
+
+        /* Badges & Chips */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: 500;
+        }
+
+        .badge-error {
+            background: var(--impact-errored-light);
+            color: var(--impact-errored);
+        }
+
+        .badge-warning {
+            background: var(--impact-degraded-light);
+            color: var(--impact-degraded);
+        }
+
+        .badge-success {
+            background: var(--impact-healthy-light);
+            color: var(--impact-healthy);
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            background: rgba(0, 0, 0, 0.08);
+            color: var(--text-primary);
+        }
+
+        .chip .material-icons {
+            font-size: 16px;
+        }
+
+        /* Dividers */
+        .divider {
+            height: 1px;
+            background: rgba(0, 0, 0, 0.08);
+            margin: var(--spacing-md) 0;
+        }
+
+        .divider-vertical {
+            width: 1px;
+            height: 32px;
+            background: rgba(0, 0, 0, 0.12);
+        }
+
+        /* Loading States */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: var(--radius-sm);
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Expand/Collapse Indicator */
+        .expand-icon {
+            transition: var(--transition-fast);
+        }
+
+        .expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Trend Indicators */
+        .trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+        }
+
+        .trend .material-icons {
+            font-size: 16px;
+        }
+
+        .trend.up {
+            color: var(--md-success);
+        }
+
+        .trend.down {
+            color: var(--md-error);
+        }
+
+        .trend.neutral {
+            color: var(--text-secondary);
+        }
+
+        /* Comparison Labels (DOD, WOW, MOM) */
+        .comparison-label {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: var(--spacing-xs);
+        }
+
+        /* Tooltips */
+        [data-tooltip] {
+            position: relative;
+        }
+
+        [data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background: rgba(0, 0, 0, 0.87);
+            color: white;
+            font-size: var(--font-size-sm);
+            border-radius: var(--radius-sm);
+            white-space: nowrap;
+            z-index: 1000;
+            margin-bottom: 4px;
+        }
+
+        /* Task 2: Filter Bar Styles */
+        .filter-bar {
+            background: var(--md-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--md-elevation-1);
+            padding: var(--spacing-md) var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            align-items: flex-end;
+            gap: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+            min-width: 160px;
+        }
+
+        .filter-group.location-group {
+            min-width: 300px;
+        }
+
+        .filter-group.date-range-group {
+            min-width: 220px;
+        }
+
+        .filter-group.date-range-group .filter-select {
+            min-width: 220px;
+        }
+
+        .filter-label {
+            font-size: var(--font-size-xs);
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-select {
+            appearance: none;
+            background: var(--md-surface);
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: var(--radius-sm);
+            padding: 8px 32px 8px 12px;
+            font-family: var(--font-family);
+            font-size: var(--font-size-sm);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='rgba(0,0,0,0.54)' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 4px center;
+            min-width: 100%;
+        }
+
+        .filter-select:hover {
+            border-color: var(--md-primary);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--md-primary);
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.15);
+        }
+
+        /* Location Cascading Filter */
+        .location-filters {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .location-filters .filter-select {
+            min-width: 140px;
+        }
+
+        .location-filters .filter-select:disabled {
+            background-color: var(--md-surface-variant);
+            color: var(--text-disabled);
+            cursor: not-allowed;
+        }
+
+        /* Comparison Badge in Filter */
+        .comparison-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            background: #e3f2fd;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-xs);
+            color: var(--md-primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: auto;
+        }
+
+        .comparison-badge .material-icons {
+            font-size: 14px;
+        }
+
+        /* Task 3: KPI Dock Styles - Clean Executive Style */
+        .kpi-dock {
+            display: flex;
+            gap: 0;
+            background: var(--md-surface);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--md-elevation-1);
+        }
+
+        .kpi-card {
+            flex: 1;
+            background: var(--md-surface);
+            padding: var(--spacing-md) var(--spacing-lg);
+            position: relative;
+            transition: var(--transition-fast);
+            min-width: 200px;
+            border-right: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .kpi-card:last-child {
+            border-right: none;
+        }
+
+        .kpi-card:hover {
+            background: var(--md-surface-variant);
+        }
+
+        .kpi-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .kpi-label {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-trend {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .kpi-trend.positive {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .kpi-trend.negative {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .kpi-trend.neutral {
+            background: rgba(0, 0, 0, 0.06);
+            color: var(--text-secondary);
+        }
+
+        .kpi-trend .material-icons {
+            font-size: 14px;
+        }
+
+        .kpi-body {
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.1;
+            font-family: var(--font-mono);
+        }
+
+        .kpi-value .kpi-unit {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .kpi-subtext {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-xs);
+        }
+
+        .kpi-sub-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: var(--font-size-xs);
+        }
+
+        .kpi-sub-item .sub-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .kpi-sub-item .sub-dot.errored {
+            background: var(--impact-errored);
+        }
+
+        .kpi-sub-item .sub-dot.degraded {
+            background: var(--impact-degraded);
+        }
+
+        .kpi-sub-item .sub-value {
+            font-weight: 600;
+            font-family: var(--font-mono);
+        }
+
+        .kpi-sub-item .sub-label {
+            color: var(--text-secondary);
+        }
+
+        /* KPI Comparisons (DoD, WoW, MoM) */
+        .kpi-comparisons {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-sm);
+            padding-top: var(--spacing-sm);
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .kpi-comp-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            background: rgba(0, 0, 0, 0.04);
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+        }
+
+        .kpi-comp-item .comp-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .kpi-comp-item .comp-value {
+            font-weight: 600;
+            font-family: var(--font-mono);
+        }
+
+        .kpi-comp-item.positive .comp-value {
+            color: #5a9a5a;
+        }
+
+        .kpi-comp-item.negative .comp-value {
+            color: #c75050;
+        }
+
+        .kpi-comp-item.neutral .comp-value {
+            color: var(--text-secondary);
+        }
+
+        /* KPI Animation */
+        @keyframes kpiPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.01); }
+            100% { transform: scale(1); }
+        }
+
+        .kpi-card.updating {
+            animation: kpiPulse 0.3s ease;
+        }
+
+        .kpi-value.counting {
+            color: var(--md-primary);
+        }
+
+        /* Task 4: Vendor Metrics Styles */
+        .vendor-section {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .vendor-section .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .vendor-grid {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .vendor-card {
+            background: var(--md-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--md-elevation-1);
+            overflow: hidden;
+            transition: var(--transition-normal);
+        }
+
+        .vendor-card:hover {
+            box-shadow: var(--md-elevation-2);
+        }
+
+        .vendor-card-header {
+            padding: var(--spacing-md) var(--spacing-lg);
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 60px;
+            align-items: center;
+            gap: var(--spacing-md);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .vendor-card-header:hover {
+            background: var(--md-surface-variant);
+        }
+
+        .vendor-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .vendor-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            background: var(--md-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: var(--font-size-lg);
+        }
+
+        .vendor-details h4 {
+            font-size: var(--font-size-body);
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .vendor-details .vendor-meta {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        .vendor-metric {
+            text-align: center;
+        }
+
+        .vendor-metric-label {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .vendor-metric-value {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+        }
+
+        .vendor-metric-value.errored {
+            color: var(--impact-errored);
+        }
+
+        .vendor-metric-value.degraded {
+            color: var(--impact-degraded);
+        }
+
+        .vendor-metric-value.agents {
+            color: var(--md-secondary);
+        }
+
+        /* Vendor Trend */
+        .vendor-trend {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+        }
+
+        .vendor-trend.improving {
+            color: var(--impact-healthy);
+        }
+
+        .vendor-trend.declining {
+            color: var(--impact-errored);
+        }
+
+        .vendor-trend .material-icons {
+            font-size: 18px;
+        }
+
+        /* Expand Button */
+        .vendor-expand-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-fast);
+        }
+
+        .vendor-expand-btn:hover {
+            background: rgba(0, 0, 0, 0.08);
+            color: var(--text-primary);
+        }
+
+        .vendor-expand-btn .material-icons {
+            transition: var(--transition-fast);
+        }
+
+        .vendor-card.expanded .vendor-expand-btn .material-icons {
+            transform: rotate(180deg);
+        }
+
+        /* Vendor Card Body (Location Breakdown) */
+        .vendor-card-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height var(--transition-normal);
+            background: var(--md-surface-variant);
+        }
+
+        .vendor-card.expanded .vendor-card-body {
+            max-height: 500px;
+        }
+
+        .location-breakdown {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .location-breakdown-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .location-breakdown-header .material-icons-outlined {
+            font-size: 18px;
+            color: var(--md-primary);
+        }
+
+        .location-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .location-table th,
+        .location-table td {
+            padding: var(--spacing-sm) var(--spacing-md);
+            text-align: left;
+            font-size: var(--font-size-sm);
+        }
+
+        .location-table th {
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: var(--font-size-xs);
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .location-table td {
+            color: var(--text-primary);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .location-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .location-table .continent-row {
+            background: rgba(25, 118, 210, 0.04);
+        }
+
+        .location-table .continent-row td {
+            font-weight: 500;
+        }
+
+        .location-table .country-row td:first-child {
+            padding-left: var(--spacing-xl);
+        }
+
+        .location-table .metric-cell {
+            font-family: var(--font-mono);
+            text-align: right;
+        }
+
+        .location-table .metric-cell.error {
+            color: var(--impact-errored);
+        }
+
+        /* Task 5: Agent Table Styles */
+        .agent-section {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .agent-table-container {
+            background: var(--md-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--md-elevation-1);
+            overflow: hidden;
+        }
+
+        .agent-table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .agent-table-title {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: var(--font-size-lg);
+            font-weight: 500;
+        }
+
+        .agent-table-title .material-icons-outlined {
+            color: var(--md-primary);
+        }
+
+        .agent-table-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .agent-search {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--md-surface-variant);
+            border-radius: var(--radius-full);
+            border: 1px solid transparent;
+            transition: var(--transition-fast);
+        }
+
+        .agent-search:focus-within {
+            background: var(--md-surface);
+            border-color: var(--md-primary);
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        }
+
+        .agent-search .material-icons-outlined {
+            color: var(--text-secondary);
+            font-size: 20px;
+        }
+
+        .agent-search input {
+            border: none;
+            background: transparent;
+            font-family: var(--font-family);
+            font-size: var(--font-size-body);
+            color: var(--text-primary);
+            outline: none;
+            width: 200px;
+        }
+
+        .agent-search input::placeholder {
+            color: var(--text-disabled);
+        }
+
+        /* Agent Table */
+        .agent-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .agent-table th {
+            padding: var(--spacing-sm) var(--spacing-md);
+            text-align: left;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--md-surface-variant);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            user-select: none;
+            transition: var(--transition-fast);
+        }
+
+        .agent-table th:hover {
+            background: rgba(0, 0, 0, 0.06);
+        }
+
+        .agent-table th .sort-icon {
+            font-size: 16px;
+            vertical-align: middle;
+            margin-left: 4px;
+            opacity: 0.5;
+        }
+
+        .agent-table th.sorted .sort-icon {
+            opacity: 1;
+            color: var(--md-primary);
+        }
+
+        .agent-table td {
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-size: var(--font-size-body);
+            color: var(--text-primary);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            vertical-align: middle;
+        }
+
+        .agent-table tbody tr {
+            transition: var(--transition-fast);
+        }
+
+        .agent-table tbody tr:hover {
+            background: rgba(25, 118, 210, 0.04);
+        }
+
+        .agent-table tbody tr.expanded {
+            background: rgba(25, 118, 210, 0.06);
+        }
+
+        /* Agent Info Cell */
+        .agent-info-cell {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .agent-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            background: var(--md-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: var(--font-size-sm);
+        }
+
+        .agent-name-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .agent-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .agent-email {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+        }
+
+        .status-badge.critical {
+            background: var(--impact-errored-light);
+            color: var(--impact-errored);
+        }
+
+        .status-badge.warning {
+            background: var(--impact-degraded-light);
+            color: var(--impact-degraded);
+        }
+
+        .status-badge.healthy {
+            background: var(--impact-healthy-light);
+            color: var(--impact-healthy);
+        }
+
+        /* Metric Cell */
+        .metric-value {
+            font-family: var(--font-mono);
+            font-weight: 500;
+        }
+
+        .metric-value.error {
+            color: var(--impact-errored);
+        }
+
+        .metric-value.warning {
+            color: var(--impact-degraded);
+        }
+
+        /* Expand Row Button */
+        .expand-row-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-full);
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-fast);
+        }
+
+        .expand-row-btn:hover {
+            background: rgba(0, 0, 0, 0.08);
+            color: var(--md-primary);
+        }
+
+        .expand-row-btn .material-icons {
+            font-size: 20px;
+            transition: var(--transition-fast);
+        }
+
+        tr.expanded .expand-row-btn .material-icons {
+            transform: rotate(180deg);
+        }
+
+        /* Expanded Call Details Row */
+        .call-details-row {
+            display: none;
+        }
+
+        .call-details-row.visible {
+            display: table-row;
+        }
+
+        .call-details-row td {
+            padding: 0;
+            background: var(--md-surface-variant);
+        }
+
+        .call-details-container {
+            padding: var(--spacing-md) var(--spacing-lg);
+        }
+
+        .call-details-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .call-details-header .material-icons-outlined {
+            font-size: 18px;
+            color: var(--md-primary);
+        }
+
+        .call-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: var(--spacing-sm);
+        }
+
+        .call-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--md-surface);
+            border-radius: var(--radius-md);
+            border-left: 3px solid var(--text-disabled);
+        }
+
+        .call-item.errored {
+            border-left-color: var(--impact-errored);
+        }
+
+        .call-item.degraded {
+            border-left-color: var(--impact-degraded);
+        }
+
+        .call-item.healthy {
+            border-left-color: var(--impact-healthy);
+        }
+
+        .call-item-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .call-item.errored .call-item-icon {
+            background: var(--impact-errored-light);
+            color: var(--impact-errored);
+        }
+
+        .call-item.degraded .call-item-icon {
+            background: var(--impact-degraded-light);
+            color: var(--impact-degraded);
+        }
+
+        .call-item.healthy .call-item-icon {
+            background: var(--impact-healthy-light);
+            color: var(--impact-healthy);
+        }
+
+        .call-item-icon .material-icons {
+            font-size: 16px;
+        }
+
+        .call-item-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .call-item-id {
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            font-family: var(--font-mono);
+        }
+
+        .call-item-meta {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+        }
+
+        .call-item-duration {
+            font-size: var(--font-size-sm);
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+        }
+
+        /* Pagination */
+        .table-pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .pagination-info {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .pagination-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            background: var(--md-surface);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-fast);
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: var(--md-surface-variant);
+            border-color: var(--md-primary);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-btn.active {
+            background: var(--md-primary);
+            border-color: var(--md-primary);
+            color: white;
+        }
+
+        /* Task 6: Threshold Tables Styles */
+        .threshold-section {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .threshold-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-lg);
+        }
+
+        @media (max-width: 1200px) {
+            .threshold-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .threshold-card {
+            background: var(--md-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--md-elevation-1);
+            overflow: hidden;
+        }
+
+        .threshold-card-header {
+            padding: var(--spacing-md) var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .threshold-card.errored .threshold-card-header {
+            background: var(--impact-errored-light);
+        }
+
+        .threshold-card.degraded .threshold-card-header {
+            background: var(--impact-degraded-light);
+        }
+
+        .threshold-title {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: var(--font-size-body);
+            font-weight: 600;
+        }
+
+        .threshold-card.errored .threshold-title {
+            color: var(--impact-errored);
+        }
+
+        .threshold-card.degraded .threshold-title {
+            color: var(--impact-degraded);
+        }
+
+        .threshold-title .material-icons-outlined {
+            font-size: 22px;
+        }
+
+        .threshold-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+        }
+
+        .threshold-card.errored .threshold-badge {
+            background: var(--impact-errored);
+            color: white;
+        }
+
+        .threshold-card.degraded .threshold-badge {
+            background: var(--impact-degraded);
+            color: white;
+        }
+
+        .threshold-info {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background: var(--md-surface-variant);
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .threshold-info .material-icons-outlined {
+            font-size: 16px;
+            color: var(--md-primary);
+        }
+
+        .threshold-list {
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .threshold-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .threshold-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .threshold-list::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+
+        .threshold-item {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            transition: var(--transition-fast);
+        }
+
+        .threshold-item:hover {
+            background: var(--md-surface-variant);
+        }
+
+        .threshold-item:last-child {
+            border-bottom: none;
+        }
+
+        .threshold-item-rank {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-sm);
+            font-weight: 700;
+            margin-right: var(--spacing-sm);
+        }
+
+        .threshold-card.errored .threshold-item-rank {
+            background: var(--impact-errored-light);
+            color: var(--impact-errored);
+        }
+
+        .threshold-card.degraded .threshold-item-rank {
+            background: var(--impact-degraded-light);
+            color: var(--impact-degraded);
+        }
+
+        .threshold-item-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            background: #607d8b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: var(--font-size-sm);
+            margin-right: var(--spacing-sm);
+        }
+
+        .threshold-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .threshold-item-name {
+            font-weight: 500;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .threshold-item-meta {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+        }
+
+        .threshold-item-value {
+            text-align: right;
+            margin-left: var(--spacing-md);
+        }
+
+        .threshold-item-percent {
+            font-size: var(--font-size-lg);
+            font-weight: 700;
+            font-family: var(--font-mono);
+        }
+
+        .threshold-card.errored .threshold-item-percent {
+            color: var(--impact-errored);
+        }
+
+        .threshold-card.degraded .threshold-item-percent {
+            color: var(--impact-degraded);
+        }
+
+        .threshold-item-count {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+        }
+
+        .threshold-item-bar {
+            width: 60px;
+            height: 6px;
+            background: rgba(0, 0, 0, 0.08);
+            border-radius: var(--radius-full);
+            margin-left: var(--spacing-sm);
+            overflow: hidden;
+        }
+
+        .threshold-item-bar-fill {
+            height: 100%;
+            border-radius: var(--radius-full);
+            transition: width var(--transition-normal);
+        }
+
+        .threshold-card.errored .threshold-item-bar-fill {
+            background: var(--impact-errored);
+        }
+
+        .threshold-card.degraded .threshold-item-bar-fill {
+            background: var(--impact-degraded);
+        }
+
+        .threshold-empty {
+            padding: var(--spacing-xl);
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .threshold-empty .material-icons-outlined {
+            font-size: 48px;
+            margin-bottom: var(--spacing-sm);
+            opacity: 0.5;
+        }
+
+        /* Task 7: Repeat Offenders Styles */
+        .offenders-section {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .offenders-container {
+            background: var(--md-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--md-elevation-1);
+            overflow: hidden;
+        }
+
+        .offenders-header {
+            padding: var(--spacing-md) var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            background: var(--md-surface);
+        }
+
+        .offenders-title {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: var(--font-size-lg);
+            font-weight: 700;
+            color: var(--impact-errored);
+        }
+
+        .offenders-title .material-icons-outlined {
+            font-size: 24px;
+        }
+
+        .offenders-subtitle {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-left: var(--spacing-sm);
+        }
+
+        .offenders-stats {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+        }
+
+        .offenders-stat {
+            text-align: center;
+        }
+
+        .offenders-stat-value {
+            font-size: var(--font-size-xl);
+            font-weight: 800;
+            font-family: var(--font-mono);
+            color: var(--impact-errored);
+        }
+
+        .offenders-stat-label {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .offenders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: var(--spacing-md);
+            padding: var(--spacing-lg);
+        }
+
+        .offender-card {
+            background: var(--md-surface-variant);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            border-left: 4px solid var(--impact-errored);
+            transition: var(--transition-fast);
+        }
+
+        .offender-card:hover {
+            box-shadow: var(--md-elevation-2);
+            transform: translateY(-2px);
+        }
+
+        .offender-card.severe {
+            border-left-color: var(--impact-errored);
+            background: var(--md-surface-variant);
+        }
+
+        .offender-card.moderate {
+            border-left-color: var(--impact-degraded);
+            background: var(--md-surface-variant);
+        }
+
+        .offender-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .offender-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-full);
+            background: var(--impact-errored);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: var(--font-size-body);
+            flex-shrink: 0;
+        }
+
+        .offender-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .offender-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .offender-meta {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        .offender-severity {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+        }
+
+        .offender-severity.severe {
+            background: transparent;
+            color: var(--impact-errored);
+            font-weight: 700;
+            border: 2px solid var(--impact-errored);
+        }
+
+        .offender-severity.moderate {
+            background: transparent;
+            color: var(--impact-degraded);
+            font-weight: 700;
+            border: 2px solid var(--impact-degraded);
+        }
+
+        .offender-severity .material-icons {
+            font-size: 14px;
+        }
+
+        /* Timeline */
+        .offender-timeline {
+            margin-top: var(--spacing-sm);
+            padding-top: var(--spacing-sm);
+            border-top: 1px dashed rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-label {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xs);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .timeline-label .material-icons-outlined {
+            font-size: 14px;
+        }
+
+        .timeline-grid {
+            display: flex;
+            gap: 4px;
+        }
+
+        .timeline-item {
+            flex: 1;
+            height: 28px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-xs);
+            font-weight: 500;
+            transition: var(--transition-fast);
+            cursor: default;
+            position: relative;
+        }
+
+        .timeline-item.errored {
+            background: transparent;
+            color: var(--impact-errored);
+            font-weight: 700;
+            border: 2px solid var(--impact-errored);
+        }
+
+        .timeline-item.degraded {
+            background: transparent;
+            color: var(--impact-degraded);
+            font-weight: 700;
+            border: 2px solid var(--impact-degraded);
+        }
+
+        .timeline-item.clean {
+            background: transparent;
+            color: var(--impact-healthy);
+            font-weight: 700;
+            border: 2px solid var(--impact-healthy);
+        }
+
+        .timeline-item.no-data {
+            background: rgba(0, 0, 0, 0.06);
+            color: var(--text-disabled);
+        }
+
+        .timeline-item:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.87);
+            color: white;
+            font-size: var(--font-size-xs);
+            border-radius: var(--radius-sm);
+            white-space: nowrap;
+            z-index: 10;
+            margin-bottom: 4px;
+        }
+
+        /* Offender Metrics */
+        .offender-metrics {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-sm);
+        }
+
+        .offender-metric {
+            flex: 1;
+            text-align: center;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background: var(--md-surface);
+            border-radius: var(--radius-sm);
+        }
+
+        .offender-metric-value {
+            font-size: var(--font-size-body);
+            font-weight: 700;
+            font-family: var(--font-mono);
+        }
+
+        .offender-metric-value.error {
+            color: var(--impact-errored);
+            font-weight: 800;
+        }
+
+        .offender-metric-value.warning {
+            color: var(--impact-degraded);
+            font-weight: 800;
+        }
+
+        .offender-metric-label {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+        }
+
+        /* Empty State */
+        .offenders-empty {
+            padding: var(--spacing-xxl);
+            text-align: center;
+        }
+
+        .offenders-empty .material-icons-outlined {
+            font-size: 64px;
+            color: var(--impact-healthy);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .offenders-empty h3 {
+            font-size: var(--font-size-lg);
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .offenders-empty p {
+            color: var(--text-secondary);
+        }
+
+        /* Dashboard Loading/Updating States */
+        .dashboard-updating .kpi-card,
+        .dashboard-updating .vendor-card,
+        .dashboard-updating .agent-table-container,
+        .dashboard-updating .threshold-card,
+        .dashboard-updating .offenders-container {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .dashboard-updating .kpi-value,
+        .dashboard-updating .vendor-metric-value,
+        .dashboard-updating .threshold-item-percent {
+            color: var(--md-primary) !important;
+        }
+
+        /* Fade-in animation for updated content */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        /* Pulse animation for updated values */
+        @keyframes valuePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .value-updated {
+            animation: valuePulse 0.3s ease-out;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1400px) {
+            .kpi-dock {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group {
+                min-width: 100%;
+            }
+
+            .filter-group.location-group {
+                min-width: 100%;
+            }
+
+            .filter-actions {
+                margin-left: 0;
+                justify-content: flex-end;
+            }
+
+            .kpi-dock {
+                grid-template-columns: 1fr;
+            }
+
+            .vendor-card-header {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-sm);
+            }
+
+            .vendor-info {
+                margin-bottom: var(--spacing-sm);
+            }
+
+            .vendor-metric {
+                text-align: left;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .vendor-metric::before {
+                content: attr(data-label);
+                font-size: var(--font-size-xs);
+                color: var(--text-secondary);
+            }
+
+            .agent-table th,
+            .agent-table td {
+                padding: var(--spacing-xs) var(--spacing-sm);
+            }
+
+            .agent-info-cell {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .threshold-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .offenders-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .app-bar,
+            .filter-bar,
+            .filter-actions,
+            .btn,
+            .expand-row-btn,
+            .vendor-expand-btn {
+                display: none !important;
+            }
+
+            .kpi-card,
+            .vendor-card,
+            .threshold-card,
+            .offenders-container {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+
+            body {
+                background: white;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Main App Bar -->
+        <header class="app-bar">
+            <a href="#" class="app-bar-brand">
+                <div class="brand-icon">
+                    <span class="material-icons-outlined">hub</span>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">TechCorp</span>
+                    <span class="brand-tagline">Enterprise Solutions</span>
+                </div>
+            </a>
+            <div class="app-bar-center">
+                <span class="portal-name">Call Impact Analytics</span>
+            </div>
+            <div class="app-bar-actions">
+                <button class="icon-btn" title="Refresh Data" onclick="refreshDashboard()">
+                    <span class="material-icons-outlined">refresh</span>
+                </button>
+                <button class="icon-btn" title="Notifications">
+                    <span class="material-icons-outlined">notifications</span>
+                </button>
+                <div class="user-profile">
+                    <div class="user-avatar">JD</div>
+                    <div class="user-info">
+                        <span class="user-name">John Doe</span>
+                        <span class="user-role">Operations Manager</span>
+                    </div>
+                    <span class="material-icons" style="font-size: 18px; opacity: 0.7;">expand_more</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sub Navigation Bar -->
+        <div class="sub-nav-bar">
+            <div class="sub-nav-tabs">
+                <button class="sub-nav-tab active" data-tab="overview">
+                    <span class="material-icons-outlined">dashboard</span>
+                    Overview
+                </button>
+                <button class="sub-nav-tab" data-tab="vendors">
+                    <span class="material-icons-outlined">business</span>
+                    Vendors
+                </button>
+                <button class="sub-nav-tab" data-tab="agents">
+                    <span class="material-icons-outlined">support_agent</span>
+                    Agents
+                </button>
+                <button class="sub-nav-tab" data-tab="thresholds">
+                    <span class="material-icons-outlined">warning</span>
+                    Thresholds
+                </button>
+                <button class="sub-nav-tab" data-tab="offenders">
+                    <span class="material-icons-outlined">report_problem</span>
+                    Repeat Offenders
+                </button>
+            </div>
+            <div class="sub-nav-actions">
+                <button class="icon-btn" title="Export" onclick="exportDashboard()">
+                    <span class="material-icons-outlined">download</span>
+                </button>
+                <button class="icon-btn" title="Settings" onclick="openSettings()">
+                    <span class="material-icons-outlined">settings</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Task 2: Filter Bar -->
+            <section id="filterSection">
+                <div class="filter-bar">
+                    <!-- Vendor Filter -->
+                    <div class="filter-group">
+                        <label class="filter-label">Vendor</label>
+                        <select class="filter-select" id="vendorFilter" onchange="handleFilterChange()">
+                            <option value="all">All Vendors</option>
+                            <option value="Concentrix">Concentrix</option>
+                            <option value="Teleperformance">Teleperformance</option>
+                            <option value="TTEC">TTEC</option>
+                            <option value="Sitel Group">Sitel Group</option>
+                            <option value="Alorica">Alorica</option>
+                            <option value="Conduent">Conduent</option>
+                            <option value="HGS">HGS</option>
+                        </select>
+                    </div>
+
+                    <!-- Date Range Filter with Date Display -->
+                    <div class="filter-group date-range-group">
+                        <label class="filter-label">Date Range</label>
+                        <select class="filter-select date-range-select" id="dateRangeFilter" onchange="handleDateRangeChange()">
+                            <option value="yesterday">Yesterday</option>
+                            <option value="thisWeek" selected>This Week (Dec 15 - Dec 18)</option>
+                            <option value="lastWeek">Last Week</option>
+                            <option value="thisMonth">This Month</option>
+                            <option value="lastMonth">Last Month</option>
+                            <option value="thisQuarter">This Quarter</option>
+                            <option value="lastQuarter">Last Quarter</option>
+                            <option value="last3Months">Last 3 Months</option>
+                            <option value="last6Months">Last 6 Months</option>
+                        </select>
+                    </div>
+
+                    <!-- Location Filter (Cascading) -->
+                    <div class="filter-group location-group">
+                        <label class="filter-label">Location</label>
+                        <div class="location-filters">
+                            <select class="filter-select" id="continentFilter" onchange="handleContinentChange()">
+                                <option value="all">All Continents</option>
+                                <option value="North America">North America</option>
+                                <option value="Europe">Europe</option>
+                                <option value="Asia Pacific">Asia Pacific</option>
+                                <option value="Latin America">Latin America</option>
+                            </select>
+                            <select class="filter-select" id="countryFilter" onchange="handleFilterChange()" disabled>
+                                <option value="all">All Countries</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Task 3: KPI Dock -->
+            <section id="kpiSection">
+                <div class="kpi-dock">
+                    <!-- Total Calls KPI -->
+                    <div class="kpi-card" id="kpiTotalCalls">
+                        <div class="kpi-header">
+                            <div class="kpi-label">Total Calls</div>
+                        </div>
+                        <div class="kpi-body">
+                            <div class="kpi-value" id="totalCallsValue">92,847</div>
+                        </div>
+                        <div class="kpi-comparisons">
+                            <div class="kpi-comp-item positive" id="totalCallsDoD">
+                                <span class="comp-label">DoD</span>
+                                <span class="comp-value">+2.1%</span>
+                            </div>
+                            <div class="kpi-comp-item positive" id="totalCallsWoW">
+                                <span class="comp-label">WoW</span>
+                                <span class="comp-value">+8.4%</span>
+                            </div>
+                            <div class="kpi-comp-item positive" id="totalCallsMoM">
+                                <span class="comp-label">MoM</span>
+                                <span class="comp-value">+12.3%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Impacted Calls KPI -->
+                    <div class="kpi-card" id="kpiImpactedCalls">
+                        <div class="kpi-header">
+                            <div class="kpi-label">Impacted Calls</div>
+                        </div>
+                        <div class="kpi-body">
+                            <div class="kpi-value">
+                                <span id="impactedCallsValue">9.0</span><span class="kpi-unit">%</span>
+                            </div>
+                        </div>
+                        <div class="kpi-subtext">
+                            <div class="kpi-sub-item">
+                                <span class="sub-dot errored"></span>
+                                <span class="sub-label">Errored:</span>
+                                <span class="sub-value" id="erroredCallsValue">4.0%</span>
+                            </div>
+                            <div class="kpi-sub-item">
+                                <span class="sub-dot degraded"></span>
+                                <span class="sub-label">Degraded:</span>
+                                <span class="sub-value" id="degradedCallsValue">5.0%</span>
+                            </div>
+                        </div>
+                        <div class="kpi-comparisons">
+                            <div class="kpi-comp-item positive" id="impactedCallsDoD">
+                                <span class="comp-label">DoD</span>
+                                <span class="comp-value">-3.2%</span>
+                            </div>
+                            <div class="kpi-comp-item positive" id="impactedCallsWoW">
+                                <span class="comp-label">WoW</span>
+                                <span class="comp-value">-12.6%</span>
+                            </div>
+                            <div class="kpi-comp-item positive" id="impactedCallsMoM">
+                                <span class="comp-label">MoM</span>
+                                <span class="comp-value">-18.4%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Impacted Agents KPI -->
+                    <div class="kpi-card" id="kpiImpactedAgents">
+                        <div class="kpi-header">
+                            <div class="kpi-label">Impacted Agents</div>
+                        </div>
+                        <div class="kpi-body">
+                            <div class="kpi-value">
+                                <span id="impactedAgentsValue">11.2</span><span class="kpi-unit">%</span>
+                            </div>
+                        </div>
+                        <div class="kpi-subtext">
+                            <div class="kpi-sub-item">
+                                <span class="sub-value" id="impactedAgentsCount">312</span>
+                                <span class="sub-label">of</span>
+                                <span class="sub-value" id="totalAgentsCount">2,786</span>
+                                <span class="sub-label">agents</span>
+                            </div>
+                        </div>
+                        <div class="kpi-comparisons">
+                            <div class="kpi-comp-item positive" id="impactedAgentsDoD">
+                                <span class="comp-label">DoD</span>
+                                <span class="comp-value">-1.8%</span>
+                            </div>
+                            <div class="kpi-comp-item positive" id="impactedAgentsWoW">
+                                <span class="comp-label">WoW</span>
+                                <span class="comp-value">-8.8%</span>
+                            </div>
+                            <div class="kpi-comp-item positive" id="impactedAgentsMoM">
+                                <span class="comp-label">MoM</span>
+                                <span class="comp-value">-15.2%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Task 4: Vendor Metrics -->
+            <section id="vendorSection" class="vendor-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="material-icons-outlined">business</span>
+                        Vendor Performance
+                    </h2>
+                    <div style="display: flex; gap: var(--spacing-sm);">
+                        <button class="btn btn-text" onclick="expandAllVendors()">
+                            <span class="material-icons-outlined" style="font-size: 18px;">unfold_more</span>
+                            Expand All
+                        </button>
+                        <button class="btn btn-text" onclick="collapseAllVendors()">
+                            <span class="material-icons-outlined" style="font-size: 18px;">unfold_less</span>
+                            Collapse All
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Column Headers -->
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 60px; padding: 0 var(--spacing-lg) var(--spacing-sm); gap: var(--spacing-md);">
+                    <div style="font-size: var(--font-size-xs); color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Vendor</div>
+                    <div style="font-size: var(--font-size-xs); color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">Total Calls</div>
+                    <div style="font-size: var(--font-size-xs); color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">Impacted %</div>
+                    <div style="font-size: var(--font-size-xs); color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">Agents Impacted</div>
+                    <div style="font-size: var(--font-size-xs); color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">Trend</div>
+                    <div></div>
+                </div>
+
+                <div class="vendor-grid" id="vendorGrid">
+                    <!-- Vendor cards will be dynamically generated -->
+                </div>
+            </section>
+
+            <!-- Task 5: Agent Data Table -->
+            <section id="agentSection" class="agent-section">
+                <div class="agent-table-container">
+                    <div class="agent-table-header">
+                        <h2 class="agent-table-title">
+                            <span class="material-icons-outlined">support_agent</span>
+                            Agent Performance Details
+                        </h2>
+                        <div class="agent-table-actions">
+                            <div class="agent-search">
+                                <span class="material-icons-outlined">search</span>
+                                <input type="text" id="agentSearch" placeholder="Search agents..." oninput="filterAgentTable()">
+                            </div>
+                            <button class="btn btn-outlined" onclick="exportAgentData()">
+                                <span class="material-icons-outlined" style="font-size: 18px;">download</span>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+
+                    <table class="agent-table" id="agentTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortAgentTable('name')">
+                                    Agent
+                                    <span class="material-icons sort-icon">unfold_more</span>
+                                </th>
+                                <th onclick="sortAgentTable('vendor')">
+                                    Vendor
+                                    <span class="material-icons sort-icon">unfold_more</span>
+                                </th>
+                                <th onclick="sortAgentTable('location')">
+                                    Location
+                                    <span class="material-icons sort-icon">unfold_more</span>
+                                </th>
+                                <th onclick="sortAgentTable('totalCalls')">
+                                    Total Calls
+                                    <span class="material-icons sort-icon">unfold_more</span>
+                                </th>
+                                <th onclick="sortAgentTable('erroredPercent')">
+                                    Errored %
+                                    <span class="material-icons sort-icon">unfold_more</span>
+                                </th>
+                                <th onclick="sortAgentTable('degradedPercent')">
+                                    Degraded %
+                                    <span class="material-icons sort-icon">unfold_more</span>
+                                </th>
+                                <th>Status</th>
+                                <th style="width: 50px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="agentTableBody">
+                            <!-- Agent rows will be dynamically generated -->
+                        </tbody>
+                    </table>
+
+                    <div class="table-pagination">
+                        <div class="pagination-info">
+                            Showing <span id="paginationStart">1</span>-<span id="paginationEnd">10</span> of <span id="paginationTotal">12</span> agents
+                        </div>
+                        <div class="pagination-controls">
+                            <button class="pagination-btn" onclick="prevPage()" id="prevPageBtn" disabled>
+                                <span class="material-icons">chevron_left</span>
+                            </button>
+                            <button class="pagination-btn active">1</button>
+                            <button class="pagination-btn">2</button>
+                            <button class="pagination-btn" onclick="nextPage()" id="nextPageBtn">
+                                <span class="material-icons">chevron_right</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Task 6: Threshold Tables -->
+            <section id="thresholdSection" class="threshold-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="material-icons-outlined">report_problem</span>
+                        Threshold Violations
+                    </h2>
+                </div>
+
+                <div class="threshold-grid">
+                    <!-- Errored Threshold Card -->
+                    <div class="threshold-card errored">
+                        <div class="threshold-card-header">
+                            <div class="threshold-title">
+                                <span class="material-icons-outlined">error_outline</span>
+                                High Error Rate Agents
+                            </div>
+                            <div class="threshold-badge" id="erroredCount">0 agents</div>
+                        </div>
+                        <div class="threshold-info">
+                            <span class="material-icons-outlined">info</span>
+                            Agents exceeding <strong id="erroredThreshold">8%</strong> errored calls threshold
+                        </div>
+                        <div class="threshold-list" id="erroredThresholdList">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+
+                    <!-- Degraded Threshold Card -->
+                    <div class="threshold-card degraded">
+                        <div class="threshold-card-header">
+                            <div class="threshold-title">
+                                <span class="material-icons-outlined">warning_amber</span>
+                                High Degradation Rate Agents
+                            </div>
+                            <div class="threshold-badge" id="degradedCount">0 agents</div>
+                        </div>
+                        <div class="threshold-info">
+                            <span class="material-icons-outlined">info</span>
+                            Agents exceeding <strong id="degradedThreshold">10%</strong> degraded calls threshold
+                        </div>
+                        <div class="threshold-list" id="degradedThresholdList">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Task 7: Repeat Offenders -->
+            <section id="offendersSection" class="offenders-section">
+                <div class="offenders-container">
+                    <div class="offenders-header">
+                        <div class="offenders-title">
+                            <span class="material-icons-outlined">repeat</span>
+                            Repeat Offenders
+                            <span class="offenders-subtitle">Agents with recurring issues across time periods</span>
+                        </div>
+                        <div class="offenders-stats">
+                            <div class="offenders-stat">
+                                <div class="offenders-stat-value" id="repeatOffenderCount">0</div>
+                                <div class="offenders-stat-label">Offenders</div>
+                            </div>
+                            <div class="offenders-stat">
+                                <div class="offenders-stat-value" id="avgOccurrences">0</div>
+                                <div class="offenders-stat-label">Avg Occurrences</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="offenders-grid" id="offendersGrid">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // ============================================
+        // CALL IMPACT ANALYTICS DASHBOARD
+        // ============================================
+
+        // Current filter state
+        let currentFilters = {
+            vendor: 'all',
+            dateRange: 'thisWeek',
+            location: 'all'
+        };
+
+        // Date range configurations with smart labels
+        const dateRangeConfig = {
+            yesterday: {
+                label: 'Yesterday',
+                getDateLabel: () => {
+                    const d = new Date();
+                    d.setDate(d.getDate() - 1);
+                    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                },
+                comparisons: ['dod'],
+                comparisonLabel: 'vs Day Before'
+            },
+            thisWeek: {
+                label: 'This Week',
+                getDateLabel: () => {
+                    const now = new Date();
+                    const startOfWeek = new Date(now);
+                    startOfWeek.setDate(now.getDate() - now.getDay());
+                    return `${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+                },
+                comparisons: ['wow'],
+                comparisonLabel: 'vs Last Week'
+            },
+            lastWeek: {
+                label: 'Last Week',
+                getDateLabel: () => {
+                    const now = new Date();
+                    const endOfLastWeek = new Date(now);
+                    endOfLastWeek.setDate(now.getDate() - now.getDay() - 1);
+                    const startOfLastWeek = new Date(endOfLastWeek);
+                    startOfLastWeek.setDate(endOfLastWeek.getDate() - 6);
+                    return `${startOfLastWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endOfLastWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+                },
+                comparisons: ['wow'],
+                comparisonLabel: 'vs Week Before'
+            },
+            thisMonth: {
+                label: 'This Month',
+                getDateLabel: () => {
+                    const now = new Date();
+                    return now.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                },
+                comparisons: ['mom', 'wow'],
+                comparisonLabel: 'vs Last Month'
+            },
+            lastMonth: {
+                label: 'Last Month',
+                getDateLabel: () => {
+                    const d = new Date();
+                    d.setMonth(d.getMonth() - 1);
+                    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                },
+                comparisons: ['mom'],
+                comparisonLabel: 'vs Month Before'
+            },
+            thisQuarter: {
+                label: 'This Quarter',
+                getDateLabel: () => {
+                    const now = new Date();
+                    const quarter = Math.floor(now.getMonth() / 3);
+                    const startMonth = quarter * 3;
+                    const startDate = new Date(now.getFullYear(), startMonth, 1);
+                    return `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+                },
+                comparisons: ['qoq', 'mom'],
+                comparisonLabel: 'vs Last Quarter'
+            },
+            lastQuarter: {
+                label: 'Last Quarter',
+                getDateLabel: () => {
+                    const now = new Date();
+                    const quarter = Math.floor(now.getMonth() / 3) - 1;
+                    const year = quarter < 0 ? now.getFullYear() - 1 : now.getFullYear();
+                    const adjustedQuarter = quarter < 0 ? 3 : quarter;
+                    const startMonth = adjustedQuarter * 3;
+                    const startDate = new Date(year, startMonth, 1);
+                    const endDate = new Date(year, startMonth + 3, 0);
+                    return `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+                },
+                comparisons: ['qoq'],
+                comparisonLabel: 'vs Quarter Before'
+            },
+            last3Months: {
+                label: 'Last 3 Months',
+                getDateLabel: () => {
+                    const now = new Date();
+                    const start = new Date(now);
+                    start.setMonth(now.getMonth() - 3);
+                    return `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+                },
+                comparisons: ['mom'],
+                comparisonLabel: 'vs Previous 3 Months'
+            },
+            last6Months: {
+                label: 'Last 6 Months',
+                getDateLabel: () => {
+                    const now = new Date();
+                    const start = new Date(now);
+                    start.setMonth(now.getMonth() - 6);
+                    return `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+                },
+                comparisons: ['mom'],
+                comparisonLabel: 'vs Previous 6 Months'
+            }
+        };
+
+        // Location hierarchy
+        const locationData = {
+            'North America': ['United States', 'Canada', 'Mexico'],
+            'Europe': ['United Kingdom', 'Germany', 'France', 'Spain', 'Italy', 'Netherlands'],
+            'Asia Pacific': ['India', 'Philippines', 'Australia', 'Singapore', 'Japan'],
+            'Latin America': ['Brazil', 'Argentina', 'Colombia', 'Chile']
+        };
+
+        // Vendor list
+        const vendors = ['Concentrix', 'Teleperformance', 'TTEC', 'Sitel Group', 'Alorica', 'Conduent', 'HGS'];
+
+        // ============================================
+        // DATA STORE
+        // ============================================
+        const dataStore = {
+            // Yesterday's data
+            yesterday: {
+                kpis: {
+                    totalCalls: 18472,
+                    impactedCalls: 1847,
+                    impactedCallsPercent: 10.0,
+                    erroredCalls: 923,
+                    erroredCallsPercent: 5.0,
+                    degradedCalls: 924,
+                    degradedCallsPercent: 5.0,
+                    impactedAgents: 156,
+                    impactedAgentsPercent: 12.4,
+                    totalAgents: 1258
+                },
+                comparison: {
+                    dod: {
+                        totalCalls: 5.2,
+                        impactedCalls: -8.4,
+                        impactedAgents: -6.2
+                    },
+                    wow: {
+                        totalCalls: 3.8,
+                        impactedCalls: -5.6,
+                        impactedAgents: -4.1
+                    },
+                    mom: {
+                        totalCalls: 8.2,
+                        impactedCalls: -12.1,
+                        impactedAgents: -9.8
+                    }
+                },
+                vendors: {
+                    'Concentrix': { calls: 4120, impacted: 371, impactedPercent: 9.0, agents: 32, agentsPercent: 10.2, trend: -2.1 },
+                    'Teleperformance': { calls: 3850, impacted: 462, impactedPercent: 12.0, agents: 38, agentsPercent: 14.8, trend: 3.4 },
+                    'TTEC': { calls: 3200, impacted: 256, impactedPercent: 8.0, agents: 22, agentsPercent: 9.1, trend: -4.2 },
+                    'Sitel Group': { calls: 2800, impacted: 336, impactedPercent: 12.0, agents: 28, agentsPercent: 15.2, trend: 5.8 },
+                    'Alorica': { calls: 2502, impacted: 225, impactedPercent: 9.0, agents: 20, agentsPercent: 11.4, trend: -1.8 },
+                    'Conduent': { calls: 1200, impacted: 120, impactedPercent: 10.0, agents: 10, agentsPercent: 12.5, trend: 2.1 },
+                    'HGS': { calls: 800, impacted: 77, impactedPercent: 9.6, agents: 6, agentsPercent: 10.0, trend: -0.8 }
+                },
+                locations: {
+                    'North America': { 'United States': { calls: 8500, impacted: 765 }, 'Canada': { calls: 2100, impacted: 189 }, 'Mexico': { calls: 1500, impacted: 165 } },
+                    'Europe': { 'United Kingdom': { calls: 2400, impacted: 216 }, 'Germany': { calls: 1200, impacted: 96 } },
+                    'Asia Pacific': { 'India': { calls: 3200, impacted: 352 }, 'Philippines': { calls: 2800, impacted: 252 } }
+                }
+            },
+            // This Week's data
+            thisWeek: {
+                kpis: {
+                    totalCalls: 92847,
+                    impactedCalls: 8356,
+                    impactedCallsPercent: 9.0,
+                    erroredCalls: 3714,
+                    erroredCallsPercent: 4.0,
+                    degradedCalls: 4642,
+                    degradedCallsPercent: 5.0,
+                    impactedAgents: 312,
+                    impactedAgentsPercent: 11.2,
+                    totalAgents: 2786
+                },
+                comparison: {
+                    dod: {
+                        totalCalls: 2.1,
+                        impactedCalls: -3.2,
+                        impactedAgents: -1.8
+                    },
+                    wow: {
+                        totalCalls: 8.4,
+                        impactedCalls: -12.6,
+                        impactedAgents: -8.8
+                    },
+                    mom: {
+                        totalCalls: 12.3,
+                        impactedCalls: -18.4,
+                        impactedAgents: -15.2
+                    }
+                },
+                vendors: {
+                    'Concentrix': { calls: 20650, impacted: 1652, impactedPercent: 8.0, agents: 62, agentsPercent: 9.8, trend: -3.2 },
+                    'Teleperformance': { calls: 19250, impacted: 2118, impactedPercent: 11.0, agents: 72, agentsPercent: 13.4, trend: 2.8 },
+                    'TTEC': { calls: 16000, impacted: 1120, impactedPercent: 7.0, agents: 48, agentsPercent: 8.2, trend: -5.1 },
+                    'Sitel Group': { calls: 14000, impacted: 1540, impactedPercent: 11.0, agents: 56, agentsPercent: 14.1, trend: 4.2 },
+                    'Alorica': { calls: 12510, impacted: 1001, impactedPercent: 8.0, agents: 42, agentsPercent: 10.5, trend: -2.4 },
+                    'Conduent': { calls: 6000, impacted: 540, impactedPercent: 9.0, agents: 20, agentsPercent: 11.1, trend: 1.8 },
+                    'HGS': { calls: 4437, impacted: 385, impactedPercent: 8.7, agents: 12, agentsPercent: 9.2, trend: -1.2 }
+                },
+                locations: {
+                    'North America': { 'United States': { calls: 42500, impacted: 3400 }, 'Canada': { calls: 10500, impacted: 840 }, 'Mexico': { calls: 7500, impacted: 675 } },
+                    'Europe': { 'United Kingdom': { calls: 12000, impacted: 960 }, 'Germany': { calls: 6000, impacted: 420 } },
+                    'Asia Pacific': { 'India': { calls: 16000, impacted: 1440 }, 'Philippines': { calls: 14000, impacted: 1120 } }
+                }
+            },
+            // Last Week's data
+            lastWeek: {
+                kpis: {
+                    totalCalls: 85642,
+                    impactedCalls: 9421,
+                    impactedCallsPercent: 11.0,
+                    erroredCalls: 4711,
+                    erroredCallsPercent: 5.5,
+                    degradedCalls: 4710,
+                    degradedCallsPercent: 5.5,
+                    impactedAgents: 342,
+                    impactedAgentsPercent: 12.8,
+                    totalAgents: 2672
+                },
+                comparison: {
+                    dod: {
+                        totalCalls: 1.8,
+                        impactedCalls: -2.4,
+                        impactedAgents: -1.5
+                    },
+                    wow: {
+                        totalCalls: 4.2,
+                        impactedCalls: -6.8,
+                        impactedAgents: -5.2
+                    },
+                    mom: {
+                        totalCalls: 9.8,
+                        impactedCalls: -14.2,
+                        impactedAgents: -11.6
+                    }
+                },
+                vendors: {
+                    'Concentrix': { calls: 19050, impacted: 1714, impactedPercent: 9.0, agents: 68, agentsPercent: 11.2, trend: -1.8 },
+                    'Teleperformance': { calls: 17750, impacted: 2130, impactedPercent: 12.0, agents: 78, agentsPercent: 14.8, trend: 4.2 },
+                    'TTEC': { calls: 14800, impacted: 1184, impactedPercent: 8.0, agents: 52, agentsPercent: 9.4, trend: -3.6 },
+                    'Sitel Group': { calls: 12900, impacted: 1548, impactedPercent: 12.0, agents: 62, agentsPercent: 15.8, trend: 5.4 },
+                    'Alorica': { calls: 11520, impacted: 1037, impactedPercent: 9.0, agents: 46, agentsPercent: 11.8, trend: -1.2 },
+                    'Conduent': { calls: 5522, impacted: 552, impactedPercent: 10.0, agents: 22, agentsPercent: 12.2, trend: 2.4 },
+                    'HGS': { calls: 4100, impacted: 410, impactedPercent: 10.0, agents: 14, agentsPercent: 10.8, trend: 0.6 }
+                },
+                locations: {
+                    'North America': { 'United States': { calls: 39200, impacted: 3920 }, 'Canada': { calls: 9680, impacted: 968 }, 'Mexico': { calls: 6900, impacted: 759 } },
+                    'Europe': { 'United Kingdom': { calls: 11040, impacted: 1104 }, 'Germany': { calls: 5520, impacted: 497 } },
+                    'Asia Pacific': { 'India': { calls: 14720, impacted: 1619 }, 'Philippines': { calls: 12880, impacted: 1288 } }
+                }
+            },
+            // This Month's data
+            thisMonth: {
+                kpis: {
+                    totalCalls: 385420,
+                    impactedCalls: 30834,
+                    impactedCallsPercent: 8.0,
+                    erroredCalls: 13489,
+                    erroredCallsPercent: 3.5,
+                    degradedCalls: 17345,
+                    degradedCallsPercent: 4.5,
+                    impactedAgents: 486,
+                    impactedAgentsPercent: 10.2,
+                    totalAgents: 4765
+                },
+                comparison: {
+                    mom: {
+                        totalCalls: 12.4,
+                        impactedCalls: -18.2,
+                        impactedAgents: -14.6
+                    },
+                    wow: {
+                        totalCalls: 6.8,
+                        impactedCalls: -8.4,
+                        impactedAgents: -6.2
+                    }
+                },
+                vendors: {
+                    'Concentrix': { calls: 85700, impacted: 6000, impactedPercent: 7.0, agents: 96, agentsPercent: 8.4, trend: -4.8 },
+                    'Teleperformance': { calls: 79900, impacted: 7990, impactedPercent: 10.0, agents: 112, agentsPercent: 12.1, trend: 2.2 },
+                    'TTEC': { calls: 66400, impacted: 4648, impactedPercent: 7.0, agents: 78, agentsPercent: 7.8, trend: -6.2 },
+                    'Sitel Group': { calls: 58100, impacted: 5810, impactedPercent: 10.0, agents: 92, agentsPercent: 13.2, trend: 3.8 },
+                    'Alorica': { calls: 51900, impacted: 3633, impactedPercent: 7.0, agents: 68, agentsPercent: 9.4, trend: -3.2 },
+                    'Conduent': { calls: 24900, impacted: 1992, impactedPercent: 8.0, agents: 28, agentsPercent: 10.0, trend: 1.4 },
+                    'HGS': { calls: 18520, impacted: 1481, impactedPercent: 8.0, agents: 22, agentsPercent: 9.2, trend: -0.4 }
+                },
+                locations: {
+                    'North America': { 'United States': { calls: 176500, impacted: 12355 }, 'Canada': { calls: 43600, impacted: 3052 }, 'Mexico': { calls: 31100, impacted: 2488 } },
+                    'Europe': { 'United Kingdom': { calls: 49800, impacted: 3486 }, 'Germany': { calls: 24900, impacted: 1743 } },
+                    'Asia Pacific': { 'India': { calls: 66400, impacted: 5312 }, 'Philippines': { calls: 58100, impacted: 4068 } }
+                }
+            },
+            // Last Month's data
+            lastMonth: {
+                kpis: {
+                    totalCalls: 342850,
+                    impactedCalls: 37714,
+                    impactedCallsPercent: 11.0,
+                    erroredCalls: 18857,
+                    erroredCallsPercent: 5.5,
+                    degradedCalls: 18857,
+                    degradedCallsPercent: 5.5,
+                    impactedAgents: 569,
+                    impactedAgentsPercent: 13.2,
+                    totalAgents: 4311
+                },
+                comparison: {
+                    mom: {
+                        totalCalls: 8.2,
+                        impactedCalls: -12.4,
+                        impactedAgents: -10.8
+                    }
+                },
+                vendors: {
+                    'Concentrix': { calls: 76200, impacted: 6858, impactedPercent: 9.0, agents: 112, agentsPercent: 10.8, trend: -2.4 },
+                    'Teleperformance': { calls: 71100, impacted: 8532, impactedPercent: 12.0, agents: 128, agentsPercent: 14.2, trend: 3.6 },
+                    'TTEC': { calls: 59100, impacted: 5319, impactedPercent: 9.0, agents: 92, agentsPercent: 9.8, trend: -4.2 },
+                    'Sitel Group': { calls: 51700, impacted: 6204, impactedPercent: 12.0, agents: 108, agentsPercent: 15.4, trend: 4.8 },
+                    'Alorica': { calls: 46200, impacted: 4158, impactedPercent: 9.0, agents: 82, agentsPercent: 11.2, trend: -1.8 },
+                    'Conduent': { calls: 22200, impacted: 2220, impactedPercent: 10.0, agents: 32, agentsPercent: 11.4, trend: 2.2 },
+                    'HGS': { calls: 16350, impacted: 1635, impactedPercent: 10.0, agents: 25, agentsPercent: 10.6, trend: 0.8 }
+                },
+                locations: {
+                    'North America': { 'United States': { calls: 157000, impacted: 14130 }, 'Canada': { calls: 38800, impacted: 3492 }, 'Mexico': { calls: 27700, impacted: 2770 } },
+                    'Europe': { 'United Kingdom': { calls: 44300, impacted: 3987 }, 'Germany': { calls: 22200, impacted: 1998 } },
+                    'Asia Pacific': { 'India': { calls: 59100, impacted: 5910 }, 'Philippines': { calls: 51700, impacted: 5170 } }
+                }
+            },
+            // This Quarter's data
+            thisQuarter: {
+                kpis: {
+                    totalCalls: 1156260,
+                    impactedCalls: 80938,
+                    impactedCallsPercent: 7.0,
+                    erroredCalls: 34688,
+                    erroredCallsPercent: 3.0,
+                    degradedCalls: 46250,
+                    degradedCallsPercent: 4.0,
+                    impactedAgents: 892,
+                    impactedAgentsPercent: 8.8,
+                    totalAgents: 10136
+                },
+                comparison: {
+                    qoq: {
+                        totalCalls: 18.4,
+                        impactedCalls: -22.6,
+                        impactedAgents: -18.4
+                    },
+                    mom: {
+                        totalCalls: 10.2,
+                        impactedCalls: -14.8,
+                        impactedAgents: -11.2
+                    }
+                },
+                vendors: {
+                    'Concentrix': { calls: 257100, impacted: 15426, impactedPercent: 6.0, agents: 176, agentsPercent: 7.2, trend: -6.4 },
+                    'Teleperformance': { calls: 239700, impacted: 19176, impactedPercent: 8.0, agents: 208, agentsPercent: 10.8, trend: 1.8 },
+                    'TTEC': { calls: 199200, impacted: 11952, impactedPercent: 6.0, agents: 148, agentsPercent: 6.8, trend: -7.2 },
+                    'Sitel Group': { calls: 174300, impacted: 15687, impactedPercent: 9.0, agents: 172, agentsPercent: 11.4, trend: 2.4 },
+                    'Alorica': { calls: 155700, impacted: 9342, impactedPercent: 6.0, agents: 128, agentsPercent: 8.2, trend: -4.6 },
+                    'Conduent': { calls: 74700, impacted: 5229, impactedPercent: 7.0, agents: 52, agentsPercent: 8.8, trend: 0.8 },
+                    'HGS': { calls: 55560, impacted: 3889, impactedPercent: 7.0, agents: 42, agentsPercent: 8.0, trend: -1.2 }
+                },
+                locations: {
+                    'North America': { 'United States': { calls: 529500, impacted: 31770 }, 'Canada': { calls: 130800, impacted: 7848 }, 'Mexico': { calls: 93300, impacted: 6531 } },
+                    'Europe': { 'United Kingdom': { calls: 149400, impacted: 8964 }, 'Germany': { calls: 74700, impacted: 4482 } },
+                    'Asia Pacific': { 'India': { calls: 199200, impacted: 13944 }, 'Philippines': { calls: 174300, impacted: 10458 } }
+                }
+            },
+            // Last Quarter's data
+            lastQuarter: {
+                kpis: {
+                    totalCalls: 976420,
+                    impactedCalls: 104617,
+                    impactedCallsPercent: 10.7,
+                    erroredCalls: 53703,
+                    erroredCallsPercent: 5.5,
+                    degradedCalls: 50914,
+                    degradedCallsPercent: 5.2,
+                    impactedAgents: 1093,
+                    impactedAgentsPercent: 12.4,
+                    totalAgents: 8815
+                },
+                comparison: {
+                    qoq: {
+                        totalCalls: 14.2,
+                        impactedCalls: -16.8,
+                        impactedAgents: -12.6
+                    }
+                },
+                vendors: {
+                    'Concentrix': { calls: 217100, impacted: 19539, impactedPercent: 9.0, agents: 216, agentsPercent: 10.4, trend: -3.2 },
+                    'Teleperformance': { calls: 202400, impacted: 22264, impactedPercent: 11.0, agents: 252, agentsPercent: 13.8, trend: 2.8 },
+                    'TTEC': { calls: 168200, impacted: 14298, impactedPercent: 8.5, agents: 182, agentsPercent: 9.2, trend: -4.8 },
+                    'Sitel Group': { calls: 147100, impacted: 16181, impactedPercent: 11.0, agents: 212, agentsPercent: 14.2, trend: 3.6 },
+                    'Alorica': { calls: 131400, impacted: 11826, impactedPercent: 9.0, agents: 158, agentsPercent: 10.8, trend: -2.4 },
+                    'Conduent': { calls: 63100, impacted: 6310, impactedPercent: 10.0, agents: 64, agentsPercent: 11.2, trend: 1.4 },
+                    'HGS': { calls: 47120, impacted: 4712, impactedPercent: 10.0, agents: 52, agentsPercent: 10.6, trend: 0.2 }
+                },
+                locations: {
+                    'North America': { 'United States': { calls: 447200, impacted: 40248 }, 'Canada': { calls: 110400, impacted: 9936 }, 'Mexico': { calls: 78800, impacted: 7892 } },
+                    'Europe': { 'United Kingdom': { calls: 126200, impacted: 11358 }, 'Germany': { calls: 63100, impacted: 5679 } },
+                    'Asia Pacific': { 'India': { calls: 168200, impacted: 16820 }, 'Philippines': { calls: 147100, impacted: 13239 } }
+                }
+            },
+            // Last 3 Months' data
+            last3Months: {
+                kpis: {
+                    totalCalls: 1070520,
+                    impactedCalls: 74936,
+                    impactedCallsPercent: 7.0,
+                    erroredCalls: 32116,
+                    erroredCallsPercent: 3.0,
+                    degradedCalls: 42821,
+                    degradedCallsPercent: 4.0,
+                    impactedAgents: 824,
+                    impactedAgentsPercent: 8.4,
+                    totalAgents: 9810
+                },
+                comparison: {
+                    mom: {
+                        totalCalls: 16.8,
+                        impactedCalls: -20.4,
+                        impactedAgents: -16.2
+                    }
+                },
+                vendors: {
+                    'Concentrix': { calls: 237900, impacted: 14274, impactedPercent: 6.0, agents: 162, agentsPercent: 7.0, trend: -5.8 },
+                    'Teleperformance': { calls: 221800, impacted: 17744, impactedPercent: 8.0, agents: 192, agentsPercent: 10.4, trend: 1.6 },
+                    'TTEC': { calls: 184400, impacted: 11064, impactedPercent: 6.0, agents: 136, agentsPercent: 6.6, trend: -6.8 },
+                    'Sitel Group': { calls: 161300, impacted: 14517, impactedPercent: 9.0, agents: 158, agentsPercent: 11.0, trend: 2.2 },
+                    'Alorica': { calls: 144100, impacted: 8646, impactedPercent: 6.0, agents: 118, agentsPercent: 7.8, trend: -4.2 },
+                    'Conduent': { calls: 69100, impacted: 4837, impactedPercent: 7.0, agents: 48, agentsPercent: 8.4, trend: 0.6 },
+                    'HGS': { calls: 51920, impacted: 3634, impactedPercent: 7.0, agents: 38, agentsPercent: 7.6, trend: -1.0 }
+                },
+                locations: {
+                    'North America': { 'United States': { calls: 490400, impacted: 29424 }, 'Canada': { calls: 121100, impacted: 7266 }, 'Mexico': { calls: 86400, impacted: 6048 } },
+                    'Europe': { 'United Kingdom': { calls: 138400, impacted: 8304 }, 'Germany': { calls: 69200, impacted: 4152 } },
+                    'Asia Pacific': { 'India': { calls: 184400, impacted: 12908 }, 'Philippines': { calls: 161300, impacted: 9678 } }
+                }
+            },
+            // Last 6 Months' data
+            last6Months: {
+                kpis: {
+                    totalCalls: 2046940,
+                    impactedCalls: 122816,
+                    impactedCallsPercent: 6.0,
+                    erroredCalls: 51174,
+                    erroredCallsPercent: 2.5,
+                    degradedCalls: 71643,
+                    degradedCallsPercent: 3.5,
+                    impactedAgents: 1286,
+                    impactedAgentsPercent: 7.2,
+                    totalAgents: 17861
+                },
+                comparison: {
+                    mom: {
+                        totalCalls: 22.4,
+                        impactedCalls: -28.6,
+                        impactedAgents: -22.8
+                    }
+                },
+                vendors: {
+                    'Concentrix': { calls: 454800, impacted: 22740, impactedPercent: 5.0, agents: 254, agentsPercent: 6.2, trend: -7.4 },
+                    'Teleperformance': { calls: 424100, impacted: 29687, impactedPercent: 7.0, agents: 302, agentsPercent: 9.4, trend: 1.2 },
+                    'TTEC': { calls: 352600, impacted: 17630, impactedPercent: 5.0, agents: 214, agentsPercent: 5.8, trend: -8.2 },
+                    'Sitel Group': { calls: 308500, impacted: 24680, impactedPercent: 8.0, agents: 248, agentsPercent: 9.8, trend: 1.8 },
+                    'Alorica': { calls: 275600, impacted: 13780, impactedPercent: 5.0, agents: 186, agentsPercent: 6.8, trend: -5.4 },
+                    'Conduent': { calls: 132200, impacted: 7932, impactedPercent: 6.0, agents: 76, agentsPercent: 7.4, trend: 0.4 },
+                    'HGS': { calls: 99140, impacted: 5949, impactedPercent: 6.0, agents: 58, agentsPercent: 6.6, trend: -1.4 }
+                },
+                locations: {
+                    'North America': { 'United States': { calls: 937800, impacted: 46890 }, 'Canada': { calls: 231500, impacted: 11575 }, 'Mexico': { calls: 165200, impacted: 9912 } },
+                    'Europe': { 'United Kingdom': { calls: 264600, impacted: 13230 }, 'Germany': { calls: 132300, impacted: 6615 } },
+                    'Asia Pacific': { 'India': { calls: 352600, impacted: 21156 }, 'Philippines': { calls: 308500, impacted: 15425 } }
+                }
+            }
+        };
+
+        // Agent sample data (will be filtered)
+        const agentData = [
+            { id: 'AGT001', name: 'James Martinez', email: 'james.martinez@concentrix.com', vendor: 'Concentrix', location: 'United States', continent: 'North America', totalCalls: 245, erroredCalls: 18, degradedCalls: 22, erroredPercent: 7.3, degradedPercent: 9.0 },
+            { id: 'AGT002', name: 'Sarah Johnson', email: 'sarah.johnson@teleperformance.com', vendor: 'Teleperformance', location: 'United Kingdom', continent: 'Europe', totalCalls: 312, erroredCalls: 28, degradedCalls: 35, erroredPercent: 9.0, degradedPercent: 11.2 },
+            { id: 'AGT003', name: 'Michael Chen', email: 'michael.chen@ttec.com', vendor: 'TTEC', location: 'Philippines', continent: 'Asia Pacific', totalCalls: 287, erroredCalls: 12, degradedCalls: 18, erroredPercent: 4.2, degradedPercent: 6.3 },
+            { id: 'AGT004', name: 'Emily Davis', email: 'emily.davis@sitel.com', vendor: 'Sitel Group', location: 'India', continent: 'Asia Pacific', totalCalls: 198, erroredCalls: 24, degradedCalls: 28, erroredPercent: 12.1, degradedPercent: 14.1 },
+            { id: 'AGT005', name: 'David Wilson', email: 'david.wilson@alorica.com', vendor: 'Alorica', location: 'Canada', continent: 'North America', totalCalls: 276, erroredCalls: 15, degradedCalls: 20, erroredPercent: 5.4, degradedPercent: 7.2 },
+            { id: 'AGT006', name: 'Lisa Anderson', email: 'lisa.anderson@concentrix.com', vendor: 'Concentrix', location: 'Germany', continent: 'Europe', totalCalls: 234, erroredCalls: 21, degradedCalls: 25, erroredPercent: 9.0, degradedPercent: 10.7 },
+            { id: 'AGT007', name: 'Robert Taylor', email: 'robert.taylor@teleperformance.com', vendor: 'Teleperformance', location: 'United States', continent: 'North America', totalCalls: 298, erroredCalls: 32, degradedCalls: 38, erroredPercent: 10.7, degradedPercent: 12.8 },
+            { id: 'AGT008', name: 'Jennifer Brown', email: 'jennifer.brown@ttec.com', vendor: 'TTEC', location: 'Mexico', continent: 'North America', totalCalls: 256, erroredCalls: 14, degradedCalls: 16, erroredPercent: 5.5, degradedPercent: 6.3 },
+            { id: 'AGT009', name: 'William Lee', email: 'william.lee@sitel.com', vendor: 'Sitel Group', location: 'Philippines', continent: 'Asia Pacific', totalCalls: 312, erroredCalls: 38, degradedCalls: 42, erroredPercent: 12.2, degradedPercent: 13.5 },
+            { id: 'AGT010', name: 'Amanda White', email: 'amanda.white@alorica.com', vendor: 'Alorica', location: 'India', continent: 'Asia Pacific', totalCalls: 189, erroredCalls: 11, degradedCalls: 14, erroredPercent: 5.8, degradedPercent: 7.4 },
+            { id: 'AGT011', name: 'Christopher Hall', email: 'christopher.hall@conduent.com', vendor: 'Conduent', location: 'United States', continent: 'North America', totalCalls: 267, erroredCalls: 26, degradedCalls: 30, erroredPercent: 9.7, degradedPercent: 11.2 },
+            { id: 'AGT012', name: 'Michelle Garcia', email: 'michelle.garcia@hgs.com', vendor: 'HGS', location: 'United Kingdom', continent: 'Europe', totalCalls: 223, erroredCalls: 19, degradedCalls: 24, erroredPercent: 8.5, degradedPercent: 10.8 }
+        ];
+
+        // Threshold settings
+        const thresholdSettings = {
+            errored: 8.0,  // 8% errored calls threshold
+            degraded: 10.0  // 10% degraded calls threshold
+        };
+
+        // ============================================
+        // MASTER DASHBOARD UPDATE FUNCTION
+        // ============================================
+
+        // Update entire dashboard based on filters
+        function updateDashboard() {
+            console.log('Updating dashboard with filters:', currentFilters);
+
+            // Add loading state
+            document.body.classList.add('dashboard-updating');
+
+            // Stagger updates for smooth visual effect
+            setTimeout(() => updateKPIs(), 0);
+            setTimeout(() => renderVendorCards(), 100);
+            setTimeout(() => renderAgentTable(), 200);
+            setTimeout(() => renderThresholdTables(), 300);
+            setTimeout(() => renderRepeatOffenders(), 400);
+
+            // Remove loading state
+            setTimeout(() => {
+                document.body.classList.remove('dashboard-updating');
+            }, 600);
+        }
+
+        // ============================================
+        // REPEAT OFFENDERS FUNCTIONS
+        // ============================================
+
+        // Repeat offender data (simulated history across periods)
+        const repeatOffenderData = [
+            {
+                id: 'AGT004',
+                name: 'Emily Davis',
+                vendor: 'Sitel Group',
+                location: 'India',
+                continent: 'Asia Pacific',
+                occurrences: 5,
+                severity: 'severe',
+                avgErrored: 11.8,
+                avgDegraded: 13.6,
+                history: [
+                    { period: 'W1', status: 'errored', value: 12.1 },
+                    { period: 'W2', status: 'errored', value: 11.5 },
+                    { period: 'W3', status: 'degraded', value: 14.1 },
+                    { period: 'W4', status: 'errored', value: 12.8 },
+                    { period: 'W5', status: 'errored', value: 10.9 }
+                ]
+            },
+            {
+                id: 'AGT009',
+                name: 'William Lee',
+                vendor: 'Sitel Group',
+                location: 'Philippines',
+                continent: 'Asia Pacific',
+                occurrences: 5,
+                severity: 'severe',
+                avgErrored: 11.4,
+                avgDegraded: 12.8,
+                history: [
+                    { period: 'W1', status: 'errored', value: 12.2 },
+                    { period: 'W2', status: 'degraded', value: 13.5 },
+                    { period: 'W3', status: 'errored', value: 11.8 },
+                    { period: 'W4', status: 'errored', value: 10.2 },
+                    { period: 'W5', status: 'degraded', value: 14.2 }
+                ]
+            },
+            {
+                id: 'AGT007',
+                name: 'Robert Taylor',
+                vendor: 'Teleperformance',
+                location: 'United States',
+                continent: 'North America',
+                occurrences: 4,
+                severity: 'severe',
+                avgErrored: 10.2,
+                avgDegraded: 12.1,
+                history: [
+                    { period: 'W1', status: 'errored', value: 10.7 },
+                    { period: 'W2', status: 'degraded', value: 12.8 },
+                    { period: 'W3', status: 'clean', value: 5.2 },
+                    { period: 'W4', status: 'errored', value: 9.8 },
+                    { period: 'W5', status: 'degraded', value: 11.4 }
+                ]
+            },
+            {
+                id: 'AGT002',
+                name: 'Sarah Johnson',
+                vendor: 'Teleperformance',
+                location: 'United Kingdom',
+                continent: 'Europe',
+                occurrences: 4,
+                severity: 'moderate',
+                avgErrored: 8.6,
+                avgDegraded: 10.8,
+                history: [
+                    { period: 'W1', status: 'degraded', value: 11.2 },
+                    { period: 'W2', status: 'errored', value: 9.0 },
+                    { period: 'W3', status: 'degraded', value: 10.5 },
+                    { period: 'W4', status: 'clean', value: 6.8 },
+                    { period: 'W5', status: 'degraded', value: 10.8 }
+                ]
+            },
+            {
+                id: 'AGT011',
+                name: 'Christopher Hall',
+                vendor: 'Conduent',
+                location: 'United States',
+                continent: 'North America',
+                occurrences: 3,
+                severity: 'moderate',
+                avgErrored: 9.2,
+                avgDegraded: 10.6,
+                history: [
+                    { period: 'W1', status: 'errored', value: 9.7 },
+                    { period: 'W2', status: 'clean', value: 5.4 },
+                    { period: 'W3', status: 'degraded', value: 11.2 },
+                    { period: 'W4', status: 'clean', value: 7.2 },
+                    { period: 'W5', status: 'errored', value: 8.8 }
+                ]
+            },
+            {
+                id: 'AGT006',
+                name: 'Lisa Anderson',
+                vendor: 'Concentrix',
+                location: 'Germany',
+                continent: 'Europe',
+                occurrences: 3,
+                severity: 'moderate',
+                avgErrored: 8.8,
+                avgDegraded: 10.2,
+                history: [
+                    { period: 'W1', status: 'clean', value: 6.2 },
+                    { period: 'W2', status: 'errored', value: 9.0 },
+                    { period: 'W3', status: 'degraded', value: 10.7 },
+                    { period: 'W4', status: 'degraded', value: 10.1 },
+                    { period: 'W5', status: 'clean', value: 7.5 }
+                ]
+            }
+        ];
+
+        // Render repeat offenders
+        function renderRepeatOffenders() {
+            const grid = document.getElementById('offendersGrid');
+            
+            // Filter based on current filters
+            let offenders = repeatOffenderData.filter(offender => {
+                if (currentFilters.vendor !== 'all' && offender.vendor !== currentFilters.vendor) return false;
+                if (currentFilters.location !== 'all' && offender.continent !== currentFilters.location) return false;
+                if (currentFilters.country && currentFilters.country !== 'all' && offender.location !== currentFilters.country) return false;
+                return true;
+            });
+
+            // Sort by occurrences and severity
+            offenders.sort((a, b) => {
+                if (b.occurrences !== a.occurrences) return b.occurrences - a.occurrences;
+                if (a.severity === 'severe' && b.severity !== 'severe') return -1;
+                if (b.severity === 'severe' && a.severity !== 'severe') return 1;
+                return b.avgErrored - a.avgErrored;
+            });
+
+            // Update stats
+            document.getElementById('repeatOffenderCount').textContent = offenders.length;
+            const avgOcc = offenders.length > 0 
+                ? (offenders.reduce((sum, o) => sum + o.occurrences, 0) / offenders.length).toFixed(1)
+                : 0;
+            document.getElementById('avgOccurrences').textContent = avgOcc;
+
+            if (offenders.length === 0) {
+                grid.innerHTML = `
+                    <div class="offenders-empty" style="grid-column: 1 / -1;">
+                        <span class="material-icons-outlined">verified</span>
+                        <h3>No Repeat Offenders Found</h3>
+                        <p>All agents are performing within acceptable thresholds across time periods.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = offenders.map(offender => createOffenderCard(offender)).join('');
+        }
+
+        // Create offender card HTML
+        function createOffenderCard(offender) {
+            const initials = offender.name.split(' ').map(w => w[0]).join('');
+            const severityLabel = offender.severity === 'severe' ? 'Critical' : 'Warning';
+            const severityIcon = offender.severity === 'severe' ? 'error' : 'warning';
+
+            const timelineHTML = offender.history.map(h => {
+                const statusClass = h.status;
+                const tooltip = `${h.period}: ${h.value.toFixed(1)}% (${h.status})`;
+                const label = h.status === 'clean' ? '✓' : h.value.toFixed(0);
+                return `<div class="timeline-item ${statusClass}" data-tooltip="${tooltip}">${label}</div>`;
+            }).join('');
+
+            return `
+                <div class="offender-card ${offender.severity}">
+                    <div class="offender-card-header">
+                        <div class="offender-avatar">${initials}</div>
+                        <div class="offender-info">
+                            <div class="offender-name">${offender.name}</div>
+                            <div class="offender-meta">${offender.vendor} • ${offender.location}</div>
+                        </div>
+                        <div class="offender-severity ${offender.severity}">
+                            <span class="material-icons">${severityIcon}</span>
+                            ${severityLabel}
+                        </div>
+                    </div>
+                    
+                    <div class="offender-timeline">
+                        <div class="timeline-label">
+                            <span class="material-icons-outlined">timeline</span>
+                            Last 5 Weeks Performance
+                        </div>
+                        <div class="timeline-grid">
+                            ${timelineHTML}
+                        </div>
+                    </div>
+
+                    <div class="offender-metrics">
+                        <div class="offender-metric">
+                            <div class="offender-metric-value">${offender.occurrences}</div>
+                            <div class="offender-metric-label">Violations</div>
+                        </div>
+                        <div class="offender-metric">
+                            <div class="offender-metric-value error">${offender.avgErrored.toFixed(1)}%</div>
+                            <div class="offender-metric-label">Avg Errored</div>
+                        </div>
+                        <div class="offender-metric">
+                            <div class="offender-metric-value warning">${offender.avgDegraded.toFixed(1)}%</div>
+                            <div class="offender-metric-label">Avg Degraded</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================
+        // THRESHOLD TABLES FUNCTIONS
+        // ============================================
+
+        // Render threshold tables
+        function renderThresholdTables() {
+            renderErroredThresholdTable();
+            renderDegradedThresholdTable();
+        }
+
+        // Render errored threshold table
+        function renderErroredThresholdTable() {
+            const list = document.getElementById('erroredThresholdList');
+            const countBadge = document.getElementById('erroredCount');
+            
+            // Filter agents exceeding errored threshold
+            let violators = agentData.filter(agent => {
+                if (agent.erroredPercent <= thresholdSettings.errored) return false;
+                if (currentFilters.vendor !== 'all' && agent.vendor !== currentFilters.vendor) return false;
+                if (currentFilters.location !== 'all' && agent.continent !== currentFilters.location) return false;
+                if (currentFilters.country && currentFilters.country !== 'all' && agent.location !== currentFilters.country) return false;
+                return true;
+            });
+
+            // Sort by errored percent descending
+            violators.sort((a, b) => b.erroredPercent - a.erroredPercent);
+
+            countBadge.textContent = `${violators.length} agent${violators.length !== 1 ? 's' : ''}`;
+
+            if (violators.length === 0) {
+                list.innerHTML = `
+                    <div class="threshold-empty">
+                        <span class="material-icons-outlined">check_circle</span>
+                        <div>No agents exceeding threshold</div>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = violators.map((agent, index) => {
+                const initials = agent.name.split(' ').map(w => w[0]).join('');
+                const barWidth = Math.min((agent.erroredPercent / 20) * 100, 100); // Max at 20%
+                
+                return `
+                    <div class="threshold-item">
+                        <div class="threshold-item-rank">${index + 1}</div>
+                        <div class="threshold-item-avatar">${initials}</div>
+                        <div class="threshold-item-info">
+                            <div class="threshold-item-name">${agent.name}</div>
+                            <div class="threshold-item-meta">${agent.vendor} • ${agent.location}</div>
+                        </div>
+                        <div class="threshold-item-value">
+                            <div class="threshold-item-percent">${agent.erroredPercent.toFixed(1)}%</div>
+                            <div class="threshold-item-count">${agent.erroredCalls} of ${agent.totalCalls}</div>
+                        </div>
+                        <div class="threshold-item-bar">
+                            <div class="threshold-item-bar-fill" style="width: ${barWidth}%;"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render degraded threshold table
+        function renderDegradedThresholdTable() {
+            const list = document.getElementById('degradedThresholdList');
+            const countBadge = document.getElementById('degradedCount');
+            
+            // Filter agents exceeding degraded threshold
+            let violators = agentData.filter(agent => {
+                if (agent.degradedPercent <= thresholdSettings.degraded) return false;
+                if (currentFilters.vendor !== 'all' && agent.vendor !== currentFilters.vendor) return false;
+                if (currentFilters.location !== 'all' && agent.continent !== currentFilters.location) return false;
+                if (currentFilters.country && currentFilters.country !== 'all' && agent.location !== currentFilters.country) return false;
+                return true;
+            });
+
+            // Sort by degraded percent descending
+            violators.sort((a, b) => b.degradedPercent - a.degradedPercent);
+
+            countBadge.textContent = `${violators.length} agent${violators.length !== 1 ? 's' : ''}`;
+
+            if (violators.length === 0) {
+                list.innerHTML = `
+                    <div class="threshold-empty">
+                        <span class="material-icons-outlined">check_circle</span>
+                        <div>No agents exceeding threshold</div>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = violators.map((agent, index) => {
+                const initials = agent.name.split(' ').map(w => w[0]).join('');
+                const barWidth = Math.min((agent.degradedPercent / 25) * 100, 100); // Max at 25%
+                
+                return `
+                    <div class="threshold-item">
+                        <div class="threshold-item-rank">${index + 1}</div>
+                        <div class="threshold-item-avatar">${initials}</div>
+                        <div class="threshold-item-info">
+                            <div class="threshold-item-name">${agent.name}</div>
+                            <div class="threshold-item-meta">${agent.vendor} • ${agent.location}</div>
+                        </div>
+                        <div class="threshold-item-value">
+                            <div class="threshold-item-percent">${agent.degradedPercent.toFixed(1)}%</div>
+                            <div class="threshold-item-count">${agent.degradedCalls} of ${agent.totalCalls}</div>
+                        </div>
+                        <div class="threshold-item-bar">
+                            <div class="threshold-item-bar-fill" style="width: ${barWidth}%;"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update threshold display values
+        function updateThresholdDisplay() {
+            document.getElementById('erroredThreshold').textContent = `${thresholdSettings.errored}%`;
+            document.getElementById('degradedThreshold').textContent = `${thresholdSettings.degraded}%`;
+        }
+
+        // ============================================
+        // AGENT TABLE FUNCTIONS
+        // ============================================
+
+        let currentAgentSort = { column: 'erroredPercent', direction: 'desc' };
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let filteredAgents = [...agentData];
+
+        // Render agent table
+        function renderAgentTable() {
+            const tbody = document.getElementById('agentTableBody');
+            tbody.innerHTML = '';
+
+            // Apply filters
+            filteredAgents = agentData.filter(agent => {
+                if (currentFilters.vendor !== 'all' && agent.vendor !== currentFilters.vendor) return false;
+                if (currentFilters.location !== 'all' && agent.continent !== currentFilters.location) return false;
+                if (currentFilters.country && currentFilters.country !== 'all' && agent.location !== currentFilters.country) return false;
+                return true;
+            });
+
+            // Apply search
+            const searchTerm = document.getElementById('agentSearch')?.value?.toLowerCase() || '';
+            if (searchTerm) {
+                filteredAgents = filteredAgents.filter(agent =>
+                    agent.name.toLowerCase().includes(searchTerm) ||
+                    agent.email.toLowerCase().includes(searchTerm) ||
+                    agent.id.toLowerCase().includes(searchTerm) ||
+                    agent.vendor.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Apply sort
+            filteredAgents.sort((a, b) => {
+                let aVal = a[currentAgentSort.column];
+                let bVal = b[currentAgentSort.column];
+                if (typeof aVal === 'string') {
+                    aVal = aVal.toLowerCase();
+                    bVal = bVal.toLowerCase();
+                }
+                if (currentAgentSort.direction === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+
+            // Pagination
+            const startIdx = (currentPage - 1) * itemsPerPage;
+            const endIdx = Math.min(startIdx + itemsPerPage, filteredAgents.length);
+            const pageAgents = filteredAgents.slice(startIdx, endIdx);
+
+            pageAgents.forEach(agent => {
+                const row = createAgentRow(agent);
+                tbody.appendChild(row);
+                
+                const detailsRow = createAgentDetailsRow(agent);
+                tbody.appendChild(detailsRow);
+            });
+
+            // Update pagination info
+            updatePaginationInfo(startIdx + 1, endIdx, filteredAgents.length);
+        }
+
+        // Create agent table row
+        function createAgentRow(agent) {
+            const row = document.createElement('tr');
+            row.dataset.agentId = agent.id;
+
+            const initials = agent.name.split(' ').map(w => w[0]).join('');
+            const status = getAgentStatus(agent);
+
+            row.innerHTML = `
+                <td>
+                    <div class="agent-info-cell">
+                        <div class="agent-avatar">${initials}</div>
+                        <div class="agent-name-group">
+                            <span class="agent-name">${agent.name}</span>
+                            <span class="agent-email">${agent.id}</span>
+                        </div>
+                    </div>
+                </td>
+                <td>${agent.vendor}</td>
+                <td>${agent.location}</td>
+                <td class="metric-value">${agent.totalCalls.toLocaleString()}</td>
+                <td class="metric-value ${agent.erroredPercent > thresholdSettings.errored ? 'error' : ''}">${agent.erroredPercent.toFixed(1)}%</td>
+                <td class="metric-value ${agent.degradedPercent > thresholdSettings.degraded ? 'warning' : ''}">${agent.degradedPercent.toFixed(1)}%</td>
+                <td><span class="status-badge ${status.class}">${status.label}</span></td>
+                <td>
+                    <button class="expand-row-btn" onclick="toggleAgentDetails('${agent.id}')">
+                        <span class="material-icons">expand_more</span>
+                    </button>
+                </td>
+            `;
+
+            return row;
+        }
+
+        // Create agent details row (expandable)
+        function createAgentDetailsRow(agent) {
+            const row = document.createElement('tr');
+            row.className = 'call-details-row';
+            row.id = `details-${agent.id}`;
+
+            // Generate sample calls for this agent
+            const calls = generateSampleCalls(agent);
+
+            row.innerHTML = `
+                <td colspan="8">
+                    <div class="call-details-container">
+                        <div class="call-details-header">
+                            <span class="material-icons-outlined">call</span>
+                            Recent Impacted Calls (${calls.length} shown)
+                        </div>
+                        <div class="call-list">
+                            ${calls.map(call => `
+                                <div class="call-item ${call.status}">
+                                    <div class="call-item-icon">
+                                        <span class="material-icons">${call.status === 'errored' ? 'error' : call.status === 'degraded' ? 'warning' : 'check_circle'}</span>
+                                    </div>
+                                    <div class="call-item-details">
+                                        <div class="call-item-id">${call.id}</div>
+                                        <div class="call-item-meta">${call.time} • ${call.reason}</div>
+                                    </div>
+                                    <div class="call-item-duration">${call.duration}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </td>
+            `;
+
+            return row;
+        }
+
+        // Generate sample calls for an agent
+        function generateSampleCalls(agent) {
+            const calls = [];
+            const reasons = {
+                errored: ['Connection timeout', 'Audio failure', 'System crash', 'Network error'],
+                degraded: ['High latency', 'Audio quality', 'Packet loss', 'Jitter detected'],
+                healthy: ['Completed', 'Resolved', 'Successful']
+            };
+
+            // Generate errored calls
+            for (let i = 0; i < Math.min(agent.erroredCalls, 3); i++) {
+                calls.push({
+                    id: `CALL-${agent.id}-E${String(i + 1).padStart(3, '0')}`,
+                    status: 'errored',
+                    time: `${9 + i}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')} AM`,
+                    duration: `${Math.floor(Math.random() * 10) + 1}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
+                    reason: reasons.errored[Math.floor(Math.random() * reasons.errored.length)]
+                });
+            }
+
+            // Generate degraded calls
+            for (let i = 0; i < Math.min(agent.degradedCalls, 3); i++) {
+                calls.push({
+                    id: `CALL-${agent.id}-D${String(i + 1).padStart(3, '0')}`,
+                    status: 'degraded',
+                    time: `${11 + i}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')} AM`,
+                    duration: `${Math.floor(Math.random() * 15) + 5}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
+                    reason: reasons.degraded[Math.floor(Math.random() * reasons.degraded.length)]
+                });
+            }
+
+            return calls;
+        }
+
+        // Get agent status based on thresholds
+        function getAgentStatus(agent) {
+            if (agent.erroredPercent > thresholdSettings.errored) {
+                return { class: 'critical', label: 'Critical' };
+            } else if (agent.degradedPercent > thresholdSettings.degraded) {
+                return { class: 'warning', label: 'Warning' };
+            }
+            return { class: 'healthy', label: 'Healthy' };
+        }
+
+        // Toggle agent details row
+        function toggleAgentDetails(agentId) {
+            const mainRow = document.querySelector(`tr[data-agent-id="${agentId}"]`);
+            const detailsRow = document.getElementById(`details-${agentId}`);
+            
+            if (mainRow && detailsRow) {
+                mainRow.classList.toggle('expanded');
+                detailsRow.classList.toggle('visible');
+            }
+        }
+
+        // Sort agent table
+        function sortAgentTable(column) {
+            // Toggle direction if same column
+            if (currentAgentSort.column === column) {
+                currentAgentSort.direction = currentAgentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentAgentSort.column = column;
+                currentAgentSort.direction = 'desc';
+            }
+
+            // Update header icons
+            document.querySelectorAll('.agent-table th').forEach(th => {
+                th.classList.remove('sorted');
+            });
+            event.target.closest('th').classList.add('sorted');
+            
+            const icon = event.target.closest('th').querySelector('.sort-icon');
+            if (icon) {
+                icon.textContent = currentAgentSort.direction === 'asc' ? 'arrow_upward' : 'arrow_downward';
+            }
+
+            currentPage = 1;
+            renderAgentTable();
+        }
+
+        // Filter agent table by search
+        function filterAgentTable() {
+            currentPage = 1;
+            renderAgentTable();
+        }
+
+        // Update pagination info
+        function updatePaginationInfo(start, end, total) {
+            document.getElementById('paginationStart').textContent = total > 0 ? start : 0;
+            document.getElementById('paginationEnd').textContent = end;
+            document.getElementById('paginationTotal').textContent = total;
+
+            document.getElementById('prevPageBtn').disabled = currentPage === 1;
+            document.getElementById('nextPageBtn').disabled = end >= total;
+        }
+
+        // Pagination controls
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderAgentTable();
+            }
+        }
+
+        function nextPage() {
+            const maxPage = Math.ceil(filteredAgents.length / itemsPerPage);
+            if (currentPage < maxPage) {
+                currentPage++;
+                renderAgentTable();
+            }
+        }
+
+        // Export agent data
+        function exportAgentData() {
+            console.log('Exporting agent data...');
+            // Simple CSV export
+            const headers = ['Agent ID', 'Name', 'Email', 'Vendor', 'Location', 'Total Calls', 'Errored %', 'Degraded %'];
+            const rows = filteredAgents.map(a => [a.id, a.name, a.email, a.vendor, a.location, a.totalCalls, a.erroredPercent, a.degradedPercent]);
+            
+            let csv = headers.join(',') + '\n';
+            rows.forEach(row => {
+                csv += row.join(',') + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `agent-performance-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+
+        // ============================================
+        // VENDOR METRICS FUNCTIONS
+        // ============================================
+
+        // Render vendor cards
+        function renderVendorCards() {
+            const data = dataStore[currentFilters.dateRange];
+            if (!data) return;
+
+            const vendorGrid = document.getElementById('vendorGrid');
+            vendorGrid.innerHTML = '';
+
+            Object.entries(data.vendors).forEach(([vendorName, vendorData]) => {
+                // Filter by vendor if selected
+                if (currentFilters.vendor !== 'all' && currentFilters.vendor !== vendorName) {
+                    return;
+                }
+
+                const card = createVendorCard(vendorName, vendorData, data.locations);
+                vendorGrid.appendChild(card);
+            });
+        }
+
+        // Create a vendor card element
+        function createVendorCard(vendorName, vendorData, locations) {
+            const card = document.createElement('div');
+            card.className = 'vendor-card';
+            card.dataset.vendor = vendorName;
+
+            const initials = vendorName.split(' ').map(w => w[0]).join('').substring(0, 2);
+            const trendClass = vendorData.trend < 0 ? 'improving' : 'declining';
+            const trendIcon = vendorData.trend < 0 ? 'trending_down' : 'trending_up';
+            const trendSign = vendorData.trend > 0 ? '+' : '';
+
+            // Calculate errored/degraded split (approximate)
+            const erroredPercent = (vendorData.impactedPercent * 0.45).toFixed(1);
+            const degradedPercent = (vendorData.impactedPercent * 0.55).toFixed(1);
+
+            card.innerHTML = `
+                <div class="vendor-card-header" onclick="toggleVendorCard(this.parentElement)">
+                    <div class="vendor-info">
+                        <div class="vendor-logo">${initials}</div>
+                        <div class="vendor-details">
+                            <h4>${vendorName}</h4>
+                            <div class="vendor-meta">${vendorData.agents} agents impacted</div>
+                        </div>
+                    </div>
+                    <div class="vendor-metric">
+                        <div class="vendor-metric-label">Total Calls</div>
+                        <div class="vendor-metric-value">${vendorData.calls.toLocaleString()}</div>
+                    </div>
+                    <div class="vendor-metric">
+                        <div class="vendor-metric-label">Impacted</div>
+                        <div class="vendor-metric-value errored">${vendorData.impactedPercent.toFixed(1)}%</div>
+                    </div>
+                    <div class="vendor-metric">
+                        <div class="vendor-metric-label">Agents</div>
+                        <div class="vendor-metric-value agents">${vendorData.agentsPercent.toFixed(1)}%</div>
+                    </div>
+                    <div class="vendor-metric">
+                        <div class="vendor-metric-label">Trend</div>
+                        <div class="vendor-trend ${trendClass}">
+                            <span class="material-icons">${trendIcon}</span>
+                            ${trendSign}${vendorData.trend.toFixed(1)}%
+                        </div>
+                    </div>
+                    <button class="vendor-expand-btn">
+                        <span class="material-icons">expand_more</span>
+                    </button>
+                </div>
+                <div class="vendor-card-body">
+                    <div class="location-breakdown">
+                        <div class="location-breakdown-header">
+                            <span class="material-icons-outlined">location_on</span>
+                            Location Breakdown
+                        </div>
+                        <table class="location-table">
+                            <thead>
+                                <tr>
+                                    <th>Location</th>
+                                    <th style="text-align: right;">Calls</th>
+                                    <th style="text-align: right;">Impacted</th>
+                                    <th style="text-align: right;">Impact %</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${generateLocationRows(locations)}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Generate location breakdown rows
+        function generateLocationRows(locations) {
+            let rows = '';
+            
+            Object.entries(locations).forEach(([continent, countries]) => {
+                // Filter by location if selected
+                if (currentFilters.location !== 'all' && currentFilters.location !== continent) {
+                    return;
+                }
+
+                // Calculate continent totals
+                let continentCalls = 0;
+                let continentImpacted = 0;
+                Object.values(countries).forEach(c => {
+                    continentCalls += c.calls;
+                    continentImpacted += c.impacted;
+                });
+                const continentPercent = ((continentImpacted / continentCalls) * 100).toFixed(1);
+
+                rows += `
+                    <tr class="continent-row">
+                        <td>${continent}</td>
+                        <td class="metric-cell">${continentCalls.toLocaleString()}</td>
+                        <td class="metric-cell">${continentImpacted.toLocaleString()}</td>
+                        <td class="metric-cell ${parseFloat(continentPercent) > 10 ? 'error' : ''}">${continentPercent}%</td>
+                    </tr>
+                `;
+
+                // Country rows
+                Object.entries(countries).forEach(([country, data]) => {
+                    if (currentFilters.country && currentFilters.country !== country && currentFilters.country !== 'all') {
+                        return;
+                    }
+                    const countryPercent = ((data.impacted / data.calls) * 100).toFixed(1);
+                    rows += `
+                        <tr class="country-row">
+                            <td>${country}</td>
+                            <td class="metric-cell">${data.calls.toLocaleString()}</td>
+                            <td class="metric-cell">${data.impacted.toLocaleString()}</td>
+                            <td class="metric-cell ${parseFloat(countryPercent) > 10 ? 'error' : ''}">${countryPercent}%</td>
+                        </tr>
+                    `;
+                });
+            });
+
+            return rows;
+        }
+
+        // Toggle vendor card expansion
+        function toggleVendorCard(card) {
+            card.classList.toggle('expanded');
+        }
+
+        // Expand all vendor cards
+        function expandAllVendors() {
+            document.querySelectorAll('.vendor-card').forEach(card => {
+                card.classList.add('expanded');
+            });
+        }
+
+        // Collapse all vendor cards
+        function collapseAllVendors() {
+            document.querySelectorAll('.vendor-card').forEach(card => {
+                card.classList.remove('expanded');
+            });
+        }
+
+        // ============================================
+        // KPI UPDATE FUNCTIONS
+        // ============================================
+
+        // Update all KPIs based on current filters
+        function updateKPIs() {
+            const data = dataStore[currentFilters.dateRange];
+            if (!data) return;
+
+            const kpis = data.kpis;
+            const comparison = data.comparison || {};
+
+            // Animate KPI cards
+            document.querySelectorAll('.kpi-card').forEach(card => {
+                card.classList.add('updating');
+                setTimeout(() => card.classList.remove('updating'), 300);
+            });
+
+            // Update Total Calls
+            animateValue('totalCallsValue', kpis.totalCalls, true);
+            
+            // Update comparison values for Total Calls
+            updateComparisonItem('totalCallsDoD', comparison.dod?.totalCalls || 2.1, true);
+            updateComparisonItem('totalCallsWoW', comparison.wow?.totalCalls || 8.4, true);
+            updateComparisonItem('totalCallsMoM', comparison.mom?.totalCalls || 12.3, true);
+
+            // Update Impacted Calls
+            animateValue('impactedCallsValue', kpis.impactedCallsPercent, false, 1);
+            animateValue('erroredCallsValue', kpis.erroredCallsPercent, false, 1, '%');
+            animateValue('degradedCallsValue', kpis.degradedCallsPercent, false, 1, '%');
+            
+            // Update comparison values for Impacted Calls
+            updateComparisonItem('impactedCallsDoD', comparison.dod?.impactedCalls || -3.2, false);
+            updateComparisonItem('impactedCallsWoW', comparison.wow?.impactedCalls || -12.6, false);
+            updateComparisonItem('impactedCallsMoM', comparison.mom?.impactedCalls || -18.4, false);
+
+            // Update Impacted Agents
+            animateValue('impactedAgentsValue', kpis.impactedAgentsPercent, false, 1);
+            animateValue('impactedAgentsCount', kpis.impactedAgents, true);
+            animateValue('totalAgentsCount', kpis.totalAgents, true);
+            
+            // Update comparison values for Impacted Agents
+            updateComparisonItem('impactedAgentsDoD', comparison.dod?.impactedAgents || -1.8, false);
+            updateComparisonItem('impactedAgentsWoW', comparison.wow?.impactedAgents || -8.8, false);
+            updateComparisonItem('impactedAgentsMoM', comparison.mom?.impactedAgents || -15.2, false);
+        }
+
+        // Update a comparison item (DoD, WoW, MoM)
+        function updateComparisonItem(elementId, value, higherIsBetter = true) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+
+            const isPositive = higherIsBetter ? value > 0 : value < 0;
+            const isNegative = higherIsBetter ? value < 0 : value > 0;
+
+            element.className = 'kpi-comp-item ' + (isPositive ? 'positive' : isNegative ? 'negative' : 'neutral');
+            
+            const sign = value > 0 ? '+' : '';
+            const valueEl = element.querySelector('.comp-value');
+            if (valueEl) {
+                valueEl.textContent = `${sign}${value.toFixed(1)}%`;
+            }
+        }
+
+        // Animate number value
+        function animateValue(elementId, endValue, formatNumber = false, decimals = 0, suffix = '') {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+
+            const startValue = parseFloat(element.textContent.replace(/[^0-9.-]/g, '')) || 0;
+            const duration = 500;
+            const startTime = performance.now();
+
+            element.classList.add('counting');
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+                const currentValue = startValue + (endValue - startValue) * easeProgress;
+
+                if (formatNumber) {
+                    element.textContent = Math.round(currentValue).toLocaleString() + suffix;
+                } else {
+                    element.textContent = currentValue.toFixed(decimals) + suffix;
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    element.classList.remove('counting');
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        // Update trend indicator
+        function updateTrend(elementId, value, higherIsBetter = true) {
+            const element = document.getElementById(elementId);
+            if (!element || value === undefined) return;
+
+            const isPositive = higherIsBetter ? value > 0 : value < 0;
+            const isNegative = higherIsBetter ? value < 0 : value > 0;
+
+            element.className = 'kpi-trend ' + (isPositive ? 'positive' : isNegative ? 'negative' : 'neutral');
+            
+            const icon = value > 0 ? 'trending_up' : value < 0 ? 'trending_down' : 'trending_flat';
+            const sign = value > 0 ? '+' : '';
+            
+            element.innerHTML = `
+                <span class="material-icons">${icon}</span>
+                <span class="trend-value">${sign}${value.toFixed(1)}%</span>
+            `;
+        }
+
+        // ============================================
+        // FILTER FUNCTIONS
+        // ============================================
+
+        // Handle date range change
+        function handleDateRangeChange() {
+            const dateRangeSelect = document.getElementById('dateRangeFilter');
+            const dateRange = dateRangeSelect.value;
+            currentFilters.dateRange = dateRange;
+            
+            // Update dropdown option text to show date range
+            const config = dateRangeConfig[dateRange];
+            if (config) {
+                const dateLabel = config.getDateLabel();
+                
+                // Update all dropdown options with date labels
+                const options = dateRangeSelect.options;
+                for (let i = 0; i < options.length; i++) {
+                    const optValue = options[i].value;
+                    const optConfig = dateRangeConfig[optValue];
+                    if (optConfig) {
+                        const optLabel = optConfig.getDateLabel();
+                        const baseName = getDateRangeBaseName(optValue);
+                        options[i].textContent = `${baseName} (${optLabel})`;
+                    }
+                }
+            }
+            
+            handleFilterChange();
+        }
+
+        // Get base name for date range
+        function getDateRangeBaseName(value) {
+            const names = {
+                'yesterday': 'Yesterday',
+                'thisWeek': 'This Week',
+                'lastWeek': 'Last Week',
+                'thisMonth': 'This Month',
+                'lastMonth': 'Last Month',
+                'thisQuarter': 'This Quarter',
+                'lastQuarter': 'Last Quarter',
+                'last3Months': 'Last 3 Months',
+                'last6Months': 'Last 6 Months'
+            };
+            return names[value] || value;
+        }
+
+        // Handle continent change (cascading to country)
+        function handleContinentChange() {
+            const continent = document.getElementById('continentFilter').value;
+            const countrySelect = document.getElementById('countryFilter');
+            
+            currentFilters.location = continent;
+            
+            // Clear and repopulate country dropdown
+            countrySelect.innerHTML = '<option value="all">All Countries</option>';
+            
+            if (continent !== 'all' && locationData[continent]) {
+                countrySelect.disabled = false;
+                locationData[continent].forEach(country => {
+                    const option = document.createElement('option');
+                    option.value = country;
+                    option.textContent = country;
+                    countrySelect.appendChild(option);
+                });
+            } else {
+                countrySelect.disabled = true;
+            }
+            
+            handleFilterChange();
+        }
+
+        // Handle any filter change
+        function handleFilterChange() {
+            currentFilters.vendor = document.getElementById('vendorFilter').value;
+            currentFilters.dateRange = document.getElementById('dateRangeFilter').value;
+            currentFilters.location = document.getElementById('continentFilter').value;
+            
+            const country = document.getElementById('countryFilter').value;
+            if (country !== 'all') {
+                currentFilters.country = country;
+            } else {
+                delete currentFilters.country;
+            }
+            
+            updateActiveFilterChips();
+            
+            // Auto-update dashboard on filter change
+            updateDashboard();
+        }
+
+        // Update active filter chips (if container exists)
+        function updateActiveFilterChips() {
+            const container = document.getElementById('activeFilters');
+            if (!container) return; // Container was removed in simplified UI
+            
+            container.innerHTML = '';
+            
+            // Vendor chip
+            if (currentFilters.vendor !== 'all') {
+                container.appendChild(createFilterChip('Vendor', currentFilters.vendor, () => {
+                    document.getElementById('vendorFilter').value = 'all';
+                    handleFilterChange();
+                }));
+            }
+            
+            // Date range chip (always show)
+            const dateConfig = dateRangeConfig[currentFilters.dateRange];
+            container.appendChild(createFilterChip('Date', `${dateConfig.label} (${dateConfig.getDateLabel()})`, null, false));
+            
+            // Location chip
+            if (currentFilters.location !== 'all') {
+                const locationText = currentFilters.country 
+                    ? `${currentFilters.location} > ${currentFilters.country}`
+                    : currentFilters.location;
+                container.appendChild(createFilterChip('Location', locationText, () => {
+                    document.getElementById('continentFilter').value = 'all';
+                    handleContinentChange();
+                }));
+            }
+        }
+
+        // Create a filter chip element
+        function createFilterChip(label, value, onRemove, removable = true) {
+            const chip = document.createElement('div');
+            chip.className = 'filter-chip';
+            chip.innerHTML = `
+                <span>${label}: ${value}</span>
+                ${removable ? `<button class="remove-chip" title="Remove filter">
+                    <span class="material-icons">close</span>
+                </button>` : ''}
+            `;
+            
+            if (removable && onRemove) {
+                chip.querySelector('.remove-chip').addEventListener('click', onRemove);
+            }
+            
+            return chip;
+        }
+
+        // Reset all filters
+        function resetFilters() {
+            document.getElementById('vendorFilter').value = 'all';
+            document.getElementById('dateRangeFilter').value = 'thisWeek';
+            document.getElementById('continentFilter').value = 'all';
+            document.getElementById('countryFilter').value = 'all';
+            document.getElementById('countryFilter').disabled = true;
+            
+            currentFilters = {
+                vendor: 'all',
+                dateRange: 'thisWeek',
+                location: 'all'
+            };
+            
+            handleDateRangeChange();
+            updateActiveFilterChips();
+            updateDashboard();
+        }
+
+        // Apply filters (trigger data refresh)
+        function applyFilters() {
+            console.log('Applying filters:', currentFilters);
+            
+            // Visual feedback on button
+            const btn = event.target.closest('.btn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<span class="material-icons-outlined" style="font-size: 18px;">hourglass_empty</span> Updating...';
+            btn.disabled = true;
+
+            // Update dashboard
+            updateDashboard();
+
+            // Reset button after update
+            setTimeout(() => {
+                btn.innerHTML = '<span class="material-icons-outlined" style="font-size: 18px;">check</span> Applied';
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                }, 1000);
+            }, 600);
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Call Impact Analytics Dashboard initialized');
+            
+            // Initialize date range display
+            handleDateRangeChange();
+            
+            // Initialize filter chips
+            updateActiveFilterChips();
+
+            // Initialize KPIs
+            updateKPIs();
+
+            // Initialize Vendor Cards
+            renderVendorCards();
+
+            // Initialize Agent Table
+            renderAgentTable();
+
+            // Initialize Threshold Tables
+            updateThresholdDisplay();
+            renderThresholdTables();
+
+            // Initialize Repeat Offenders
+            renderRepeatOffenders();
+
+            console.log('Dashboard fully initialized');
+        });
+
+        // ============================================
+        // GLOBAL ACTIONS
+        // ============================================
+
+        // Refresh dashboard data
+        function refreshDashboard() {
+            const btn = event.target.closest('.btn');
+            btn.querySelector('.material-icons-outlined').style.animation = 'spin 1s linear infinite';
+            
+            // Simulate data refresh
+            setTimeout(() => {
+                updateDashboard();
+                btn.querySelector('.material-icons-outlined').style.animation = '';
+            }, 1000);
+        }
+
+        // Export dashboard as PDF/Image placeholder
+        function exportDashboard() {
+            alert('Export functionality would generate a PDF report of the current dashboard view.');
+        }
+
+        // Open settings modal placeholder
+        function openSettings() {
+            const newErrorThreshold = prompt('Set Errored Calls Threshold (%):', thresholdSettings.errored);
+            const newDegradedThreshold = prompt('Set Degraded Calls Threshold (%):', thresholdSettings.degraded);
+            
+            if (newErrorThreshold && !isNaN(parseFloat(newErrorThreshold))) {
+                thresholdSettings.errored = parseFloat(newErrorThreshold);
+            }
+            if (newDegradedThreshold && !isNaN(parseFloat(newDegradedThreshold))) {
+                thresholdSettings.degraded = parseFloat(newDegradedThreshold);
+            }
+            
+            updateThresholdDisplay();
+            renderThresholdTables();
+            renderAgentTable();
+        }
+
+        // Add spin animation for refresh button
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // ============================================
+        // GLOBAL API
+        // ============================================
+        window.CallImpactDashboard = {
+            updateDashboard,
+            updateKPIs,
+            renderVendorCards,
+            renderAgentTable,
+            renderThresholdTables,
+            renderRepeatOffenders,
+            getFilters: () => ({ ...currentFilters }),
+            setFilters: (filters) => {
+                Object.assign(currentFilters, filters);
+                updateDashboard();
+            },
+            getData: () => dataStore[currentFilters.dateRange],
+            getThresholds: () => ({ ...thresholdSettings }),
+            setThresholds: (thresholds) => {
+                Object.assign(thresholdSettings, thresholds);
+                updateThresholdDisplay();
+                renderThresholdTables();
+            }
+        };
+    </script>
+</body>
+</html>

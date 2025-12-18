@@ -83,6 +83,376 @@ LEFT JOIN historical_errors he ON cs.entity_id = he.entity_id;
 
 
 -- ============================================================================
+-- 1B. BASELINE CALCULATION - Average and Standard Deviation
+-- Calculate historical baseline for anomaly detection
+-- ============================================================================
+
+/*
+BASELINE CONCEPT:
+- Baseline = "What's normal for this entity at this time?"
+- We compare current metrics against baseline to detect anomalies
+- Using same hour-of-day accounts for daily patterns (e.g., peak hours)
+- Using 7-30 days of history provides statistical significance
+*/
+
+-- -----------------------------------------------------------------------------
+-- METHOD 1: Simple Baseline (Last 7 Days, Same Hour)
+-- Good for: Quick implementation, moderate accuracy
+-- -----------------------------------------------------------------------------
+
+SELECT 
+    entity_id,
+    entity_name,
+    metric_name,
+    DATEPART(HOUR, GETDATE()) AS current_hour,
+    
+    -- Baseline Average: Mean of same-hour values over past 7 days
+    AVG(metric_value) AS baseline_avg,
+    
+    -- Baseline Standard Deviation: Measure of normal variance
+    STDEV(metric_value) AS baseline_stddev,
+    
+    -- Sample size (number of data points used)
+    COUNT(*) AS sample_count,
+    
+    -- Min/Max for context
+    MIN(metric_value) AS baseline_min,
+    MAX(metric_value) AS baseline_max,
+    
+    -- Percentiles for more robust thresholds
+    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY metric_value) OVER (PARTITION BY entity_id, metric_name) AS baseline_p50,
+    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY metric_value) OVER (PARTITION BY entity_id, metric_name) AS baseline_p95,
+    PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY metric_value) OVER (PARTITION BY entity_id, metric_name) AS baseline_p99
+
+FROM application_metrics
+WHERE 
+    -- Last 7 days of data
+    recorded_at >= DATEADD(DAY, -7, GETDATE())
+    -- Same hour as current time (e.g., if it's 10 AM, look at 10 AM data)
+    AND DATEPART(HOUR, recorded_at) = DATEPART(HOUR, GETDATE())
+    -- Exclude weekends if business app (optional)
+    -- AND DATEPART(WEEKDAY, recorded_at) BETWEEN 2 AND 6
+GROUP BY entity_id, entity_name, metric_name;
+
+
+-- -----------------------------------------------------------------------------
+-- METHOD 2: Hourly Baseline Table (Pre-calculated, Recommended for Production)
+-- Good for: High performance, query efficiency
+-- -----------------------------------------------------------------------------
+
+-- Step 1: Create baseline table (run daily via scheduled job)
+/*
+CREATE TABLE entity_baseline (
+    entity_id           INT,
+    entity_name         VARCHAR(255),
+    metric_name         VARCHAR(100),
+    hour_of_day         INT,              -- 0-23
+    day_type            VARCHAR(10),      -- 'WEEKDAY' or 'WEEKEND'
+    baseline_avg        DECIMAL(18,4),
+    baseline_stddev     DECIMAL(18,4),
+    baseline_p50        DECIMAL(18,4),
+    baseline_p95        DECIMAL(18,4),
+    baseline_p99        DECIMAL(18,4),
+    sample_count        INT,
+    calculated_at       DATETIME,
+    PRIMARY KEY (entity_id, metric_name, hour_of_day, day_type)
+);
+*/
+
+-- Step 2: Populate baseline table (run daily at midnight)
+INSERT INTO entity_baseline (
+    entity_id, entity_name, metric_name, hour_of_day, day_type,
+    baseline_avg, baseline_stddev, baseline_p50, baseline_p95, baseline_p99,
+    sample_count, calculated_at
+)
+SELECT 
+    entity_id,
+    entity_name,
+    metric_name,
+    DATEPART(HOUR, recorded_at) AS hour_of_day,
+    CASE 
+        WHEN DATEPART(WEEKDAY, recorded_at) IN (1, 7) THEN 'WEEKEND'
+        ELSE 'WEEKDAY'
+    END AS day_type,
+    AVG(metric_value) AS baseline_avg,
+    STDEV(metric_value) AS baseline_stddev,
+    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY metric_value) 
+        OVER (PARTITION BY entity_id, metric_name, DATEPART(HOUR, recorded_at)) AS baseline_p50,
+    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY metric_value) 
+        OVER (PARTITION BY entity_id, metric_name, DATEPART(HOUR, recorded_at)) AS baseline_p95,
+    PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY metric_value) 
+        OVER (PARTITION BY entity_id, metric_name, DATEPART(HOUR, recorded_at)) AS baseline_p99,
+    COUNT(*) AS sample_count,
+    GETDATE() AS calculated_at
+FROM application_metrics
+WHERE recorded_at >= DATEADD(DAY, -30, GETDATE())  -- Last 30 days for better statistics
+GROUP BY 
+    entity_id, 
+    entity_name, 
+    metric_name, 
+    DATEPART(HOUR, recorded_at),
+    CASE WHEN DATEPART(WEEKDAY, recorded_at) IN (1, 7) THEN 'WEEKEND' ELSE 'WEEKDAY' END;
+
+
+-- -----------------------------------------------------------------------------
+-- METHOD 3: Anomaly Detection Using Baseline
+-- Compare current value against baseline to detect anomalies
+-- -----------------------------------------------------------------------------
+
+WITH current_metrics AS (
+    SELECT 
+        entity_id,
+        entity_name,
+        metric_name,
+        AVG(metric_value) AS current_value,  -- Average of last 5 minutes
+        MAX(metric_value) AS current_max
+    FROM application_metrics
+    WHERE recorded_at >= DATEADD(MINUTE, -5, GETDATE())
+    GROUP BY entity_id, entity_name, metric_name
+),
+baseline AS (
+    SELECT 
+        entity_id,
+        metric_name,
+        baseline_avg,
+        baseline_stddev,
+        baseline_p95,
+        baseline_p99
+    FROM entity_baseline
+    WHERE hour_of_day = DATEPART(HOUR, GETDATE())
+        AND day_type = CASE 
+            WHEN DATEPART(WEEKDAY, GETDATE()) IN (1, 7) THEN 'WEEKEND'
+            ELSE 'WEEKDAY'
+        END
+)
+SELECT 
+    cm.entity_id,
+    cm.entity_name,
+    cm.metric_name,
+    cm.current_value,
+    b.baseline_avg,
+    b.baseline_stddev,
+    
+    -- How many standard deviations from the mean?
+    CASE 
+        WHEN b.baseline_stddev > 0 
+        THEN (cm.current_value - b.baseline_avg) / b.baseline_stddev
+        ELSE 0 
+    END AS z_score,
+    
+    -- Threshold calculations
+    b.baseline_avg + (2 * COALESCE(b.baseline_stddev, 0)) AS threshold_2sigma,  -- ~95% of normal values below this
+    b.baseline_avg + (3 * COALESCE(b.baseline_stddev, 0)) AS threshold_3sigma,  -- ~99.7% of normal values below this
+    
+    -- Anomaly classification
+    CASE 
+        -- Z-score > 3: Very unusual (beyond 99.7% of normal)
+        WHEN b.baseline_stddev > 0 
+            AND (cm.current_value - b.baseline_avg) / b.baseline_stddev > 3 
+        THEN 'CRITICAL_ANOMALY'
+        
+        -- Z-score > 2: Unusual (beyond 95% of normal)
+        WHEN b.baseline_stddev > 0 
+            AND (cm.current_value - b.baseline_avg) / b.baseline_stddev > 2 
+        THEN 'WARNING_ANOMALY'
+        
+        -- Above P95 but within 2 sigma
+        WHEN cm.current_value > b.baseline_p95 
+        THEN 'ELEVATED'
+        
+        -- Normal range
+        ELSE 'NORMAL'
+    END AS anomaly_status,
+    
+    -- Percent above baseline
+    CASE 
+        WHEN b.baseline_avg > 0 
+        THEN ROUND(((cm.current_value - b.baseline_avg) / b.baseline_avg) * 100, 2)
+        ELSE 0 
+    END AS pct_above_baseline
+
+FROM current_metrics cm
+LEFT JOIN baseline b ON cm.entity_id = b.entity_id 
+    AND cm.metric_name = b.metric_name
+ORDER BY 
+    CASE 
+        WHEN (cm.current_value - b.baseline_avg) / NULLIF(b.baseline_stddev, 0) > 3 THEN 1
+        WHEN (cm.current_value - b.baseline_avg) / NULLIF(b.baseline_stddev, 0) > 2 THEN 2
+        ELSE 3
+    END,
+    cm.current_value DESC;
+
+
+-- -----------------------------------------------------------------------------
+-- METHOD 4: Error Rate Baseline (Specific Example)
+-- Calculate baseline for error rates per application
+-- -----------------------------------------------------------------------------
+
+WITH daily_error_rates AS (
+    -- Calculate error rate for each hour of each day
+    SELECT 
+        application_id,
+        application_name,
+        CAST(recorded_at AS DATE) AS metric_date,
+        DATEPART(HOUR, recorded_at) AS hour_of_day,
+        DATEPART(WEEKDAY, recorded_at) AS day_of_week,
+        SUM(error_count) AS total_errors,
+        SUM(request_count) AS total_requests,
+        CASE 
+            WHEN SUM(request_count) > 0 
+            THEN ROUND(SUM(error_count) * 100.0 / SUM(request_count), 4)
+            ELSE 0 
+        END AS error_rate_pct
+    FROM application_metrics
+    WHERE recorded_at >= DATEADD(DAY, -14, GETDATE())  -- 2 weeks of data
+    GROUP BY 
+        application_id, 
+        application_name, 
+        CAST(recorded_at AS DATE), 
+        DATEPART(HOUR, recorded_at),
+        DATEPART(WEEKDAY, recorded_at)
+)
+SELECT 
+    application_id,
+    application_name,
+    hour_of_day,
+    CASE 
+        WHEN day_of_week IN (1, 7) THEN 'WEEKEND'
+        ELSE 'WEEKDAY'
+    END AS day_type,
+    
+    -- Baseline Statistics
+    ROUND(AVG(error_rate_pct), 4) AS baseline_error_rate_avg,
+    ROUND(STDEV(error_rate_pct), 4) AS baseline_error_rate_stddev,
+    
+    -- Dynamic Thresholds (calculated from baseline)
+    ROUND(AVG(error_rate_pct) + (2 * COALESCE(STDEV(error_rate_pct), 0)), 4) AS warning_threshold,
+    ROUND(AVG(error_rate_pct) + (3 * COALESCE(STDEV(error_rate_pct), 0)), 4) AS critical_threshold,
+    
+    -- Sample Info
+    COUNT(*) AS days_of_data,
+    MIN(error_rate_pct) AS min_error_rate,
+    MAX(error_rate_pct) AS max_error_rate
+    
+FROM daily_error_rates
+GROUP BY 
+    application_id, 
+    application_name, 
+    hour_of_day,
+    CASE WHEN day_of_week IN (1, 7) THEN 'WEEKEND' ELSE 'WEEKDAY' END
+ORDER BY application_name, hour_of_day;
+
+
+/*
+================================================================================
+BASELINE CALCULATION - DETAILED EXPLANATION
+================================================================================
+
+WHAT IS BASELINE?
+-----------------
+Baseline is the "expected normal" value for a metric at a specific time.
+It accounts for:
+- Time-of-day patterns (peak vs off-peak hours)
+- Day-of-week patterns (weekday vs weekend)
+- Seasonal variations (optional, for longer timeframes)
+
+WHAT IS STANDARD DEVIATION (STDDEV)?
+-------------------------------------
+Standard deviation measures how spread out the values are from the average.
+
+Example: Error Rate for App X at 10 AM (last 7 weekdays)
+┌─────────────┬─────────────┐
+│ Day         │ Error Rate  │
+├─────────────┼─────────────┤
+│ Monday      │ 0.8%        │
+│ Tuesday     │ 1.2%        │
+│ Wednesday   │ 0.9%        │
+│ Thursday    │ 1.1%        │
+│ Friday      │ 1.5%        │
+│ Last Monday │ 0.7%        │
+│ Last Tuesday│ 1.0%        │
+├─────────────┼─────────────┤
+│ AVERAGE     │ 1.03%       │  ← baseline_avg
+│ STDDEV      │ 0.27%       │  ← baseline_stddev
+└─────────────┴─────────────┘
+
+CALCULATING THRESHOLDS:
+- 1-sigma (68% of data): 1.03% ± 0.27% = 0.76% to 1.30%
+- 2-sigma (95% of data): 1.03% ± 0.54% = 0.49% to 1.57%  ← WARNING
+- 3-sigma (99.7% of data): 1.03% ± 0.81% = 0.22% to 1.84%  ← CRITICAL
+
+Z-SCORE INTERPRETATION:
+-----------------------
+Z-score = (current_value - baseline_avg) / baseline_stddev
+
+┌──────────────┬─────────────────────────────────────────────────────┐
+│ Z-Score      │ Meaning                                             │
+├──────────────┼─────────────────────────────────────────────────────┤
+│ -1 to +1     │ Normal (68% of observations fall here)              │
+│ +1 to +2     │ Slightly elevated (common, ~14% of observations)    │
+│ +2 to +3     │ Unusual - WARNING (only ~2% of observations)        │
+│ > +3         │ Very unusual - CRITICAL (only ~0.15% of obs)        │
+│ < -2         │ Unusually LOW (might indicate data quality issue)   │
+└──────────────┴─────────────────────────────────────────────────────┘
+
+EXAMPLE ANOMALY DETECTION:
+--------------------------
+Current Error Rate: 2.1%
+Baseline Avg: 1.03%
+Baseline StdDev: 0.27%
+
+Z-Score = (2.1 - 1.03) / 0.27 = 3.96
+
+Since Z-Score (3.96) > 3 → CRITICAL_ANOMALY
+The current error rate is nearly 4 standard deviations above normal!
+
+WHY SAME HOUR COMPARISON?
+-------------------------
+Error rates vary by time of day:
+┌──────────┬─────────────┬─────────────────────────────────┐
+│ Hour     │ Typical Rate│ Reason                          │
+├──────────┼─────────────┼─────────────────────────────────┤
+│ 2-5 AM   │ 0.2%        │ Low traffic, batch jobs         │
+│ 9-11 AM  │ 1.5%        │ Peak login/morning activity     │
+│ 12-1 PM  │ 0.8%        │ Lunch lull                      │
+│ 2-5 PM   │ 1.2%        │ Afternoon activity              │
+│ 8-10 PM  │ 0.5%        │ Evening wind-down               │
+└──────────┴─────────────┴─────────────────────────────────┘
+
+A 1.5% error rate at 3 AM is CRITICAL (7x normal)
+A 1.5% error rate at 10 AM is NORMAL (matches baseline)
+
+MINIMUM SAMPLE SIZE:
+--------------------
+For reliable statistics, you need sufficient data points:
+- Minimum: 7 days (7 data points per hour)
+- Recommended: 14-30 days
+- If sample_count < 7, use global defaults or wider thresholds
+
+HANDLING ZERO/LOW STDDEV:
+-------------------------
+If stddev = 0 or very low, it means the metric is extremely consistent.
+In this case:
+- Use percentage deviation instead: (current - avg) / avg > 50% → ANOMALY
+- Or use absolute thresholds as fallback
+- Example: If avg = 0.5% and stddev = 0.01%, 
+  any error rate > 0.6% could be considered anomalous
+
+RECOMMENDED BASELINE REFRESH FREQUENCY:
+---------------------------------------
+┌────────────────────────┬─────────────────────────────────────────┐
+│ Data Type              │ Refresh Frequency                       │
+├────────────────────────┼─────────────────────────────────────────┤
+│ Hourly baselines       │ Daily (at midnight)                     │
+│ Weekly patterns        │ Weekly (Sunday night)                   │
+│ Seasonal adjustments   │ Monthly                                 │
+│ After major releases   │ Immediately (may need baseline reset)   │
+└────────────────────────┴─────────────────────────────────────────┘
+
+*/
+
+
+-- ============================================================================
 -- 2. REPEATED HOST ERRORS DETECTION
 -- Identifies hosts throwing errors repeatedly over a configurable period
 -- ============================================================================
@@ -546,40 +916,350 @@ WHERE a.is_active = 1;
 
 
 -- ============================================================================
--- USAGE NOTES
+-- USAGE NOTES & DETAILED STRATEGIES
 -- ============================================================================
 /*
-KEY STRATEGIES FOR FALSE ALARM REDUCTION:
+================================================================================
+KEY STRATEGIES FOR FALSE ALARM REDUCTION
+================================================================================
 
-1. TEMPORAL VALIDATION
-   - Don't alert on single-minute spikes
-   - Require 3-5 consecutive minutes of threshold breach
-   - Use rolling averages instead of point-in-time values
+1. TEMPORAL VALIDATION - Require Persistence Before Alerting
+--------------------------------------------------------------------------------
+   PROBLEM: Single-minute spikes cause alert fatigue
+   
+   SOLUTION: Require consecutive breaches before alerting
+   
+   EXAMPLE DATA:
+   ┌─────────────┬───────────┬──────────┬─────────────┬──────────────────┐
+   │ Time        │ Error Rate│ Threshold│ Breaching?  │ Alert Decision   │
+   ├─────────────┼───────────┼──────────┼─────────────┼──────────────────┤
+   │ 10:01       │ 0.5%      │ 2%       │ No          │ -                │
+   │ 10:02       │ 5.2%      │ 2%       │ Yes (1)     │ SUPPRESS         │
+   │ 10:03       │ 1.1%      │ 2%       │ No (reset)  │ -                │
+   │ 10:04       │ 4.8%      │ 2%       │ Yes (1)     │ SUPPRESS         │
+   │ 10:05       │ 6.1%      │ 2%       │ Yes (2)     │ SUPPRESS         │
+   │ 10:06       │ 5.5%      │ 2%       │ Yes (3)     │ SUPPRESS         │
+   │ 10:07       │ 7.2%      │ 2%       │ Yes (4)     │ ⚠️ ALERT NOW     │
+   └─────────────┴───────────┴──────────┴─────────────┴──────────────────┘
+   
+   IMPLEMENTATION:
+   - consecutive_breaches >= 4 → Genuine issue, raise alert
+   - consecutive_breaches = 1 → Likely transient, suppress
+   - Use rolling window of 5-10 minutes for spike detection
+   
+   TUNING PARAMETERS:
+   - MIN_CONSECUTIVE_BREACHES: 4 (recommended), range 3-6
+   - ROLLING_WINDOW_MINUTES: 10 (for averaging)
 
-2. HISTORICAL CONTEXT
-   - Compare against baseline (same hour, last 7 days)
-   - Use standard deviation to identify true anomalies
-   - Track distinct error minutes, not just error counts
 
-3. CORRELATION ANALYSIS
-   - If multiple apps in same infrastructure group affected, likely infra issue
-   - Suppress individual app alerts, raise infrastructure alert instead
+2. HISTORICAL CONTEXT - Compare Against Baseline
+--------------------------------------------------------------------------------
+   PROBLEM: "Normal" varies by time of day, day of week
+   
+   SOLUTION: Compare current metrics against same-hour baseline from past 7 days
+   
+   EXAMPLE BASELINE CALCULATION:
+   ┌─────────────────┬────────────────┬────────────────┬─────────────────┐
+   │ Day             │ Hour (10 AM)   │ Avg Error Rate │ Std Deviation   │
+   ├─────────────────┼────────────────┼────────────────┼─────────────────┤
+   │ Mon (Dec 2)     │ 10:00-11:00    │ 0.8%           │ -               │
+   │ Tue (Dec 3)     │ 10:00-11:00    │ 1.2%           │ -               │
+   │ Wed (Dec 4)     │ 10:00-11:00    │ 0.9%           │ -               │
+   │ Thu (Dec 5)     │ 10:00-11:00    │ 1.1%           │ -               │
+   │ Fri (Dec 6)     │ 10:00-11:00    │ 1.5%           │ -               │
+   │ Sat (Dec 7)     │ 10:00-11:00    │ 0.3%           │ -               │
+   │ Sun (Dec 8)     │ 10:00-11:00    │ 0.2%           │ -               │
+   ├─────────────────┼────────────────┼────────────────┼─────────────────┤
+   │ BASELINE        │ 10:00-11:00    │ 0.86%          │ 0.45%           │
+   └─────────────────┴────────────────┴────────────────┴─────────────────┘
+   
+   ANOMALY DETECTION FORMULA:
+   - is_anomaly = current_value > (baseline_avg + 3 * baseline_stddev)
+   - For above: threshold = 0.86% + (3 * 0.45%) = 2.21%
+   - If current = 2.5% → ANOMALY (above 2.21%)
+   - If current = 1.8% → NORMAL (below 2.21%)
+   
+   IMPLEMENTATION:
+   - Store hourly aggregates for 7-30 days
+   - Calculate baseline per entity, per hour-of-day
+   - Use 2-sigma for warnings, 3-sigma for critical
 
-4. MAINTENANCE AWARENESS
-   - Suppress alerts during maintenance windows
-   - Allow 30-minute stabilization period post-maintenance
 
-5. WEIGHTED SCORING
-   - Recent errors (5 min) weighted higher than older errors (30 min)
-   - Combine multiple signals (synthetic, host, errors) for confidence
+3. CORRELATION ANALYSIS - Detect Infrastructure Issues
+--------------------------------------------------------------------------------
+   PROBLEM: Network/infra issues trigger alerts for ALL dependent apps
+   
+   SOLUTION: If >50% of apps in same group affected, suppress individual alerts
+   
+   EXAMPLE SCENARIO:
+   ┌──────────────────┬─────────────────┬────────────┬─────────────────────┐
+   │ Application      │ Infra Group     │ Has Errors │ Individual Action   │
+   ├──────────────────┼─────────────────┼────────────┼─────────────────────┤
+   │ Customer Portal  │ Datacenter-East │ YES        │ Would alert...      │
+   │ Admin Dashboard  │ Datacenter-East │ YES        │ Would alert...      │
+   │ Payment Service  │ Datacenter-East │ YES        │ Would alert...      │
+   │ API Gateway      │ Datacenter-East │ YES        │ Would alert...      │
+   │ Auth Service     │ Datacenter-East │ NO         │ -                   │
+   │ Search Service   │ Datacenter-East │ NO         │ -                   │
+   ├──────────────────┼─────────────────┼────────────┼─────────────────────┤
+   │ SUMMARY          │ 4/6 affected    │ 67%        │ INFRA ISSUE!        │
+   └──────────────────┴─────────────────┴────────────┴─────────────────────┘
+   
+   DECISION MATRIX:
+   ┌─────────────────────┬─────────────────────────────────────────────────┐
+   │ % Apps Affected     │ Action                                          │
+   ├─────────────────────┼─────────────────────────────────────────────────┤
+   │ 0-20%               │ RAISE individual app alerts                     │
+   │ 21-50%              │ RAISE with correlation note                     │
+   │ 51-80%              │ SUPPRESS app alerts, RAISE infra alert          │
+   │ 81-100%             │ SUPPRESS all, RAISE CRITICAL infra alert        │
+   └─────────────────────┴─────────────────────────────────────────────────┘
 
-6. RECOVERY TRACKING
-   - Track consecutive healthy minutes
-   - Show "Recovering" status when improving
-   - Avoid flip-flopping between states
 
-RECOMMENDED ALERT THRESHOLDS:
-- Raise alert only when consecutive_breaches >= 4 (4+ minutes)
-- Suppress if same infrastructure_group has >50% apps affected
-- Require confidence_level = 'Confirmed' for paging alerts
+4. MAINTENANCE WINDOW AWARENESS
+--------------------------------------------------------------------------------
+   PROBLEM: Scheduled maintenance triggers false alerts
+   
+   SOLUTION: Time-based suppression with stabilization buffer
+   
+   TIMELINE EXAMPLE:
+   ┌────────────────────────────────────────────────────────────────────────┐
+   │                     MAINTENANCE WINDOW TIMELINE                        │
+   ├────────────────────────────────────────────────────────────────────────┤
+   │                                                                        │
+   │  ◄──── PRE ────►◄────── MAINTENANCE ──────►◄──── STABILIZE ────►      │
+   │     15 mins              2 hours                  30 mins              │
+   │                                                                        │
+   │  10:45 AM          11:00 AM              1:00 PM              1:30 PM  │
+   │     │                  │                    │                    │    │
+   │     ▼                  ▼                    ▼                    ▼    │
+   │  [WARN MODE]      [SUPPRESS ALL]       [ALLOW >10 errors]    [NORMAL] │
+   │                                                                        │
+   └────────────────────────────────────────────────────────────────────────┘
+   
+   SUPPRESSION RULES:
+   ┌─────────────────────┬──────────────────────────────────────────────────┐
+   │ Time Period         │ Alert Behavior                                   │
+   ├─────────────────────┼──────────────────────────────────────────────────┤
+   │ 15 min before start │ Log warnings, no pages                           │
+   │ During maintenance  │ Suppress ALL alerts                              │
+   │ 30 min after end    │ Only alert if errors > 10 (allow stabilization) │
+   │ After stabilization │ Normal alerting resumes                          │
+   └─────────────────────┴──────────────────────────────────────────────────┘
+
+
+5. WEIGHTED SCORING - Prioritize Recent Data
+--------------------------------------------------------------------------------
+   PROBLEM: Old errors (25 min ago) weighted same as current errors
+   
+   SOLUTION: Time-decay weighting for error scoring
+   
+   WEIGHT DISTRIBUTION:
+   ┌─────────────────┬──────────┬────────────────────────────────────────────┐
+   │ Time Window     │ Weight   │ Reasoning                                  │
+   ├─────────────────┼──────────┼────────────────────────────────────────────┤
+   │ Last 5 minutes  │ 3x       │ Most relevant, immediate impact            │
+   │ 6-15 minutes    │ 2x       │ Recent, likely still relevant              │
+   │ 16-30 minutes   │ 1x       │ Historical context only                    │
+   │ 30+ minutes     │ 0x       │ Ignore for current health status           │
+   └─────────────────┴──────────┴────────────────────────────────────────────┘
+   
+   EXAMPLE CALCULATION:
+   ┌─────────────────┬──────────────┬──────────┬────────────────────────────┐
+   │ Time Window     │ Error Count  │ Weight   │ Weighted Score             │
+   ├─────────────────┼──────────────┼──────────┼────────────────────────────┤
+   │ Last 5 min      │ 3 errors     │ 3x       │ 9                          │
+   │ 6-15 min        │ 5 errors     │ 2x       │ 10                         │
+   │ 16-30 min       │ 8 errors     │ 1x       │ 8                          │
+   ├─────────────────┼──────────────┼──────────┼────────────────────────────┤
+   │ TOTAL           │ 16 errors    │ -        │ 27 (weighted score)        │
+   └─────────────────┴──────────────┴──────────┴────────────────────────────┘
+   
+   THRESHOLD MAPPING:
+   - Weighted Score 0-5:    HEALTHY
+   - Weighted Score 6-15:   WARNING
+   - Weighted Score 16-30:  DEGRADED
+   - Weighted Score 31+:    CRITICAL
+
+
+6. RECOVERY TRACKING - Prevent Status Flip-Flopping
+--------------------------------------------------------------------------------
+   PROBLEM: Status rapidly changes: DEGRADED → HEALTHY → DEGRADED → HEALTHY
+   
+   SOLUTION: Require sustained healthy period before status upgrade
+   
+   STATE MACHINE:
+   ┌──────────────────────────────────────────────────────────────────────────┐
+   │                        STATUS TRANSITION RULES                           │
+   ├──────────────────────────────────────────────────────────────────────────┤
+   │                                                                          │
+   │   ┌─────────┐    4+ consecutive    ┌──────────┐                         │
+   │   │ HEALTHY │◄──────breaches──────►│ DEGRADED │                         │
+   │   └────┬────┘                      └────┬─────┘                         │
+   │        │                                │                                │
+   │        │ 5+ healthy                     │ 8+ consecutive                │
+   │        │ minutes                        │ breaches                       │
+   │        ▼                                ▼                                │
+   │   ┌──────────┐                    ┌──────────┐                          │
+   │   │RECOVERING│                    │ CRITICAL │                          │
+   │   └──────────┘                    └──────────┘                          │
+   │                                                                          │
+   └──────────────────────────────────────────────────────────────────────────┘
+   
+   HYSTERESIS EXAMPLE (prevents flip-flop):
+   ┌─────────┬───────────┬─────────────────┬────────────────────────────────┐
+   │ Minute  │ Errors    │ Consecutive OK  │ Status                         │
+   ├─────────┼───────────┼─────────────────┼────────────────────────────────┤
+   │ 10:00   │ 5         │ 0               │ DEGRADED                       │
+   │ 10:01   │ 0         │ 1               │ DEGRADED (need 5 OK minutes)   │
+   │ 10:02   │ 0         │ 2               │ DEGRADED                       │
+   │ 10:03   │ 1         │ 0 (reset)       │ DEGRADED                       │
+   │ 10:04   │ 0         │ 1               │ DEGRADED                       │
+   │ 10:05   │ 0         │ 2               │ DEGRADED                       │
+   │ 10:06   │ 0         │ 3               │ DEGRADED                       │
+   │ 10:07   │ 0         │ 4               │ DEGRADED                       │
+   │ 10:08   │ 0         │ 5               │ ✅ RECOVERING                  │
+   │ 10:09   │ 0         │ 6               │ RECOVERING                     │
+   │ 10:10   │ 0         │ 7               │ RECOVERING                     │
+   │ 10:11   │ 0         │ 8               │ ✅ HEALTHY                     │
+   └─────────┴───────────┴─────────────────┴────────────────────────────────┘
+
+
+7. DISTINCT ERROR MINUTES - Quality Over Quantity
+--------------------------------------------------------------------------------
+   PROBLEM: Single bad minute with 100 errors looks worse than 10 minutes with 
+            5 errors each (but latter is more concerning)
+   
+   SOLUTION: Track DISTINCT minutes with errors, not total error count
+   
+   COMPARISON:
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ SCENARIO A: Burst (Single Minute Issue)                                │
+   ├─────────────────────────────────────────────────────────────────────────┤
+   │ Minute  │ 10:01 │ 10:02 │ 10:03 │ 10:04 │ 10:05 │ Total │ Distinct Min│
+   │ Errors  │  150  │   0   │   0   │   0   │   0   │  150  │      1      │
+   │ STATUS: WARNING (single burst, likely transient)                       │
+   └─────────────────────────────────────────────────────────────────────────┘
+   
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ SCENARIO B: Persistent (Ongoing Issue)                                 │
+   ├─────────────────────────────────────────────────────────────────────────┤
+   │ Minute  │ 10:01 │ 10:02 │ 10:03 │ 10:04 │ 10:05 │ Total │ Distinct Min│
+   │ Errors  │   8   │   5   │   7   │   6   │   9   │   35  │      5      │
+   │ STATUS: DEGRADED (persistent issue, needs attention)                   │
+   └─────────────────────────────────────────────────────────────────────────┘
+   
+   THRESHOLD GUIDANCE:
+   ┌─────────────────────┬─────────────────────┬─────────────────────────────┐
+   │ Distinct Error Mins │ Total Errors (30m)  │ Recommended Status          │
+   ├─────────────────────┼─────────────────────┼─────────────────────────────┤
+   │ 1-2                 │ Any                 │ WARNING (monitor)           │
+   │ 3-5                 │ < 20                │ WARNING                     │
+   │ 3-5                 │ >= 20               │ DEGRADED                    │
+   │ 6-10                │ Any                 │ DEGRADED                    │
+   │ 11-15               │ Any                 │ DEGRADED (high confidence)  │
+   │ 16+                 │ Any                 │ CRITICAL                    │
+   └─────────────────────┴─────────────────────┴─────────────────────────────┘
+
+
+================================================================================
+RECOMMENDED ALERT THRESHOLDS & CONFIGURATION
+================================================================================
+
+ALERTING TIERS:
+┌─────────────┬──────────────────────────────────────┬────────────────────────┐
+│ Tier        │ Criteria                             │ Notification           │
+├─────────────┼──────────────────────────────────────┼────────────────────────┤
+│ P1-CRITICAL │ - Synthetic < 90% for 5+ mins        │ Page on-call           │
+│             │ - Distinct error mins >= 15          │ Slack + Email          │
+│             │ - >50% hosts unhealthy               │ Auto-create incident   │
+├─────────────┼──────────────────────────────────────┼────────────────────────┤
+│ P2-DEGRADED │ - Synthetic 90-98% for 5+ mins       │ Slack channel          │
+│             │ - Distinct error mins 10-14          │ Email to team          │
+│             │ - Weighted error score 16-30         │                        │
+├─────────────┼──────────────────────────────────────┼────────────────────────┤
+│ P3-WARNING  │ - Synthetic 98-99%                   │ Dashboard only         │
+│             │ - Distinct error mins 5-9            │ Optional Slack         │
+│             │ - Single active alert                │                        │
+├─────────────┼──────────────────────────────────────┼────────────────────────┤
+│ P4-INFO     │ - Distinct error mins 1-4            │ Log only               │
+│             │ - Transient spikes                   │ No notification        │
+│             │ - Confidence = 'Possible Transient'  │                        │
+└─────────────┴──────────────────────────────────────┴────────────────────────┘
+
+
+SUPPRESSION RULES:
+┌─────────────────────────────────────────┬─────────────────────────────────────┐
+│ Condition                               │ Action                              │
+├─────────────────────────────────────────┼─────────────────────────────────────┤
+│ consecutive_breaches < 4                │ Suppress (transient)                │
+│ infra_group_pct_affected > 50%          │ Suppress app, raise infra alert     │
+│ During maintenance window               │ Suppress all                        │
+│ Within 30 min post-maintenance          │ Suppress if errors < 10             │
+│ confidence_level = 'Possible Transient' │ Suppress for P1/P2, allow P3/P4     │
+│ status = 'RECOVERING'                   │ Suppress new alerts                 │
+└─────────────────────────────────────────┴─────────────────────────────────────┘
+
+
+QUERY EXECUTION FREQUENCY:
+┌─────────────────────────────────────────┬─────────────────────────────────────┐
+│ Query                                   │ Recommended Frequency               │
+├─────────────────────────────────────────┼─────────────────────────────────────┤
+│ Dashboard Summary View                  │ Every 1 minute                      │
+│ Threshold Breach Detection              │ Every 1 minute                      │
+│ Host Error Pattern Analysis             │ Every 5 minutes                     │
+│ Correlation Analysis                    │ Every 5 minutes                     │
+│ Baseline Calculation                    │ Every 1 hour (or daily)             │
+│ Maintenance Window Check                │ Every 5 minutes                     │
+└─────────────────────────────────────────┴─────────────────────────────────────┘
+
+
+DATA RETENTION RECOMMENDATIONS:
+┌─────────────────────────────────────────┬─────────────────────────────────────┐
+│ Data Type                               │ Retention Period                    │
+├─────────────────────────────────────────┼─────────────────────────────────────┤
+│ Per-minute metrics                      │ 7 days (raw), 90 days (aggregated)  │
+│ Error logs                              │ 30 days (raw), 1 year (aggregated)  │
+│ Baseline statistics                     │ 30 days                             │
+│ Alert history                           │ 1 year                              │
+│ Maintenance windows                     │ 1 year                              │
+└─────────────────────────────────────────┴─────────────────────────────────────┘
+
+
+================================================================================
+SAMPLE DATA SCENARIOS FOR TESTING
+================================================================================
+
+SCENARIO 1: Normal Operation
+- Synthetic Health: 99.8%
+- Host Health: 4/4 Healthy
+- Errors (30 min): 2 errors in 1 distinct minute
+- Expected Status: HEALTHY
+- Expected Alert: None
+
+SCENARIO 2: Transient Spike (Should NOT alert)
+- Synthetic Health: 96% at 10:01, 99.5% at 10:02-10:05
+- Errors (30 min): 45 errors in 1 distinct minute
+- Expected Status: WARNING
+- Expected Alert: Suppressed (single minute, not sustained)
+
+SCENARIO 3: Genuine Degradation (Should alert)
+- Synthetic Health: 97.2% average over 5 minutes
+- Host Health: 5/6 Healthy
+- Errors (30 min): 35 errors across 8 distinct minutes
+- Expected Status: DEGRADED
+- Expected Alert: P2 (Slack + Email)
+
+SCENARIO 4: Infrastructure Issue (Should suppress app alerts)
+- 4 out of 6 apps in Datacenter-East showing errors
+- Each app has 20+ errors
+- Expected Action: Suppress individual app alerts
+- Expected Alert: Single P1 Infrastructure Alert
+
+SCENARIO 5: Post-Maintenance Stabilization (Should suppress)
+- Maintenance ended 15 minutes ago
+- Errors: 8 errors since maintenance end
+- Expected Status: Allow (within stabilization threshold of 10)
+- Expected Alert: Suppressed until stabilization period ends
+
 */

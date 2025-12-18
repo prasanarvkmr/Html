@@ -1,0 +1,4026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Agent Performance - Enhanced Dashboard</title>
+    
+    <!-- Google Fonts - Roboto (Material Design Typography) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Round" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        /* ============================================
+           CSS RESET & BASE STYLES
+           ============================================ */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Material Design Color Palette */
+            --md-primary: #1976D2;
+            --md-primary-light: #42A5F5;
+            --md-primary-dark: #1565C0;
+            --md-primary-variant: #0D47A1;
+            
+            --md-secondary: #7C4DFF;
+            --md-secondary-light: #B388FF;
+            --md-secondary-dark: #651FFF;
+            
+            --md-error: #D32F2F;
+            --md-error-light: #EF5350;
+            --md-warning: #F57C00;
+            --md-warning-light: #FFB74D;
+            --md-success: #388E3C;
+            --md-success-light: #66BB6A;
+            --md-info: #0288D1;
+            
+            /* Surface Colors */
+            --md-background: #FAFAFA;
+            --md-surface: #FFFFFF;
+            --md-surface-variant: #F5F5F5;
+            
+            /* Text Colors */
+            --md-on-primary: #FFFFFF;
+            --md-on-surface: #212121;
+            --md-on-surface-medium: #666666;
+            --md-on-surface-disabled: #9E9E9E;
+            
+            /* Elevation Shadows (Material Design dp levels) */
+            --md-elevation-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            --md-elevation-2: 0 3px 6px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.12);
+            --md-elevation-3: 0 10px 20px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.10);
+            --md-elevation-4: 0 15px 25px rgba(0,0,0,0.15), 0 5px 10px rgba(0,0,0,0.05);
+            
+            /* Spacing (8dp grid system) */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-xxl: 48px;
+            
+            /* Border Radius */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --radius-full: 9999px;
+            
+            /* Typography Scale */
+            --type-h1: 96px;
+            --type-h2: 60px;
+            --type-h3: 48px;
+            --type-h4: 34px;
+            --type-h5: 24px;
+            --type-h6: 20px;
+            --type-subtitle1: 16px;
+            --type-subtitle2: 14px;
+            --type-body1: 16px;
+            --type-body2: 14px;
+            --type-caption: 12px;
+            --type-overline: 10px;
+            
+            /* Transitions */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--md-background);
+            color: var(--md-on-surface);
+            line-height: 1.5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ============================================
+           TYPOGRAPHY
+           ============================================ */
+        .text-h5 {
+            font-size: var(--type-h5);
+            font-weight: 500;
+            letter-spacing: 0;
+            line-height: 1.334;
+        }
+
+        .text-h6 {
+            font-size: var(--type-h6);
+            font-weight: 500;
+            letter-spacing: 0.0075em;
+            line-height: 1.6;
+        }
+
+        .text-subtitle1 {
+            font-size: var(--type-subtitle1);
+            font-weight: 500;
+            letter-spacing: 0.0094em;
+            line-height: 1.75;
+        }
+
+        .text-subtitle2 {
+            font-size: var(--type-subtitle2);
+            font-weight: 500;
+            letter-spacing: 0.0071em;
+            line-height: 1.57;
+        }
+
+        .text-body1 {
+            font-size: var(--type-body1);
+            font-weight: 400;
+            letter-spacing: 0.0094em;
+            line-height: 1.5;
+        }
+
+        .text-body2 {
+            font-size: var(--type-body2);
+            font-weight: 400;
+            letter-spacing: 0.0179em;
+            line-height: 1.43;
+        }
+
+        .text-caption {
+            font-size: var(--type-caption);
+            font-weight: 400;
+            letter-spacing: 0.0333em;
+            line-height: 1.66;
+        }
+
+        .text-overline {
+            font-size: var(--type-overline);
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            line-height: 2.66;
+            text-transform: uppercase;
+        }
+
+        /* ============================================
+           UTILITY CLASSES
+           ============================================ */
+        .text-primary { color: var(--md-primary); }
+        .text-error { color: var(--md-error); }
+        .text-warning { color: var(--md-warning); }
+        .text-success { color: var(--md-success); }
+        .text-muted { color: var(--md-on-surface-medium); }
+        .text-disabled { color: var(--md-on-surface-disabled); }
+
+        .bg-primary { background-color: var(--md-primary); }
+        .bg-surface { background-color: var(--md-surface); }
+        .bg-error { background-color: var(--md-error); }
+        .bg-warning { background-color: var(--md-warning); }
+        .bg-success { background-color: var(--md-success); }
+
+        .font-mono { font-family: 'Roboto Mono', monospace; }
+        .font-medium { font-weight: 500; }
+        .font-bold { font-weight: 700; }
+
+        /* ============================================
+           MATERIAL ICONS
+           ============================================ */
+        .material-icons,
+        .material-icons-outlined,
+        .material-icons-round {
+            font-size: 24px;
+            vertical-align: middle;
+        }
+
+        .icon-sm { font-size: 18px; }
+        .icon-lg { font-size: 32px; }
+        .icon-xl { font-size: 48px; }
+
+        /* ============================================
+           APP BAR (TOP NAVIGATION)
+           ============================================ */
+        .app-bar {
+            background: var(--md-surface);
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--spacing-md);
+            position: sticky;
+            top: 0;
+            z-index: 1100;
+            box-shadow: var(--md-elevation-2);
+        }
+
+        .app-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--md-primary) 0%, var(--md-primary-light) 50%, var(--md-secondary) 100%);
+        }
+
+        .app-bar-section {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        /* Brand */
+        .app-bar-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--md-primary) 0%, var(--md-primary-dark) 100%);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--md-on-primary);
+            box-shadow: var(--md-elevation-1);
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--md-primary-dark);
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-tagline {
+            font-size: 11px;
+            color: var(--md-on-surface-medium);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* App Bar Actions */
+        .app-bar-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            border: none;
+            background: transparent;
+            color: var(--md-on-surface-medium);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: var(--transition-fast);
+        }
+
+        .icon-btn:hover {
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--md-on-surface);
+        }
+
+        .icon-btn:active {
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        .icon-btn .badge-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: var(--md-error);
+            border-radius: var(--radius-full);
+            border: 2px solid var(--md-surface);
+        }
+
+        .icon-btn .badge-count {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            min-width: 18px;
+            height: 18px;
+            background: var(--md-error);
+            color: var(--md-on-primary);
+            border-radius: var(--radius-full);
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        /* User Avatar */
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            margin-left: var(--spacing-sm);
+        }
+
+        .user-menu:hover {
+            background: rgba(0, 0, 0, 0.04);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, var(--md-secondary) 0%, var(--md-secondary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--md-on-primary);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--md-on-surface);
+            line-height: 1.2;
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: var(--md-on-surface-medium);
+        }
+
+        /* ============================================
+           SECONDARY NAVIGATION (TABS)
+           ============================================ */
+        .nav-tabs-bar {
+            background: var(--md-surface);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 64px;
+            z-index: 1000;
+        }
+
+        .nav-tabs {
+            display: flex;
+            padding: 0 var(--spacing-md);
+            gap: var(--spacing-xs);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-tab {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md) var(--spacing-lg);
+            color: var(--md-on-surface-medium);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition-fast);
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            color: var(--md-primary);
+            background: rgba(25, 118, 210, 0.04);
+        }
+
+        .nav-tab.active {
+            color: var(--md-primary);
+            border-bottom-color: var(--md-primary);
+        }
+
+        .nav-tab .material-icons-outlined {
+            font-size: 20px;
+        }
+
+        /* Tab indicator animation */
+        .nav-tab::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: var(--md-primary);
+            transition: var(--transition-normal);
+            transform: translateX(-50%);
+        }
+
+        .nav-tab:hover::after {
+            width: 100%;
+        }
+
+        /* ============================================
+           MAIN CONTENT AREA
+           ============================================ */
+        .main-content {
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+            padding: var(--spacing-md);
+            background: var(--md-background);
+        }
+
+        /* ============================================
+           FILTER BAR / HEADER
+           ============================================ */
+        .filter-bar {
+            background: var(--md-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-md) var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--spacing-lg);
+            box-shadow: var(--md-elevation-1);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .filter-bar-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            flex-shrink: 0;
+        }
+
+        .page-header {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--md-on-surface);
+            margin: 0;
+        }
+
+        .page-title .material-icons {
+            color: var(--md-primary);
+            font-size: 24px;
+        }
+
+        .page-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 12px;
+            color: var(--md-on-surface-medium);
+        }
+
+        .page-meta .material-icons-outlined {
+            font-size: 14px;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--md-success);
+            font-weight: 500;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--md-success);
+            border-radius: var(--radius-full);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .filter-bar-right {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+
+        /* Form Controls - Material Design Style */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 140px;
+        }
+
+        .form-label {
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--md-on-surface-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-select {
+            padding: 8px 32px 8px 12px;
+            font-size: 13px;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+            color: var(--md-on-surface);
+            background: var(--md-surface-variant);
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23666666' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 4px center;
+            background-size: 20px;
+            transition: var(--transition-fast);
+        }
+
+        .form-select:hover {
+            background-color: #EEEEEE;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--md-primary);
+            background-color: var(--md-surface);
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.12);
+        }
+
+        /* Action Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: var(--radius-sm);
+        }
+
+        .btn-text {
+            background: transparent;
+            color: var(--md-primary);
+        }
+
+        .btn-text:hover {
+            background: rgba(25, 118, 210, 0.08);
+        }
+
+        .btn-outlined {
+            background: transparent;
+            color: var(--md-primary);
+            border: 1px solid var(--md-primary);
+        }
+
+        .btn-outlined:hover {
+            background: rgba(25, 118, 210, 0.08);
+        }
+
+        .btn-filled {
+            background: var(--md-primary);
+            color: var(--md-on-primary);
+            box-shadow: var(--md-elevation-1);
+        }
+
+        .btn-filled:hover {
+            background: var(--md-primary-dark);
+            box-shadow: var(--md-elevation-2);
+        }
+
+        .btn .material-icons,
+        .btn .material-icons-outlined {
+            font-size: 18px;
+        }
+
+        /* Divider */
+        .divider-vertical {
+            width: 1px;
+            height: 32px;
+            background: rgba(0, 0, 0, 0.12);
+        }
+
+        /* ============================================
+           KPI DOCK BAR
+           ============================================ */
+        .kpi-dock {
+            background: var(--md-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--md-elevation-1);
+            display: flex;
+            align-items: stretch;
+            overflow: hidden;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .kpi-item {
+            flex: 1;
+            padding: var(--spacing-md) var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            border-right: 1px solid rgba(0, 0, 0, 0.06);
+            transition: var(--transition-fast);
+            cursor: default;
+            position: relative;
+        }
+
+        .kpi-item:last-child {
+            border-right: none;
+        }
+
+        .kpi-item:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .kpi-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--md-primary);
+            opacity: 0;
+            transition: var(--transition-fast);
+        }
+
+        .kpi-item:hover::before {
+            opacity: 1;
+        }
+
+        .kpi-item.success::before { background: var(--md-success); }
+        .kpi-item.warning::before { background: var(--md-warning); }
+        .kpi-item.error::before { background: var(--md-error); }
+
+        .kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .kpi-icon.primary {
+            background: rgba(25, 118, 210, 0.1);
+            color: var(--md-primary);
+        }
+
+        .kpi-icon.success {
+            background: rgba(56, 142, 60, 0.1);
+            color: var(--md-success);
+        }
+
+        .kpi-icon.warning {
+            background: rgba(245, 124, 0, 0.1);
+            color: var(--md-warning);
+        }
+
+        .kpi-icon.error {
+            background: rgba(211, 47, 47, 0.1);
+            color: var(--md-error);
+        }
+
+        .kpi-icon.info {
+            background: rgba(2, 136, 209, 0.1);
+            color: var(--md-info);
+        }
+
+        .kpi-icon .material-icons-outlined {
+            font-size: 24px;
+        }
+
+        .kpi-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--md-on-surface-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .kpi-value-row {
+            display: flex;
+            align-items: baseline;
+            gap: var(--spacing-sm);
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--md-on-surface);
+            line-height: 1;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .kpi-unit {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--md-on-surface-medium);
+        }
+
+        .kpi-trend {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+        }
+
+        .kpi-trend.up {
+            background: rgba(56, 142, 60, 0.1);
+            color: var(--md-success);
+        }
+
+        .kpi-trend.down {
+            background: rgba(211, 47, 47, 0.1);
+            color: var(--md-error);
+        }
+
+        .kpi-trend.neutral {
+            background: rgba(0, 0, 0, 0.06);
+            color: var(--md-on-surface-medium);
+        }
+
+        .kpi-trend .material-icons {
+            font-size: 14px;
+        }
+
+        .kpi-compare {
+            font-size: 10px;
+            color: var(--md-on-surface-disabled);
+            margin-top: 2px;
+        }
+
+        /* KPI Target Indicator */
+        .kpi-target {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: var(--md-on-surface-medium);
+            margin-top: 4px;
+        }
+
+        .kpi-target-bar {
+            width: 60px;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+
+        .kpi-target-fill {
+            height: 100%;
+            border-radius: var(--radius-full);
+            transition: var(--transition-normal);
+        }
+
+        .kpi-target-fill.success { background: var(--md-success); }
+        .kpi-target-fill.warning { background: var(--md-warning); }
+        .kpi-target-fill.error { background: var(--md-error); }
+
+        /* ============================================
+           CONTENT GRID (Two Column Layout)
+           ============================================ */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        /* ============================================
+           DATA TABLE - VENDOR PERFORMANCE
+           ============================================ */
+        .data-card {
+            background: var(--md-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--md-elevation-1);
+            overflow: hidden;
+        }
+
+        .data-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .data-card-title {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--md-on-surface);
+        }
+
+        .data-card-title .material-icons-outlined {
+            color: var(--md-primary);
+            font-size: 22px;
+        }
+
+        .data-card-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        /* Table Styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--md-on-surface-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+            background: var(--md-surface-variant);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            white-space: nowrap;
+        }
+
+        .data-table th:first-child {
+            text-align: left;
+            padding-left: var(--spacing-lg);
+        }
+
+        .data-table td {
+            padding: var(--spacing-md);
+            text-align: center;
+            vertical-align: middle;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            font-size: 13px;
+        }
+
+        .data-table td:first-child {
+            text-align: left;
+            padding-left: var(--spacing-lg);
+        }
+
+        .data-table tbody tr {
+            transition: var(--transition-fast);
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Vendor Info Cell */
+        .vendor-cell {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .vendor-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--md-on-primary);
+            flex-shrink: 0;
+        }
+
+        .vendor-avatar.gradient-1 { background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%); }
+        .vendor-avatar.gradient-2 { background: linear-gradient(135deg, #7C4DFF 0%, #651FFF 100%); }
+        .vendor-avatar.gradient-3 { background: linear-gradient(135deg, #00BCD4 0%, #0097A7 100%); }
+        .vendor-avatar.gradient-4 { background: linear-gradient(135deg, #FF5722 0%, #E64A19 100%); }
+        .vendor-avatar.gradient-5 { background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%); }
+
+        .vendor-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .vendor-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--md-on-surface);
+        }
+
+        .vendor-region {
+            font-size: 11px;
+            color: var(--md-on-surface-medium);
+        }
+
+        /* Metric Cell */
+        .metric-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .metric-value {
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Roboto Mono', monospace;
+            color: var(--md-on-surface);
+        }
+
+        .metric-value.success { color: var(--md-success); }
+        .metric-value.warning { color: var(--md-warning); }
+        .metric-value.error { color: var(--md-error); }
+
+        .metric-change {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .metric-change.up { color: var(--md-success); }
+        .metric-change.down { color: var(--md-error); }
+        .metric-change.neutral { color: var(--md-on-surface-medium); }
+
+        .metric-change .material-icons {
+            font-size: 12px;
+        }
+
+        /* Sparkline */
+        .sparkline {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 20px;
+            padding: 0 4px;
+        }
+
+        .spark-bar {
+            width: 4px;
+            border-radius: 2px;
+            background: var(--md-primary);
+            transition: var(--transition-fast);
+        }
+
+        .spark-bar:hover {
+            background: var(--md-primary-dark);
+        }
+
+        /* Status Chip */
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .status-chip.excellent {
+            background: rgba(56, 142, 60, 0.12);
+            color: var(--md-success);
+        }
+
+        .status-chip.good {
+            background: rgba(2, 136, 209, 0.12);
+            color: var(--md-info);
+        }
+
+        .status-chip.needs-attention {
+            background: rgba(245, 124, 0, 0.12);
+            color: var(--md-warning);
+        }
+
+        .status-chip.critical {
+            background: rgba(211, 47, 47, 0.12);
+            color: var(--md-error);
+        }
+
+        .status-chip .material-icons {
+            font-size: 14px;
+        }
+
+        /* ============================================
+           REPEATED OFFENDERS / ALERTS SIDEBAR
+           ============================================ */
+        .alerts-sidebar {
+            background: var(--md-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--md-elevation-1);
+            min-width: 340px;
+            max-width: 380px;
+            display: flex;
+            flex-direction: column;
+            max-height: 600px;
+        }
+
+        .alerts-header {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .alerts-title {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: var(--font-size-body);
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .alerts-title .material-icons-outlined {
+            color: var(--md-error);
+            font-size: 20px;
+        }
+
+        .alerts-badge {
+            background: var(--md-error);
+            color: white;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: var(--spacing-xs);
+        }
+
+        .alerts-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--spacing-sm);
+        }
+
+        .alert-card {
+            background: var(--md-surface);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+            transition: var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .alert-card:hover {
+            border-color: rgba(0, 0, 0, 0.16);
+            box-shadow: var(--md-elevation-1);
+        }
+
+        .alert-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        .alert-card.critical::before {
+            background: var(--md-error);
+        }
+
+        .alert-card.warning::before {
+            background: var(--md-warning);
+        }
+
+        .alert-card.info::before {
+            background: var(--md-primary);
+        }
+
+        .alert-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .alert-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--md-primary), var(--md-primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .alert-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .alert-name {
+            font-size: var(--font-size-body);
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .alert-meta {
+            font-size: var(--font-size-caption);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .alert-severity {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .alert-severity.critical {
+            background: rgba(211, 47, 47, 0.12);
+            color: var(--md-error);
+        }
+
+        .alert-severity.warning {
+            background: rgba(255, 152, 0, 0.12);
+            color: var(--md-warning);
+        }
+
+        .alert-severity .material-icons {
+            font-size: 12px;
+        }
+
+        .alert-issue {
+            background: rgba(0, 0, 0, 0.03);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .alert-issue-title {
+            font-size: var(--font-size-caption);
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xs);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .alert-issue-text {
+            font-size: var(--font-size-body);
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .alert-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-xs);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .alert-metric {
+            text-align: center;
+            padding: var(--spacing-xs);
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: var(--radius-sm);
+        }
+
+        .alert-metric-value {
+            font-size: var(--font-size-body);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .alert-metric-value.poor {
+            color: var(--md-error);
+        }
+
+        .alert-metric-value.warning {
+            color: var(--md-warning);
+        }
+
+        .alert-metric-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .alert-actions {
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+
+        .alert-actions .btn {
+            flex: 1;
+            font-size: var(--font-size-caption);
+            padding: var(--spacing-xs) var(--spacing-sm);
+        }
+
+        .alert-footer {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            text-align: center;
+        }
+
+        .alert-footer .btn {
+            width: 100%;
+        }
+
+        /* Occurrence Badge */
+        .occurrence-badge {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--md-error);
+        }
+
+        .occurrence-badge .material-icons {
+            font-size: 14px;
+        }
+
+        /* Progress Ring (for percentage columns) */
+        .progress-ring {
+            position: relative;
+            width: 44px;
+            height: 44px;
+        }
+
+        .progress-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-bg {
+            fill: none;
+            stroke: rgba(0, 0, 0, 0.08);
+            stroke-width: 4;
+        }
+
+        .progress-ring-fill {
+            fill: none;
+            stroke-width: 4;
+            stroke-linecap: round;
+            transition: var(--transition-normal);
+        }
+
+        .progress-ring-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 11px;
+            font-weight: 600;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        /* ============================================
+           PERFORMANCE TRENDS CHARTS
+           ============================================ */
+        .charts-section {
+            margin-top: var(--spacing-lg);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .chart-card {
+            background: var(--md-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--md-elevation-1);
+            padding: var(--spacing-lg);
+            transition: var(--transition-fast);
+        }
+
+        .chart-card:hover {
+            box-shadow: var(--md-elevation-2);
+        }
+
+        .chart-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .chart-title {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: var(--font-size-body);
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .chart-title .material-icons-outlined {
+            font-size: 20px;
+            color: var(--md-primary);
+        }
+
+        .chart-period {
+            font-size: var(--font-size-caption);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 220px;
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-md);
+            padding-top: var(--spacing-sm);
+            border-top: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            font-size: var(--font-size-caption);
+            color: var(--text-secondary);
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .legend-color.primary {
+            background: var(--md-primary);
+        }
+
+        .legend-color.success {
+            background: var(--md-success);
+        }
+
+        .legend-color.warning {
+            background: var(--md-warning);
+        }
+
+        .legend-color.error {
+            background: var(--md-error);
+        }
+
+        .legend-color.secondary {
+            background: var(--md-secondary);
+        }
+
+        /* Chart Summary Stats */
+        .chart-summary {
+            display: flex;
+            justify-content: space-around;
+            margin-top: var(--spacing-md);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .chart-stat {
+            text-align: center;
+        }
+
+        .chart-stat-value {
+            font-size: var(--font-size-h5);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .chart-stat-value.up {
+            color: var(--md-success);
+        }
+
+        .chart-stat-value.down {
+            color: var(--md-error);
+        }
+
+        .chart-stat-label {
+            font-size: var(--font-size-caption);
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* Wide chart card for full width */
+        .chart-card.wide {
+            grid-column: span 2;
+        }
+
+        .chart-card.full {
+            grid-column: span 3;
+        }
+
+        /* Responsive Charts */
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .chart-card.wide,
+            .chart-card.full {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .chart-card.wide,
+            .chart-card.full {
+                grid-column: span 1;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Content will be added in subsequent tasks -->
+    <div id="app">
+        <!-- App Bar (Top Navigation) -->
+        <header class="app-bar">
+            <div class="app-bar-section">
+                <a href="#" class="app-bar-brand">
+                    <div class="brand-icon">
+                        <span class="material-icons">insights</span>
+                    </div>
+                    <div class="brand-text">
+                        <span class="brand-name">VendorPulse</span>
+                        <span class="brand-tagline">Contact Center Analytics</span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="app-bar-section">
+                <div class="app-bar-actions">
+                    <button class="icon-btn" title="Search">
+                        <span class="material-icons-outlined">search</span>
+                    </button>
+                    <button class="icon-btn" title="Notifications">
+                        <span class="material-icons-outlined">notifications</span>
+                        <span class="badge-count">5</span>
+                    </button>
+                    <button class="icon-btn" title="Help">
+                        <span class="material-icons-outlined">help_outline</span>
+                    </button>
+                    <button class="icon-btn" title="Settings">
+                        <span class="material-icons-outlined">settings</span>
+                    </button>
+                </div>
+                
+                <div class="user-menu">
+                    <div class="user-avatar">JD</div>
+                    <div class="user-info">
+                        <span class="user-name">John Doe</span>
+                        <span class="user-role">Operations Manager</span>
+                    </div>
+                    <span class="material-icons" style="font-size: 18px; color: var(--md-on-surface-medium);">expand_more</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Secondary Navigation Tabs -->
+        <nav class="nav-tabs-bar">
+            <div class="nav-tabs">
+                <a href="#" class="nav-tab">
+                    <span class="material-icons-outlined">dashboard</span>
+                    Executive Summary
+                </a>
+                <a href="#" class="nav-tab">
+                    <span class="material-icons-outlined">assessment</span>
+                    Vendor Scorecard
+                </a>
+                <a href="#" class="nav-tab active">
+                    <span class="material-icons-outlined">support_agent</span>
+                    Agent Performance
+                </a>
+                <a href="#" class="nav-tab">
+                    <span class="material-icons-outlined">verified</span>
+                    Quality Metrics
+                </a>
+                <a href="#" class="nav-tab">
+                    <span class="material-icons-outlined">trending_up</span>
+                    Trends & Analytics
+                </a>
+                <a href="#" class="nav-tab">
+                    <span class="material-icons-outlined">notifications_active</span>
+                    Alerts
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Filter Bar / Header -->
+            <div class="filter-bar">
+                <div class="filter-bar-left">
+                    <div class="page-header">
+                        <h1 class="page-title">
+                            <span class="material-icons">support_agent</span>
+                            Vendor Agent Performance
+                        </h1>
+                        <div class="page-meta">
+                            <span class="material-icons-outlined">schedule</span>
+                            <span>Last updated: Dec 16, 2025 at 10:45 AM EST</span>
+                            <span class="divider-vertical" style="height: 12px; margin: 0 8px;"></span>
+                            <span class="live-indicator">
+                                <span class="live-dot"></span>
+                                Live
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-bar-right">
+                    <div class="form-group">
+                        <label class="form-label">Vendor</label>
+                        <select class="form-select" id="vendorFilter">
+                            <option value="all">All Vendors</option>
+                            <option value="concentrix">Concentrix</option>
+                            <option value="teleperformance">Teleperformance</option>
+                            <option value="ttec">TTEC</option>
+                            <option value="sitel">Sitel Group</option>
+                            <option value="alorica">Alorica</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Region</label>
+                        <select class="form-select" id="regionFilter">
+                            <option value="all">All Regions</option>
+                            <option value="north-america">North America</option>
+                            <option value="latam">LATAM</option>
+                            <option value="emea">EMEA</option>
+                            <option value="apac">APAC</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Time Range</label>
+                        <select class="form-select" id="timeRangeFilter">
+                            <option value="today">Today</option>
+                            <option value="yesterday">Yesterday</option>
+                            <option value="7days" selected>Last 7 Days</option>
+                            <option value="30days">Last 30 Days</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Compare To</label>
+                        <select class="form-select" id="compareFilter">
+                            <option value="previous" selected>Previous Period</option>
+                            <option value="lastWeek">Same Period Last Week</option>
+                            <option value="lastMonth">Same Period Last Month</option>
+                            <option value="none">No Comparison</option>
+                        </select>
+                    </div>
+
+                    <span class="divider-vertical"></span>
+
+                    <button class="btn btn-icon btn-text" title="Refresh Data">
+                        <span class="material-icons-outlined">refresh</span>
+                    </button>
+
+                    <button class="btn btn-icon btn-text" title="Export Report">
+                        <span class="material-icons-outlined">download</span>
+                    </button>
+
+                    <button class="btn btn-icon btn-text" title="More Options">
+                        <span class="material-icons-outlined">more_vert</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Task 5: KPI Dock Bar -->
+            <!-- KPI Dock Bar -->
+            <div class="kpi-dock">
+                <!-- Total Calls -->
+                <div class="kpi-item">
+                    <div class="kpi-icon primary">
+                        <span class="material-icons-outlined">phone_in_talk</span>
+                    </div>
+                    <div class="kpi-content">
+                        <span class="kpi-label">Total Calls</span>
+                        <div class="kpi-value-row">
+                            <span class="kpi-value">156,847</span>
+                        </div>
+                        <div class="kpi-trend up">
+                            <span class="material-icons">trending_up</span>
+                            <span>8.3%</span>
+                        </div>
+                        <span class="kpi-compare">vs 144,812 prev period</span>
+                    </div>
+                </div>
+
+                <!-- Service Level (SLA) -->
+                <div class="kpi-item success">
+                    <div class="kpi-icon success">
+                        <span class="material-icons-outlined">verified</span>
+                    </div>
+                    <div class="kpi-content">
+                        <span class="kpi-label">Service Level (SLA)</span>
+                        <div class="kpi-value-row">
+                            <span class="kpi-value">94.2</span>
+                            <span class="kpi-unit">%</span>
+                        </div>
+                        <div class="kpi-trend up">
+                            <span class="material-icons">trending_up</span>
+                            <span>2.1%</span>
+                        </div>
+                        <div class="kpi-target">
+                            <span>Target: 90%</span>
+                            <div class="kpi-target-bar">
+                                <div class="kpi-target-fill success" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- First Call Resolution -->
+                <div class="kpi-item success">
+                    <div class="kpi-icon success">
+                        <span class="material-icons-outlined">check_circle</span>
+                    </div>
+                    <div class="kpi-content">
+                        <span class="kpi-label">First Call Resolution</span>
+                        <div class="kpi-value-row">
+                            <span class="kpi-value">78.6</span>
+                            <span class="kpi-unit">%</span>
+                        </div>
+                        <div class="kpi-trend up">
+                            <span class="material-icons">trending_up</span>
+                            <span>3.4%</span>
+                        </div>
+                        <div class="kpi-target">
+                            <span>Target: 75%</span>
+                            <div class="kpi-target-bar">
+                                <div class="kpi-target-fill success" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Average Handle Time -->
+                <div class="kpi-item warning">
+                    <div class="kpi-icon warning">
+                        <span class="material-icons-outlined">timer</span>
+                    </div>
+                    <div class="kpi-content">
+                        <span class="kpi-label">Avg Handle Time</span>
+                        <div class="kpi-value-row">
+                            <span class="kpi-value">4:32</span>
+                            <span class="kpi-unit">min</span>
+                        </div>
+                        <div class="kpi-trend down">
+                            <span class="material-icons">trending_down</span>
+                            <span>12s</span>
+                        </div>
+                        <div class="kpi-target">
+                            <span>Target: 4:00</span>
+                            <div class="kpi-target-bar">
+                                <div class="kpi-target-fill warning" style="width: 88%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CSAT Score -->
+                <div class="kpi-item success">
+                    <div class="kpi-icon success">
+                        <span class="material-icons-outlined">sentiment_satisfied</span>
+                    </div>
+                    <div class="kpi-content">
+                        <span class="kpi-label">CSAT Score</span>
+                        <div class="kpi-value-row">
+                            <span class="kpi-value">4.6</span>
+                            <span class="kpi-unit">/ 5.0</span>
+                        </div>
+                        <div class="kpi-trend up">
+                            <span class="material-icons">trending_up</span>
+                            <span>0.2</span>
+                        </div>
+                        <div class="kpi-target">
+                            <span>Target: 4.5</span>
+                            <div class="kpi-target-bar">
+                                <div class="kpi-target-fill success" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Abandonment Rate -->
+                <div class="kpi-item error">
+                    <div class="kpi-icon error">
+                        <span class="material-icons-outlined">phone_missed</span>
+                    </div>
+                    <div class="kpi-content">
+                        <span class="kpi-label">Abandonment Rate</span>
+                        <div class="kpi-value-row">
+                            <span class="kpi-value">5.8</span>
+                            <span class="kpi-unit">%</span>
+                        </div>
+                        <div class="kpi-trend down">
+                            <span class="material-icons">trending_up</span>
+                            <span>1.2%</span>
+                        </div>
+                        <div class="kpi-target">
+                            <span>Target: &lt;3%</span>
+                            <div class="kpi-target-bar">
+                                <div class="kpi-target-fill error" style="width: 52%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Grid with Vendor Table and Offenders -->
+            <div class="content-grid">
+                <!-- Vendor Performance Table -->
+                <div class="data-card">
+                    <div class="data-card-header">
+                        <h2 class="data-card-title">
+                            <span class="material-icons-outlined">business</span>
+                            Vendor Performance Breakdown
+                        </h2>
+                        <div class="data-card-actions">
+                            <button class="btn btn-icon btn-text" title="Filter">
+                                <span class="material-icons-outlined">filter_list</span>
+                            </button>
+                            <button class="btn btn-icon btn-text" title="Export">
+                                <span class="material-icons-outlined">download</span>
+                            </button>
+                        </div>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Vendor</th>
+                                <th>Calls</th>
+                                <th>SLA %</th>
+                                <th>FCR %</th>
+                                <th>AHT</th>
+                                <th>CSAT</th>
+                                <th>Abandon %</th>
+                                <th>Trend</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Concentrix -->
+                            <tr>
+                                <td>
+                                    <div class="vendor-cell">
+                                        <div class="vendor-avatar gradient-1">CX</div>
+                                        <div class="vendor-info">
+                                            <span class="vendor-name">Concentrix</span>
+                                            <span class="vendor-region">North America • USA</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value">45,678</span>
+                                        <span class="metric-change up">
+                                            <span class="material-icons">arrow_upward</span>
+                                            12.3%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value success">96.4%</span>
+                                        <span class="metric-change up">
+                                            <span class="material-icons">arrow_upward</span>
+                                            1.8%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value success">82.1%</span>
+                                        <span class="metric-change up">
+                                            <span class="material-icons">arrow_upward</span>
+                                            2.4%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value success">3:58</span>
+                                        <span class="metric-change up">
+                                            <span class="material-icons">arrow_downward</span>
+                                            18s
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value success">4.7</span>
+                                        <span class="metric-change up">
+                                            <span class="material-icons">arrow_upward</span>
+                                            0.2
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value success">2.1%</span>
+                                        <span class="metric-change up">
+                                            <span class="material-icons">arrow_downward</span>
+                                            0.4%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="sparkline">
+                                        <div class="spark-bar" style="height: 60%;"></div>
+                                        <div class="spark-bar" style="height: 75%;"></div>
+                                        <div class="spark-bar" style="height: 65%;"></div>
+                                        <div class="spark-bar" style="height: 80%;"></div>
+                                        <div class="spark-bar" style="height: 90%;"></div>
+                                        <div class="spark-bar" style="height: 85%;"></div>
+                                        <div class="spark-bar" style="height: 100%;"></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-chip excellent">
+                                        <span class="material-icons">star</span>
+                                        Excellent
+                                    </span>
+                                </td>
+                            </tr>
+                            <!-- Teleperformance -->
+                            <tr>
+                                <td>
+                                    <div class="vendor-cell">
+                                        <div class="vendor-avatar gradient-2">TP</div>
+                                        <div class="vendor-info">
+                                            <span class="vendor-name">Teleperformance</span>
+                                            <span class="vendor-region">EMEA • Portugal</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value">38,912</span>
+                                        <span class="metric-change up">
+                                            <span class="material-icons">arrow_upward</span>
+                                            8.7%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value success">94.8%</span>
+                                        <span class="metric-change up">
+                                            <span class="material-icons">arrow_upward</span>
+                                            2.1%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value success">79.3%</span>
+                                        <span class="metric-change up">
+                                            <span class="material-icons">arrow_upward</span>
+                                            1.9%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value success">4:12</span>
+                                        <span class="metric-change up">
+                                            <span class="material-icons">arrow_downward</span>
+                                            8s
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value success">4.6</span>
+                                        <span class="metric-change up">
+                                            <span class="material-icons">arrow_upward</span>
+                                            0.1
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value success">2.8%</span>
+                                        <span class="metric-change up">
+                                            <span class="material-icons">arrow_downward</span>
+                                            0.2%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="sparkline">
+                                        <div class="spark-bar" style="height: 70%;"></div>
+                                        <div class="spark-bar" style="height: 65%;"></div>
+                                        <div class="spark-bar" style="height: 80%;"></div>
+                                        <div class="spark-bar" style="height: 75%;"></div>
+                                        <div class="spark-bar" style="height: 85%;"></div>
+                                        <div class="spark-bar" style="height: 90%;"></div>
+                                        <div class="spark-bar" style="height: 88%;"></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-chip good">
+                                        <span class="material-icons">thumb_up</span>
+                                        Good
+                                    </span>
+                                </td>
+                            </tr>
+                            <!-- TTEC -->
+                            <tr>
+                                <td>
+                                    <div class="vendor-cell">
+                                        <div class="vendor-avatar gradient-3">TT</div>
+                                        <div class="vendor-info">
+                                            <span class="vendor-name">TTEC</span>
+                                            <span class="vendor-region">APAC • Philippines</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value">34,567</span>
+                                        <span class="metric-change up">
+                                            <span class="material-icons">arrow_upward</span>
+                                            5.2%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value warning">88.2%</span>
+                                        <span class="metric-change down">
+                                            <span class="material-icons">arrow_downward</span>
+                                            1.4%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value warning">72.8%</span>
+                                        <span class="metric-change down">
+                                            <span class="material-icons">arrow_downward</span>
+                                            0.8%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value warning">5:02</span>
+                                        <span class="metric-change down">
+                                            <span class="material-icons">arrow_upward</span>
+                                            24s
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value warning">4.3</span>
+                                        <span class="metric-change down">
+                                            <span class="material-icons">arrow_downward</span>
+                                            0.1
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value warning">4.6%</span>
+                                        <span class="metric-change down">
+                                            <span class="material-icons">arrow_upward</span>
+                                            0.8%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="sparkline">
+                                        <div class="spark-bar" style="height: 85%; background: var(--md-warning);"></div>
+                                        <div class="spark-bar" style="height: 80%; background: var(--md-warning);"></div>
+                                        <div class="spark-bar" style="height: 70%; background: var(--md-warning);"></div>
+                                        <div class="spark-bar" style="height: 65%; background: var(--md-warning);"></div>
+                                        <div class="spark-bar" style="height: 60%; background: var(--md-warning);"></div>
+                                        <div class="spark-bar" style="height: 55%; background: var(--md-warning);"></div>
+                                        <div class="spark-bar" style="height: 58%; background: var(--md-warning);"></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-chip needs-attention">
+                                        <span class="material-icons">warning</span>
+                                        Attention
+                                    </span>
+                                </td>
+                            </tr>
+                            <!-- Sitel Group -->
+                            <tr>
+                                <td>
+                                    <div class="vendor-cell">
+                                        <div class="vendor-avatar gradient-4">SG</div>
+                                        <div class="vendor-info">
+                                            <span class="vendor-name">Sitel Group</span>
+                                            <span class="vendor-region">LATAM • Colombia</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value">22,890</span>
+                                        <span class="metric-change up">
+                                            <span class="material-icons">arrow_upward</span>
+                                            3.1%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value success">93.1%</span>
+                                        <span class="metric-change up">
+                                            <span class="material-icons">arrow_upward</span>
+                                            1.2%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value success">77.4%</span>
+                                        <span class="metric-change up">
+                                            <span class="material-icons">arrow_upward</span>
+                                            2.1%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value success">4:28</span>
+                                        <span class="metric-change neutral">
+                                            <span class="material-icons">remove</span>
+                                            0s
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value success">4.5</span>
+                                        <span class="metric-change neutral">
+                                            <span class="material-icons">remove</span>
+                                            0.0
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value success">3.2%</span>
+                                        <span class="metric-change up">
+                                            <span class="material-icons">arrow_downward</span>
+                                            0.1%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="sparkline">
+                                        <div class="spark-bar" style="height: 72%;"></div>
+                                        <div class="spark-bar" style="height: 74%;"></div>
+                                        <div class="spark-bar" style="height: 76%;"></div>
+                                        <div class="spark-bar" style="height: 75%;"></div>
+                                        <div class="spark-bar" style="height: 78%;"></div>
+                                        <div class="spark-bar" style="height: 80%;"></div>
+                                        <div class="spark-bar" style="height: 82%;"></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-chip good">
+                                        <span class="material-icons">thumb_up</span>
+                                        Good
+                                    </span>
+                                </td>
+                            </tr>
+                            <!-- Alorica -->
+                            <tr>
+                                <td>
+                                    <div class="vendor-cell">
+                                        <div class="vendor-avatar gradient-5">AL</div>
+                                        <div class="vendor-info">
+                                            <span class="vendor-name">Alorica</span>
+                                            <span class="vendor-region">APAC • India</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value">14,800</span>
+                                        <span class="metric-change down">
+                                            <span class="material-icons">arrow_downward</span>
+                                            2.8%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value error">84.6%</span>
+                                        <span class="metric-change down">
+                                            <span class="material-icons">arrow_downward</span>
+                                            3.2%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value error">68.2%</span>
+                                        <span class="metric-change down">
+                                            <span class="material-icons">arrow_downward</span>
+                                            4.1%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value error">5:48</span>
+                                        <span class="metric-change down">
+                                            <span class="material-icons">arrow_upward</span>
+                                            42s
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value error">4.0</span>
+                                        <span class="metric-change down">
+                                            <span class="material-icons">arrow_downward</span>
+                                            0.3
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="metric-cell">
+                                        <span class="metric-value error">7.8%</span>
+                                        <span class="metric-change down">
+                                            <span class="material-icons">arrow_upward</span>
+                                            1.9%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="sparkline">
+                                        <div class="spark-bar" style="height: 90%; background: var(--md-error);"></div>
+                                        <div class="spark-bar" style="height: 85%; background: var(--md-error);"></div>
+                                        <div class="spark-bar" style="height: 75%; background: var(--md-error);"></div>
+                                        <div class="spark-bar" style="height: 60%; background: var(--md-error);"></div>
+                                        <div class="spark-bar" style="height: 50%; background: var(--md-error);"></div>
+                                        <div class="spark-bar" style="height: 45%; background: var(--md-error);"></div>
+                                        <div class="spark-bar" style="height: 40%; background: var(--md-error);"></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-chip critical">
+                                        <span class="material-icons">error</span>
+                                        Critical
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Task 7: Repeated Offenders Sidebar -->
+                <aside class="alerts-sidebar">
+                    <div class="alerts-header">
+                        <div class="alerts-title">
+                            <span class="material-icons-outlined">warning_amber</span>
+                            Repeated Offenders
+                            <span class="alerts-badge">5</span>
+                        </div>
+                        <button class="btn btn-icon btn-text" title="Settings">
+                            <span class="material-icons-outlined">tune</span>
+                        </button>
+                    </div>
+                    <div class="alerts-list">
+                        <!-- Alert Card 1: Critical - Low SLA -->
+                        <div class="alert-card critical">
+                            <div class="alert-card-header">
+                                <div class="alert-avatar">JM</div>
+                                <div class="alert-info">
+                                    <div class="alert-name">James Martinez</div>
+                                    <div class="alert-meta">
+                                        <span>Concentrix • Team Alpha</span>
+                                    </div>
+                                </div>
+                                <span class="alert-severity critical">
+                                    <span class="material-icons">error</span>
+                                    Critical
+                                </span>
+                            </div>
+                            <div class="alert-issue">
+                                <div class="alert-issue-title">Issue Detected</div>
+                                <div class="alert-issue-text">SLA compliance below threshold for 5 consecutive days. Average response time exceeds 45 seconds.</div>
+                            </div>
+                            <div class="alert-metrics">
+                                <div class="alert-metric">
+                                    <div class="alert-metric-value poor">68%</div>
+                                    <div class="alert-metric-label">SLA</div>
+                                </div>
+                                <div class="alert-metric">
+                                    <div class="alert-metric-value warning">52%</div>
+                                    <div class="alert-metric-label">FCR</div>
+                                </div>
+                                <div class="alert-metric">
+                                    <div class="alert-metric-value">6:45</div>
+                                    <div class="alert-metric-label">AHT</div>
+                                </div>
+                            </div>
+                            <div class="occurrence-badge">
+                                <span class="material-icons">replay</span>
+                                5 occurrences this month
+                            </div>
+                            <div class="alert-actions">
+                                <button class="btn btn-outlined btn-small">View Profile</button>
+                                <button class="btn btn-primary btn-small">Take Action</button>
+                            </div>
+                        </div>
+
+                        <!-- Alert Card 2: Critical - High Abandonment -->
+                        <div class="alert-card critical">
+                            <div class="alert-card-header">
+                                <div class="alert-avatar" style="background: linear-gradient(135deg, #d32f2f, #b71c1c);">SR</div>
+                                <div class="alert-info">
+                                    <div class="alert-name">Sarah Roberts</div>
+                                    <div class="alert-meta">
+                                        <span>Sitel Group • Team Delta</span>
+                                    </div>
+                                </div>
+                                <span class="alert-severity critical">
+                                    <span class="material-icons">error</span>
+                                    Critical
+                                </span>
+                            </div>
+                            <div class="alert-issue">
+                                <div class="alert-issue-title">Issue Detected</div>
+                                <div class="alert-issue-text">High call abandonment rate pattern detected. 12.4% abandonment vs 3% target.</div>
+                            </div>
+                            <div class="alert-metrics">
+                                <div class="alert-metric">
+                                    <div class="alert-metric-value warning">78%</div>
+                                    <div class="alert-metric-label">SLA</div>
+                                </div>
+                                <div class="alert-metric">
+                                    <div class="alert-metric-value poor">12.4%</div>
+                                    <div class="alert-metric-label">Abandon</div>
+                                </div>
+                                <div class="alert-metric">
+                                    <div class="alert-metric-value">3.2</div>
+                                    <div class="alert-metric-label">CSAT</div>
+                                </div>
+                            </div>
+                            <div class="occurrence-badge">
+                                <span class="material-icons">replay</span>
+                                4 occurrences this month
+                            </div>
+                            <div class="alert-actions">
+                                <button class="btn btn-outlined btn-small">View Profile</button>
+                                <button class="btn btn-primary btn-small">Take Action</button>
+                            </div>
+                        </div>
+
+                        <!-- Alert Card 3: Warning - Low FCR -->
+                        <div class="alert-card warning">
+                            <div class="alert-card-header">
+                                <div class="alert-avatar" style="background: linear-gradient(135deg, #ff9800, #f57c00);">MK</div>
+                                <div class="alert-info">
+                                    <div class="alert-name">Michael Kim</div>
+                                    <div class="alert-meta">
+                                        <span>TTEC • Team Bravo</span>
+                                    </div>
+                                </div>
+                                <span class="alert-severity warning">
+                                    <span class="material-icons">warning</span>
+                                    Warning
+                                </span>
+                            </div>
+                            <div class="alert-issue">
+                                <div class="alert-issue-title">Issue Detected</div>
+                                <div class="alert-issue-text">First Call Resolution trending downward. Multiple callback requests noted.</div>
+                            </div>
+                            <div class="alert-metrics">
+                                <div class="alert-metric">
+                                    <div class="alert-metric-value">91%</div>
+                                    <div class="alert-metric-label">SLA</div>
+                                </div>
+                                <div class="alert-metric">
+                                    <div class="alert-metric-value poor">58%</div>
+                                    <div class="alert-metric-label">FCR</div>
+                                </div>
+                                <div class="alert-metric">
+                                    <div class="alert-metric-value">4.1</div>
+                                    <div class="alert-metric-label">CSAT</div>
+                                </div>
+                            </div>
+                            <div class="occurrence-badge">
+                                <span class="material-icons">replay</span>
+                                3 occurrences this month
+                            </div>
+                            <div class="alert-actions">
+                                <button class="btn btn-outlined btn-small">View Profile</button>
+                                <button class="btn btn-primary btn-small">Schedule Training</button>
+                            </div>
+                        </div>
+
+                        <!-- Alert Card 4: Warning - High AHT -->
+                        <div class="alert-card warning">
+                            <div class="alert-card-header">
+                                <div class="alert-avatar" style="background: linear-gradient(135deg, #7c4dff, #651fff);">LP</div>
+                                <div class="alert-info">
+                                    <div class="alert-name">Lisa Patel</div>
+                                    <div class="alert-meta">
+                                        <span>Teleperformance • Team Charlie</span>
+                                    </div>
+                                </div>
+                                <span class="alert-severity warning">
+                                    <span class="material-icons">warning</span>
+                                    Warning
+                                </span>
+                            </div>
+                            <div class="alert-issue">
+                                <div class="alert-issue-title">Issue Detected</div>
+                                <div class="alert-issue-text">Average Handle Time consistently above target. May need process optimization coaching.</div>
+                            </div>
+                            <div class="alert-metrics">
+                                <div class="alert-metric">
+                                    <div class="alert-metric-value">88%</div>
+                                    <div class="alert-metric-label">SLA</div>
+                                </div>
+                                <div class="alert-metric">
+                                    <div class="alert-metric-value">76%</div>
+                                    <div class="alert-metric-label">FCR</div>
+                                </div>
+                                <div class="alert-metric">
+                                    <div class="alert-metric-value poor">8:12</div>
+                                    <div class="alert-metric-label">AHT</div>
+                                </div>
+                            </div>
+                            <div class="occurrence-badge">
+                                <span class="material-icons">replay</span>
+                                3 occurrences this month
+                            </div>
+                            <div class="alert-actions">
+                                <button class="btn btn-outlined btn-small">View Profile</button>
+                                <button class="btn btn-primary btn-small">Coach</button>
+                            </div>
+                        </div>
+
+                        <!-- Alert Card 5: Warning - Low CSAT -->
+                        <div class="alert-card warning">
+                            <div class="alert-card-header">
+                                <div class="alert-avatar" style="background: linear-gradient(135deg, #00bcd4, #0097a7);">DW</div>
+                                <div class="alert-info">
+                                    <div class="alert-name">David Wilson</div>
+                                    <div class="alert-meta">
+                                        <span>Alorica • Team Echo</span>
+                                    </div>
+                                </div>
+                                <span class="alert-severity warning">
+                                    <span class="material-icons">warning</span>
+                                    Warning
+                                </span>
+                            </div>
+                            <div class="alert-issue">
+                                <div class="alert-issue-title">Issue Detected</div>
+                                <div class="alert-issue-text">Customer satisfaction scores declining. Multiple negative feedback mentions tone and empathy.</div>
+                            </div>
+                            <div class="alert-metrics">
+                                <div class="alert-metric">
+                                    <div class="alert-metric-value">94%</div>
+                                    <div class="alert-metric-label">SLA</div>
+                                </div>
+                                <div class="alert-metric">
+                                    <div class="alert-metric-value">81%</div>
+                                    <div class="alert-metric-label">FCR</div>
+                                </div>
+                                <div class="alert-metric">
+                                    <div class="alert-metric-value poor">3.4</div>
+                                    <div class="alert-metric-label">CSAT</div>
+                                </div>
+                            </div>
+                            <div class="occurrence-badge">
+                                <span class="material-icons">replay</span>
+                                2 occurrences this month
+                            </div>
+                            <div class="alert-actions">
+                                <button class="btn btn-outlined btn-small">View Profile</button>
+                                <button class="btn btn-primary btn-small">Soft Skills Training</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert-footer">
+                        <button class="btn btn-text">
+                            <span class="material-icons-outlined">visibility</span>
+                            View All Alerts (12)
+                        </button>
+                    </div>
+                </aside>
+            </div>
+
+            <!-- Task 8: Performance Trends Charts -->
+            <section class="charts-section">
+                <div class="charts-grid">
+                    <!-- SLA Trend Chart -->
+                    <div class="chart-card">
+                        <div class="chart-card-header">
+                            <div class="chart-title">
+                                <span class="material-icons-outlined">speed</span>
+                                SLA Performance Trend
+                            </div>
+                            <div class="chart-period">
+                                <span class="material-icons-outlined" style="font-size: 16px;">date_range</span>
+                                Last 7 Days
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="slaChart"></canvas>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color primary"></span>
+                                <span>Actual SLA</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color success"></span>
+                                <span>Target (90%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-summary">
+                            <div class="chart-stat">
+                                <div class="chart-stat-value up">94.2%</div>
+                                <div class="chart-stat-label">Current</div>
+                            </div>
+                            <div class="chart-stat">
+                                <div class="chart-stat-value">92.8%</div>
+                                <div class="chart-stat-label">Average</div>
+                            </div>
+                            <div class="chart-stat">
+                                <div class="chart-stat-value up">+2.4%</div>
+                                <div class="chart-stat-label">vs Last Week</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Call Volume Chart -->
+                    <div class="chart-card">
+                        <div class="chart-card-header">
+                            <div class="chart-title">
+                                <span class="material-icons-outlined">phone_in_talk</span>
+                                Call Volume Trend
+                            </div>
+                            <div class="chart-period">
+                                <span class="material-icons-outlined" style="font-size: 16px;">date_range</span>
+                                Last 7 Days
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="volumeChart"></canvas>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color primary"></span>
+                                <span>Handled</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color error"></span>
+                                <span>Abandoned</span>
+                            </div>
+                        </div>
+                        <div class="chart-summary">
+                            <div class="chart-stat">
+                                <div class="chart-stat-value">12,847</div>
+                                <div class="chart-stat-label">Total Calls</div>
+                            </div>
+                            <div class="chart-stat">
+                                <div class="chart-stat-value">1,835</div>
+                                <div class="chart-stat-label">Daily Avg</div>
+                            </div>
+                            <div class="chart-stat">
+                                <div class="chart-stat-value up">+8.2%</div>
+                                <div class="chart-stat-label">vs Last Week</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CSAT Trend Chart -->
+                    <div class="chart-card">
+                        <div class="chart-card-header">
+                            <div class="chart-title">
+                                <span class="material-icons-outlined">sentiment_satisfied</span>
+                                Customer Satisfaction Trend
+                            </div>
+                            <div class="chart-period">
+                                <span class="material-icons-outlined" style="font-size: 16px;">date_range</span>
+                                Last 7 Days
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="csatChart"></canvas>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color secondary"></span>
+                                <span>CSAT Score</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color success"></span>
+                                <span>Target (4.5)</span>
+                            </div>
+                        </div>
+                        <div class="chart-summary">
+                            <div class="chart-stat">
+                                <div class="chart-stat-value up">4.6</div>
+                                <div class="chart-stat-label">Current</div>
+                            </div>
+                            <div class="chart-stat">
+                                <div class="chart-stat-value">4.4</div>
+                                <div class="chart-stat-label">Average</div>
+                            </div>
+                            <div class="chart-stat">
+                                <div class="chart-stat-value up">+0.3</div>
+                                <div class="chart-stat-label">vs Last Week</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vendor Comparison Chart (Wide) -->
+                    <div class="chart-card wide">
+                        <div class="chart-card-header">
+                            <div class="chart-title">
+                                <span class="material-icons-outlined">leaderboard</span>
+                                Vendor Performance Comparison
+                            </div>
+                            <div class="chart-period">
+                                <span class="material-icons-outlined" style="font-size: 16px;">date_range</span>
+                                Current Period
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="vendorCompareChart"></canvas>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color primary"></span>
+                                <span>SLA %</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color success"></span>
+                                <span>FCR %</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color secondary"></span>
+                                <span>CSAT (x20)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FCR & AHT Trend Chart -->
+                    <div class="chart-card">
+                        <div class="chart-card-header">
+                            <div class="chart-title">
+                                <span class="material-icons-outlined">track_changes</span>
+                                FCR & AHT Trends
+                            </div>
+                            <div class="chart-period">
+                                <span class="material-icons-outlined" style="font-size: 16px;">date_range</span>
+                                Last 7 Days
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="fcrAhtChart"></canvas>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color success"></span>
+                                <span>FCR %</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color warning"></span>
+                                <span>AHT (min)</span>
+                            </div>
+                        </div>
+                        <div class="chart-summary">
+                            <div class="chart-stat">
+                                <div class="chart-stat-value up">78.6%</div>
+                                <div class="chart-stat-label">FCR Current</div>
+                            </div>
+                            <div class="chart-stat">
+                                <div class="chart-stat-value">4:32</div>
+                                <div class="chart-stat-label">AHT Current</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // ============================================
+        // ENHANCED VENDOR AGENT PERFORMANCE DASHBOARD
+        // JavaScript Functionality - Task 9
+        // ============================================
+
+        // Current state
+        let currentTimeRange = '7days';
+        let currentCompare = 'previous';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Enhanced Vendor Agent Performance Dashboard initialized');
+            
+            // Initialize all components
+            initializeCharts();
+            initializeFilters();
+            initializeInteractions();
+            updateTimestamp();
+        });
+
+        // ============================================
+        // CHART CONFIGURATIONS
+        // ============================================
+        
+        // Chart.js default configurations
+        Chart.defaults.font.family = "'Roboto', sans-serif";
+        Chart.defaults.font.size = 12;
+        Chart.defaults.color = 'rgba(0, 0, 0, 0.6)';
+        Chart.defaults.plugins.legend.display = false;
+        
+        // Color palette
+        const colors = {
+            primary: '#1976d2',
+            primaryLight: 'rgba(25, 118, 210, 0.1)',
+            secondary: '#7c4dff',
+            secondaryLight: 'rgba(124, 77, 255, 0.1)',
+            success: '#4caf50',
+            successLight: 'rgba(76, 175, 80, 0.1)',
+            warning: '#ff9800',
+            warningLight: 'rgba(255, 152, 0, 0.1)',
+            error: '#d32f2f',
+            errorLight: 'rgba(211, 47, 47, 0.1)',
+            gray: 'rgba(0, 0, 0, 0.12)'
+        };
+
+        // ============================================
+        // DATA STORE - Different Time Ranges
+        // ============================================
+        const dataStore = {
+            // TODAY's data
+            today: {
+                labels: ['6AM', '8AM', '10AM', '12PM', '2PM', '4PM', '6PM'],
+                kpis: {
+                    totalCalls: 1847,
+                    sla: 95.1,
+                    fcr: 79.8,
+                    aht: '4:18',
+                    ahtMinutes: 4.3,
+                    csat: 4.7,
+                    abandonment: 4.9
+                },
+                comparison: { // vs Yesterday
+                    totalCalls: { value: 1756, change: 5.2 },
+                    sla: { value: 93.8, change: 1.3 },
+                    fcr: { value: 78.2, change: 1.6 },
+                    aht: { value: '4:42', change: -8.5 },
+                    csat: { value: 4.5, change: 0.2 },
+                    abandonment: { value: 5.8, change: -15.5 }
+                },
+                charts: {
+                    sla: [92.4, 93.8, 94.2, 95.6, 94.8, 95.2, 95.1],
+                    callsHandled: [180, 245, 312, 289, 298, 276, 247],
+                    callsAbandoned: [12, 15, 18, 14, 16, 12, 11],
+                    csat: [4.5, 4.6, 4.7, 4.8, 4.6, 4.7, 4.7],
+                    fcr: [77.2, 78.4, 79.1, 80.2, 79.8, 80.1, 79.8],
+                    aht: [4.5, 4.4, 4.3, 4.2, 4.3, 4.2, 4.3]
+                },
+                vendors: {
+                    concentrix: { calls: 412, sla: 95.8, fcr: 83.2, aht: '4:12', csat: 4.8, abandon: 4.2, change: 3.2 },
+                    teleperformance: { calls: 385, sla: 93.4, fcr: 77.8, aht: '4:45', csat: 4.5, abandon: 5.8, change: -1.4 },
+                    ttec: { calls: 398, sla: 96.2, fcr: 85.1, aht: '4:08', csat: 4.9, abandon: 3.8, change: 4.8 },
+                    sitel: { calls: 324, sla: 89.6, fcr: 73.4, aht: '5:12', csat: 4.2, abandon: 8.2, change: -2.6 },
+                    alorica: { calls: 328, sla: 94.1, fcr: 80.5, aht: '4:28', csat: 4.6, abandon: 5.1, change: 2.1 }
+                }
+            },
+            // YESTERDAY's data
+            yesterday: {
+                labels: ['6AM', '8AM', '10AM', '12PM', '2PM', '4PM', '6PM'],
+                kpis: {
+                    totalCalls: 1756,
+                    sla: 93.8,
+                    fcr: 78.2,
+                    aht: '4:42',
+                    ahtMinutes: 4.7,
+                    csat: 4.5,
+                    abandonment: 5.8
+                },
+                comparison: { // vs Day Before
+                    totalCalls: { value: 1698, change: 3.4 },
+                    sla: { value: 92.4, change: 1.5 },
+                    fcr: { value: 77.1, change: 1.4 },
+                    aht: { value: '4:48', change: -2.1 },
+                    csat: { value: 4.4, change: 0.1 },
+                    abandonment: { value: 6.2, change: -6.5 }
+                },
+                charts: {
+                    sla: [91.2, 92.4, 93.1, 94.2, 93.8, 94.1, 93.8],
+                    callsHandled: [165, 228, 298, 275, 284, 262, 244],
+                    callsAbandoned: [14, 18, 21, 16, 19, 14, 13],
+                    csat: [4.3, 4.4, 4.5, 4.6, 4.5, 4.5, 4.5],
+                    fcr: [75.8, 77.2, 78.4, 79.1, 78.6, 78.4, 78.2],
+                    aht: [4.9, 4.8, 4.7, 4.6, 4.7, 4.7, 4.7]
+                },
+                vendors: {
+                    concentrix: { calls: 392, sla: 94.2, fcr: 81.8, aht: '4:24', csat: 4.6, abandon: 4.8, change: 2.8 },
+                    teleperformance: { calls: 368, sla: 92.1, fcr: 76.2, aht: '4:52', csat: 4.4, abandon: 6.4, change: -2.1 },
+                    ttec: { calls: 378, sla: 95.1, fcr: 83.8, aht: '4:18', csat: 4.7, abandon: 4.2, change: 3.6 },
+                    sitel: { calls: 312, sla: 88.2, fcr: 71.8, aht: '5:24', csat: 4.1, abandon: 9.1, change: -3.4 },
+                    alorica: { calls: 306, sla: 92.8, fcr: 78.9, aht: '4:38', csat: 4.4, abandon: 5.8, change: 1.4 }
+                }
+            },
+            // LAST 7 DAYS data
+            '7days': {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                kpis: {
+                    totalCalls: 12847,
+                    sla: 94.2,
+                    fcr: 78.6,
+                    aht: '4:32',
+                    ahtMinutes: 4.53,
+                    csat: 4.6,
+                    abandonment: 5.8
+                },
+                comparison: { // vs Previous Week
+                    totalCalls: { value: 11892, change: 8.0 },
+                    sla: { value: 91.8, change: 2.4 },
+                    fcr: { value: 76.2, change: 2.4 },
+                    aht: { value: '4:48', change: -5.6 },
+                    csat: { value: 4.4, change: 0.2 },
+                    abandonment: { value: 7.0, change: -17.1 }
+                },
+                charts: {
+                    sla: [91.2, 93.4, 92.8, 94.1, 93.6, 95.2, 94.2],
+                    callsHandled: [1680, 1820, 1750, 1890, 1920, 1450, 1337],
+                    callsAbandoned: [98, 112, 95, 108, 102, 78, 65],
+                    csat: [4.2, 4.3, 4.4, 4.5, 4.4, 4.7, 4.6],
+                    fcr: [76.2, 77.8, 78.1, 79.4, 78.9, 79.2, 78.6],
+                    aht: [4.8, 4.6, 4.5, 4.4, 4.3, 4.4, 4.53]
+                },
+                vendors: {
+                    concentrix: { calls: 2856, sla: 94.8, fcr: 82.4, aht: '4:18', csat: 4.7, abandon: 4.6, change: 5.2 },
+                    teleperformance: { calls: 2684, sla: 92.4, fcr: 76.8, aht: '4:48', csat: 4.4, abandon: 6.2, change: -1.8 },
+                    ttec: { calls: 2742, sla: 95.2, fcr: 84.1, aht: '4:12', csat: 4.8, abandon: 4.1, change: 6.4 },
+                    sitel: { calls: 2245, sla: 88.6, fcr: 72.3, aht: '5:18', csat: 4.1, abandon: 8.8, change: -3.2 },
+                    alorica: { calls: 2320, sla: 93.1, fcr: 79.5, aht: '4:32', csat: 4.5, abandon: 5.4, change: 2.8 }
+                }
+            },
+            // LAST 30 DAYS data
+            '30days': {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                kpis: {
+                    totalCalls: 52418,
+                    sla: 93.1,
+                    fcr: 77.4,
+                    aht: '4:38',
+                    ahtMinutes: 4.63,
+                    csat: 4.5,
+                    abandonment: 6.2
+                },
+                comparison: { // vs Previous Month
+                    totalCalls: { value: 48652, change: 7.7 },
+                    sla: { value: 90.8, change: 2.3 },
+                    fcr: { value: 75.1, change: 2.3 },
+                    aht: { value: '4:52', change: -4.8 },
+                    csat: { value: 4.3, change: 0.2 },
+                    abandonment: { value: 7.4, change: -16.2 }
+                },
+                charts: {
+                    sla: [91.8, 92.6, 93.8, 94.2],
+                    callsHandled: [12450, 13120, 13280, 13568],
+                    callsAbandoned: [845, 798, 756, 712],
+                    csat: [4.3, 4.4, 4.5, 4.6],
+                    fcr: [75.8, 76.9, 77.8, 78.6],
+                    aht: [4.9, 4.7, 4.6, 4.5]
+                },
+                vendors: {
+                    concentrix: { calls: 11648, sla: 93.8, fcr: 81.2, aht: '4:24', csat: 4.6, abandon: 5.1, change: 4.8 },
+                    teleperformance: { calls: 10945, sla: 91.2, fcr: 75.4, aht: '4:54', csat: 4.3, abandon: 6.8, change: -2.4 },
+                    ttec: { calls: 11186, sla: 94.4, fcr: 82.8, aht: '4:18', csat: 4.7, abandon: 4.6, change: 5.8 },
+                    sitel: { calls: 9156, sla: 87.2, fcr: 70.8, aht: '5:24', csat: 4.0, abandon: 9.4, change: -4.1 },
+                    alorica: { calls: 9483, sla: 92.1, fcr: 78.2, aht: '4:38', csat: 4.4, abandon: 5.9, change: 2.2 }
+                }
+            }
+        };
+
+        // Comparison data labels
+        const comparisonLabels = {
+            'none': null,
+            'previous': { today: 'vs Yesterday', yesterday: 'vs Day Before', '7days': 'vs Previous Week', '30days': 'vs Previous Month' },
+            'lastWeek': { today: 'vs Last Week Same Day', yesterday: 'vs Last Week', '7days': 'vs 2 Weeks Ago', '30days': 'vs 2 Months Ago' },
+            'lastMonth': { today: 'vs Last Month Same Day', yesterday: 'vs Last Month', '7days': 'vs Last Month', '30days': 'vs Last Quarter' }
+        };
+
+        let charts = {};
+
+        function initializeCharts() {
+            const initialData = dataStore[currentTimeRange];
+            
+            // SLA Performance Trend Chart
+            const slaCtx = document.getElementById('slaChart');
+            if (slaCtx) {
+                charts.sla = new Chart(slaCtx, {
+                    type: 'line',
+                    data: {
+                        labels: initialData.labels,
+                        datasets: [
+                            {
+                                label: 'SLA %',
+                                data: initialData.charts.sla,
+                                borderColor: colors.primary,
+                                backgroundColor: colors.primaryLight,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                pointBackgroundColor: colors.primary,
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2
+                            },
+                            {
+                                label: 'Target',
+                                data: initialData.labels.map(() => 90),
+                                borderColor: colors.success,
+                                borderDash: [5, 5],
+                                borderWidth: 2,
+                                fill: false,
+                                pointRadius: 0,
+                                tension: 0
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 500,
+                            easing: 'easeOutQuart'
+                        },
+                        scales: {
+                            y: {
+                                min: 85,
+                                max: 100,
+                                grid: { color: 'rgba(0, 0, 0, 0.04)' },
+                                ticks: {
+                                    callback: value => value + '%'
+                                }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleFont: { weight: '500' },
+                                bodyFont: { size: 13 },
+                                padding: 12,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Call Volume Chart
+            const volumeCtx = document.getElementById('volumeChart');
+            if (volumeCtx) {
+                charts.volume = new Chart(volumeCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: initialData.labels,
+                        datasets: [
+                            {
+                                label: 'Handled',
+                                data: initialData.charts.callsHandled,
+                                backgroundColor: colors.primary,
+                                borderRadius: 4,
+                                barPercentage: 0.7
+                            },
+                            {
+                                label: 'Abandoned',
+                                data: initialData.charts.callsAbandoned,
+                                backgroundColor: colors.error,
+                                borderRadius: 4,
+                                barPercentage: 0.7
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 500,
+                            easing: 'easeOutQuart'
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(0, 0, 0, 0.04)' },
+                                ticks: {
+                                    callback: value => value >= 1000 ? (value / 1000).toFixed(1) + 'k' : value
+                                }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toLocaleString()
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // CSAT Trend Chart
+            const csatCtx = document.getElementById('csatChart');
+            if (csatCtx) {
+                charts.csat = new Chart(csatCtx, {
+                    type: 'line',
+                    data: {
+                        labels: initialData.labels,
+                        datasets: [
+                            {
+                                label: 'CSAT',
+                                data: initialData.charts.csat,
+                                borderColor: colors.secondary,
+                                backgroundColor: colors.secondaryLight,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                pointBackgroundColor: colors.secondary,
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2
+                            },
+                            {
+                                label: 'Target',
+                                data: initialData.labels.map(() => 4.5),
+                                borderColor: colors.success,
+                                borderDash: [5, 5],
+                                borderWidth: 2,
+                                fill: false,
+                                pointRadius: 0,
+                                tension: 0
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 500,
+                            easing: 'easeOutQuart'
+                        },
+                        scales: {
+                            y: {
+                                min: 3.5,
+                                max: 5,
+                                grid: { color: 'rgba(0, 0, 0, 0.04)' },
+                                ticks: {
+                                    callback: value => value.toFixed(1)
+                                }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + ' / 5.0'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Vendor Comparison Chart
+            const vendorCtx = document.getElementById('vendorCompareChart');
+            if (vendorCtx) {
+                const vendors = Object.keys(initialData.vendors);
+                const vendorNames = vendors.map(v => v.charAt(0).toUpperCase() + v.slice(1));
+                
+                charts.vendor = new Chart(vendorCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: vendorNames,
+                        datasets: [
+                            {
+                                label: 'SLA %',
+                                data: vendors.map(v => initialData.vendors[v].sla),
+                                backgroundColor: colors.primary,
+                                borderRadius: 4,
+                                barPercentage: 0.8,
+                                categoryPercentage: 0.7
+                            },
+                            {
+                                label: 'FCR %',
+                                data: vendors.map(v => initialData.vendors[v].fcr),
+                                backgroundColor: colors.success,
+                                borderRadius: 4,
+                                barPercentage: 0.8,
+                                categoryPercentage: 0.7
+                            },
+                            {
+                                label: 'CSAT (x20)',
+                                data: vendors.map(v => initialData.vendors[v].csat * 20),
+                                backgroundColor: colors.secondary,
+                                borderRadius: 4,
+                                barPercentage: 0.8,
+                                categoryPercentage: 0.7
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 500,
+                            easing: 'easeOutQuart'
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                grid: { color: 'rgba(0, 0, 0, 0.04)' },
+                                ticks: {
+                                    callback: value => value + '%'
+                                }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                cornerRadius: 8
+                            }
+                        }
+                    }
+                });
+            }
+
+            // FCR & AHT Trend Chart
+            const fcrAhtCtx = document.getElementById('fcrAhtChart');
+            if (fcrAhtCtx) {
+                charts.fcrAht = new Chart(fcrAhtCtx, {
+                    type: 'line',
+                    data: {
+                        labels: initialData.labels,
+                        datasets: [
+                            {
+                                label: 'FCR %',
+                                data: initialData.charts.fcr,
+                                borderColor: colors.success,
+                                backgroundColor: colors.successLight,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                pointBackgroundColor: colors.success,
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'AHT (min)',
+                                data: initialData.charts.aht,
+                                borderColor: colors.warning,
+                                backgroundColor: 'transparent',
+                                fill: false,
+                                tension: 0.4,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                pointBackgroundColor: colors.warning,
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                yAxisID: 'y1'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 500,
+                            easing: 'easeOutQuart'
+                        },
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                position: 'left',
+                                min: 70,
+                                max: 90,
+                                grid: { color: 'rgba(0, 0, 0, 0.04)' },
+                                ticks: {
+                                    callback: value => value + '%'
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                position: 'right',
+                                min: 4,
+                                max: 5.5,
+                                grid: { display: false },
+                                ticks: {
+                                    callback: value => value.toFixed(1) + 'm'
+                                }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: ctx => {
+                                        if (ctx.dataset.label === 'FCR %') {
+                                            return 'FCR: ' + ctx.parsed.y.toFixed(1) + '%';
+                                        }
+                                        return 'AHT: ' + ctx.parsed.y.toFixed(2) + ' min';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Initialize sparklines in the table
+            initializeSparklines();
+        }
+
+        // ============================================
+        // SPARKLINE CHARTS (Table Mini Charts)
+        // ============================================
+        
+        function initializeSparklines() {
+            const sparklineCanvases = document.querySelectorAll('.sparkline-chart');
+            const sparklineData = {
+                'concentrix': [88, 90, 92, 91, 94, 93, 95],
+                'teleperformance': [85, 87, 89, 90, 91, 92, 92],
+                'ttec': [90, 92, 91, 93, 94, 95, 95],
+                'sitel': [82, 84, 83, 85, 86, 87, 89],
+                'alorica': [86, 88, 89, 91, 92, 93, 93]
+            };
+
+            sparklineCanvases.forEach(canvas => {
+                const vendorId = canvas.id.replace('sparkline-', '');
+                const data = sparklineData[vendorId] || [85, 87, 89, 91, 93, 94, 95];
+                
+                new Chart(canvas, {
+                    type: 'line',
+                    data: {
+                        labels: ['', '', '', '', '', '', ''],
+                        datasets: [{
+                            data: data,
+                            borderColor: colors.primary,
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.4,
+                            pointRadius: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { display: false },
+                            y: { display: false, min: 75, max: 100 }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { enabled: false }
+                        }
+                    }
+                });
+            });
+        }
+
+        // ============================================
+        // FILTER FUNCTIONALITY
+        // ============================================
+        
+        function initializeFilters() {
+            // Vendor Filter
+            const vendorFilter = document.getElementById('vendorFilter');
+            if (vendorFilter) {
+                vendorFilter.addEventListener('change', (e) => {
+                    filterByVendor(e.target.value);
+                });
+            }
+
+            // Region Filter
+            const regionFilter = document.getElementById('regionFilter');
+            if (regionFilter) {
+                regionFilter.addEventListener('change', (e) => {
+                    filterByRegion(e.target.value);
+                });
+            }
+
+            // Time Range Filter
+            const timeRangeFilter = document.getElementById('timeRangeFilter');
+            if (timeRangeFilter) {
+                timeRangeFilter.addEventListener('change', (e) => {
+                    currentTimeRange = e.target.value;
+                    updateDashboardData();
+                });
+            }
+
+            // Compare To Filter
+            const compareFilter = document.getElementById('compareFilter');
+            if (compareFilter) {
+                compareFilter.addEventListener('change', (e) => {
+                    currentCompare = e.target.value;
+                    updateComparisonDisplay();
+                });
+            }
+        }
+
+        function filterByVendor(vendor) {
+            const tableRows = document.querySelectorAll('.data-table tbody tr');
+            tableRows.forEach(row => {
+                if (vendor === 'all' || row.dataset.vendor === vendor) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            console.log('Filtering by vendor:', vendor);
+        }
+
+        function filterByRegion(region) {
+            console.log('Filtering by region:', region);
+        }
+
+        // ============================================
+        // MAIN DATA UPDATE FUNCTION
+        // ============================================
+        function updateDashboardData() {
+            const data = dataStore[currentTimeRange];
+            if (!data) return;
+
+            // Show loading state
+            const main = document.querySelector('main');
+            main.style.opacity = '0.7';
+            main.style.transition = 'opacity 0.2s';
+
+            setTimeout(() => {
+                // Update KPI Dock
+                updateKPIs(data.kpis, data.comparison);
+
+                // Update Charts
+                updateCharts(data);
+
+                // Update Vendor Table
+                updateVendorTable(data.vendors);
+
+                // Update period labels
+                updatePeriodLabels();
+
+                // Update timestamp
+                updateTimestamp();
+
+                // Remove loading state
+                main.style.opacity = '1';
+
+                console.log('Dashboard updated for:', currentTimeRange);
+            }, 300);
+        }
+
+        // ============================================
+        // KPI UPDATE FUNCTION
+        // ============================================
+        function updateKPIs(kpis, comparison) {
+            // Total Calls
+            const totalCallsEl = document.querySelector('.kpi-item:nth-child(1) .kpi-value');
+            const totalCallsTrend = document.querySelector('.kpi-item:nth-child(1) .kpi-trend span:last-child');
+            if (totalCallsEl) {
+                animateValue(totalCallsEl, parseInt(totalCallsEl.textContent.replace(/,/g, '')), kpis.totalCalls, 500, true);
+            }
+            if (totalCallsTrend && comparison.totalCalls) {
+                updateTrendIndicator(totalCallsTrend.parentElement, comparison.totalCalls.change, true);
+            }
+
+            // SLA %
+            const slaEl = document.querySelector('.kpi-item:nth-child(2) .kpi-value');
+            const slaTrend = document.querySelector('.kpi-item:nth-child(2) .kpi-trend');
+            if (slaEl) {
+                animateValue(slaEl, parseFloat(slaEl.textContent), kpis.sla, 500, false, 1);
+            }
+            if (slaTrend && comparison.sla) {
+                updateTrendIndicator(slaTrend, comparison.sla.change, true);
+            }
+            // Update SLA progress bar
+            const slaProgress = document.querySelector('.kpi-item:nth-child(2) .kpi-target-fill');
+            if (slaProgress) {
+                const slaPercent = Math.min((kpis.sla / 90) * 100, 100);
+                slaProgress.style.width = slaPercent + '%';
+                slaProgress.className = 'kpi-target-fill ' + (kpis.sla >= 90 ? 'success' : 'warning');
+            }
+
+            // FCR %
+            const fcrEl = document.querySelector('.kpi-item:nth-child(3) .kpi-value');
+            const fcrTrend = document.querySelector('.kpi-item:nth-child(3) .kpi-trend');
+            if (fcrEl) {
+                animateValue(fcrEl, parseFloat(fcrEl.textContent), kpis.fcr, 500, false, 1);
+            }
+            if (fcrTrend && comparison.fcr) {
+                updateTrendIndicator(fcrTrend, comparison.fcr.change, true);
+            }
+            // Update FCR progress bar
+            const fcrProgress = document.querySelector('.kpi-item:nth-child(3) .kpi-target-fill');
+            if (fcrProgress) {
+                const fcrPercent = Math.min((kpis.fcr / 80) * 100, 100);
+                fcrProgress.style.width = fcrPercent + '%';
+                fcrProgress.className = 'kpi-target-fill ' + (kpis.fcr >= 80 ? 'success' : 'warning');
+            }
+
+            // AHT
+            const ahtEl = document.querySelector('.kpi-item:nth-child(4) .kpi-value');
+            const ahtTrend = document.querySelector('.kpi-item:nth-child(4) .kpi-trend');
+            if (ahtEl) {
+                ahtEl.textContent = kpis.aht;
+            }
+            if (ahtTrend && comparison.aht) {
+                // For AHT, negative change is good (lower is better)
+                updateTrendIndicator(ahtTrend, comparison.aht.change, false);
+            }
+            // Update AHT progress bar
+            const ahtProgress = document.querySelector('.kpi-item:nth-child(4) .kpi-target-fill');
+            if (ahtProgress) {
+                const ahtPercent = Math.min((5 / kpis.ahtMinutes) * 80, 100);
+                ahtProgress.style.width = ahtPercent + '%';
+                ahtProgress.className = 'kpi-target-fill ' + (kpis.ahtMinutes <= 5 ? 'success' : 'warning');
+            }
+
+            // CSAT
+            const csatEl = document.querySelector('.kpi-item:nth-child(5) .kpi-value');
+            const csatTrend = document.querySelector('.kpi-item:nth-child(5) .kpi-trend');
+            if (csatEl) {
+                animateValue(csatEl, parseFloat(csatEl.textContent), kpis.csat, 500, false, 1);
+            }
+            if (csatTrend && comparison.csat) {
+                updateTrendIndicator(csatTrend, comparison.csat.change, true);
+            }
+            // Update CSAT progress bar
+            const csatProgress = document.querySelector('.kpi-item:nth-child(5) .kpi-target-fill');
+            if (csatProgress) {
+                const csatPercent = Math.min((kpis.csat / 4.5) * 100, 100);
+                csatProgress.style.width = csatPercent + '%';
+                csatProgress.className = 'kpi-target-fill ' + (kpis.csat >= 4.5 ? 'success' : 'warning');
+            }
+
+            // Abandonment Rate
+            const abandonEl = document.querySelector('.kpi-item:nth-child(6) .kpi-value');
+            const abandonTrend = document.querySelector('.kpi-item:nth-child(6) .kpi-trend');
+            if (abandonEl) {
+                animateValue(abandonEl, parseFloat(abandonEl.textContent), kpis.abandonment, 500, false, 1);
+            }
+            if (abandonTrend && comparison.abandonment) {
+                // For abandonment, negative change is good (lower is better)
+                updateTrendIndicator(abandonTrend, comparison.abandonment.change, false);
+            }
+            // Update Abandonment progress bar
+            const abandonProgress = document.querySelector('.kpi-item:nth-child(6) .kpi-target-fill');
+            if (abandonProgress) {
+                const abandonPercent = Math.min((kpis.abandonment / 3) * 52, 100);
+                abandonProgress.style.width = abandonPercent + '%';
+                abandonProgress.className = 'kpi-target-fill ' + (kpis.abandonment <= 3 ? 'success' : 'error');
+            }
+        }
+
+        // Animate numeric values
+        function animateValue(element, start, end, duration, isInteger = false, decimals = 0) {
+            const startTime = performance.now();
+            const diff = end - start;
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+                const current = start + (diff * easeProgress);
+
+                if (isInteger) {
+                    element.textContent = Math.round(current).toLocaleString();
+                } else {
+                    element.textContent = current.toFixed(decimals);
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            requestAnimationFrame(update);
+        }
+
+        // Update trend indicator (arrow + value + color)
+        function updateTrendIndicator(trendEl, change, higherIsBetter) {
+            if (!trendEl) return;
+
+            const isPositive = change > 0;
+            const isGood = higherIsBetter ? isPositive : !isPositive;
+
+            // Update classes
+            trendEl.classList.remove('up', 'down');
+            trendEl.classList.add(isGood ? 'up' : 'down');
+
+            // Update icon
+            const icon = trendEl.querySelector('.material-icons');
+            if (icon) {
+                icon.textContent = isPositive ? 'trending_up' : 'trending_down';
+            }
+
+            // Update value
+            const valueSpan = trendEl.querySelector('span:last-child');
+            if (valueSpan && valueSpan !== icon) {
+                valueSpan.textContent = Math.abs(change).toFixed(1) + '%';
+            }
+        }
+
+        // ============================================
+        // CHART UPDATE FUNCTION
+        // ============================================
+        function updateCharts(data) {
+            const chartLabels = data.labels;
+            const chartValues = data.charts;
+
+            // Update SLA Chart
+            if (charts.sla) {
+                charts.sla.data.labels = chartLabels;
+                charts.sla.data.datasets[0].data = chartValues.sla;
+                charts.sla.data.datasets[1].data = chartLabels.map(() => 90); // Target line
+                charts.sla.update('active');
+            }
+
+            // Update Volume Chart
+            if (charts.volume) {
+                charts.volume.data.labels = chartLabels;
+                charts.volume.data.datasets[0].data = chartValues.callsHandled;
+                charts.volume.data.datasets[1].data = chartValues.callsAbandoned;
+                charts.volume.update('active');
+            }
+
+            // Update CSAT Chart
+            if (charts.csat) {
+                charts.csat.data.labels = chartLabels;
+                charts.csat.data.datasets[0].data = chartValues.csat;
+                charts.csat.data.datasets[1].data = chartLabels.map(() => 4.5); // Target line
+                charts.csat.update('active');
+            }
+
+            // Update FCR/AHT Chart
+            if (charts.fcrAht) {
+                charts.fcrAht.data.labels = chartLabels;
+                charts.fcrAht.data.datasets[0].data = chartValues.fcr;
+                charts.fcrAht.data.datasets[1].data = chartValues.aht;
+                charts.fcrAht.update('active');
+            }
+
+            // Update Vendor Comparison Chart
+            if (charts.vendor) {
+                const vendors = Object.keys(data.vendors);
+                const vendorNames = vendors.map(v => v.charAt(0).toUpperCase() + v.slice(1));
+                const vendorSLA = vendors.map(v => data.vendors[v].sla);
+                const vendorFCR = vendors.map(v => data.vendors[v].fcr);
+                const vendorCSAT = vendors.map(v => data.vendors[v].csat * 20);
+
+                charts.vendor.data.labels = vendorNames;
+                charts.vendor.data.datasets[0].data = vendorSLA;
+                charts.vendor.data.datasets[1].data = vendorFCR;
+                charts.vendor.data.datasets[2].data = vendorCSAT;
+                charts.vendor.update('active');
+            }
+
+            // Update chart summary stats
+            updateChartSummaries(data);
+        }
+
+        // Update chart summary statistics
+        function updateChartSummaries(data) {
+            const kpis = data.kpis;
+            const comparison = data.comparison;
+
+            // SLA Chart Summary
+            const slaSummary = document.querySelector('#slaChart').closest('.chart-card').querySelectorAll('.chart-stat-value');
+            if (slaSummary.length >= 3) {
+                slaSummary[0].textContent = kpis.sla.toFixed(1) + '%';
+                slaSummary[0].className = 'chart-stat-value ' + (kpis.sla >= 90 ? 'up' : 'down');
+                const slaAvg = (data.charts.sla.reduce((a, b) => a + b, 0) / data.charts.sla.length).toFixed(1);
+                slaSummary[1].textContent = slaAvg + '%';
+                slaSummary[2].textContent = (comparison.sla.change > 0 ? '+' : '') + comparison.sla.change.toFixed(1) + '%';
+                slaSummary[2].className = 'chart-stat-value ' + (comparison.sla.change > 0 ? 'up' : 'down');
+            }
+
+            // Volume Chart Summary
+            const volumeSummary = document.querySelector('#volumeChart').closest('.chart-card').querySelectorAll('.chart-stat-value');
+            if (volumeSummary.length >= 3) {
+                const totalCalls = data.charts.callsHandled.reduce((a, b) => a + b, 0);
+                volumeSummary[0].textContent = totalCalls.toLocaleString();
+                const avgCalls = Math.round(totalCalls / data.charts.callsHandled.length);
+                volumeSummary[1].textContent = avgCalls.toLocaleString();
+                volumeSummary[2].textContent = (comparison.totalCalls.change > 0 ? '+' : '') + comparison.totalCalls.change.toFixed(1) + '%';
+                volumeSummary[2].className = 'chart-stat-value ' + (comparison.totalCalls.change > 0 ? 'up' : 'down');
+            }
+
+            // CSAT Chart Summary
+            const csatSummary = document.querySelector('#csatChart').closest('.chart-card').querySelectorAll('.chart-stat-value');
+            if (csatSummary.length >= 3) {
+                csatSummary[0].textContent = kpis.csat.toFixed(1);
+                csatSummary[0].className = 'chart-stat-value ' + (kpis.csat >= 4.5 ? 'up' : 'down');
+                const csatAvg = (data.charts.csat.reduce((a, b) => a + b, 0) / data.charts.csat.length).toFixed(1);
+                csatSummary[1].textContent = csatAvg;
+                csatSummary[2].textContent = (comparison.csat.change > 0 ? '+' : '') + comparison.csat.change.toFixed(1);
+                csatSummary[2].className = 'chart-stat-value ' + (comparison.csat.change > 0 ? 'up' : 'down');
+            }
+
+            // FCR/AHT Chart Summary
+            const fcrSummary = document.querySelector('#fcrAhtChart').closest('.chart-card').querySelectorAll('.chart-stat-value');
+            if (fcrSummary.length >= 2) {
+                fcrSummary[0].textContent = kpis.fcr.toFixed(1) + '%';
+                fcrSummary[0].className = 'chart-stat-value ' + (kpis.fcr >= 80 ? 'up' : 'down');
+                fcrSummary[1].textContent = kpis.aht;
+            }
+        }
+
+        // ============================================
+        // VENDOR TABLE UPDATE FUNCTION
+        // ============================================
+        function updateVendorTable(vendors) {
+            const vendorKeys = ['concentrix', 'teleperformance', 'ttec', 'sitel', 'alorica'];
+
+            vendorKeys.forEach((vendorKey, index) => {
+                const vendorData = vendors[vendorKey];
+                if (!vendorData) return;
+
+                const row = document.querySelector(`.data-table tbody tr:nth-child(${index + 1})`);
+                if (!row) return;
+
+                // Update Calls
+                const callsCell = row.querySelector('td:nth-child(2)');
+                if (callsCell) {
+                    const callsValue = callsCell.querySelector('.metric-value');
+                    const callsChange = callsCell.querySelector('.metric-change');
+                    if (callsValue) callsValue.textContent = vendorData.calls.toLocaleString();
+                    if (callsChange) {
+                        const changeClass = vendorData.change > 0 ? 'positive' : 'negative';
+                        callsChange.className = 'metric-change ' + changeClass;
+                        callsChange.innerHTML = `<span class="material-icons">${vendorData.change > 0 ? 'arrow_upward' : 'arrow_downward'}</span>${Math.abs(vendorData.change).toFixed(1)}%`;
+                    }
+                }
+
+                // Update SLA
+                const slaCell = row.querySelector('td:nth-child(3)');
+                if (slaCell) {
+                    const slaValue = slaCell.querySelector('.metric-value');
+                    const slaBar = slaCell.querySelector('.progress-bar-fill');
+                    if (slaValue) slaValue.textContent = vendorData.sla.toFixed(1) + '%';
+                    if (slaBar) {
+                        slaBar.style.width = vendorData.sla + '%';
+                        slaBar.className = 'progress-bar-fill ' + (vendorData.sla >= 90 ? 'success' : vendorData.sla >= 85 ? 'warning' : 'error');
+                    }
+                }
+
+                // Update FCR
+                const fcrCell = row.querySelector('td:nth-child(4)');
+                if (fcrCell) {
+                    const fcrValue = fcrCell.querySelector('.metric-value');
+                    const fcrBar = fcrCell.querySelector('.progress-bar-fill');
+                    if (fcrValue) fcrValue.textContent = vendorData.fcr.toFixed(1) + '%';
+                    if (fcrBar) {
+                        fcrBar.style.width = vendorData.fcr + '%';
+                        fcrBar.className = 'progress-bar-fill ' + (vendorData.fcr >= 80 ? 'success' : vendorData.fcr >= 70 ? 'warning' : 'error');
+                    }
+                }
+
+                // Update AHT
+                const ahtCell = row.querySelector('td:nth-child(5)');
+                if (ahtCell) {
+                    const ahtValue = ahtCell.querySelector('.metric-value') || ahtCell;
+                    if (ahtValue) {
+                        if (ahtValue.classList) {
+                            ahtValue.textContent = vendorData.aht;
+                        } else {
+                            ahtCell.innerHTML = `<span class="metric-mono">${vendorData.aht}</span>`;
+                        }
+                    }
+                }
+
+                // Update CSAT
+                const csatCell = row.querySelector('td:nth-child(6)');
+                if (csatCell) {
+                    const csatValue = csatCell.querySelector('.metric-value');
+                    if (csatValue) csatValue.textContent = vendorData.csat.toFixed(1);
+                }
+
+                // Update Abandon Rate
+                const abandonCell = row.querySelector('td:nth-child(7)');
+                if (abandonCell) {
+                    const abandonValue = abandonCell.querySelector('.metric-value');
+                    if (abandonValue) {
+                        abandonValue.textContent = vendorData.abandon.toFixed(1) + '%';
+                        abandonValue.className = 'metric-value ' + (vendorData.abandon <= 5 ? 'success' : vendorData.abandon <= 7 ? 'warning' : 'error');
+                    }
+                }
+
+                // Update Status Chip
+                const statusCell = row.querySelector('td:nth-child(9)');
+                if (statusCell) {
+                    const statusChip = statusCell.querySelector('.status-chip');
+                    if (statusChip) {
+                        const avgScore = (vendorData.sla + vendorData.fcr + (vendorData.csat * 20)) / 3;
+                        let statusClass, statusText, statusIcon;
+
+                        if (avgScore >= 90) {
+                            statusClass = 'excellent';
+                            statusText = 'Excellent';
+                            statusIcon = 'check_circle';
+                        } else if (avgScore >= 85) {
+                            statusClass = 'good';
+                            statusText = 'Good';
+                            statusIcon = 'thumb_up';
+                        } else if (avgScore >= 80) {
+                            statusClass = 'needs-attention';
+                            statusText = 'Attention';
+                            statusIcon = 'warning';
+                        } else {
+                            statusClass = 'critical';
+                            statusText = 'Critical';
+                            statusIcon = 'error';
+                        }
+
+                        statusChip.className = 'status-chip ' + statusClass;
+                        statusChip.innerHTML = `<span class="material-icons">${statusIcon}</span>${statusText}`;
+                    }
+                }
+            });
+        }
+
+        // ============================================
+        // COMPARISON DISPLAY UPDATE
+        // ============================================
+        function updateComparisonDisplay() {
+            const data = dataStore[currentTimeRange];
+            if (!data) return;
+
+            const kpiTrends = document.querySelectorAll('.kpi-trend');
+
+            if (currentCompare === 'none') {
+                // Hide all comparison indicators
+                kpiTrends.forEach(trend => {
+                    trend.style.opacity = '0';
+                    trend.style.visibility = 'hidden';
+                });
+            } else {
+                // Show comparison indicators with appropriate data
+                kpiTrends.forEach(trend => {
+                    trend.style.opacity = '1';
+                    trend.style.visibility = 'visible';
+                });
+
+                // Re-apply the comparison values
+                updateKPIs(data.kpis, data.comparison);
+            }
+
+            console.log('Comparison mode:', currentCompare);
+        }
+
+        // ============================================
+        // PERIOD LABELS UPDATE
+        // ============================================
+        function updatePeriodLabels() {
+            const periodLabels = document.querySelectorAll('.chart-period');
+            const periodText = {
+                'today': 'Today',
+                'yesterday': 'Yesterday',
+                '7days': 'Last 7 Days',
+                '30days': 'Last 30 Days'
+            };
+
+            periodLabels.forEach(label => {
+                const textNode = label.childNodes[label.childNodes.length - 1];
+                if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+                    textNode.textContent = periodText[currentTimeRange] || 'Last 7 Days';
+                } else {
+                    // Find the text after the icon
+                    const html = label.innerHTML;
+                    const iconEnd = html.lastIndexOf('</span>');
+                    if (iconEnd !== -1) {
+                        label.innerHTML = html.substring(0, iconEnd + 7) + '\n                                ' + periodText[currentTimeRange];
+                    }
+                }
+            });
+        }
+
+        // ============================================
+        // UI INTERACTIONS
+        // ============================================
+        
+        function initializeInteractions() {
+            // Secondary navigation tabs
+            const navItems = document.querySelectorAll('.secondary-nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    navItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    console.log('Navigating to:', item.textContent.trim());
+                });
+            });
+
+            // Table row hover effect
+            const tableRows = document.querySelectorAll('.data-table tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('click', () => {
+                    showVendorDetail(row.dataset.vendor);
+                });
+            });
+
+            // Alert card actions
+            const alertActions = document.querySelectorAll('.alert-actions .btn');
+            alertActions.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const action = btn.textContent.trim();
+                    const card = btn.closest('.alert-card');
+                    const agentName = card.querySelector('.alert-name').textContent;
+                    console.log(`Action "${action}" for agent: ${agentName}`);
+                    
+                    // Visual feedback
+                    btn.style.transform = 'scale(0.95)';
+                    setTimeout(() => btn.style.transform = '', 150);
+                });
+            });
+
+            // KPI item hover effects
+            const kpiItems = document.querySelectorAll('.kpi-item');
+            kpiItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const label = item.querySelector('.kpi-label').textContent;
+                    console.log('KPI clicked:', label);
+                    // Could show detailed breakdown
+                });
+            });
+
+            // Search functionality
+            const searchInput = document.querySelector('.search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const query = e.target.value.toLowerCase();
+                    searchDashboard(query);
+                });
+            }
+
+            // Notification badge
+            const notificationBtn = document.querySelector('[title="Notifications"]');
+            if (notificationBtn) {
+                notificationBtn.addEventListener('click', () => {
+                    console.log('Opening notifications panel');
+                    // Could show notifications dropdown
+                });
+            }
+
+            // Refresh button
+            const refreshBtn = document.querySelector('[title="Refresh Data"]');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', () => {
+                    refreshDashboard();
+                });
+            }
+        }
+
+        function showVendorDetail(vendor) {
+            console.log('Showing details for vendor:', vendor);
+            // In production, this could open a modal or navigate to vendor detail page
+        }
+
+        function searchDashboard(query) {
+            if (query.length < 2) {
+                // Reset all visibility
+                document.querySelectorAll('.data-table tbody tr').forEach(row => {
+                    row.style.display = '';
+                });
+                return;
+            }
+
+            document.querySelectorAll('.data-table tbody tr').forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(query) ? '' : 'none';
+            });
+        }
+
+        function refreshDashboard() {
+            console.log('Refreshing dashboard data...');
+            
+            // Show loading state
+            const main = document.querySelector('main');
+            main.style.opacity = '0.6';
+            main.style.pointerEvents = 'none';
+
+            // Simulate data refresh
+            setTimeout(() => {
+                main.style.opacity = '1';
+                main.style.pointerEvents = '';
+                updateTimestamp();
+                console.log('Dashboard refreshed');
+            }, 1000);
+        }
+
+        function updateTimestamp() {
+            const timestampEl = document.querySelector('.last-updated-time');
+            if (timestampEl) {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                const dateStr = now.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                });
+                timestampEl.textContent = `${timeStr} • ${dateStr}`;
+            }
+        }
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            }
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toLocaleString();
+        }
+
+        function formatTime(minutes) {
+            const mins = Math.floor(minutes);
+            const secs = Math.round((minutes - mins) * 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function getStatusClass(value, thresholds) {
+            if (value >= thresholds.excellent) return 'excellent';
+            if (value >= thresholds.good) return 'good';
+            if (value >= thresholds.fair) return 'needs-attention';
+            return 'critical';
+        }
+
+        // Export function for external use
+        window.VendorDashboard = {
+            refresh: refreshDashboard,
+            filter: filterByVendor,
+            charts: charts,
+            updateTimeRange: (range) => {
+                currentTimeRange = range;
+                document.getElementById('timeRangeFilter').value = range;
+                updateDashboardData();
+            },
+            updateComparison: (compare) => {
+                currentCompare = compare;
+                document.getElementById('compareFilter').value = compare;
+                updateComparisonDisplay();
+            },
+            getData: () => dataStore[currentTimeRange],
+            getCurrentState: () => ({ timeRange: currentTimeRange, compare: currentCompare })
+        };
+    </script>
+</body>
+</html>
