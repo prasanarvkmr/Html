@@ -9,19 +9,19 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary-color: #1a73e8;
-            --secondary-color: #5f6368;
-            --success-color: #34a853;
-            --warning-color: #fbbc04;
-            --danger-color: #ea4335;
-            --info-color: #4285f4;
-            --bg-primary: #f8f9fa;
+            --primary-color: #3b82f6;
+            --secondary-color: #64748b;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+            --bg-primary: #f8fafc;
             --bg-card: #ffffff;
-            --text-primary: #202124;
-            --text-secondary: #5f6368;
-            --border-color: #e8eaed;
-            --shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
-            --shadow-hover: 0 4px 12px rgba(0,0,0,0.15);
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+            --shadow-hover: 0 10px 25px rgba(0,0,0,0.08);
         }
 
         * {
@@ -32,17 +32,17 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
+            background: #f8fafc;
             color: var(--text-primary);
             min-height: 100vh;
         }
 
-        /* Header */
+        /* Executive Header */
         .header {
-            background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: white;
-            padding: 20px 32px;
-            box-shadow: var(--shadow);
+            padding: 24px 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         }
 
         .header-content {
@@ -56,47 +56,75 @@
         .header-title {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 20px;
         }
 
-        .header-title i {
-            font-size: 28px;
-            opacity: 0.9;
+        .header-logo {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
         }
 
         .header-title h1 {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 600;
+            letter-spacing: -0.3px;
         }
 
         .header-title p {
             font-size: 13px;
-            opacity: 0.85;
+            opacity: 0.7;
             margin-top: 4px;
+            font-weight: 400;
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 24px;
         }
 
         .last-updated {
             font-size: 13px;
-            opacity: 0.85;
+            opacity: 0.7;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .refresh-btn {
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
+        .header-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
             color: white;
             padding: 10px 20px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .header-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .refresh-btn {
+            background: #3b82f6;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
             font-weight: 500;
             display: flex;
             align-items: center;
@@ -105,36 +133,521 @@
         }
 
         .refresh-btn:hover {
-            background: rgba(255,255,255,0.3);
+            background: #2563eb;
         }
 
         /* Main Content */
         .main-content {
             max-width: 1600px;
             margin: 0 auto;
-            padding: 24px 32px;
+            padding: 32px 40px;
+        }
+
+        /* ========== CLEAN MODERN KPI DASHBOARD ========== */
+        
+        /* Dashboard Header */
+        .dashboard-summary {
+            margin-bottom: 32px;
+        }
+
+        .summary-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .summary-title {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .summary-title h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            margin: 0;
+        }
+
+        .summary-title span {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .time-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 6px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .time-btn {
+            padding: 10px 18px;
+            border: none;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .time-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .time-btn:hover:not(.active) {
+            background: #f1f5f9;
+            color: var(--text-primary);
+        }
+
+        /* KPI Category Container */
+        .kpi-category {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .category-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .category-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .category-icon.call-quality {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            color: #ef4444;
+        }
+
+        .category-icon.network {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            color: #8b5cf6;
+        }
+
+        .category-icon.productivity {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            color: #3b82f6;
+        }
+
+        .category-icon.incident {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            color: #f59e0b;
+        }
+
+        .category-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .category-badge {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .category-badge.healthy {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .category-badge.warning {
+            background: #fffbeb;
+            color: #d97706;
+        }
+
+        .category-badge.critical {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        /* Clean KPI Tiles */
+        .kpi-tiles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .kpi-tile {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .kpi-tile:hover {
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.2);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        }
+
+        .kpi-tile .tile-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .kpi-tile .tile-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .kpi-tile .tile-icon.red { background: #fef2f2; color: #ef4444; }
+        .kpi-tile .tile-icon.orange { background: #fffbeb; color: #f59e0b; }
+        .kpi-tile .tile-icon.blue { background: #eff6ff; color: #3b82f6; }
+        .kpi-tile .tile-icon.green { background: #f0fdf4; color: #22c55e; }
+        .kpi-tile .tile-icon.purple { background: #f5f3ff; color: #8b5cf6; }
+        .kpi-tile .tile-icon.cyan { background: #ecfeff; color: #06b6d4; }
+        .kpi-tile .tile-icon.rose { background: #fff1f2; color: #f43f5e; }
+        .kpi-tile .tile-icon.emerald { background: #ecfdf5; color: #10b981; }
+
+        .kpi-tile .tile-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .kpi-tile .tile-status.good { background: #22c55e; }
+        .kpi-tile .tile-status.warning { background: #f59e0b; }
+        .kpi-tile .tile-status.critical { background: #ef4444; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .kpi-tile .tile-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .kpi-tile .tile-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+            line-height: 1;
+        }
+
+        .kpi-tile .tile-value.large {
+            font-size: 32px;
+        }
+
+        .kpi-tile .tile-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .kpi-tile .tile-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .kpi-tile .tile-change.up-good {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .kpi-tile .tile-change.up-bad {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .kpi-tile .tile-change.down-good {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .kpi-tile .tile-change.down-bad {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .kpi-tile .tile-change.neutral {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .kpi-tile .tile-target {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* Mini Chart */
+        .mini-chart {
+            height: 32px;
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            margin: 10px 0 6px;
+        }
+
+        .mini-bar {
+            flex: 1;
+            border-radius: 2px;
+            transition: all 0.2s ease;
+            background: #e2e8f0;
+        }
+
+        .mini-bar.active {
+            background: var(--bar-color, #3b82f6);
+        }
+
+        .mini-bar:hover {
+            opacity: 0.8;
+        }
+
+        /* Progress Arc */
+        .progress-arc {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 48px;
+            height: 48px;
+        }
+
+        .progress-arc svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-arc .arc-bg {
+            fill: none;
+            stroke: #e2e8f0;
+            stroke-width: 4;
+        }
+
+        .progress-arc .arc-fill {
+            fill: none;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-dasharray: 126;
+            transition: stroke-dashoffset 0.6s ease;
+        }
+
+        .progress-arc .arc-fill.red { stroke: #ef4444; }
+        .progress-arc .arc-fill.orange { stroke: #f59e0b; }
+        .progress-arc .arc-fill.blue { stroke: #3b82f6; }
+        .progress-arc .arc-fill.green { stroke: #22c55e; }
+        .progress-arc .arc-fill.purple { stroke: #8b5cf6; }
+
+        .progress-arc .arc-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Inline Stats */
+        .inline-stats {
+            display: flex;
+            gap: 16px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #e2e8f0;
+        }
+
+        .inline-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+        }
+
+        .inline-stat .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .inline-stat .dot.tx { background: #3b82f6; }
+        .inline-stat .dot.rx { background: #22c55e; }
+
+        .inline-stat span {
+            color: var(--text-secondary);
+        }
+
+        .inline-stat strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Two Column Layout for Network */
+        .kpi-tiles.two-col {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        /* Wide Tile */
+        .kpi-tile.wide {
+            grid-column: span 2;
+        }
+
+        /* Severity Pills */
+        .severity-pills {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .severity-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #f8fafc;
+        }
+
+        .severity-pill .pill-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .severity-pill .pill-dot.p1 { background: #ef4444; }
+        .severity-pill .pill-dot.p2 { background: #f59e0b; }
+        .severity-pill .pill-dot.p3 { background: #3b82f6; }
+        .severity-pill .pill-dot.p4 { background: #22c55e; }
+
+        .severity-pill .pill-label {
+            color: var(--text-secondary);
+        }
+
+        .severity-pill .pill-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* KPI Groups - Legacy Support */
+        .kpi-groups {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .kpi-group {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .kpi-group-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .kpi-group-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .kpi-group-icon.calls { background: #eff6ff; color: #3b82f6; }
+        .kpi-group-icon.operations { background: #f0fdf4; color: #22c55e; }
+
+        .kpi-group-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         /* KPI Cards Row */
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 24px;
+            gap: 16px;
         }
+
+        .kpi-group .kpi-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .kpi-card.purple { border-left-color: #8b5cf6; }
+        .kpi-card.teal { border-left-color: #14b8a6; }
+        .kpi-card.indigo { border-left-color: #6366f1; }
+        .kpi-card.pink { border-left-color: #ec4899; }
+        .kpi-icon.purple { background: #f5f3ff; color: #8b5cf6; }
+        .kpi-icon.teal { background: #f0fdfa; color: #14b8a6; }
+        .kpi-icon.indigo { background: #eef2ff; color: #6366f1; }
+        .kpi-icon.pink { background: #fdf2f8; color: #ec4899; }
 
         .kpi-card {
             background: var(--bg-card);
             border-radius: 12px;
             padding: 20px 24px;
             box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
         }
 
         .kpi-card:hover {
             box-shadow: var(--shadow-hover);
-            transform: translateY(-2px);
         }
 
         .kpi-card.blue { border-left-color: var(--primary-color); }
@@ -150,40 +663,41 @@
         }
 
         .kpi-label {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
             font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
         .kpi-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
         }
 
-        .kpi-icon.blue { background: #e8f0fe; color: var(--primary-color); }
-        .kpi-icon.green { background: #e6f4ea; color: var(--success-color); }
-        .kpi-icon.orange { background: #fef7e0; color: var(--warning-color); }
-        .kpi-icon.red { background: #fce8e6; color: var(--danger-color); }
+        .kpi-icon.blue { background: #eff6ff; color: var(--primary-color); }
+        .kpi-icon.green { background: #f0fdf4; color: var(--success-color); }
+        .kpi-icon.orange { background: #fffbeb; color: var(--warning-color); }
+        .kpi-icon.red { background: #fef2f2; color: var(--danger-color); }
 
         .kpi-value {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
 
         .kpi-trend {
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .kpi-trend.up { color: var(--success-color); }
@@ -504,6 +1018,648 @@
             color: var(--text-secondary);
         }
 
+        .bandwidth-tx-rx {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .bandwidth-tx-rx i {
+            margin-right: 4px;
+        }
+
+        .bandwidth-tx-rx span:first-child i { color: var(--success-color); }
+        .bandwidth-tx-rx span:last-child i { color: var(--primary-color); }
+
+        .bandwidth-summary {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .bandwidth-summary-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .bandwidth-summary-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .bandwidth-summary-icon.tx { background: #e6f4ea; color: var(--success-color); }
+        .bandwidth-summary-icon.rx { background: #e8f0fe; color: var(--primary-color); }
+        .bandwidth-summary-icon.total { background: #fef7e0; color: var(--warning-color); }
+
+        .bandwidth-summary-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .bandwidth-summary-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .bandwidth-summary-value span {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .bandwidth-summary-detail {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Agent Performance Table */
+        .agent-table-container {
+            overflow-x: auto;
+        }
+
+        .agent-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        .agent-table th,
+        .agent-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .agent-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            position: sticky;
+            top: 0;
+        }
+
+        .agent-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .agent-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .agent-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), #0d47a1);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .agent-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .agent-id {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .vendor-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .vendor-badge.alpha { background: #e8f0fe; color: #1a73e8; }
+        .vendor-badge.beta { background: #e6f4ea; color: #137333; }
+        .vendor-badge.gamma { background: #fef7e0; color: #e37400; }
+        .vendor-badge.delta { background: #fce8e6; color: #c5221f; }
+
+        .metric-cell {
+            font-weight: 500;
+        }
+
+        .metric-cell.success { color: var(--success-color); }
+        .metric-cell.warning { color: var(--warning-color); }
+        .metric-cell.danger { color: var(--danger-color); }
+
+        .rate-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rate-bar-track {
+            flex: 1;
+            height: 6px;
+            background: #e8eaed;
+            border-radius: 3px;
+            overflow: hidden;
+            max-width: 80px;
+        }
+
+        .rate-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .rate-value {
+            font-weight: 600;
+            min-width: 45px;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .table-action-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            background: #f1f3f4;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .table-action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .table-search {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .table-search-input {
+            padding: 8px 12px 8px 36px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 13px;
+            width: 250px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%235f6368' viewBox='0 0 24 24'%3E%3Cpath d='M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E") no-repeat 10px center;
+            background-size: 18px;
+        }
+
+        .table-search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 16px;
+        }
+
+        .pagination-info {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .pagination-btn {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pagination-btn:hover {
+            background: #f8f9fa;
+        }
+
+        .pagination-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Agent Schedule Styles */
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .schedule-date-nav {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .schedule-date {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .schedule-nav-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .schedule-nav-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .schedule-legend {
+            display: flex;
+            gap: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .legend-color.working { background: var(--primary-color); }
+        .legend-color.break { background: var(--warning-color); }
+        .legend-color.training { background: #9c27b0; }
+        .legend-color.offline { background: #e8eaed; }
+
+        .schedule-timeline {
+            position: relative;
+        }
+
+        .timeline-header {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+        }
+
+        .timeline-hours {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+        }
+
+        .timeline-hour {
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .schedule-row {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .schedule-row:hover {
+            background: #f8f9fa;
+        }
+
+        .schedule-agent {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .schedule-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), #0d47a1);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .schedule-agent-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .schedule-agent-status {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .schedule-bars {
+            display: grid;
+            grid-template-columns: repeat(48, 1fr);
+            gap: 1px;
+            height: 32px;
+            background: #f1f3f4;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .schedule-block {
+            height: 100%;
+            position: relative;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .schedule-block:hover {
+            opacity: 0.8;
+        }
+
+        .schedule-block.working { background: var(--primary-color); }
+        .schedule-block.break { background: var(--warning-color); }
+        .schedule-block.training { background: #9c27b0; }
+        .schedule-block.offline { background: #e8eaed; }
+
+        .schedule-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .summary-item {
+            text-align: center;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .current-time-indicator {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--danger-color);
+            z-index: 10;
+        }
+
+        .current-time-indicator::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            width: 10px;
+            height: 10px;
+            background: var(--danger-color);
+            border-radius: 50%;
+        }
+
+        /* Vendor Summary Table Styles */
+        .vendor-table-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-top: 24px;
+        }
+
+        .vendor-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .vendor-table thead {
+            background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+            color: white;
+        }
+
+        .vendor-table th {
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .vendor-table th:first-child {
+            border-radius: 12px 0 0 0;
+        }
+
+        .vendor-table th:last-child {
+            border-radius: 0 12px 0 0;
+        }
+
+        .vendor-table td {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .vendor-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .vendor-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .vendor-name-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .vendor-color-indicator {
+            width: 4px;
+            height: 40px;
+            border-radius: 4px;
+        }
+
+        .vendor-color-indicator.alpha { background: #1a73e8; }
+        .vendor-color-indicator.beta { background: #34a853; }
+        .vendor-color-indicator.gamma { background: #f9ab00; }
+        .vendor-color-indicator.delta { background: #ea4335; }
+
+        .vendor-name-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .vendor-name-info span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .vendor-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #e6f4ea;
+            color: #137333;
+        }
+
+        .vendor-status .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .vendor-table .metric-success { color: var(--success-color); font-weight: 600; }
+        .vendor-table .metric-warning { color: var(--warning-color); font-weight: 600; }
+        .vendor-table .metric-danger { color: var(--danger-color); font-weight: 600; }
+
+        .vendor-table .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .vendor-table .table-action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+        }
+
+        .vendor-table .table-action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 8px;
+        }
+
+        .view-toggle-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .view-toggle-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
         /* AEP Score */
         .aep-container {
             display: flex;
@@ -619,6 +1775,116 @@
                 flex-direction: column;
             }
         }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: var(--bg-card);
+            padding: 16px 40px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .filter-bar-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .filter-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .filter-select {
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            background: white;
+            color: var(--text-primary);
+            min-width: 200px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-select:hover {
+            border-color: var(--primary-color);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .active-filter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #eff6ff;
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--primary-color);
+        }
+
+        .active-filter .remove-filter {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .active-filter .remove-filter:hover {
+            color: var(--danger-color);
+        }
+
+        .filter-stats {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .filter-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .filter-stat-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .filter-stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .filter-stat-icon.blue { background: #e8f0fe; color: var(--primary-color); }
+        .filter-stat-icon.green { background: #e6f4ea; color: var(--success-color); }
+        .filter-stat-icon.orange { background: #fef7e0; color: var(--warning-color); }
     </style>
 </head>
 <body>
@@ -626,17 +1892,23 @@
     <header class="header">
         <div class="header-content">
             <div class="header-title">
-                <i class="fas fa-chart-line"></i>
+                <div class="header-logo">
+                    <i class="fas fa-chart-line"></i>
+                </div>
                 <div>
-                    <h1>Operations Metrics Dashboard</h1>
-                    <p>Real-time monitoring of key performance indicators</p>
+                    <h1>Operations Dashboard</h1>
+                    <p>Real-time performance monitoring</p>
                 </div>
             </div>
             <div class="header-actions">
                 <span class="last-updated">
                     <i class="fas fa-clock"></i>
-                    Last updated: <span id="lastUpdate">Loading...</span>
+                    Updated: <span id="lastUpdate">Loading...</span>
                 </span>
+                <button class="header-btn">
+                    <i class="fas fa-file-export"></i>
+                    Export
+                </button>
                 <button class="refresh-btn" onclick="refreshDashboard()">
                     <i class="fas fa-sync-alt"></i>
                     Refresh
@@ -645,66 +1917,601 @@
         </div>
     </header>
 
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <div class="filter-bar-content">
+            <div class="filter-group">
+                <span class="filter-label">View By:</span>
+                <select class="filter-select" id="vendorFilter" onchange="filterByVendor()">
+                    <option value="all">All Vendors</option>
+                    <option value="vendor-alpha">Alpha Communications</option>
+                    <option value="vendor-beta">Beta Services Inc.</option>
+                    <option value="vendor-gamma">Gamma Solutions</option>
+                    <option value="vendor-delta">Delta Networks</option>
+                </select>
+                <select class="filter-select" id="timeRangeFilter" onchange="filterByTimeRange()">
+                    <option value="today">Today</option>
+                    <option value="yesterday">Yesterday</option>
+                    <option value="7days" selected>Last 7 Days</option>
+                    <option value="30days">Last 30 Days</option>
+                    <option value="quarter">This Quarter</option>
+                    <option value="custom">Custom Range</option>
+                </select>
+                <div id="activeFilters" style="display: none;">
+                    <span class="active-filter">
+                        <span id="activeFilterText">All</span>
+                        <button class="remove-filter" onclick="clearFilter()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </span>
+                </div>
+            </div>
+            <div class="filter-stats">
+                <div class="filter-stat">
+                    <div class="filter-stat-icon blue">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div>
+                        <div class="filter-stat-value" id="vendorCountDisplay">4</div>
+                        <div>Vendors</div>
+                    </div>
+                </div>
+                <div class="filter-stat">
+                    <div class="filter-stat-icon green">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <div class="filter-stat-value" id="agentCount">248</div>
+                        <div>Active Agents</div>
+                    </div>
+                </div>
+                <div class="filter-stat">
+                    <div class="filter-stat-icon orange">
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <div>
+                        <div class="filter-stat-value" id="callsToday">12,847</div>
+                        <div>Calls Today</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <main class="main-content">
-        <!-- KPI Cards -->
-        <section class="kpi-grid">
-            <div class="kpi-card blue">
-                <div class="kpi-header">
-                    <span class="kpi-label">Call Quality Score</span>
-                    <div class="kpi-icon blue">
-                        <i class="fas fa-phone-volume"></i>
-                    </div>
+        <!-- Clean Modern KPI Dashboard -->
+        <div class="dashboard-summary">
+            <div class="summary-header">
+                <div class="summary-title">
+                    <h2>Operations Dashboard</h2>
+                    <span>Real-time monitoring across all operational metrics</span>
                 </div>
-                <div class="kpi-value">92.4%</div>
-                <div class="kpi-trend up">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>2.3% from last week</span>
-                </div>
-            </div>
-
-            <div class="kpi-card green">
-                <div class="kpi-header">
-                    <span class="kpi-label">Agent Availability</span>
-                    <div class="kpi-icon green">
-                        <i class="fas fa-user-check"></i>
-                    </div>
-                </div>
-                <div class="kpi-value">97.8%</div>
-                <div class="kpi-trend up">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>1.2% from last week</span>
+                <div class="time-selector">
+                    <button class="time-btn active">Today</button>
+                    <button class="time-btn">7 Days</button>
+                    <button class="time-btn">30 Days</button>
+                    <button class="time-btn">Custom</button>
                 </div>
             </div>
 
-            <div class="kpi-card orange">
-                <div class="kpi-header">
-                    <span class="kpi-label">Avg Response Time</span>
-                    <div class="kpi-icon orange">
-                        <i class="fas fa-stopwatch"></i>
+            <!-- 1. CALL QUALITY CATEGORY -->
+            <div class="kpi-category">
+                <div class="category-header">
+                    <div class="category-label">
+                        <div class="category-icon call-quality">
+                            <i class="fas fa-phone-slash"></i>
+                        </div>
+                        <span class="category-name">Call Quality</span>
                     </div>
+                    <span class="category-badge warning">2 Metrics Need Attention</span>
                 </div>
-                <div class="kpi-value">4.2 min</div>
-                <div class="kpi-trend up">
-                    <i class="fas fa-arrow-down"></i>
-                    <span>12% faster than target</span>
+                <div class="kpi-tiles">
+                    <!-- Errored Calls -->
+                    <div class="kpi-tile">
+                        <div class="tile-header">
+                            <div class="tile-icon red">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="tile-status critical"></div>
+                        </div>
+                        <div class="tile-label">Errored Calls</div>
+                        <div class="tile-value">127</div>
+                        <div class="mini-chart">
+                            <div class="mini-bar active" style="height: 60%; --bar-color: #fca5a5;"></div>
+                            <div class="mini-bar active" style="height: 45%; --bar-color: #fca5a5;"></div>
+                            <div class="mini-bar active" style="height: 72%; --bar-color: #fca5a5;"></div>
+                            <div class="mini-bar active" style="height: 55%; --bar-color: #fca5a5;"></div>
+                            <div class="mini-bar active" style="height: 48%; --bar-color: #fca5a5;"></div>
+                            <div class="mini-bar active" style="height: 65%; --bar-color: #fca5a5;"></div>
+                            <div class="mini-bar active" style="height: 52%; --bar-color: #ef4444;"></div>
+                        </div>
+                        <div class="tile-meta">
+                            <span class="tile-change up-bad">
+                                <i class="fas fa-arrow-up"></i> +12
+                            </span>
+                            <span class="tile-target">vs yesterday</span>
+                        </div>
+                    </div>
+
+                    <!-- Degraded Calls -->
+                    <div class="kpi-tile">
+                        <div class="tile-header">
+                            <div class="tile-icon orange">
+                                <i class="fas fa-signal"></i>
+                            </div>
+                            <div class="tile-status warning"></div>
+                        </div>
+                        <div class="tile-label">Degraded Calls</div>
+                        <div class="tile-value">342</div>
+                        <div class="mini-chart">
+                            <div class="mini-bar active" style="height: 75%; --bar-color: #fcd34d;"></div>
+                            <div class="mini-bar active" style="height: 60%; --bar-color: #fcd34d;"></div>
+                            <div class="mini-bar active" style="height: 80%; --bar-color: #fcd34d;"></div>
+                            <div class="mini-bar active" style="height: 50%; --bar-color: #fcd34d;"></div>
+                            <div class="mini-bar active" style="height: 70%; --bar-color: #fcd34d;"></div>
+                            <div class="mini-bar active" style="height: 55%; --bar-color: #fcd34d;"></div>
+                            <div class="mini-bar active" style="height: 65%; --bar-color: #f59e0b;"></div>
+                        </div>
+                        <div class="tile-meta">
+                            <span class="tile-change down-good">
+                                <i class="fas fa-arrow-down"></i> -8.2%
+                            </span>
+                            <span class="tile-target">vs last week</span>
+                        </div>
+                    </div>
+
+                    <!-- Error Rate -->
+                    <div class="kpi-tile">
+                        <div class="progress-arc">
+                            <svg width="48" height="48">
+                                <circle class="arc-bg" cx="24" cy="24" r="20"/>
+                                <circle class="arc-fill red" cx="24" cy="24" r="20" style="stroke-dashoffset: 103;"/>
+                            </svg>
+                            <span class="arc-value">1.8%</span>
+                        </div>
+                        <div class="tile-header">
+                            <div class="tile-icon rose">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                        </div>
+                        <div class="tile-label">Error Rate</div>
+                        <div class="tile-value">1.8%</div>
+                        <div class="tile-meta">
+                            <span class="tile-change down-good">
+                                <i class="fas fa-arrow-down"></i> -0.3%
+                            </span>
+                            <span class="tile-target">Target: &lt;2%</span>
+                        </div>
+                    </div>
+
+                    <!-- Degradation Rate -->
+                    <div class="kpi-tile">
+                        <div class="progress-arc">
+                            <svg width="48" height="48">
+                                <circle class="arc-bg" cx="24" cy="24" r="20"/>
+                                <circle class="arc-fill orange" cx="24" cy="24" r="20" style="stroke-dashoffset: 92;"/>
+                            </svg>
+                            <span class="arc-value">2.7%</span>
+                        </div>
+                        <div class="tile-header">
+                            <div class="tile-icon orange">
+                                <i class="fas fa-chart-area"></i>
+                            </div>
+                        </div>
+                        <div class="tile-label">Degradation Rate</div>
+                        <div class="tile-value">2.7%</div>
+                        <div class="tile-meta">
+                            <span class="tile-change neutral">
+                                <i class="fas fa-minus"></i> Stable
+                            </span>
+                            <span class="tile-target">Target: &lt;3%</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="kpi-card red">
-                <div class="kpi-header">
-                    <span class="kpi-label">Open Incidents</span>
-                    <div class="kpi-icon red">
-                        <i class="fas fa-exclamation-triangle"></i>
+            <!-- 2. NETWORK BW UTILIZATION CATEGORY -->
+            <div class="kpi-category">
+                <div class="category-header">
+                    <div class="category-label">
+                        <div class="category-icon network">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <span class="category-name">Network Bandwidth Utilization</span>
+                    </div>
+                    <span class="category-badge healthy">All Systems Normal</span>
+                </div>
+                <div class="kpi-tiles two-col">
+                    <!-- Primary Link -->
+                    <div class="kpi-tile">
+                        <div class="progress-arc">
+                            <svg width="48" height="48">
+                                <circle class="arc-bg" cx="24" cy="24" r="20"/>
+                                <circle class="arc-fill purple" cx="24" cy="24" r="20" style="stroke-dashoffset: 38;"/>
+                            </svg>
+                            <span class="arc-value">72%</span>
+                        </div>
+                        <div class="tile-header">
+                            <div class="tile-icon purple">
+                                <i class="fas fa-satellite-dish"></i>
+                            </div>
+                            <div class="tile-status good"></div>
+                        </div>
+                        <div class="tile-label">Primary Link</div>
+                        <div class="tile-value large">72%</div>
+                        <div class="inline-stats">
+                            <div class="inline-stat">
+                                <div class="dot tx"></div>
+                                <span>TX:</span>
+                                <strong>845 Mbps</strong>
+                            </div>
+                            <div class="inline-stat">
+                                <div class="dot rx"></div>
+                                <span>RX:</span>
+                                <strong>623 Mbps</strong>
+                            </div>
+                        </div>
+                        <div class="tile-meta" style="margin-top: 12px;">
+                            <span class="tile-change up-bad">
+                                <i class="fas fa-arrow-up"></i> +5%
+                            </span>
+                            <span class="tile-target">Capacity: 1 Gbps</span>
+                        </div>
+                    </div>
+
+                    <!-- Secondary Link -->
+                    <div class="kpi-tile">
+                        <div class="progress-arc">
+                            <svg width="48" height="48">
+                                <circle class="arc-bg" cx="24" cy="24" r="20"/>
+                                <circle class="arc-fill green" cx="24" cy="24" r="20" style="stroke-dashoffset: 81;"/>
+                            </svg>
+                            <span class="arc-value">35%</span>
+                        </div>
+                        <div class="tile-header">
+                            <div class="tile-icon green">
+                                <i class="fas fa-broadcast-tower"></i>
+                            </div>
+                            <div class="tile-status good"></div>
+                        </div>
+                        <div class="tile-label">Secondary Link</div>
+                        <div class="tile-value large">35%</div>
+                        <div class="inline-stats">
+                            <div class="inline-stat">
+                                <div class="dot tx"></div>
+                                <span>TX:</span>
+                                <strong>178 Mbps</strong>
+                            </div>
+                            <div class="inline-stat">
+                                <div class="dot rx"></div>
+                                <span>RX:</span>
+                                <strong>142 Mbps</strong>
+                            </div>
+                        </div>
+                        <div class="tile-meta" style="margin-top: 12px;">
+                            <span class="tile-change down-good">
+                                <i class="fas fa-arrow-down"></i> -3%
+                            </span>
+                            <span class="tile-target">Capacity: 500 Mbps</span>
+                        </div>
+                    </div>
+
+                    <!-- Peak Utilization -->
+                    <div class="kpi-tile">
+                        <div class="tile-header">
+                            <div class="tile-icon cyan">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="tile-status warning"></div>
+                        </div>
+                        <div class="tile-label">Peak Utilization (Today)</div>
+                        <div class="tile-value">89%</div>
+                        <div class="mini-chart">
+                            <div class="mini-bar active" style="height: 45%; --bar-color: #a5b4fc;"></div>
+                            <div class="mini-bar active" style="height: 60%; --bar-color: #a5b4fc;"></div>
+                            <div class="mini-bar active" style="height: 75%; --bar-color: #a5b4fc;"></div>
+                            <div class="mini-bar active" style="height: 89%; --bar-color: #f59e0b;"></div>
+                            <div class="mini-bar active" style="height: 70%; --bar-color: #a5b4fc;"></div>
+                            <div class="mini-bar active" style="height: 55%; --bar-color: #a5b4fc;"></div>
+                            <div class="mini-bar active" style="height: 65%; --bar-color: #8b5cf6;"></div>
+                        </div>
+                        <div class="tile-meta">
+                            <span class="tile-change neutral">
+                                <i class="fas fa-clock"></i> 2:30 PM
+                            </span>
+                            <span class="tile-target">Threshold: 85%</span>
+                        </div>
+                    </div>
+
+                    <!-- Avg Latency -->
+                    <div class="kpi-tile">
+                        <div class="tile-header">
+                            <div class="tile-icon blue">
+                                <i class="fas fa-stopwatch"></i>
+                            </div>
+                            <div class="tile-status good"></div>
+                        </div>
+                        <div class="tile-label">Avg Network Latency</div>
+                        <div class="tile-value">24ms</div>
+                        <div class="mini-chart">
+                            <div class="mini-bar active" style="height: 35%; --bar-color: #93c5fd;"></div>
+                            <div class="mini-bar active" style="height: 40%; --bar-color: #93c5fd;"></div>
+                            <div class="mini-bar active" style="height: 32%; --bar-color: #93c5fd;"></div>
+                            <div class="mini-bar active" style="height: 38%; --bar-color: #93c5fd;"></div>
+                            <div class="mini-bar active" style="height: 30%; --bar-color: #93c5fd;"></div>
+                            <div class="mini-bar active" style="height: 36%; --bar-color: #93c5fd;"></div>
+                            <div class="mini-bar active" style="height: 34%; --bar-color: #3b82f6;"></div>
+                        </div>
+                        <div class="tile-meta">
+                            <span class="tile-change down-good">
+                                <i class="fas fa-arrow-down"></i> -4ms
+                            </span>
+                            <span class="tile-target">Target: &lt;50ms</span>
+                        </div>
                     </div>
                 </div>
-                <div class="kpi-value">23</div>
-                <div class="kpi-trend down">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>5 new since yesterday</span>
+            </div>
+
+            <!-- 3. AGENT PRODUCTIVITY CATEGORY -->
+            <div class="kpi-category">
+                <div class="category-header">
+                    <div class="category-label">
+                        <div class="category-icon productivity">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                        <span class="category-name">Agent Productivity</span>
+                    </div>
+                    <span class="category-badge healthy">Above Target</span>
+                </div>
+                <div class="kpi-tiles">
+                    <!-- Calls Handled -->
+                    <div class="kpi-tile">
+                        <div class="tile-header">
+                            <div class="tile-icon blue">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <div class="tile-status good"></div>
+                        </div>
+                        <div class="tile-label">Calls Handled</div>
+                        <div class="tile-value large">12,847</div>
+                        <div class="mini-chart">
+                            <div class="mini-bar active" style="height: 70%; --bar-color: #93c5fd;"></div>
+                            <div class="mini-bar active" style="height: 85%; --bar-color: #93c5fd;"></div>
+                            <div class="mini-bar active" style="height: 75%; --bar-color: #93c5fd;"></div>
+                            <div class="mini-bar active" style="height: 90%; --bar-color: #93c5fd;"></div>
+                            <div class="mini-bar active" style="height: 80%; --bar-color: #93c5fd;"></div>
+                            <div class="mini-bar active" style="height: 95%; --bar-color: #93c5fd;"></div>
+                            <div class="mini-bar active" style="height: 100%; --bar-color: #3b82f6;"></div>
+                        </div>
+                        <div class="tile-meta">
+                            <span class="tile-change up-good">
+                                <i class="fas fa-arrow-up"></i> +8.5%
+                            </span>
+                            <span class="tile-target">vs yesterday</span>
+                        </div>
+                    </div>
+
+                    <!-- Agent Utilization -->
+                    <div class="kpi-tile">
+                        <div class="progress-arc">
+                            <svg width="48" height="48">
+                                <circle class="arc-bg" cx="24" cy="24" r="20"/>
+                                <circle class="arc-fill blue" cx="24" cy="24" r="20" style="stroke-dashoffset: 21;"/>
+                            </svg>
+                            <span class="arc-value">83%</span>
+                        </div>
+                        <div class="tile-header">
+                            <div class="tile-icon purple">
+                                <i class="fas fa-user-cog"></i>
+                            </div>
+                        </div>
+                        <div class="tile-label">Agent Utilization</div>
+                        <div class="tile-value">83.4%</div>
+                        <div class="tile-meta">
+                            <span class="tile-change up-good">
+                                <i class="fas fa-arrow-up"></i> +2.1%
+                            </span>
+                            <span class="tile-target">Target: 80%</span>
+                        </div>
+                    </div>
+
+                    <!-- Avg Handle Time -->
+                    <div class="kpi-tile">
+                        <div class="tile-header">
+                            <div class="tile-icon cyan">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                            <div class="tile-status good"></div>
+                        </div>
+                        <div class="tile-label">Avg Handle Time</div>
+                        <div class="tile-value">4:32</div>
+                        <div class="mini-chart">
+                            <div class="mini-bar active" style="height: 80%; --bar-color: #a5f3fc;"></div>
+                            <div class="mini-bar active" style="height: 75%; --bar-color: #a5f3fc;"></div>
+                            <div class="mini-bar active" style="height: 70%; --bar-color: #a5f3fc;"></div>
+                            <div class="mini-bar active" style="height: 65%; --bar-color: #a5f3fc;"></div>
+                            <div class="mini-bar active" style="height: 60%; --bar-color: #a5f3fc;"></div>
+                            <div class="mini-bar active" style="height: 55%; --bar-color: #a5f3fc;"></div>
+                            <div class="mini-bar active" style="height: 50%; --bar-color: #06b6d4;"></div>
+                        </div>
+                        <div class="tile-meta">
+                            <span class="tile-change down-good">
+                                <i class="fas fa-arrow-down"></i> -18s
+                            </span>
+                            <span class="tile-target">Target: 5:00</span>
+                        </div>
+                    </div>
+
+                    <!-- First Call Resolution -->
+                    <div class="kpi-tile">
+                        <div class="progress-arc">
+                            <svg width="48" height="48">
+                                <circle class="arc-bg" cx="24" cy="24" r="20"/>
+                                <circle class="arc-fill green" cx="24" cy="24" r="20" style="stroke-dashoffset: 11;"/>
+                            </svg>
+                            <span class="arc-value">91%</span>
+                        </div>
+                        <div class="tile-header">
+                            <div class="tile-icon emerald">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                        </div>
+                        <div class="tile-label">First Call Resolution</div>
+                        <div class="tile-value">91.2%</div>
+                        <div class="tile-meta">
+                            <span class="tile-change up-good">
+                                <i class="fas fa-arrow-up"></i> +1.8%
+                            </span>
+                            <span class="tile-target">Target: 90%</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </section>
+
+            <!-- 4. INCIDENT DATA CATEGORY -->
+            <div class="kpi-category">
+                <div class="category-header">
+                    <div class="category-label">
+                        <div class="category-icon incident">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <span class="category-name">Incident Data</span>
+                    </div>
+                    <span class="category-badge warning">5 Open Critical</span>
+                </div>
+                <div class="kpi-tiles">
+                    <!-- Resolution Time -->
+                    <div class="kpi-tile">
+                        <div class="tile-header">
+                            <div class="tile-icon green">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="tile-status good"></div>
+                        </div>
+                        <div class="tile-label">Avg Resolution Time</div>
+                        <div class="tile-value">2.4h</div>
+                        <div class="mini-chart">
+                            <div class="mini-bar active" style="height: 70%; --bar-color: #bbf7d0;"></div>
+                            <div class="mini-bar active" style="height: 65%; --bar-color: #bbf7d0;"></div>
+                            <div class="mini-bar active" style="height: 55%; --bar-color: #bbf7d0;"></div>
+                            <div class="mini-bar active" style="height: 50%; --bar-color: #bbf7d0;"></div>
+                            <div class="mini-bar active" style="height: 48%; --bar-color: #bbf7d0;"></div>
+                            <div class="mini-bar active" style="height: 45%; --bar-color: #bbf7d0;"></div>
+                            <div class="mini-bar active" style="height: 42%; --bar-color: #22c55e;"></div>
+                        </div>
+                        <div class="tile-meta">
+                            <span class="tile-change down-good">
+                                <i class="fas fa-arrow-down"></i> -18min
+                            </span>
+                            <span class="tile-target">SLA: 4h</span>
+                        </div>
+                    </div>
+
+                    <!-- Response Time -->
+                    <div class="kpi-tile">
+                        <div class="tile-header">
+                            <div class="tile-icon blue">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="tile-status good"></div>
+                        </div>
+                        <div class="tile-label">Avg Response Time</div>
+                        <div class="tile-value">12min</div>
+                        <div class="mini-chart">
+                            <div class="mini-bar active" style="height: 50%; --bar-color: #93c5fd;"></div>
+                            <div class="mini-bar active" style="height: 45%; --bar-color: #93c5fd;"></div>
+                            <div class="mini-bar active" style="height: 40%; --bar-color: #93c5fd;"></div>
+                            <div class="mini-bar active" style="height: 38%; --bar-color: #93c5fd;"></div>
+                            <div class="mini-bar active" style="height: 35%; --bar-color: #93c5fd;"></div>
+                            <div class="mini-bar active" style="height: 32%; --bar-color: #93c5fd;"></div>
+                            <div class="mini-bar active" style="height: 30%; --bar-color: #3b82f6;"></div>
+                        </div>
+                        <div class="tile-meta">
+                            <span class="tile-change down-good">
+                                <i class="fas fa-arrow-down"></i> -3min
+                            </span>
+                            <span class="tile-target">SLA: 15min</span>
+                        </div>
+                    </div>
+
+                    <!-- Open Incidents -->
+                    <div class="kpi-tile">
+                        <div class="tile-header">
+                            <div class="tile-icon red">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <div class="tile-status warning"></div>
+                        </div>
+                        <div class="tile-label">Open Incidents</div>
+                        <div class="tile-value">23</div>
+                        <div class="severity-pills">
+                            <div class="severity-pill">
+                                <div class="pill-dot p1"></div>
+                                <span class="pill-label">P1:</span>
+                                <span class="pill-value">2</span>
+                            </div>
+                            <div class="severity-pill">
+                                <div class="pill-dot p2"></div>
+                                <span class="pill-label">P2:</span>
+                                <span class="pill-value">5</span>
+                            </div>
+                            <div class="severity-pill">
+                                <div class="pill-dot p3"></div>
+                                <span class="pill-label">P3:</span>
+                                <span class="pill-value">9</span>
+                            </div>
+                            <div class="severity-pill">
+                                <div class="pill-dot p4"></div>
+                                <span class="pill-label">P4:</span>
+                                <span class="pill-value">7</span>
+                            </div>
+                        </div>
+                        <div class="tile-meta" style="margin-top: 8px;">
+                            <span class="tile-change up-bad">
+                                <i class="fas fa-arrow-up"></i> +5
+                            </span>
+                            <span class="tile-target">since yesterday</span>
+                        </div>
+                    </div>
+
+                    <!-- Problems -->
+                    <div class="kpi-tile">
+                        <div class="tile-header">
+                            <div class="tile-icon orange">
+                                <i class="fas fa-bug"></i>
+                            </div>
+                            <div class="tile-status warning"></div>
+                        </div>
+                        <div class="tile-label">Active Problems</div>
+                        <div class="tile-value">8</div>
+                        <div class="severity-pills">
+                            <div class="severity-pill">
+                                <div class="pill-dot p1"></div>
+                                <span class="pill-label">Critical:</span>
+                                <span class="pill-value">1</span>
+                            </div>
+                            <div class="severity-pill">
+                                <div class="pill-dot p2"></div>
+                                <span class="pill-label">Major:</span>
+                                <span class="pill-value">3</span>
+                            </div>
+                            <div class="severity-pill">
+                                <div class="pill-dot p3"></div>
+                                <span class="pill-label">Minor:</span>
+                                <span class="pill-value">4</span>
+                            </div>
+                        </div>
+                        <div class="tile-meta" style="margin-top: 8px;">
+                            <span class="tile-change neutral">
+                                <i class="fas fa-minus"></i> No change
+                            </span>
+                            <span class="tile-target">vs yesterday</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Dashboard Grid -->
         <section class="dashboard-grid">
@@ -791,7 +2598,7 @@
             </div>
 
             <!-- Data Circuit Bandwidth Utilization -->
-            <div class="dashboard-card">
+            <div class="dashboard-card full-width">
                 <div class="card-header">
                     <h3 class="card-title">
                         <i class="fas fa-network-wired"></i>
@@ -799,6 +2606,40 @@
                     </h3>
                 </div>
                 <div class="card-body">
+                    <!-- Avg Transmit/Receive Summary -->
+                    <div class="bandwidth-summary">
+                        <div class="bandwidth-summary-item">
+                            <div class="bandwidth-summary-icon tx">
+                                <i class="fas fa-arrow-up"></i>
+                            </div>
+                            <div class="bandwidth-summary-info">
+                                <div class="bandwidth-summary-label">Avg Transmit</div>
+                                <div class="bandwidth-summary-value">485.2 <span>Mbps</span></div>
+                                <div class="bandwidth-summary-detail">Peak: 892 Mbps | Min: 125 Mbps</div>
+                            </div>
+                        </div>
+                        <div class="bandwidth-summary-item">
+                            <div class="bandwidth-summary-icon rx">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            <div class="bandwidth-summary-info">
+                                <div class="bandwidth-summary-label">Avg Receive</div>
+                                <div class="bandwidth-summary-value">623.8 <span>Mbps</span></div>
+                                <div class="bandwidth-summary-detail">Peak: 978 Mbps | Min: 245 Mbps</div>
+                            </div>
+                        </div>
+                        <div class="bandwidth-summary-item">
+                            <div class="bandwidth-summary-icon total">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <div class="bandwidth-summary-info">
+                                <div class="bandwidth-summary-label">Total Throughput</div>
+                                <div class="bandwidth-summary-value">1.1 <span>Gbps</span></div>
+                                <div class="bandwidth-summary-detail">55% of 2 Gbps capacity</div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="bandwidth-grid">
                         <div class="bandwidth-card">
                             <div class="bandwidth-header">
@@ -811,6 +2652,10 @@
                             <div class="bandwidth-details">
                                 <span>680 Mbps / 1 Gbps</span>
                                 <span>Peak: 85%</span>
+                            </div>
+                            <div class="bandwidth-tx-rx">
+                                <span><i class="fas fa-arrow-up"></i> TX: 312 Mbps</span>
+                                <span><i class="fas fa-arrow-down"></i> RX: 368 Mbps</span>
                             </div>
                         </div>
                         <div class="bandwidth-card">
@@ -825,6 +2670,10 @@
                                 <span>420 Mbps / 1 Gbps</span>
                                 <span>Peak: 65%</span>
                             </div>
+                            <div class="bandwidth-tx-rx">
+                                <span><i class="fas fa-arrow-up"></i> TX: 173 Mbps</span>
+                                <span><i class="fas fa-arrow-down"></i> RX: 247 Mbps</span>
+                            </div>
                         </div>
                         <div class="bandwidth-card">
                             <div class="bandwidth-header">
@@ -837,6 +2686,10 @@
                             <div class="bandwidth-details">
                                 <span>175 Mbps / 500 Mbps</span>
                                 <span>Peak: 52%</span>
+                            </div>
+                            <div class="bandwidth-tx-rx">
+                                <span><i class="fas fa-arrow-up"></i> TX: 88 Mbps</span>
+                                <span><i class="fas fa-arrow-down"></i> RX: 87 Mbps</span>
                             </div>
                         </div>
                         <div class="bandwidth-card">
@@ -851,13 +2704,17 @@
                                 <span>390 Mbps / 500 Mbps</span>
                                 <span>Peak: 92%</span>
                             </div>
+                            <div class="bandwidth-tx-rx">
+                                <span><i class="fas fa-arrow-up"></i> TX: 145 Mbps</span>
+                                <span><i class="fas fa-arrow-down"></i> RX: 245 Mbps</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Agent Availability -->
-            <div class="dashboard-card">
+            <div class="dashboard-card full-width">
                 <div class="card-header">
                     <h3 class="card-title">
                         <i class="fas fa-users"></i>
@@ -1056,7 +2913,810 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Agent Performance Details -->
+            <div class="dashboard-card full-width">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-user-tie"></i>
+                        Agent Performance Details
+                    </h3>
+                    <div class="table-search">
+                        <input type="text" class="table-search-input" placeholder="Search agents..." id="agentSearch">
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="agent-table-container">
+                        <table class="agent-table">
+                            <thead>
+                                <tr>
+                                    <th>Agent</th>
+                                    <th>Vendor</th>
+                                    <th>Calls Handled</th>
+                                    <th>Errored</th>
+                                    <th>Degraded</th>
+                                    <th>Incidents Raised</th>
+                                    <th>Resolution Rate</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="agent-info">
+                                            <div class="agent-avatar">JD</div>
+                                            <div>
+                                                <div class="agent-name">John Davis</div>
+                                                <div class="agent-id">AGT-001</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="vendor-badge alpha"><i class="fas fa-building"></i> Alpha Communications</span></td>
+                                    <td class="metric-cell">847</td>
+                                    <td class="metric-cell danger">12</td>
+                                    <td class="metric-cell warning">23</td>
+                                    <td class="metric-cell">5</td>
+                                    <td>
+                                        <div class="rate-bar">
+                                            <div class="rate-bar-track">
+                                                <div class="rate-bar-fill" style="width: 96%; background: var(--success-color);"></div>
+                                            </div>
+                                            <span class="rate-value" style="color: var(--success-color);">96%</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="table-action-btn" title="View Details"><i class="fas fa-eye"></i></button>
+                                            <button class="table-action-btn" title="View Schedule"><i class="fas fa-calendar"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="agent-info">
+                                            <div class="agent-avatar">SM</div>
+                                            <div>
+                                                <div class="agent-name">Sarah Mitchell</div>
+                                                <div class="agent-id">AGT-002</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="vendor-badge beta"><i class="fas fa-building"></i> Beta Services Inc.</span></td>
+                                    <td class="metric-cell">923</td>
+                                    <td class="metric-cell success">4</td>
+                                    <td class="metric-cell warning">18</td>
+                                    <td class="metric-cell">3</td>
+                                    <td>
+                                        <div class="rate-bar">
+                                            <div class="rate-bar-track">
+                                                <div class="rate-bar-fill" style="width: 98%; background: var(--success-color);"></div>
+                                            </div>
+                                            <span class="rate-value" style="color: var(--success-color);">98%</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="table-action-btn" title="View Details"><i class="fas fa-eye"></i></button>
+                                            <button class="table-action-btn" title="View Schedule"><i class="fas fa-calendar"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="agent-info">
+                                            <div class="agent-avatar">MR</div>
+                                            <div>
+                                                <div class="agent-name">Mike Rodriguez</div>
+                                                <div class="agent-id">AGT-003</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="vendor-badge gamma"><i class="fas fa-building"></i> Gamma Solutions</span></td>
+                                    <td class="metric-cell">756</td>
+                                    <td class="metric-cell warning">8</td>
+                                    <td class="metric-cell danger">32</td>
+                                    <td class="metric-cell">7</td>
+                                    <td>
+                                        <div class="rate-bar">
+                                            <div class="rate-bar-track">
+                                                <div class="rate-bar-fill" style="width: 89%; background: var(--warning-color);"></div>
+                                            </div>
+                                            <span class="rate-value" style="color: var(--warning-color);">89%</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="table-action-btn" title="View Details"><i class="fas fa-eye"></i></button>
+                                            <button class="table-action-btn" title="View Schedule"><i class="fas fa-calendar"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="agent-info">
+                                            <div class="agent-avatar">EW</div>
+                                            <div>
+                                                <div class="agent-name">Emily Watson</div>
+                                                <div class="agent-id">AGT-004</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="vendor-badge delta"><i class="fas fa-building"></i> Delta Networks</span></td>
+                                    <td class="metric-cell">892</td>
+                                    <td class="metric-cell success">3</td>
+                                    <td class="metric-cell success">11</td>
+                                    <td class="metric-cell">2</td>
+                                    <td>
+                                        <div class="rate-bar">
+                                            <div class="rate-bar-track">
+                                                <div class="rate-bar-fill" style="width: 99%; background: var(--success-color);"></div>
+                                            </div>
+                                            <span class="rate-value" style="color: var(--success-color);">99%</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="table-action-btn" title="View Details"><i class="fas fa-eye"></i></button>
+                                            <button class="table-action-btn" title="View Schedule"><i class="fas fa-calendar"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="agent-info">
+                                            <div class="agent-avatar">RK</div>
+                                            <div>
+                                                <div class="agent-name">Robert Kim</div>
+                                                <div class="agent-id">AGT-005</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="vendor-badge alpha"><i class="fas fa-building"></i> Alpha Communications</span></td>
+                                    <td class="metric-cell">634</td>
+                                    <td class="metric-cell danger">15</td>
+                                    <td class="metric-cell danger">41</td>
+                                    <td class="metric-cell">9</td>
+                                    <td>
+                                        <div class="rate-bar">
+                                            <div class="rate-bar-track">
+                                                <div class="rate-bar-fill" style="width: 82%; background: var(--danger-color);"></div>
+                                            </div>
+                                            <span class="rate-value" style="color: var(--danger-color);">82%</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="table-action-btn" title="View Details"><i class="fas fa-eye"></i></button>
+                                            <button class="table-action-btn" title="View Schedule"><i class="fas fa-calendar"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="agent-info">
+                                            <div class="agent-avatar">LC</div>
+                                            <div>
+                                                <div class="agent-name">Lisa Chen</div>
+                                                <div class="agent-id">AGT-006</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="vendor-badge beta"><i class="fas fa-building"></i> Beta Services Inc.</span></td>
+                                    <td class="metric-cell">978</td>
+                                    <td class="metric-cell success">2</td>
+                                    <td class="metric-cell success">9</td>
+                                    <td class="metric-cell">1</td>
+                                    <td>
+                                        <div class="rate-bar">
+                                            <div class="rate-bar-track">
+                                                <div class="rate-bar-fill" style="width: 100%; background: var(--success-color);"></div>
+                                            </div>
+                                            <span class="rate-value" style="color: var(--success-color);">100%</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="table-action-btn" title="View Details"><i class="fas fa-eye"></i></button>
+                                            <button class="table-action-btn" title="View Schedule"><i class="fas fa-calendar"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <div class="pagination-info">Showing 1-6 of 248 agents</div>
+                        <div class="pagination-controls">
+                            <button class="pagination-btn"><i class="fas fa-chevron-left"></i></button>
+                            <button class="pagination-btn active">1</button>
+                            <button class="pagination-btn">2</button>
+                            <button class="pagination-btn">3</button>
+                            <button class="pagination-btn">...</button>
+                            <button class="pagination-btn">42</button>
+                            <button class="pagination-btn"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Schedule -->
+            <div class="dashboard-card full-width">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        Agent Schedule
+                    </h3>
+                    <div class="schedule-legend">
+                        <div class="legend-item">
+                            <div class="legend-color working"></div>
+                            <span>Working</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color break"></div>
+                            <span>Break</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color training"></div>
+                            <span>Training</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color offline"></div>
+                            <span>Offline</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="schedule-header">
+                        <div class="schedule-date-nav">
+                            <button class="schedule-nav-btn"><i class="fas fa-chevron-left"></i></button>
+                            <span class="schedule-date">Saturday, December 28, 2025</span>
+                            <button class="schedule-nav-btn"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="schedule-timeline">
+                        <div class="timeline-header">
+                            <div></div>
+                            <div class="timeline-hours">
+                                <div class="timeline-hour">6 AM</div>
+                                <div class="timeline-hour">8 AM</div>
+                                <div class="timeline-hour">10 AM</div>
+                                <div class="timeline-hour">12 PM</div>
+                                <div class="timeline-hour">2 PM</div>
+                                <div class="timeline-hour">4 PM</div>
+                                <div class="timeline-hour">6 PM</div>
+                                <div class="timeline-hour">8 PM</div>
+                                <div class="timeline-hour">10 PM</div>
+                                <div class="timeline-hour">12 AM</div>
+                                <div class="timeline-hour">2 AM</div>
+                                <div class="timeline-hour">4 AM</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Agent 1 -->
+                        <div class="schedule-row">
+                            <div class="schedule-agent">
+                                <div class="schedule-avatar">JD</div>
+                                <div>
+                                    <div class="schedule-agent-name">John Davis</div>
+                                    <div class="schedule-agent-status">Morning Shift</div>
+                                </div>
+                            </div>
+                            <div class="schedule-bars">
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block break"></div>
+                                <div class="schedule-block break"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Agent 2 -->
+                        <div class="schedule-row">
+                            <div class="schedule-agent">
+                                <div class="schedule-avatar">SM</div>
+                                <div>
+                                    <div class="schedule-agent-name">Sarah Mitchell</div>
+                                    <div class="schedule-agent-status">Day Shift</div>
+                                </div>
+                            </div>
+                            <div class="schedule-bars">
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block training"></div>
+                                <div class="schedule-block training"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block break"></div>
+                                <div class="schedule-block break"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Agent 3 -->
+                        <div class="schedule-row">
+                            <div class="schedule-agent">
+                                <div class="schedule-avatar">MR</div>
+                                <div>
+                                    <div class="schedule-agent-name">Mike Rodriguez</div>
+                                    <div class="schedule-agent-status">Evening Shift</div>
+                                </div>
+                            </div>
+                            <div class="schedule-bars">
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block break"></div>
+                                <div class="schedule-block break"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Agent 4 -->
+                        <div class="schedule-row">
+                            <div class="schedule-agent">
+                                <div class="schedule-avatar">EW</div>
+                                <div>
+                                    <div class="schedule-agent-name">Emily Watson</div>
+                                    <div class="schedule-agent-status">Night Shift</div>
+                                </div>
+                            </div>
+                            <div class="schedule-bars">
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block break"></div>
+                                <div class="schedule-block break"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Agent 5 -->
+                        <div class="schedule-row">
+                            <div class="schedule-agent">
+                                <div class="schedule-avatar">RK</div>
+                                <div>
+                                    <div class="schedule-agent-name">Robert Kim</div>
+                                    <div class="schedule-agent-status">Split Shift</div>
+                                </div>
+                            </div>
+                            <div class="schedule-bars">
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block break"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block break"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Agent 6 -->
+                        <div class="schedule-row">
+                            <div class="schedule-agent">
+                                <div class="schedule-avatar">LC</div>
+                                <div>
+                                    <div class="schedule-agent-name">Lisa Chen</div>
+                                    <div class="schedule-agent-status">Morning Shift</div>
+                                </div>
+                            </div>
+                            <div class="schedule-bars">
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block training"></div>
+                                <div class="schedule-block training"></div>
+                                <div class="schedule-block break"></div>
+                                <div class="schedule-block break"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block working"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                                <div class="schedule-block offline"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="schedule-summary">
+                        <div class="summary-item">
+                            <div class="summary-value" style="color: var(--primary-color);">186</div>
+                            <div class="summary-label">Agents On Shift</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value" style="color: var(--warning-color);">24</div>
+                            <div class="summary-label">On Break</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value" style="color: #9c27b0;">12</div>
+                            <div class="summary-label">In Training</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value" style="color: var(--text-secondary);">26</div>
+                            <div class="summary-label">Offline</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
+
+        <!-- Vendor Performance Summary -->
+        <div class="section-header" style="margin-top: 32px;">
+            <h2 class="section-title">
+                <i class="fas fa-building"></i>
+                Vendor Performance
+            </h2>
+            <button class="header-btn" onclick="window.print()">
+                <i class="fas fa-file-export"></i>
+                Export
+            </button>
+        </div>
+
+        <div class="vendor-table-card">
+                <table class="vendor-table">
+                    <thead>
+                        <tr>
+                            <th>Vendor</th>
+                            <th>Status</th>
+                            <th>Agents</th>
+                            <th>Calls Today</th>
+                            <th>Quality Score</th>
+                            <th>Error Rate</th>
+                            <th>Degraded</th>
+                            <th>Incidents</th>
+                            <th>Resolution</th>
+                            <th>Availability</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="vendor-name-cell">
+                                    <div class="vendor-color-indicator alpha"></div>
+                                    <div class="vendor-name-info">
+                                        <h4>Alpha Communications</h4>
+                                        <span>Primary Contact Center Partner</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="vendor-status"><span class="dot"></span> Active</span></td>
+                            <td>62</td>
+                            <td>3,847</td>
+                            <td class="metric-success">94.2%</td>
+                            <td class="metric-success">1.2%</td>
+                            <td class="metric-warning">2.8%</td>
+                            <td>12</td>
+                            <td class="metric-success">96.5%</td>
+                            <td class="metric-success">98.5%</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="table-action-btn" title="View Analytics"><i class="fas fa-chart-line"></i></button>
+                                    <button class="table-action-btn" title="View Agents"><i class="fas fa-users"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="vendor-name-cell">
+                                    <div class="vendor-color-indicator beta"></div>
+                                    <div class="vendor-name-info">
+                                        <h4>Beta Services Inc.</h4>
+                                        <span>Secondary Support Partner</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="vendor-status"><span class="dot"></span> Active</span></td>
+                            <td>58</td>
+                            <td>3,421</td>
+                            <td class="metric-success">91.8%</td>
+                            <td class="metric-success">1.5%</td>
+                            <td class="metric-warning">3.1%</td>
+                            <td>8</td>
+                            <td class="metric-success">94.2%</td>
+                            <td class="metric-success">97.2%</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="table-action-btn" title="View Analytics"><i class="fas fa-chart-line"></i></button>
+                                    <button class="table-action-btn" title="View Agents"><i class="fas fa-users"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="vendor-name-cell">
+                                    <div class="vendor-color-indicator gamma"></div>
+                                    <div class="vendor-name-info">
+                                        <h4>Gamma Solutions</h4>
+                                        <span>Technical Support Specialist</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="vendor-status"><span class="dot"></span> Active</span></td>
+                            <td>71</td>
+                            <td>3,156</td>
+                            <td class="metric-success">93.1%</td>
+                            <td class="metric-warning">2.1%</td>
+                            <td class="metric-warning">2.5%</td>
+                            <td>15</td>
+                            <td class="metric-warning">89.7%</td>
+                            <td class="metric-success">98.1%</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="table-action-btn" title="View Analytics"><i class="fas fa-chart-line"></i></button>
+                                    <button class="table-action-btn" title="View Agents"><i class="fas fa-users"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="vendor-name-cell">
+                                    <div class="vendor-color-indicator delta"></div>
+                                    <div class="vendor-name-info">
+                                        <h4>Delta Networks</h4>
+                                        <span>After Hours Support</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="vendor-status"><span class="dot"></span> Active</span></td>
+                            <td>57</td>
+                            <td>2,423</td>
+                            <td class="metric-warning">90.5%</td>
+                            <td class="metric-danger">2.8%</td>
+                            <td class="metric-danger">3.9%</td>
+                            <td>18</td>
+                            <td class="metric-warning">88.3%</td>
+                            <td class="metric-success">96.8%</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="table-action-btn" title="View Analytics"><i class="fas fa-chart-line"></i></button>
+                                    <button class="table-action-btn" title="View Agents"><i class="fas fa-users"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+        </div>
     </main>
 
     <script>
@@ -1240,6 +3900,72 @@
 
         // Auto refresh every 5 minutes
         setInterval(refreshDashboard, 300000);
+
+        // Vendor/Agency Filter Functions
+        const vendorData = {
+            'all': { agencies: 4, agents: 248, vendors: 4, callQuality: 92.4, availability: 97.8 },
+            'agency-alpha': { agencies: 1, agents: 62, vendors: 1, callQuality: 94.2, availability: 98.5 },
+            'agency-beta': { agencies: 1, agents: 58, vendors: 1, callQuality: 91.8, availability: 97.2 },
+            'agency-gamma': { agencies: 1, agents: 71, vendors: 1, callQuality: 93.1, availability: 98.1 },
+            'agency-delta': { agencies: 1, agents: 57, vendors: 1, callQuality: 90.5, availability: 96.8 },
+            'vendor-techpro': { agencies: 2, agents: 120, vendors: 1, callQuality: 93.5, availability: 98.2 },
+            'vendor-cloudnet': { agencies: 1, agents: 45, vendors: 1, callQuality: 91.2, availability: 97.5 },
+            'vendor-datalink': { agencies: 1, agents: 48, vendors: 1, callQuality: 92.8, availability: 97.9 },
+            'vendor-netops': { agencies: 1, agents: 35, vendors: 1, callQuality: 90.9, availability: 96.5 }
+        };
+
+        function filterByVendor() {
+            const select = document.getElementById('vendorFilter');
+            const value = select.value;
+            const data = vendorData[value] || vendorData['all'];
+            
+            // Update filter stats
+            document.getElementById('agencyCount').textContent = data.agencies;
+            document.getElementById('agentCount').textContent = data.agents;
+            document.getElementById('vendorCount').textContent = data.vendors;
+            
+            // Show/hide active filter badge
+            const activeFilters = document.getElementById('activeFilters');
+            const activeFilterText = document.getElementById('activeFilterText');
+            
+            if (value !== 'all') {
+                activeFilters.style.display = 'block';
+                activeFilterText.textContent = select.options[select.selectedIndex].text;
+            } else {
+                activeFilters.style.display = 'none';
+            }
+            
+            // Trigger dashboard update animation
+            document.querySelectorAll('.kpi-card, .dashboard-card').forEach(card => {
+                card.style.opacity = '0.6';
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                }, 300);
+            });
+            
+            console.log(`Filtering by: ${value}`);
+        }
+
+        function filterByTimeRange() {
+            const select = document.getElementById('timeRangeFilter');
+            const value = select.value;
+            
+            // Trigger dashboard update animation
+            document.querySelectorAll('.kpi-card, .dashboard-card').forEach(card => {
+                card.style.opacity = '0.6';
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                }, 300);
+            });
+            
+            console.log(`Time range: ${value}`);
+        }
+
+        function clearFilter() {
+            document.getElementById('vendorFilter').value = 'all';
+            document.getElementById('activeFilters').style.display = 'none';
+            filterByVendor();
+        }
     </script>
 </body>
 </html>
