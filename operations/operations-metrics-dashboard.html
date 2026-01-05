@@ -8,20 +8,50 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* ========== EXECUTIVE THEME ROOT VARIABLES ========== */
         :root {
-            --primary-color: #3b82f6;
-            --secondary-color: #64748b;
-            --success-color: #22c55e;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --info-color: #3b82f6;
+            /* Executive Color Palette */
+            --exec-dark: #0f172a;
+            --exec-primary: #1e293b;
+            --exec-secondary: #475569;
+            --exec-tertiary: #64748b;
+            --exec-muted: #94a3b8;
+            --exec-light: #cbd5e1;
+            
+            /* Subtle Threshold Status Colors */
+            --status-success: #059669;
+            --status-success-bg: #ecfdf5;
+            --status-success-light: #a7f3d0;
+            --status-warning: #d97706;
+            --status-warning-bg: #fffbeb;
+            --status-warning-light: #fde68a;
+            --status-danger: #dc2626;
+            --status-danger-bg: #fef2f2;
+            --status-danger-light: #fecaca;
+            
+            /* Background & Surface Colors */
             --bg-primary: #f8fafc;
             --bg-card: #ffffff;
+            --bg-elevated: #ffffff;
+            
+            /* Text Colors */
             --text-primary: #0f172a;
             --text-secondary: #64748b;
-            --border-color: #e2e8f0;
-            --shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
-            --shadow-hover: 0 10px 25px rgba(0,0,0,0.08);
+            --text-muted: #94a3b8;
+            
+            /* Border & Shadow */
+            --border-color: #e5e7eb;
+            --border-light: #f1f5f9;
+            --shadow: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.06);
+            
+            /* Legacy Compatibility */
+            --primary-color: #1e293b;
+            --secondary-color: #64748b;
+            --success-color: #22c55e;
+            --warning-color: #eab308;
+            --danger-color: #ef4444;
+            --info-color: #475569;
         }
 
         * {
@@ -32,19 +62,300 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f8fafc;
+            background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
         }
 
-        /* Executive Header */
-        .header {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        /* ========== MAIN NAVBAR (Dark Theme) ========== */
+        .main-navbar {
+            background: #0f172a;
             color: white;
-            padding: 24px 40px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 0 40px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: white;
+        }
+
+        .navbar-logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+        }
+
+        .navbar-logo-text {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .navbar-logo-text span {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar-icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .navbar-icon-btn:hover {
+            background: rgba(255,255,255,0.08);
+            color: white;
+        }
+
+        .navbar-icon-btn .badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid #0f172a;
+        }
+
+        .navbar-divider {
+            width: 1px;
+            height: 24px;
+            background: rgba(255,255,255,0.1);
+            margin: 0 8px;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .navbar-user:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .navbar-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #475569 0%, #334155 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .navbar-user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar-username {
+            font-size: 13px;
+            font-weight: 500;
+            color: white;
+            line-height: 1.2;
+        }
+
+        .navbar-role {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .navbar-dropdown-icon {
+            color: #64748b;
+            font-size: 10px;
+            margin-left: 4px;
+        }
+
+        /* ========== SECONDARY NAVBAR (Links) ========== */
+        .secondary-navbar {
+            background: #1e293b;
+            padding: 0 40px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+        }
+
+        .secondary-nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .secondary-nav-actions {
+            position: absolute;
+            right: 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .nav-link.active {
+            color: white;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-link i {
+            font-size: 14px;
+        }
+
+        .secondary-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-timestamp {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .nav-timestamp i {
+            font-size: 12px;
+        }
+
+        .nav-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .nav-action-btn.secondary {
+            background: rgba(255,255,255,0.08);
+            color: #94a3b8;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .nav-action-btn.secondary:hover {
+            background: rgba(255,255,255,0.12);
+            color: white;
+        }
+
+        .nav-action-btn.primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .nav-action-btn.primary:hover {
+            background: #2563eb;
+        }
+
+        /* ========== OLD HEADER (converted to page header) ========== */
+        .header {
+            display: none; /* Hide old header */
+        }
+
+        .page-header {
+            background: white;
+            padding: 20px 40px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .page-header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #0f172a;
+            letter-spacing: -0.3px;
+        }
+
+        .page-title p {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .page-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Legacy header styles kept for compatibility */
         .header-content {
             max-width: 1600px;
             margin: 0 auto;
@@ -56,55 +367,55 @@
         .header-title {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
         }
 
         .header-logo {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            border-radius: 12px;
+            width: 44px;
+            height: 44px;
+            background: #475569;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 20px;
         }
 
         .header-title h1 {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 600;
             letter-spacing: -0.3px;
         }
 
         .header-title p {
-            font-size: 13px;
-            opacity: 0.7;
-            margin-top: 4px;
+            font-size: 12px;
+            opacity: 0.6;
+            margin-top: 2px;
             font-weight: 400;
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 24px;
+            gap: 20px;
         }
 
         .last-updated {
-            font-size: 13px;
-            opacity: 0.7;
+            font-size: 12px;
+            opacity: 0.6;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
         .header-btn {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
             color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 10px 18px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             display: flex;
             align-items: center;
@@ -113,18 +424,18 @@
         }
 
         .header-btn:hover {
-            background: rgba(255,255,255,0.2);
-            border-color: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.25);
         }
 
         .refresh-btn {
-            background: #3b82f6;
+            background: #475569;
             border: none;
             color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 10px 18px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             display: flex;
             align-items: center;
@@ -133,7 +444,7 @@
         }
 
         .refresh-btn:hover {
-            background: #2563eb;
+            background: #64748b;
         }
 
         /* Main Content */
@@ -143,8 +454,159 @@
             padding: 32px 40px;
         }
 
-        /* ========== CLEAN MODERN KPI DASHBOARD ========== */
-        
+        /* ========== EXECUTIVE DOCK SUMMARY ========== */
+        .kpi-dock {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 6px;
+            margin-bottom: 28px;
+            display: flex;
+            gap: 6px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+            border: 1px solid #e5e7eb;
+        }
+
+        .dock-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dock-item:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+        }
+
+        .dock-item.active {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+        }
+
+        .dock-item.active .dock-label,
+        .dock-item.active .dock-sublabel {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .dock-item.active .dock-value {
+            color: white;
+        }
+
+        .dock-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .dock-icon.call-quality {
+            background: #1e293b;
+            color: white;
+        }
+
+        .dock-icon.network {
+            background: #475569;
+            color: white;
+        }
+
+        .dock-icon.productivity {
+            background: #64748b;
+            color: white;
+        }
+
+        .dock-icon.incidents {
+            background: #94a3b8;
+            color: white;
+        }
+
+        .dock-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .dock-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .dock-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .dock-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .dock-status.healthy { background: #10b981; }
+        .dock-status.warning { background: #f59e0b; }
+        .dock-status.critical { background: #ef4444; }
+
+        .dock-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
+        .dock-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .dock-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .dock-change.positive {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .dock-change.negative {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .dock-change.neutral {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .dock-sublabel {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        /* ========== EXECUTIVE THEME KPI DASHBOARD ========== */
+
         /* Dashboard Header */
         .dashboard-summary {
             margin-bottom: 32px;
@@ -164,59 +626,58 @@
         }
 
         .summary-title h2 {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: -0.5px;
+            font-size: 22px;
+            font-weight: 600;
+            color: #1e293b;
+            letter-spacing: -0.3px;
             margin: 0;
         }
 
         .summary-title span {
             font-size: 13px;
-            color: var(--text-secondary);
+            color: #64748b;
         }
 
         .time-selector {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
             background: white;
-            padding: 6px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
         }
 
         .time-btn {
-            padding: 10px 18px;
+            padding: 8px 16px;
             border: none;
             background: transparent;
             font-size: 13px;
             font-weight: 500;
-            color: var(--text-secondary);
+            color: #64748b;
             cursor: pointer;
-            border-radius: 8px;
+            border-radius: 6px;
             transition: all 0.2s ease;
         }
 
         .time-btn.active {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            background: #1e293b;
             color: white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         .time-btn:hover:not(.active) {
-            background: #f1f5f9;
-            color: var(--text-primary);
+            background: #f8fafc;
+            color: #1e293b;
         }
 
         /* KPI Category Container */
         .kpi-category {
             background: white;
-            border-radius: 20px;
+            border-radius: 12px;
             padding: 24px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-            border: 1px solid rgba(0,0,0,0.04);
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
 
         .category-header {
@@ -224,6 +685,8 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f1f5f9;
         }
 
         .category-label {
@@ -233,46 +696,50 @@
         }
 
         .category-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .category-icon.call-quality {
-            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-            color: #ef4444;
+            background: #1e293b;
+            color: #ffffff;
         }
 
         .category-icon.network {
-            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
-            color: #8b5cf6;
+            background: #475569;
+            color: #ffffff;
         }
 
         .category-icon.productivity {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            color: #3b82f6;
+            background: #64748b;
+            color: #ffffff;
         }
 
         .category-icon.incident {
-            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-            color: #f59e0b;
+            background: #94a3b8;
+            color: #ffffff;
         }
 
         .category-name {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
-            color: var(--text-primary);
+            color: #1e293b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .category-badge {
             font-size: 11px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-weight: 500;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .category-badge.healthy {
@@ -290,26 +757,25 @@
             color: #dc2626;
         }
 
-        /* Clean KPI Tiles */
+        /* Executive KPI Tiles */
         .kpi-tiles {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 16px;
         }
 
         .kpi-tile {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-radius: 16px;
+            background: #ffffff;
+            border-radius: 10px;
             padding: 20px;
             position: relative;
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
+            transition: all 0.2s ease;
+            border: 1px solid #e5e7eb;
         }
 
         .kpi-tile:hover {
-            transform: translateY(-2px);
-            border-color: rgba(59, 130, 246, 0.2);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
         .kpi-tile .tile-header {
@@ -320,60 +786,62 @@
         }
 
         .kpi-tile .tile-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 13px;
+            background: #1e293b;
+            color: #ffffff;
         }
 
-        .kpi-tile .tile-icon.red { background: #fef2f2; color: #ef4444; }
-        .kpi-tile .tile-icon.orange { background: #fffbeb; color: #f59e0b; }
-        .kpi-tile .tile-icon.blue { background: #eff6ff; color: #3b82f6; }
-        .kpi-tile .tile-icon.green { background: #f0fdf4; color: #22c55e; }
-        .kpi-tile .tile-icon.purple { background: #f5f3ff; color: #8b5cf6; }
-        .kpi-tile .tile-icon.cyan { background: #ecfeff; color: #06b6d4; }
-        .kpi-tile .tile-icon.rose { background: #fff1f2; color: #f43f5e; }
-        .kpi-tile .tile-icon.emerald { background: #ecfdf5; color: #10b981; }
+        .kpi-tile .tile-icon.critical { background: #1e293b; }
+        .kpi-tile .tile-icon.high { background: #475569; }
+        .kpi-tile .tile-icon.medium { background: #64748b; }
+        .kpi-tile .tile-icon.low { background: #94a3b8; }
+
+        /* Legacy color support - mapped to executive */
+        .kpi-tile .tile-icon.red { background: #1e293b; color: #ffffff; }
+        .kpi-tile .tile-icon.orange { background: #475569; color: #ffffff; }
+        .kpi-tile .tile-icon.blue { background: #64748b; color: #ffffff; }
+        .kpi-tile .tile-icon.green { background: #94a3b8; color: #ffffff; }
+        .kpi-tile .tile-icon.purple { background: #475569; color: #ffffff; }
+        .kpi-tile .tile-icon.cyan { background: #64748b; color: #ffffff; }
+        .kpi-tile .tile-icon.rose { background: #1e293b; color: #ffffff; }
+        .kpi-tile .tile-icon.emerald { background: #94a3b8; color: #ffffff; }
 
         .kpi-tile .tile-status {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            animation: pulse 2s infinite;
         }
 
-        .kpi-tile .tile-status.good { background: #22c55e; }
+        .kpi-tile .tile-status.good { background: #10b981; }
         .kpi-tile .tile-status.warning { background: #f59e0b; }
         .kpi-tile .tile-status.critical { background: #ef4444; }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
         .kpi-tile .tile-label {
-            font-size: 12px;
-            color: var(--text-secondary);
+            font-size: 11px;
+            color: #64748b;
             font-weight: 500;
             margin-bottom: 6px;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
         }
 
         .kpi-tile .tile-value {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: #0f172a;
             letter-spacing: -0.5px;
             margin-bottom: 8px;
             line-height: 1;
         }
 
         .kpi-tile .tile-value.large {
-            font-size: 32px;
+            font-size: 30px;
         }
 
         .kpi-tile .tile-meta {
@@ -388,8 +856,8 @@
             gap: 4px;
             font-size: 11px;
             font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 6px;
+            padding: 4px 8px;
+            border-radius: 4px;
         }
 
         .kpi-tile .tile-change.up-good {
@@ -413,22 +881,22 @@
         }
 
         .kpi-tile .tile-change.neutral {
-            background: #f1f5f9;
+            background: #f8fafc;
             color: #64748b;
         }
 
         .kpi-tile .tile-target {
             font-size: 11px;
-            color: var(--text-secondary);
+            color: #94a3b8;
         }
 
-        /* Mini Chart */
+        /* Executive Mini Chart */
         .mini-chart {
-            height: 32px;
+            height: 28px;
             display: flex;
             align-items: flex-end;
             gap: 2px;
-            margin: 10px 0 6px;
+            margin: 10px 0 8px;
         }
 
         .mini-bar {
@@ -439,20 +907,20 @@
         }
 
         .mini-bar.active {
-            background: var(--bar-color, #3b82f6);
+            background: var(--bar-color, #64748b);
         }
 
         .mini-bar:hover {
             opacity: 0.8;
         }
 
-        /* Progress Arc */
+        /* Executive Progress Arc */
         .progress-arc {
             position: absolute;
             top: 16px;
             right: 16px;
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
         }
 
         .progress-arc svg {
@@ -462,40 +930,40 @@
         .progress-arc .arc-bg {
             fill: none;
             stroke: #e2e8f0;
-            stroke-width: 4;
+            stroke-width: 3;
         }
 
         .progress-arc .arc-fill {
             fill: none;
-            stroke-width: 4;
+            stroke-width: 3;
             stroke-linecap: round;
             stroke-dasharray: 126;
             transition: stroke-dashoffset 0.6s ease;
         }
 
-        .progress-arc .arc-fill.red { stroke: #ef4444; }
-        .progress-arc .arc-fill.orange { stroke: #f59e0b; }
-        .progress-arc .arc-fill.blue { stroke: #3b82f6; }
-        .progress-arc .arc-fill.green { stroke: #22c55e; }
-        .progress-arc .arc-fill.purple { stroke: #8b5cf6; }
+        .progress-arc .arc-fill.red { stroke: #1e293b; }
+        .progress-arc .arc-fill.orange { stroke: #475569; }
+        .progress-arc .arc-fill.blue { stroke: #64748b; }
+        .progress-arc .arc-fill.green { stroke: #94a3b8; }
+        .progress-arc .arc-fill.purple { stroke: #475569; }
 
         .progress-arc .arc-value {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: #1e293b;
         }
 
-        /* Inline Stats */
+        /* Executive Inline Stats */
         .inline-stats {
             display: flex;
             gap: 16px;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px dashed #e2e8f0;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f1f5f9;
         }
 
         .inline-stat {
@@ -511,15 +979,15 @@
             border-radius: 50%;
         }
 
-        .inline-stat .dot.tx { background: #3b82f6; }
-        .inline-stat .dot.rx { background: #22c55e; }
+        .inline-stat .dot.tx { background: #1e293b; }
+        .inline-stat .dot.rx { background: #64748b; }
 
         .inline-stat span {
-            color: var(--text-secondary);
+            color: #64748b;
         }
 
         .inline-stat strong {
-            color: var(--text-primary);
+            color: #1e293b;
             font-weight: 600;
         }
 
@@ -533,7 +1001,7 @@
             grid-column: span 2;
         }
 
-        /* Severity Pills */
+        /* Executive Severity Pills */
         .severity-pills {
             display: flex;
             gap: 8px;
@@ -545,23 +1013,24 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 11px;
             font-weight: 500;
             background: #f8fafc;
+            border: 1px solid #e5e7eb;
         }
 
         .severity-pill .pill-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
         }
 
-        .severity-pill .pill-dot.p1 { background: #ef4444; }
-        .severity-pill .pill-dot.p2 { background: #f59e0b; }
-        .severity-pill .pill-dot.p3 { background: #3b82f6; }
-        .severity-pill .pill-dot.p4 { background: #22c55e; }
+        .severity-pill .pill-dot.p1 { background: #1e293b; }
+        .severity-pill .pill-dot.p2 { background: #475569; }
+        .severity-pill .pill-dot.p3 { background: #64748b; }
+        .severity-pill .pill-dot.p4 { background: #94a3b8; }
 
         .severity-pill .pill-label {
             color: var(--text-secondary);
@@ -606,8 +1075,9 @@
             font-size: 16px;
         }
 
-        .kpi-group-icon.calls { background: #eff6ff; color: #3b82f6; }
-        .kpi-group-icon.operations { background: #f0fdf4; color: #22c55e; }
+        /* Executive Theme Group Icons */
+        .kpi-group-icon.calls { background: #f1f5f9; color: #1e293b; }
+        .kpi-group-icon.operations { background: #f1f5f9; color: #475569; }
 
         .kpi-group-title {
             font-size: 14px;
@@ -628,19 +1098,21 @@
             grid-template-columns: repeat(2, 1fr);
         }
 
-        .kpi-card.purple { border-left-color: #8b5cf6; }
-        .kpi-card.teal { border-left-color: #14b8a6; }
-        .kpi-card.indigo { border-left-color: #6366f1; }
-        .kpi-card.pink { border-left-color: #ec4899; }
-        .kpi-icon.purple { background: #f5f3ff; color: #8b5cf6; }
-        .kpi-icon.teal { background: #f0fdfa; color: #14b8a6; }
-        .kpi-icon.indigo { background: #eef2ff; color: #6366f1; }
-        .kpi-icon.pink { background: #fdf2f8; color: #ec4899; }
+        /* Executive Theme Card Colors */
+        .kpi-card.purple { border-left-color: #475569; }
+        .kpi-card.teal { border-left-color: #64748b; }
+        .kpi-card.indigo { border-left-color: #475569; }
+        .kpi-card.pink { border-left-color: #1e293b; }
+        .kpi-icon.purple { background: #f1f5f9; color: #475569; }
+        .kpi-icon.teal { background: #f1f5f9; color: #64748b; }
+        .kpi-icon.indigo { background: #f1f5f9; color: #475569; }
+        .kpi-icon.pink { background: #f1f5f9; color: #1e293b; }
 
         .kpi-card {
             background: var(--bg-card);
-            border-radius: 12px;
+            border-radius: 10px;
             padding: 20px 24px;
+            border: 1px solid var(--border-color);
             box-shadow: var(--shadow);
             transition: all 0.2s ease;
             border-left: 3px solid transparent;
@@ -680,10 +1152,11 @@
             font-size: 16px;
         }
 
-        .kpi-icon.blue { background: #eff6ff; color: var(--primary-color); }
-        .kpi-icon.green { background: #f0fdf4; color: var(--success-color); }
-        .kpi-icon.orange { background: #fffbeb; color: var(--warning-color); }
-        .kpi-icon.red { background: #fef2f2; color: var(--danger-color); }
+        /* Executive Theme KPI Icons */
+        .kpi-icon.blue { background: #f1f5f9; color: #475569; }
+        .kpi-icon.green { background: #f1f5f9; color: #64748b; }
+        .kpi-icon.orange { background: #f1f5f9; color: #475569; }
+        .kpi-icon.red { background: #f1f5f9; color: #1e293b; }
 
         .kpi-value {
             font-size: 28px;
@@ -700,47 +1173,50 @@
             font-size: 12px;
         }
 
-        .kpi-trend.up { color: var(--success-color); }
-        .kpi-trend.down { color: var(--danger-color); }
+        /* Executive Threshold Colors */
+        .kpi-trend.up { color: #166534; }
+        .kpi-trend.down { color: #991b1b; }
 
-        /* Dashboard Grid */
+        /* Executive Dashboard Grid */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
+            gap: 20px;
         }
 
         .dashboard-card {
             background: var(--bg-card);
-            border-radius: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
             box-shadow: var(--shadow);
             overflow: hidden;
         }
 
         .card-header {
-            padding: 18px 24px;
+            padding: 16px 20px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: #fafbfc;
         }
 
         .card-title {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 16px;
+            gap: 10px;
+            font-size: 14px;
             font-weight: 600;
             color: var(--text-primary);
         }
 
         .card-title i {
-            color: var(--primary-color);
-            font-size: 18px;
+            color: #64748b;
+            font-size: 16px;
         }
 
         .card-body {
-            padding: 24px;
+            padding: 20px;
         }
 
         /* Chart Container */
@@ -813,70 +1289,263 @@
             font-weight: 500;
         }
 
-        /* Resolution Time Table */
-        .resolution-table {
-            width: 100%;
-            border-collapse: collapse;
+        /* Executive Theme - Severity Resolution Cards */
+        .severity-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
         }
 
-        .resolution-table th,
-        .resolution-table td {
-            padding: 14px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
+        .severity-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s ease;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
 
-        .resolution-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-secondary);
+        .severity-card:hover {
+            border-color: #d1d5db;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
         }
 
-        .resolution-table td {
+        .severity-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 20px 16px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .severity-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .severity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 14px;
         }
 
-        .severity-badge {
+        .severity-card.critical .severity-icon {
+            background: #1e293b;
+            color: #ffffff;
+        }
+
+        .severity-card.high .severity-icon {
+            background: #475569;
+            color: #ffffff;
+        }
+
+        .severity-card.medium .severity-icon {
+            background: #64748b;
+            color: #ffffff;
+        }
+
+        .severity-card.low .severity-icon {
+            background: #94a3b8;
+            color: #ffffff;
+        }
+
+        .severity-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e293b;
+            letter-spacing: -0.2px;
+        }
+
+        .severity-tag {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        .severity-status {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             padding: 6px 12px;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .severity-status.on-track {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .severity-status.at-risk {
+            background: #fffbeb;
+            color: #d97706;
+        }
+
+        .severity-status.breached {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .severity-status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .severity-status.on-track .severity-status-dot { background: #10b981; }
+        .severity-status.at-risk .severity-status-dot { background: #f59e0b; }
+        .severity-status.breached .severity-status-dot { background: #ef4444; }
+
+        .severity-card-body {
+            padding: 20px;
+        }
+
+        .severity-metrics {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            border: 1px solid #f1f5f9;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .severity-metric {
+            flex: 1;
+            text-align: center;
+            padding: 16px 12px;
+            background: #fafbfc;
+        }
+
+        .severity-metric:first-child {
+            border-right: 1px solid #f1f5f9;
+        }
+
+        .severity-metric-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
+
+        .severity-metric-label {
+            font-size: 10px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 6px;
             font-weight: 500;
         }
 
-        .severity-badge.critical {
-            background: #fce8e6;
-            color: #c5221f;
+        .severity-progress {
+            margin-bottom: 0;
         }
 
-        .severity-badge.high {
-            background: #fef7e0;
-            color: #e37400;
+        .severity-progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
         }
 
-        .severity-badge.medium {
-            background: #e8f0fe;
-            color: #1a73e8;
+        .severity-progress-label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
         }
 
-        .severity-badge.low {
-            background: #e6f4ea;
-            color: #137333;
+        .severity-progress-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
         }
 
-        .time-value {
-            font-weight: 600;
-            color: var(--text-primary);
+        .severity-progress-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
         }
 
-        .target-value {
-            color: var(--text-secondary);
-            font-size: 13px;
+        .severity-progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.6s ease;
+        }
+
+        .severity-card.critical .severity-progress-fill { background: #1e293b; }
+        .severity-card.high .severity-progress-fill { background: #475569; }
+        .severity-card.medium .severity-progress-fill { background: #64748b; }
+        .severity-card.low .severity-progress-fill { background: #94a3b8; }
+
+        .severity-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: #f8fafc;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .severity-incidents {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .severity-incidents-count {
+            min-width: 32px;
+            height: 32px;
+            padding: 0 8px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            color: #0f172a;
+        }
+
+        .severity-incidents-label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .severity-sla {
+            font-size: 12px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .severity-sla i {
+            font-size: 12px;
+        }
+
+        /* Subtle Threshold Colors for SLA */
+        .severity-sla.success i { color: #059669; }
+        .severity-sla.warning i { color: #d97706; }
+        .severity-sla.danger i { color: #dc2626; }
+
+        /* Legacy Support */
+        .resolution-table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
         .status-indicator {
@@ -891,11 +1560,12 @@
             border-radius: 50%;
         }
 
-        .status-dot.green { background: var(--success-color); }
-        .status-dot.yellow { background: var(--warning-color); }
-        .status-dot.red { background: var(--danger-color); }
+        /* Subtle Status Dots */
+        .status-dot.green { background: #10b981; }
+        .status-dot.yellow { background: #f59e0b; }
+        .status-dot.red { background: #ef4444; }
 
-        /* MOS Score Display */
+        /* MOS Score Display - Executive Theme */
         .mos-display {
             text-align: center;
             padding: 20px;
@@ -904,7 +1574,7 @@
         .mos-score {
             font-size: 72px;
             font-weight: 700;
-            background: linear-gradient(135deg, #34a853 0%, #1a73e8 100%);
+            background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -1136,7 +1806,7 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), #0d47a1);
+            background: #475569;
             color: white;
             display: flex;
             align-items: center;
@@ -1155,6 +1825,7 @@
             color: var(--text-secondary);
         }
 
+        /* Executive Theme Vendor Badges */
         .vendor-badge {
             display: inline-flex;
             align-items: center;
@@ -1165,10 +1836,10 @@
             font-weight: 500;
         }
 
-        .vendor-badge.alpha { background: #e8f0fe; color: #1a73e8; }
-        .vendor-badge.beta { background: #e6f4ea; color: #137333; }
-        .vendor-badge.gamma { background: #fef7e0; color: #e37400; }
-        .vendor-badge.delta { background: #fce8e6; color: #c5221f; }
+        .vendor-badge.alpha { background: #f1f5f9; color: #1e293b; }
+        .vendor-badge.beta { background: #f1f5f9; color: #475569; }
+        .vendor-badge.gamma { background: #f1f5f9; color: #64748b; }
+        .vendor-badge.delta { background: #f1f5f9; color: #94a3b8; }
 
         .metric-cell {
             font-weight: 500;
@@ -1398,7 +2069,7 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), #0d47a1);
+            background: #475569;
             color: white;
             display: flex;
             align-items: center;
@@ -1439,10 +2110,11 @@
             opacity: 0.8;
         }
 
-        .schedule-block.working { background: var(--primary-color); }
-        .schedule-block.break { background: var(--warning-color); }
-        .schedule-block.training { background: #9c27b0; }
-        .schedule-block.offline { background: #e8eaed; }
+        /* Executive Schedule Block Colors */
+        .schedule-block.working { background: #1e293b; }
+        .schedule-block.break { background: #64748b; }
+        .schedule-block.training { background: #475569; }
+        .schedule-block.offline { background: #e5e7eb; }
 
         .schedule-summary {
             display: grid;
@@ -1492,10 +2164,11 @@
             border-radius: 50%;
         }
 
-        /* Vendor Summary Table Styles */
+        /* Executive Theme Vendor Summary Table */
         .vendor-table-card {
             background: var(--bg-card);
-            border-radius: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
             box-shadow: var(--shadow);
             overflow: hidden;
             margin-top: 24px;
@@ -1507,31 +2180,31 @@
         }
 
         .vendor-table thead {
-            background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+            background: #1e293b;
             color: white;
         }
 
         .vendor-table th {
-            padding: 16px 20px;
+            padding: 14px 20px;
             text-align: left;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .vendor-table th:first-child {
-            border-radius: 12px 0 0 0;
+            border-radius: 10px 0 0 0;
         }
 
         .vendor-table th:last-child {
-            border-radius: 0 12px 0 0;
+            border-radius: 0 10px 0 0;
         }
 
         .vendor-table td {
-            padding: 18px 20px;
+            padding: 16px 20px;
             border-bottom: 1px solid var(--border-color);
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .vendor-table tbody tr:last-child td {
@@ -1539,7 +2212,7 @@
         }
 
         .vendor-table tbody tr:hover {
-            background: #f8f9fa;
+            background: #f8fafc;
         }
 
         .vendor-name-cell {
@@ -1888,7 +2561,82 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
+    <!-- Main Navbar (Dark Theme) -->
+    <nav class="main-navbar">
+        <div class="navbar-left">
+            <a href="#" class="navbar-logo">
+                <span class="navbar-logo-text">OpsDash <span>Pro</span></span>
+            </a>
+        </div>
+
+        <div class="navbar-right">
+            <button class="navbar-icon-btn" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <span class="badge"></span>
+            </button>
+            <button class="navbar-icon-btn" title="Help">
+                <i class="fas fa-question-circle"></i>
+            </button>
+            <button class="navbar-icon-btn" title="Settings">
+                <i class="fas fa-cog"></i>
+            </button>
+            <div class="navbar-divider"></div>
+            <div class="navbar-user">
+                <div class="navbar-avatar">JD</div>
+                <div class="navbar-user-info">
+                    <span class="navbar-username">John Doe</span>
+                    <span class="navbar-role">Operations Admin</span>
+                </div>
+                <i class="fas fa-chevron-down navbar-dropdown-icon"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Secondary Navbar (Links) -->
+    <nav class="secondary-navbar">
+        <div class="secondary-nav-links">
+            <a href="#" class="nav-link active">
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard
+            </a>
+            <a href="#" class="nav-link">
+                <i class="fas fa-phone-alt"></i>
+                Call Analytics
+            </a>
+            <a href="#" class="nav-link">
+                <i class="fas fa-users"></i>
+                Agents
+            </a>
+            <a href="#" class="nav-link">
+                <i class="fas fa-building"></i>
+                Vendors
+            </a>
+            <a href="#" class="nav-link">
+                <i class="fas fa-exclamation-triangle"></i>
+                Incidents
+            </a>
+            <a href="#" class="nav-link">
+                <i class="fas fa-chart-bar"></i>
+                Reports
+            </a>
+        </div>
+        <div class="secondary-nav-actions">
+            <span class="nav-timestamp">
+                <i class="fas fa-clock"></i>
+                Updated: <span id="lastUpdate">Loading...</span>
+            </span>
+            <button class="nav-action-btn secondary">
+                <i class="fas fa-file-export"></i>
+                Export
+            </button>
+            <button class="nav-action-btn primary" onclick="refreshDashboard()">
+                <i class="fas fa-sync-alt"></i>
+                Refresh
+            </button>
+        </div>
+    </nav>
+
+    <!-- Old Header (hidden, kept for compatibility) -->
     <header class="header">
         <div class="header-content">
             <div class="header-title">
@@ -1903,7 +2651,7 @@
             <div class="header-actions">
                 <span class="last-updated">
                     <i class="fas fa-clock"></i>
-                    Updated: <span id="lastUpdate">Loading...</span>
+                    Updated: <span id="lastUpdateOld">Loading...</span>
                 </span>
                 <button class="header-btn">
                     <i class="fas fa-file-export"></i>
@@ -1980,6 +2728,89 @@
 
     <!-- Main Content -->
     <main class="main-content">
+        <!-- Executive KPI Dock -->
+        <div class="kpi-dock">
+            <!-- Call Quality -->
+            <div class="dock-item" onclick="scrollToSection('call-quality')">
+                <div class="dock-icon call-quality">
+                    <i class="fas fa-phone-slash"></i>
+                </div>
+                <div class="dock-content">
+                    <div class="dock-header">
+                        <span class="dock-label">Call Quality</span>
+                        <div class="dock-status warning"></div>
+                    </div>
+                    <div class="dock-value">97.2%</div>
+                    <div class="dock-meta">
+                        <span class="dock-change negative">
+                            <i class="fas fa-arrow-down"></i> 0.3%
+                        </span>
+                        <span class="dock-sublabel">469 issues</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Network BW -->
+            <div class="dock-item" onclick="scrollToSection('network')">
+                <div class="dock-icon network">
+                    <i class="fas fa-network-wired"></i>
+                </div>
+                <div class="dock-content">
+                    <div class="dock-header">
+                        <span class="dock-label">Network</span>
+                        <div class="dock-status healthy"></div>
+                    </div>
+                    <div class="dock-value">76%</div>
+                    <div class="dock-meta">
+                        <span class="dock-change positive">
+                            <i class="fas fa-arrow-up"></i> 2%
+                        </span>
+                        <span class="dock-sublabel">Utilization</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Productivity -->
+            <div class="dock-item" onclick="scrollToSection('productivity')">
+                <div class="dock-icon productivity">
+                    <i class="fas fa-user-clock"></i>
+                </div>
+                <div class="dock-content">
+                    <div class="dock-header">
+                        <span class="dock-label">Productivity</span>
+                        <div class="dock-status healthy"></div>
+                    </div>
+                    <div class="dock-value">83.4%</div>
+                    <div class="dock-meta">
+                        <span class="dock-change positive">
+                            <i class="fas fa-arrow-up"></i> 2.1%
+                        </span>
+                        <span class="dock-sublabel">Utilization</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Incidents -->
+            <div class="dock-item" onclick="scrollToSection('incidents')">
+                <div class="dock-icon incidents">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="dock-content">
+                    <div class="dock-header">
+                        <span class="dock-label">Incidents</span>
+                        <div class="dock-status warning"></div>
+                    </div>
+                    <div class="dock-value">23</div>
+                    <div class="dock-meta">
+                        <span class="dock-change negative">
+                            <i class="fas fa-arrow-up"></i> 3
+                        </span>
+                        <span class="dock-sublabel">Open tickets</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Clean Modern KPI Dashboard -->
         <div class="dashboard-summary">
             <div class="summary-header">
@@ -1996,7 +2827,7 @@
             </div>
 
             <!-- 1. CALL QUALITY CATEGORY -->
-            <div class="kpi-category">
+            <div class="kpi-category" id="call-quality">
                 <div class="category-header">
                     <div class="category-label">
                         <div class="category-icon call-quality">
@@ -2018,13 +2849,13 @@
                         <div class="tile-label">Errored Calls</div>
                         <div class="tile-value">127</div>
                         <div class="mini-chart">
-                            <div class="mini-bar active" style="height: 60%; --bar-color: #fca5a5;"></div>
-                            <div class="mini-bar active" style="height: 45%; --bar-color: #fca5a5;"></div>
-                            <div class="mini-bar active" style="height: 72%; --bar-color: #fca5a5;"></div>
-                            <div class="mini-bar active" style="height: 55%; --bar-color: #fca5a5;"></div>
-                            <div class="mini-bar active" style="height: 48%; --bar-color: #fca5a5;"></div>
-                            <div class="mini-bar active" style="height: 65%; --bar-color: #fca5a5;"></div>
-                            <div class="mini-bar active" style="height: 52%; --bar-color: #ef4444;"></div>
+                            <div class="mini-bar active" style="height: 60%; --bar-color: #94a3b8;"></div>
+                            <div class="mini-bar active" style="height: 45%; --bar-color: #94a3b8;"></div>
+                            <div class="mini-bar active" style="height: 72%; --bar-color: #94a3b8;"></div>
+                            <div class="mini-bar active" style="height: 55%; --bar-color: #94a3b8;"></div>
+                            <div class="mini-bar active" style="height: 48%; --bar-color: #94a3b8;"></div>
+                            <div class="mini-bar active" style="height: 65%; --bar-color: #94a3b8;"></div>
+                            <div class="mini-bar active" style="height: 52%; --bar-color: #1e293b;"></div>
                         </div>
                         <div class="tile-meta">
                             <span class="tile-change up-bad">
@@ -2045,13 +2876,13 @@
                         <div class="tile-label">Degraded Calls</div>
                         <div class="tile-value">342</div>
                         <div class="mini-chart">
-                            <div class="mini-bar active" style="height: 75%; --bar-color: #fcd34d;"></div>
-                            <div class="mini-bar active" style="height: 60%; --bar-color: #fcd34d;"></div>
-                            <div class="mini-bar active" style="height: 80%; --bar-color: #fcd34d;"></div>
-                            <div class="mini-bar active" style="height: 50%; --bar-color: #fcd34d;"></div>
-                            <div class="mini-bar active" style="height: 70%; --bar-color: #fcd34d;"></div>
-                            <div class="mini-bar active" style="height: 55%; --bar-color: #fcd34d;"></div>
-                            <div class="mini-bar active" style="height: 65%; --bar-color: #f59e0b;"></div>
+                            <div class="mini-bar active" style="height: 75%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 60%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 80%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 50%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 70%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 55%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 65%; --bar-color: #475569;"></div>
                         </div>
                         <div class="tile-meta">
                             <span class="tile-change down-good">
@@ -2112,7 +2943,7 @@
             </div>
 
             <!-- 2. NETWORK BW UTILIZATION CATEGORY -->
-            <div class="kpi-category">
+            <div class="kpi-category" id="network">
                 <div class="category-header">
                     <div class="category-label">
                         <div class="category-icon network">
@@ -2208,13 +3039,13 @@
                         <div class="tile-label">Peak Utilization (Today)</div>
                         <div class="tile-value">89%</div>
                         <div class="mini-chart">
-                            <div class="mini-bar active" style="height: 45%; --bar-color: #a5b4fc;"></div>
-                            <div class="mini-bar active" style="height: 60%; --bar-color: #a5b4fc;"></div>
-                            <div class="mini-bar active" style="height: 75%; --bar-color: #a5b4fc;"></div>
-                            <div class="mini-bar active" style="height: 89%; --bar-color: #f59e0b;"></div>
-                            <div class="mini-bar active" style="height: 70%; --bar-color: #a5b4fc;"></div>
-                            <div class="mini-bar active" style="height: 55%; --bar-color: #a5b4fc;"></div>
-                            <div class="mini-bar active" style="height: 65%; --bar-color: #8b5cf6;"></div>
+                            <div class="mini-bar active" style="height: 45%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 60%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 75%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 89%; --bar-color: #475569;"></div>
+                            <div class="mini-bar active" style="height: 70%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 55%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 65%; --bar-color: #64748b;"></div>
                         </div>
                         <div class="tile-meta">
                             <span class="tile-change neutral">
@@ -2235,13 +3066,13 @@
                         <div class="tile-label">Avg Network Latency</div>
                         <div class="tile-value">24ms</div>
                         <div class="mini-chart">
-                            <div class="mini-bar active" style="height: 35%; --bar-color: #93c5fd;"></div>
-                            <div class="mini-bar active" style="height: 40%; --bar-color: #93c5fd;"></div>
-                            <div class="mini-bar active" style="height: 32%; --bar-color: #93c5fd;"></div>
-                            <div class="mini-bar active" style="height: 38%; --bar-color: #93c5fd;"></div>
-                            <div class="mini-bar active" style="height: 30%; --bar-color: #93c5fd;"></div>
-                            <div class="mini-bar active" style="height: 36%; --bar-color: #93c5fd;"></div>
-                            <div class="mini-bar active" style="height: 34%; --bar-color: #3b82f6;"></div>
+                            <div class="mini-bar active" style="height: 35%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 40%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 32%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 38%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 30%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 36%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 34%; --bar-color: #64748b;"></div>
                         </div>
                         <div class="tile-meta">
                             <span class="tile-change down-good">
@@ -2254,7 +3085,7 @@
             </div>
 
             <!-- 3. AGENT PRODUCTIVITY CATEGORY -->
-            <div class="kpi-category">
+            <div class="kpi-category" id="productivity">
                 <div class="category-header">
                     <div class="category-label">
                         <div class="category-icon productivity">
@@ -2276,13 +3107,13 @@
                         <div class="tile-label">Calls Handled</div>
                         <div class="tile-value large">12,847</div>
                         <div class="mini-chart">
-                            <div class="mini-bar active" style="height: 70%; --bar-color: #93c5fd;"></div>
-                            <div class="mini-bar active" style="height: 85%; --bar-color: #93c5fd;"></div>
-                            <div class="mini-bar active" style="height: 75%; --bar-color: #93c5fd;"></div>
-                            <div class="mini-bar active" style="height: 90%; --bar-color: #93c5fd;"></div>
-                            <div class="mini-bar active" style="height: 80%; --bar-color: #93c5fd;"></div>
-                            <div class="mini-bar active" style="height: 95%; --bar-color: #93c5fd;"></div>
-                            <div class="mini-bar active" style="height: 100%; --bar-color: #3b82f6;"></div>
+                            <div class="mini-bar active" style="height: 70%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 85%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 75%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 90%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 80%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 95%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 100%; --bar-color: #64748b;"></div>
                         </div>
                         <div class="tile-meta">
                             <span class="tile-change up-good">
@@ -2327,13 +3158,13 @@
                         <div class="tile-label">Avg Handle Time</div>
                         <div class="tile-value">4:32</div>
                         <div class="mini-chart">
-                            <div class="mini-bar active" style="height: 80%; --bar-color: #a5f3fc;"></div>
-                            <div class="mini-bar active" style="height: 75%; --bar-color: #a5f3fc;"></div>
-                            <div class="mini-bar active" style="height: 70%; --bar-color: #a5f3fc;"></div>
-                            <div class="mini-bar active" style="height: 65%; --bar-color: #a5f3fc;"></div>
-                            <div class="mini-bar active" style="height: 60%; --bar-color: #a5f3fc;"></div>
-                            <div class="mini-bar active" style="height: 55%; --bar-color: #a5f3fc;"></div>
-                            <div class="mini-bar active" style="height: 50%; --bar-color: #06b6d4;"></div>
+                            <div class="mini-bar active" style="height: 80%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 75%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 70%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 65%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 60%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 55%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 50%; --bar-color: #64748b;"></div>
                         </div>
                         <div class="tile-meta">
                             <span class="tile-change down-good">
@@ -2370,7 +3201,7 @@
             </div>
 
             <!-- 4. INCIDENT DATA CATEGORY -->
-            <div class="kpi-category">
+            <div class="kpi-category" id="incidents">
                 <div class="category-header">
                     <div class="category-label">
                         <div class="category-icon incident">
@@ -2392,13 +3223,13 @@
                         <div class="tile-label">Avg Resolution Time</div>
                         <div class="tile-value">2.4h</div>
                         <div class="mini-chart">
-                            <div class="mini-bar active" style="height: 70%; --bar-color: #bbf7d0;"></div>
-                            <div class="mini-bar active" style="height: 65%; --bar-color: #bbf7d0;"></div>
-                            <div class="mini-bar active" style="height: 55%; --bar-color: #bbf7d0;"></div>
-                            <div class="mini-bar active" style="height: 50%; --bar-color: #bbf7d0;"></div>
-                            <div class="mini-bar active" style="height: 48%; --bar-color: #bbf7d0;"></div>
-                            <div class="mini-bar active" style="height: 45%; --bar-color: #bbf7d0;"></div>
-                            <div class="mini-bar active" style="height: 42%; --bar-color: #22c55e;"></div>
+                            <div class="mini-bar active" style="height: 70%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 65%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 55%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 50%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 48%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 45%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 42%; --bar-color: #94a3b8;"></div>
                         </div>
                         <div class="tile-meta">
                             <span class="tile-change down-good">
@@ -2419,13 +3250,13 @@
                         <div class="tile-label">Avg Response Time</div>
                         <div class="tile-value">12min</div>
                         <div class="mini-chart">
-                            <div class="mini-bar active" style="height: 50%; --bar-color: #93c5fd;"></div>
-                            <div class="mini-bar active" style="height: 45%; --bar-color: #93c5fd;"></div>
-                            <div class="mini-bar active" style="height: 40%; --bar-color: #93c5fd;"></div>
-                            <div class="mini-bar active" style="height: 38%; --bar-color: #93c5fd;"></div>
-                            <div class="mini-bar active" style="height: 35%; --bar-color: #93c5fd;"></div>
-                            <div class="mini-bar active" style="height: 32%; --bar-color: #93c5fd;"></div>
-                            <div class="mini-bar active" style="height: 30%; --bar-color: #3b82f6;"></div>
+                            <div class="mini-bar active" style="height: 50%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 45%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 40%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 38%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 35%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 32%; --bar-color: #cbd5e1;"></div>
+                            <div class="mini-bar active" style="height: 30%; --bar-color: #64748b;"></div>
                         </div>
                         <div class="tile-meta">
                             <span class="tile-change down-good">
@@ -2728,7 +3559,7 @@
                 </div>
             </div>
 
-            <!-- Incident Resolution Time -->
+            <!-- Incident Resolution Time - Severity Cards -->
             <div class="dashboard-card full-width">
                 <div class="card-header">
                     <h3 class="card-title">
@@ -2737,92 +3568,207 @@
                     </h3>
                 </div>
                 <div class="card-body">
-                    <table class="resolution-table">
-                        <thead>
-                            <tr>
-                                <th>Severity Level</th>
-                                <th>Avg Resolution Time</th>
-                                <th>Target SLA</th>
-                                <th>Compliance</th>
-                                <th>Open Incidents</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <span class="severity-badge critical">
-                                        <i class="fas fa-exclamation-circle"></i>
-                                        Critical (P1)
-                                    </span>
-                                </td>
-                                <td class="time-value">45 min</td>
-                                <td class="target-value">1 hour</td>
-                                <td><strong style="color: var(--success-color);">98.5%</strong></td>
-                                <td>3</td>
-                                <td>
-                                    <div class="status-indicator">
-                                        <span class="status-dot green"></span>
-                                        On Track
+                    <div class="severity-cards-grid">
+                        <!-- Critical (P1) Card -->
+                        <div class="severity-card critical">
+                            <div class="severity-card-header">
+                                <div class="severity-label">
+                                    <div class="severity-icon">
+                                        <i class="fas fa-bolt"></i>
                                     </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="severity-badge high">
+                                    <div>
+                                        <div class="severity-name">Critical</div>
+                                        <div class="severity-tag">Priority 1</div>
+                                    </div>
+                                </div>
+                                <div class="severity-status on-track">
+                                    <span class="severity-status-dot"></span>
+                                    On Track
+                                </div>
+                            </div>
+                            <div class="severity-card-body">
+                                <div class="severity-metrics">
+                                    <div class="severity-metric">
+                                        <div class="severity-metric-value">45m</div>
+                                        <div class="severity-metric-label">Avg Resolution</div>
+                                    </div>
+                                    <div class="severity-metric">
+                                        <div class="severity-metric-value">1h</div>
+                                        <div class="severity-metric-label">Target SLA</div>
+                                    </div>
+                                </div>
+                                <div class="severity-progress">
+                                    <div class="severity-progress-header">
+                                        <span class="severity-progress-label">SLA Compliance</span>
+                                        <span class="severity-progress-value">98.5%</span>
+                                    </div>
+                                    <div class="severity-progress-bar">
+                                        <div class="severity-progress-fill" style="width: 98.5%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="severity-footer">
+                                <div class="severity-incidents">
+                                    <div class="severity-incidents-count">3</div>
+                                    <span class="severity-incidents-label">Open</span>
+                                </div>
+                                <div class="severity-sla success">
+                                    <i class="fas fa-check-circle"></i>
+                                    Within SLA
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- High (P2) Card -->
+                        <div class="severity-card high">
+                            <div class="severity-card-header">
+                                <div class="severity-label">
+                                    <div class="severity-icon">
                                         <i class="fas fa-arrow-up"></i>
-                                        High (P2)
-                                    </span>
-                                </td>
-                                <td class="time-value">2.5 hrs</td>
-                                <td class="target-value">4 hours</td>
-                                <td><strong style="color: var(--success-color);">95.2%</strong></td>
-                                <td>7</td>
-                                <td>
-                                    <div class="status-indicator">
-                                        <span class="status-dot green"></span>
-                                        On Track
                                     </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="severity-badge medium">
+                                    <div>
+                                        <div class="severity-name">High</div>
+                                        <div class="severity-tag">Priority 2</div>
+                                    </div>
+                                </div>
+                                <div class="severity-status on-track">
+                                    <span class="severity-status-dot"></span>
+                                    On Track
+                                </div>
+                            </div>
+                            <div class="severity-card-body">
+                                <div class="severity-metrics">
+                                    <div class="severity-metric">
+                                        <div class="severity-metric-value">2.5h</div>
+                                        <div class="severity-metric-label">Avg Resolution</div>
+                                    </div>
+                                    <div class="severity-metric">
+                                        <div class="severity-metric-value">4h</div>
+                                        <div class="severity-metric-label">Target SLA</div>
+                                    </div>
+                                </div>
+                                <div class="severity-progress">
+                                    <div class="severity-progress-header">
+                                        <span class="severity-progress-label">SLA Compliance</span>
+                                        <span class="severity-progress-value">95.2%</span>
+                                    </div>
+                                    <div class="severity-progress-bar">
+                                        <div class="severity-progress-fill" style="width: 95.2%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="severity-footer">
+                                <div class="severity-incidents">
+                                    <div class="severity-incidents-count">7</div>
+                                    <span class="severity-incidents-label">Open</span>
+                                </div>
+                                <div class="severity-sla success">
+                                    <i class="fas fa-check-circle"></i>
+                                    Within SLA
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Medium (P3) Card -->
+                        <div class="severity-card medium">
+                            <div class="severity-card-header">
+                                <div class="severity-label">
+                                    <div class="severity-icon">
                                         <i class="fas fa-minus"></i>
-                                        Medium (P3)
-                                    </span>
-                                </td>
-                                <td class="time-value">6.2 hrs</td>
-                                <td class="target-value">8 hours</td>
-                                <td><strong style="color: var(--warning-color);">89.7%</strong></td>
-                                <td>8</td>
-                                <td>
-                                    <div class="status-indicator">
-                                        <span class="status-dot yellow"></span>
-                                        At Risk
                                     </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="severity-badge low">
+                                    <div>
+                                        <div class="severity-name">Medium</div>
+                                        <div class="severity-tag">Priority 3</div>
+                                    </div>
+                                </div>
+                                <div class="severity-status at-risk">
+                                    <span class="severity-status-dot"></span>
+                                    At Risk
+                                </div>
+                            </div>
+                            <div class="severity-card-body">
+                                <div class="severity-metrics">
+                                    <div class="severity-metric">
+                                        <div class="severity-metric-value">6.2h</div>
+                                        <div class="severity-metric-label">Avg Resolution</div>
+                                    </div>
+                                    <div class="severity-metric">
+                                        <div class="severity-metric-value">8h</div>
+                                        <div class="severity-metric-label">Target SLA</div>
+                                    </div>
+                                </div>
+                                <div class="severity-progress">
+                                    <div class="severity-progress-header">
+                                        <span class="severity-progress-label">SLA Compliance</span>
+                                        <span class="severity-progress-value">89.7%</span>
+                                    </div>
+                                    <div class="severity-progress-bar">
+                                        <div class="severity-progress-fill" style="width: 89.7%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="severity-footer">
+                                <div class="severity-incidents">
+                                    <div class="severity-incidents-count">8</div>
+                                    <span class="severity-incidents-label">Open</span>
+                                </div>
+                                <div class="severity-sla warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Monitor
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Low (P4) Card -->
+                        <div class="severity-card low">
+                            <div class="severity-card-header">
+                                <div class="severity-label">
+                                    <div class="severity-icon">
                                         <i class="fas fa-arrow-down"></i>
-                                        Low (P4)
-                                    </span>
-                                </td>
-                                <td class="time-value">18 hrs</td>
-                                <td class="target-value">24 hours</td>
-                                <td><strong style="color: var(--success-color);">97.1%</strong></td>
-                                <td>5</td>
-                                <td>
-                                    <div class="status-indicator">
-                                        <span class="status-dot green"></span>
-                                        On Track
                                     </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                    <div>
+                                        <div class="severity-name">Low</div>
+                                        <div class="severity-tag">Priority 4</div>
+                                    </div>
+                                </div>
+                                <div class="severity-status on-track">
+                                    <span class="severity-status-dot"></span>
+                                    On Track
+                                </div>
+                            </div>
+                            <div class="severity-card-body">
+                                <div class="severity-metrics">
+                                    <div class="severity-metric">
+                                        <div class="severity-metric-value">18h</div>
+                                        <div class="severity-metric-label">Avg Resolution</div>
+                                    </div>
+                                    <div class="severity-metric">
+                                        <div class="severity-metric-value">24h</div>
+                                        <div class="severity-metric-label">Target SLA</div>
+                                    </div>
+                                </div>
+                                <div class="severity-progress">
+                                    <div class="severity-progress-header">
+                                        <span class="severity-progress-label">SLA Compliance</span>
+                                        <span class="severity-progress-value">97.1%</span>
+                                    </div>
+                                    <div class="severity-progress-bar">
+                                        <div class="severity-progress-fill" style="width: 97.1%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="severity-footer">
+                                <div class="severity-incidents">
+                                    <div class="severity-incidents-count">5</div>
+                                    <span class="severity-incidents-label">Open</span>
+                                </div>
+                                <div class="severity-sla success">
+                                    <i class="fas fa-check-circle"></i>
+                                    Within SLA
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -3876,6 +4822,19 @@
                 circumference: 360
             }
         });
+
+        // Scroll to section function for dock navigation
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Highlight effect
+                section.style.boxShadow = '0 0 0 3px rgba(30, 41, 59, 0.2)';
+                setTimeout(() => {
+                    section.style.boxShadow = '';
+                }, 1500);
+            }
+        }
 
         // Refresh function
         function refreshDashboard() {

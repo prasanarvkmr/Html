@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operations Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --border: #e5e7eb;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --success-bg: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
+            --danger: #ef4444;
+            --danger-bg: #fef2f2;
+            --accent: #3b82f6;
+            --accent-bg: #eff6ff;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ========== NAVBAR ========== */
+        .navbar {
+            background: #0f172a;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo { font-size: 18px; font-weight: 600; color: white; }
+        .logo span { color: #64748b; font-weight: 400; }
+
+        .nav-links { display: flex; gap: 8px; }
+        .nav-link {
+            color: #94a3b8;
+            text-decoration: none;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: all 0.15s;
+        }
+        .nav-link:hover { color: white; background: rgba(255,255,255,0.08); }
+        .nav-link.active { color: white; background: rgba(255,255,255,0.1); }
+
+        .nav-right { display: flex; align-items: center; gap: 16px; }
+        .nav-time { font-size: 12px; color: #64748b; }
+        .nav-user { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .avatar {
+            width: 32px; height: 32px; background: #475569; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 600; color: white;
+        }
+        .user-name { font-size: 13px; color: white; font-weight: 500; }
+
+        /* ========== MAIN CONTENT ========== */
+        .main { max-width: 1440px; margin: 0 auto; padding: 24px 32px; }
+
+        /* ========== FILTER BAR ========== */
+        .filter-bar {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-select {
+            padding: 8px 32px 8px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;
+            appearance: none;
+            cursor: pointer;
+            min-width: 180px;
+            color: var(--text-primary);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .time-buttons {
+            display: flex;
+            gap: 4px;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .time-btn {
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 500;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .time-btn:hover { color: var(--text-primary); }
+        .time-btn.active { background: white; color: var(--text-primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+        .filter-actions { display: flex; gap: 8px; }
+
+        .btn {
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s;
+        }
+
+        .btn-secondary { background: white; border: 1px solid var(--border); color: var(--text-primary); }
+        .btn-secondary:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .btn-primary { background: #0f172a; border: none; color: white; }
+        .btn-primary:hover { background: #1e293b; }
+
+        /* ========== SELECTED FILTERS DISPLAY ========== */
+        .active-filters {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .active-filters-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .filter-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--accent-bg);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 6px;
+        }
+
+        .filter-tag i {
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .filter-tag i:hover { opacity: 1; }
+
+        /* ========== KPI DOCK ========== */
+        .kpi-dock {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .dock-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .dock-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: #cbd5e1; }
+
+        .dock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .dock-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .dock-status { width: 8px; height: 8px; border-radius: 50%; }
+        .dock-status.healthy { background: var(--success); }
+        .dock-status.warning { background: var(--warning); }
+        .dock-status.critical { background: var(--danger); }
+
+        .dock-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .dock-meta { display: flex; align-items: center; gap: 8px; }
+
+        .dock-change {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .dock-change.positive { background: var(--success-bg); color: #059669; }
+        .dock-change.negative { background: var(--danger-bg); color: #dc2626; }
+        .dock-sublabel { font-size: 12px; color: var(--text-muted); }
+
+        /* ========== GRID LAYOUT ========== */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .card.full-width { grid-column: 1 / -1; }
+
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+
+        .card-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .card-badge.healthy { background: var(--success-bg); color: #059669; }
+        .card-badge.warning { background: var(--warning-bg); color: #b45309; }
+
+        .card-body { padding: 20px; }
+
+        /* ========== CHART CONTAINERS ========== */
+        .chart-container {
+            position: relative;
+            height: 240px;
+        }
+
+        .chart-container-sm {
+            position: relative;
+            height: 180px;
+        }
+
+        /* ========== VENDOR QUALITY GRID ========== */
+        .vendor-quality-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .vendor-quality-item {
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 10px;
+        }
+
+        .vendor-quality-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .vendor-quality-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .vendor-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .vendor-quality-score {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .vendor-quality-score.high { color: #059669; }
+        .vendor-quality-score.medium { color: #b45309; }
+        .vendor-quality-score.low { color: #dc2626; }
+
+        .vendor-quality-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .vendor-stat {
+            text-align: center;
+        }
+
+        .vendor-stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .vendor-stat-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* ========== PROGRESS BAR ========== */
+        .progress-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-fill.success { background: var(--success); }
+        .progress-fill.warning { background: var(--warning); }
+        .progress-fill.danger { background: var(--danger); }
+
+        /* ========== METRICS LIST ========== */
+        .metrics-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .metric-row-compact {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .metric-label { font-size: 13px; color: var(--text-secondary); }
+        .metric-value-compact { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+
+        /* ========== QUICK STATS ========== */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .quick-stat {
+            text-align: center;
+            padding: 16px 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .quick-stat-value { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+        .quick-stat-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        /* ========== INCIDENT LIST ========== */
+        .incident-list { display: flex; flex-direction: column; gap: 10px; }
+
+        .incident-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 3px solid transparent;
+        }
+
+        .incident-item.p1 { border-left-color: var(--danger); }
+        .incident-item.p2 { border-left-color: var(--warning); }
+        .incident-item.p3 { border-left-color: var(--accent); }
+
+        .incident-info { display: flex; flex-direction: column; gap: 2px; }
+        .incident-title { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+        .incident-meta { font-size: 11px; color: var(--text-muted); }
+
+        .incident-status {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .incident-status.open { background: var(--danger-bg); color: #dc2626; }
+        .incident-status.progress { background: var(--warning-bg); color: #b45309; }
+        .incident-status.resolved { background: var(--success-bg); color: #059669; }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1200px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .kpi-dock { grid-template-columns: repeat(2, 1fr); }
+            .vendor-quality-grid { grid-template-columns: 1fr; }
+            .quick-stats { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .kpi-dock { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+            .filter-bar { flex-direction: column; align-items: stretch; }
+            .filter-group { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">OpsDash <span>Pro</span></div>
+        <div class="nav-links">
+            <a href="#" class="nav-link active">Dashboard</a>
+            <a href="#" class="nav-link">Analytics</a>
+            <a href="#" class="nav-link">Agents</a>
+            <a href="#" class="nav-link">Vendors</a>
+            <a href="#" class="nav-link">Reports</a>
+        </div>
+        <div class="nav-right">
+            <span class="nav-time" id="currentTime"></span>
+            <div class="nav-user">
+                <div class="avatar">JD</div>
+                <span class="user-name">John Doe</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="filter-group">
+                <div class="filter-item">
+                    <span class="filter-label">Vendor</span>
+                    <select class="filter-select" id="vendorFilter" onchange="applyFilters()">
+                        <option value="all">All Vendors</option>
+                        <option value="alpha">Alpha Communications</option>
+                        <option value="beta">Beta Services</option>
+                        <option value="gamma">Gamma Solutions</option>
+                        <option value="delta">Delta Networks</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <span class="filter-label">Time Period</span>
+                    <div class="time-buttons">
+                        <button class="time-btn" data-period="1h" onclick="setTimePeriod('1h')">1H</button>
+                        <button class="time-btn" data-period="6h" onclick="setTimePeriod('6h')">6H</button>
+                        <button class="time-btn active" data-period="24h" onclick="setTimePeriod('24h')">24H</button>
+                        <button class="time-btn" data-period="7d" onclick="setTimePeriod('7d')">7D</button>
+                        <button class="time-btn" data-period="30d" onclick="setTimePeriod('30d')">30D</button>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-secondary" onclick="resetFilters()">
+                    <i class="fas fa-undo"></i> Reset
+                </button>
+                <button class="btn btn-primary" onclick="exportData()">
+                    <i class="fas fa-download"></i> Export
+                </button>
+            </div>
+        </div>
+
+        <!-- Active Filters Display -->
+        <div class="active-filters" id="activeFilters">
+            <span class="active-filters-label">Showing:</span>
+            <span class="filter-tag" id="vendorTag">All Vendors <i class="fas fa-times" onclick="clearVendorFilter()"></i></span>
+            <span class="filter-tag" id="timeTag">Last 24 Hours <i class="fas fa-times" onclick="resetTimePeriod()"></i></span>
+        </div>
+
+        <!-- KPI Dock -->
+        <div class="kpi-dock" id="kpiDock">
+            <div class="dock-card">
+                <div class="dock-header">
+                    <span class="dock-label">Call Quality</span>
+                    <div class="dock-status warning" id="callQualityStatus"></div>
+                </div>
+                <div class="dock-value" id="callQualityValue">97.2%</div>
+                <div class="dock-meta">
+                    <span class="dock-change negative" id="callQualityChange">↓ 0.3%</span>
+                    <span class="dock-sublabel" id="callQualityIssues">469 issues</span>
+                </div>
+            </div>
+
+            <div class="dock-card">
+                <div class="dock-header">
+                    <span class="dock-label">Total Calls</span>
+                    <div class="dock-status healthy" id="totalCallsStatus"></div>
+                </div>
+                <div class="dock-value" id="totalCallsValue">12,847</div>
+                <div class="dock-meta">
+                    <span class="dock-change positive" id="totalCallsChange">↑ 8.5%</span>
+                    <span class="dock-sublabel">vs previous period</span>
+                </div>
+            </div>
+
+            <div class="dock-card">
+                <div class="dock-header">
+                    <span class="dock-label">Avg Handle Time</span>
+                    <div class="dock-status healthy" id="ahtStatus"></div>
+                </div>
+                <div class="dock-value" id="ahtValue">4:32</div>
+                <div class="dock-meta">
+                    <span class="dock-change positive" id="ahtChange">↓ 18s</span>
+                    <span class="dock-sublabel">Target: 5:00</span>
+                </div>
+            </div>
+
+            <div class="dock-card">
+                <div class="dock-header">
+                    <span class="dock-label">Open Incidents</span>
+                    <div class="dock-status warning" id="incidentStatus"></div>
+                </div>
+                <div class="dock-value" id="incidentValue">23</div>
+                <div class="dock-meta">
+                    <span class="dock-change negative" id="incidentChange">↑ 3</span>
+                    <span class="dock-sublabel" id="incidentCritical">2 critical</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Call Volume Trend Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Call Volume & Quality Trend</span>
+                    <span class="card-badge healthy" id="trendBadge">Trending Up</span>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="callTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vendor Quality Comparison -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Vendor Call Quality</span>
+                    <span class="card-badge warning">1 below target</span>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="vendorQualityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vendor Performance Cards -->
+            <div class="card full-width">
+                <div class="card-header">
+                    <span class="card-title">Vendor Performance Breakdown</span>
+                </div>
+                <div class="card-body">
+                    <div class="vendor-quality-grid" id="vendorCards">
+                        <div class="vendor-quality-item" data-vendor="alpha">
+                            <div class="vendor-quality-header">
+                                <div class="vendor-quality-name">
+                                    <span class="vendor-dot" style="background: #0f172a;"></span>
+                                    Alpha Communications
+                                </div>
+                                <span class="vendor-quality-score high">98.2%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill success" style="width: 98.2%;"></div>
+                            </div>
+                            <div class="vendor-quality-stats">
+                                <div class="vendor-stat">
+                                    <div class="vendor-stat-value">3,421</div>
+                                    <div class="vendor-stat-label">Calls</div>
+                                </div>
+                                <div class="vendor-stat">
+                                    <div class="vendor-stat-value">68</div>
+                                    <div class="vendor-stat-label">Agents</div>
+                                </div>
+                                <div class="vendor-stat">
+                                    <div class="vendor-stat-value">4:18</div>
+                                    <div class="vendor-stat-label">Avg Time</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="vendor-quality-item" data-vendor="beta">
+                            <div class="vendor-quality-header">
+                                <div class="vendor-quality-name">
+                                    <span class="vendor-dot" style="background: #475569;"></span>
+                                    Beta Services
+                                </div>
+                                <span class="vendor-quality-score high">97.8%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill success" style="width: 97.8%;"></div>
+                            </div>
+                            <div class="vendor-quality-stats">
+                                <div class="vendor-stat">
+                                    <div class="vendor-stat-value">2,890</div>
+                                    <div class="vendor-stat-label">Calls</div>
+                                </div>
+                                <div class="vendor-stat">
+                                    <div class="vendor-stat-value">54</div>
+                                    <div class="vendor-stat-label">Agents</div>
+                                </div>
+                                <div class="vendor-stat">
+                                    <div class="vendor-stat-value">4:25</div>
+                                    <div class="vendor-stat-label">Avg Time</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="vendor-quality-item" data-vendor="gamma">
+                            <div class="vendor-quality-header">
+                                <div class="vendor-quality-name">
+                                    <span class="vendor-dot" style="background: #64748b;"></span>
+                                    Gamma Solutions
+                                </div>
+                                <span class="vendor-quality-score medium">96.1%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill warning" style="width: 96.1%;"></div>
+                            </div>
+                            <div class="vendor-quality-stats">
+                                <div class="vendor-stat">
+                                    <div class="vendor-stat-value">3,856</div>
+                                    <div class="vendor-stat-label">Calls</div>
+                                </div>
+                                <div class="vendor-stat">
+                                    <div class="vendor-stat-value">72</div>
+                                    <div class="vendor-stat-label">Agents</div>
+                                </div>
+                                <div class="vendor-stat">
+                                    <div class="vendor-stat-value">4:45</div>
+                                    <div class="vendor-stat-label">Avg Time</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="vendor-quality-item" data-vendor="delta">
+                            <div class="vendor-quality-header">
+                                <div class="vendor-quality-name">
+                                    <span class="vendor-dot" style="background: #94a3b8;"></span>
+                                    Delta Networks
+                                </div>
+                                <span class="vendor-quality-score medium">95.4%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill warning" style="width: 95.4%;"></div>
+                            </div>
+                            <div class="vendor-quality-stats">
+                                <div class="vendor-stat">
+                                    <div class="vendor-stat-value">2,680</div>
+                                    <div class="vendor-stat-label">Calls</div>
+                                </div>
+                                <div class="vendor-stat">
+                                    <div class="vendor-stat-value">54</div>
+                                    <div class="vendor-stat-label">Agents</div>
+                                </div>
+                                <div class="vendor-stat">
+                                    <div class="vendor-stat-value">4:52</div>
+                                    <div class="vendor-stat-label">Avg Time</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call Quality Breakdown -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Call Quality Breakdown</span>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container-sm">
+                        <canvas id="qualityBreakdownChart"></canvas>
+                    </div>
+                    <div class="metrics-compact" style="margin-top: 16px;">
+                        <div class="metric-row-compact">
+                            <span class="metric-label">Successful Calls</span>
+                            <span class="metric-value-compact" id="successfulCalls">12,378</span>
+                        </div>
+                        <div class="metric-row-compact">
+                            <span class="metric-label">Degraded Calls</span>
+                            <span class="metric-value-compact" id="degradedCalls">342</span>
+                        </div>
+                        <div class="metric-row-compact">
+                            <span class="metric-label">Failed Calls</span>
+                            <span class="metric-value-compact" id="failedCalls">127</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Incidents -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Recent Incidents</span>
+                    <span class="card-badge warning" id="incidentBadge">2 Critical</span>
+                </div>
+                <div class="card-body">
+                    <div class="incident-list" id="incidentList">
+                        <div class="incident-item p1">
+                            <div class="incident-info">
+                                <span class="incident-title">High call drop rate - Alpha cluster</span>
+                                <span class="incident-meta">P1 • 45 mins ago • Alpha Communications</span>
+                            </div>
+                            <span class="incident-status progress">In Progress</span>
+                        </div>
+                        <div class="incident-item p1">
+                            <div class="incident-info">
+                                <span class="incident-title">Voice quality degradation</span>
+                                <span class="incident-meta">P1 • 1h 12m ago • Beta Services</span>
+                            </div>
+                            <span class="incident-status progress">In Progress</span>
+                        </div>
+                        <div class="incident-item p2">
+                            <div class="incident-info">
+                                <span class="incident-title">Intermittent login failures</span>
+                                <span class="incident-meta">P2 • 2h 30m ago • Gamma Solutions</span>
+                            </div>
+                            <span class="incident-status open">Open</span>
+                        </div>
+                        <div class="incident-item p3">
+                            <div class="incident-info">
+                                <span class="incident-title">Dashboard latency spike</span>
+                                <span class="incident-meta">P3 • 3h ago • All Vendors</span>
+                            </div>
+                            <span class="incident-status resolved">Resolved</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Summary -->
+            <div class="card full-width">
+                <div class="card-header">
+                    <span class="card-title">Performance Summary</span>
+                </div>
+                <div class="card-body">
+                    <div class="quick-stats" id="performanceStats">
+                        <div class="quick-stat">
+                            <div class="quick-stat-value" id="avgWaitTime">28s</div>
+                            <div class="quick-stat-label">Avg Wait Time</div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="quick-stat-value" id="firstCallRes">78%</div>
+                            <div class="quick-stat-label">First Call Resolution</div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="quick-stat-value" id="custSatisfaction">4.2</div>
+                            <div class="quick-stat-label">CSAT Score</div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="quick-stat-value" id="activeAgents">248</div>
+                            <div class="quick-stat-label">Active Agents</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ========== DATA STORE ==========
+        const vendorData = {
+            all: {
+                callQuality: 97.2, callQualityChange: -0.3, callQualityIssues: 469,
+                totalCalls: 12847, totalCallsChange: 8.5,
+                aht: '4:32', ahtChange: -18,
+                incidents: 23, incidentsCritical: 2, incidentsChange: 3,
+                successfulCalls: 12378, degradedCalls: 342, failedCalls: 127,
+                avgWaitTime: '28s', firstCallRes: '78%', csat: '4.2', activeAgents: 248,
+                trendData: [11200, 11800, 12100, 12400, 12600, 12847],
+                qualityData: [96.8, 97.1, 97.0, 96.9, 97.1, 97.2]
+            },
+            alpha: {
+                callQuality: 98.2, callQualityChange: 0.4, callQualityIssues: 62,
+                totalCalls: 3421, totalCallsChange: 12.3,
+                aht: '4:18', ahtChange: -22,
+                incidents: 4, incidentsCritical: 1, incidentsChange: 1,
+                successfulCalls: 3359, degradedCalls: 48, failedCalls: 14,
+                avgWaitTime: '24s', firstCallRes: '82%', csat: '4.4', activeAgents: 68,
+                trendData: [2900, 3100, 3200, 3300, 3350, 3421],
+                qualityData: [97.8, 98.0, 98.1, 98.0, 98.1, 98.2]
+            },
+            beta: {
+                callQuality: 97.8, callQualityChange: 0.2, callQualityIssues: 64,
+                totalCalls: 2890, totalCallsChange: 6.8,
+                aht: '4:25', ahtChange: -15,
+                incidents: 5, incidentsCritical: 1, incidentsChange: 0,
+                successfulCalls: 2826, degradedCalls: 51, failedCalls: 13,
+                avgWaitTime: '26s', firstCallRes: '80%', csat: '4.3', activeAgents: 54,
+                trendData: [2600, 2700, 2750, 2800, 2850, 2890],
+                qualityData: [97.5, 97.6, 97.7, 97.6, 97.7, 97.8]
+            },
+            gamma: {
+                callQuality: 96.1, callQualityChange: -0.8, callQualityIssues: 151,
+                totalCalls: 3856, totalCallsChange: 5.2,
+                aht: '4:45', ahtChange: -8,
+                incidents: 8, incidentsCritical: 0, incidentsChange: 2,
+                successfulCalls: 3705, degradedCalls: 112, failedCalls: 39,
+                avgWaitTime: '32s', firstCallRes: '75%', csat: '4.0', activeAgents: 72,
+                trendData: [3400, 3500, 3600, 3700, 3800, 3856],
+                qualityData: [96.5, 96.4, 96.2, 96.0, 96.1, 96.1]
+            },
+            delta: {
+                callQuality: 95.4, callQualityChange: -1.2, callQualityIssues: 123,
+                totalCalls: 2680, totalCallsChange: 3.1,
+                aht: '4:52', ahtChange: -5,
+                incidents: 6, incidentsCritical: 0, incidentsChange: 0,
+                successfulCalls: 2557, degradedCalls: 84, failedCalls: 39,
+                avgWaitTime: '35s', firstCallRes: '72%', csat: '3.9', activeAgents: 54,
+                trendData: [2400, 2500, 2550, 2600, 2650, 2680],
+                qualityData: [96.2, 96.0, 95.8, 95.5, 95.4, 95.4]
+            }
+        };
+
+        const timeMultipliers = {
+            '1h': 0.042, '6h': 0.25, '24h': 1, '7d': 7, '30d': 30
+        };
+
+        let currentVendor = 'all';
+        let currentPeriod = '24h';
+        let callTrendChart, vendorQualityChart, qualityBreakdownChart;
+
+        // ========== FILTER FUNCTIONS ==========
+        function setTimePeriod(period) {
+            currentPeriod = period;
+            document.querySelectorAll('.time-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.period === period);
+            });
+            applyFilters();
+        }
+
+        function applyFilters() {
+            currentVendor = document.getElementById('vendorFilter').value;
+            updateFilterTags();
+            updateDashboard();
+        }
+
+        function resetFilters() {
+            document.getElementById('vendorFilter').value = 'all';
+            currentVendor = 'all';
+            setTimePeriod('24h');
+        }
+
+        function clearVendorFilter() {
+            document.getElementById('vendorFilter').value = 'all';
+            currentVendor = 'all';
+            applyFilters();
+        }
+
+        function resetTimePeriod() {
+            setTimePeriod('24h');
+        }
+
+        function updateFilterTags() {
+            const vendorNames = {
+                all: 'All Vendors',
+                alpha: 'Alpha Communications',
+                beta: 'Beta Services',
+                gamma: 'Gamma Solutions',
+                delta: 'Delta Networks'
+            };
+
+            const timeLabels = {
+                '1h': 'Last 1 Hour',
+                '6h': 'Last 6 Hours',
+                '24h': 'Last 24 Hours',
+                '7d': 'Last 7 Days',
+                '30d': 'Last 30 Days'
+            };
+
+            document.getElementById('vendorTag').innerHTML = 
+                `${vendorNames[currentVendor]} <i class="fas fa-times" onclick="clearVendorFilter()"></i>`;
+            document.getElementById('timeTag').innerHTML = 
+                `${timeLabels[currentPeriod]} <i class="fas fa-times" onclick="resetTimePeriod()"></i>`;
+        }
+
+        // ========== UPDATE DASHBOARD ==========
+        function updateDashboard() {
+            const data = vendorData[currentVendor];
+            const multiplier = timeMultipliers[currentPeriod];
+
+            // Update KPIs
+            document.getElementById('callQualityValue').textContent = data.callQuality.toFixed(1) + '%';
+            document.getElementById('callQualityChange').textContent = 
+                (data.callQualityChange >= 0 ? '↑ ' : '↓ ') + Math.abs(data.callQualityChange).toFixed(1) + '%';
+            document.getElementById('callQualityChange').className = 
+                'dock-change ' + (data.callQualityChange >= 0 ? 'positive' : 'negative');
+            document.getElementById('callQualityIssues').textContent = 
+                Math.round(data.callQualityIssues * multiplier) + ' issues';
+            document.getElementById('callQualityStatus').className = 
+                'dock-status ' + (data.callQuality >= 97 ? 'healthy' : data.callQuality >= 95 ? 'warning' : 'critical');
+
+            document.getElementById('totalCallsValue').textContent = 
+                Math.round(data.totalCalls * multiplier).toLocaleString();
+            document.getElementById('totalCallsChange').textContent = 
+                '↑ ' + data.totalCallsChange.toFixed(1) + '%';
+
+            document.getElementById('ahtValue').textContent = data.aht;
+            document.getElementById('ahtChange').textContent = 
+                (data.ahtChange <= 0 ? '↓ ' : '↑ ') + Math.abs(data.ahtChange) + 's';
+
+            document.getElementById('incidentValue').textContent = 
+                Math.round(data.incidents * (currentPeriod === '1h' ? 0.3 : currentPeriod === '6h' ? 0.6 : 1));
+            document.getElementById('incidentCritical').textContent = data.incidentsCritical + ' critical';
+
+            // Update metrics
+            document.getElementById('successfulCalls').textContent = 
+                Math.round(data.successfulCalls * multiplier).toLocaleString();
+            document.getElementById('degradedCalls').textContent = 
+                Math.round(data.degradedCalls * multiplier).toLocaleString();
+            document.getElementById('failedCalls').textContent = 
+                Math.round(data.failedCalls * multiplier).toLocaleString();
+
+            // Update performance stats
+            document.getElementById('avgWaitTime').textContent = data.avgWaitTime;
+            document.getElementById('firstCallRes').textContent = data.firstCallRes;
+            document.getElementById('custSatisfaction').textContent = data.csat;
+            document.getElementById('activeAgents').textContent = data.activeAgents;
+
+            // Update vendor cards visibility
+            document.querySelectorAll('.vendor-quality-item').forEach(card => {
+                if (currentVendor === 'all') {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = card.dataset.vendor === currentVendor ? 'block' : 'none';
+                }
+            });
+
+            // Update charts
+            updateCharts();
+        }
+
+        // ========== CHARTS ==========
+        function initCharts() {
+            const chartDefaults = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            };
+
+            // Call Trend Chart
+            const ctxTrend = document.getElementById('callTrendChart').getContext('2d');
+            callTrendChart = new Chart(ctxTrend, {
+                type: 'line',
+                data: {
+                    labels: getTimeLabels(),
+                    datasets: [{
+                        label: 'Call Volume',
+                        data: vendorData.all.trendData,
+                        borderColor: '#0f172a',
+                        backgroundColor: 'rgba(15, 23, 42, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    }, {
+                        label: 'Quality %',
+                        data: vendorData.all.qualityData,
+                        borderColor: '#10b981',
+                        backgroundColor: 'transparent',
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    ...chartDefaults,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: { size: 11 }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            grid: { color: '#f1f5f9' },
+                            ticks: { font: { size: 11 } }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            min: 94,
+                            max: 100,
+                            grid: { display: false },
+                            ticks: { 
+                                font: { size: 11 },
+                                callback: v => v + '%'
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 11 } }
+                        }
+                    }
+                }
+            });
+
+            // Vendor Quality Chart
+            const ctxVendor = document.getElementById('vendorQualityChart').getContext('2d');
+            vendorQualityChart = new Chart(ctxVendor, {
+                type: 'bar',
+                data: {
+                    labels: ['Alpha', 'Beta', 'Gamma', 'Delta'],
+                    datasets: [{
+                        data: [98.2, 97.8, 96.1, 95.4],
+                        backgroundColor: ['#0f172a', '#475569', '#64748b', '#94a3b8'],
+                        borderRadius: 6,
+                        barThickness: 40
+                    }]
+                },
+                options: {
+                    ...chartDefaults,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            min: 90,
+                            max: 100,
+                            grid: { color: '#f1f5f9' },
+                            ticks: { 
+                                font: { size: 11 },
+                                callback: v => v + '%'
+                            }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { font: { size: 11 } }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ctx.raw.toFixed(1) + '% Quality'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Quality Breakdown Chart
+            const ctxBreakdown = document.getElementById('qualityBreakdownChart').getContext('2d');
+            qualityBreakdownChart = new Chart(ctxBreakdown, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Successful', 'Degraded', 'Failed'],
+                    datasets: [{
+                        data: [12378, 342, 127],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 0,
+                        spacing: 2
+                    }]
+                },
+                options: {
+                    ...chartDefaults,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 16,
+                                font: { size: 11 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function getTimeLabels() {
+            const labels = {
+                '1h': ['0m', '10m', '20m', '30m', '40m', '50m'],
+                '6h': ['0h', '1h', '2h', '3h', '4h', '5h'],
+                '24h': ['0h', '4h', '8h', '12h', '16h', '20h'],
+                '7d': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                '30d': ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Current']
+            };
+            return labels[currentPeriod];
+        }
+
+        function updateCharts() {
+            const data = vendorData[currentVendor];
+            const multiplier = timeMultipliers[currentPeriod];
+
+            // Update trend chart
+            callTrendChart.data.labels = getTimeLabels();
+            callTrendChart.data.datasets[0].data = data.trendData.map(v => Math.round(v * multiplier));
+            callTrendChart.data.datasets[1].data = data.qualityData;
+            callTrendChart.update();
+
+            // Update vendor quality chart
+            if (currentVendor === 'all') {
+                vendorQualityChart.data.labels = ['Alpha', 'Beta', 'Gamma', 'Delta'];
+                vendorQualityChart.data.datasets[0].data = [98.2, 97.8, 96.1, 95.4];
+                vendorQualityChart.data.datasets[0].backgroundColor = ['#0f172a', '#475569', '#64748b', '#94a3b8'];
+            } else {
+                vendorQualityChart.data.labels = [document.querySelector(`[data-vendor="${currentVendor}"] .vendor-quality-name`).textContent.trim()];
+                vendorQualityChart.data.datasets[0].data = [data.callQuality];
+                vendorQualityChart.data.datasets[0].backgroundColor = ['#0f172a'];
+            }
+            vendorQualityChart.update();
+
+            // Update breakdown chart
+            qualityBreakdownChart.data.datasets[0].data = [
+                Math.round(data.successfulCalls * multiplier),
+                Math.round(data.degradedCalls * multiplier),
+                Math.round(data.failedCalls * multiplier)
+            ];
+            qualityBreakdownChart.update();
+        }
+
+        // ========== UTILITY FUNCTIONS ==========
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', minute: '2-digit', hour12: true 
+            });
+        }
+
+        function exportData() {
+            alert('Exporting data for ' + (currentVendor === 'all' ? 'All Vendors' : currentVendor) + 
+                  ' - ' + currentPeriod + ' period...');
+        }
+
+        // ========== INIT ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTime();
+            setInterval(updateTime, 60000);
+            initCharts();
+            updateDashboard();
+        });
+    </script>
+</body>
+</html>

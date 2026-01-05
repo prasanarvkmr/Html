@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operations Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --border: #e5e7eb;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --success-bg: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
+            --danger: #ef4444;
+            --danger-bg: #fef2f2;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ========== NAVBAR ========== */
+        .navbar {
+            background: #0f172a;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .logo span {
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-link {
+            color: #94a3b8;
+            text-decoration: none;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: all 0.15s;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .nav-link.active {
+            color: white;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-time {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            background: #475569;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .user-name {
+            font-size: 13px;
+            color: white;
+            font-weight: 500;
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 32px;
+        }
+
+        /* ========== PAGE HEADER ========== */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .page-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .btn-primary {
+            background: #0f172a;
+            border: none;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e293b;
+        }
+
+        /* ========== KPI DOCK ========== */
+        .kpi-dock {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .dock-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dock-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-color: #cbd5e1;
+        }
+
+        .dock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .dock-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .dock-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .dock-status.healthy { background: var(--success); }
+        .dock-status.warning { background: var(--warning); }
+        .dock-status.critical { background: var(--danger); }
+
+        .dock-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .dock-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dock-change {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .dock-change.positive {
+            background: var(--success-bg);
+            color: #059669;
+        }
+
+        .dock-change.negative {
+            background: var(--danger-bg);
+            color: #dc2626;
+        }
+
+        .dock-sublabel {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ========== GRID LAYOUT ========== */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .card-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .card-badge.healthy {
+            background: var(--success-bg);
+            color: #059669;
+        }
+
+        .card-badge.warning {
+            background: var(--warning-bg);
+            color: #b45309;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* ========== METRICS LIST ========== */
+        .metrics-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .metric-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .metric-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .metric-icon.slate { background: #f1f5f9; color: #475569; }
+
+        .metric-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .metric-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .metric-value {
+            text-align: right;
+        }
+
+        .metric-number {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .metric-change {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .metric-change.positive { color: #059669; }
+        .metric-change.negative { color: #dc2626; }
+
+        /* ========== SEVERITY CARDS ========== */
+        .severity-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .severity-card {
+            padding: 16px;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .severity-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 8px;
+        }
+
+        .severity-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .severity-time {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* ========== VENDOR TABLE ========== */
+        .vendor-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .vendor-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #f8fafc;
+        }
+
+        .vendor-table td {
+            padding: 14px 16px;
+            font-size: 13px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .vendor-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .vendor-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vendor-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .vendor-dot.v1 { background: #0f172a; }
+        .vendor-dot.v2 { background: #475569; }
+        .vendor-dot.v3 { background: #64748b; }
+        .vendor-dot.v4 { background: #94a3b8; }
+
+        .score {
+            font-weight: 600;
+        }
+
+        .score.high { color: #059669; }
+        .score.medium { color: #b45309; }
+        .score.low { color: #dc2626; }
+
+        /* ========== QUICK STATS ========== */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .quick-stat {
+            text-align: center;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .quick-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .quick-stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* ========== FULL WIDTH SECTION ========== */
+        .full-width {
+            grid-column: 1 / -1;
+            margin-top: 4px;
+        }
+
+        /* ========== AGENT ROW ========== */
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+
+        .agent-card {
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .agent-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #475569;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0 auto 10px;
+        }
+
+        .agent-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .agent-calls {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .agent-score {
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .agent-score.high { color: #059669; }
+        .agent-score.medium { color: #b45309; }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .kpi-dock {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .agent-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .kpi-dock {
+                grid-template-columns: 1fr;
+            }
+            .nav-links {
+                display: none;
+            }
+            .agent-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">OpsDash <span>Pro</span></div>
+        <div class="nav-links">
+            <a href="#" class="nav-link active">Dashboard</a>
+            <a href="#" class="nav-link">Analytics</a>
+            <a href="#" class="nav-link">Agents</a>
+            <a href="#" class="nav-link">Vendors</a>
+            <a href="#" class="nav-link">Reports</a>
+        </div>
+        <div class="nav-right">
+            <span class="nav-time" id="currentTime"></span>
+            <div class="nav-user">
+                <div class="avatar">JD</div>
+                <span class="user-name">John Doe</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Operations Overview</h1>
+                <p class="page-subtitle">Real-time metrics for December 30, 2025</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary">
+                    <i class="fas fa-download"></i> Export
+                </button>
+                <button class="btn btn-primary" onclick="location.reload()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- KPI Dock -->
+        <div class="kpi-dock">
+            <div class="dock-card">
+                <div class="dock-header">
+                    <span class="dock-label">Call Quality</span>
+                    <div class="dock-status warning"></div>
+                </div>
+                <div class="dock-value">97.2%</div>
+                <div class="dock-meta">
+                    <span class="dock-change negative">↓ 0.3%</span>
+                    <span class="dock-sublabel">469 issues today</span>
+                </div>
+            </div>
+
+            <div class="dock-card">
+                <div class="dock-header">
+                    <span class="dock-label">Network</span>
+                    <div class="dock-status healthy"></div>
+                </div>
+                <div class="dock-value">76%</div>
+                <div class="dock-meta">
+                    <span class="dock-change positive">↑ 2%</span>
+                    <span class="dock-sublabel">Avg utilization</span>
+                </div>
+            </div>
+
+            <div class="dock-card">
+                <div class="dock-header">
+                    <span class="dock-label">Productivity</span>
+                    <div class="dock-status healthy"></div>
+                </div>
+                <div class="dock-value">83.4%</div>
+                <div class="dock-meta">
+                    <span class="dock-change positive">↑ 2.1%</span>
+                    <span class="dock-sublabel">Agent utilization</span>
+                </div>
+            </div>
+
+            <div class="dock-card">
+                <div class="dock-header">
+                    <span class="dock-label">Incidents</span>
+                    <div class="dock-status warning"></div>
+                </div>
+                <div class="dock-value">23</div>
+                <div class="dock-meta">
+                    <span class="dock-change negative">↑ 3</span>
+                    <span class="dock-sublabel">Open tickets</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Call Metrics -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Call Metrics</span>
+                    <span class="card-badge warning">2 need attention</span>
+                </div>
+                <div class="card-body">
+                    <div class="metrics-list">
+                        <div class="metric-row">
+                            <div class="metric-info">
+                                <div class="metric-icon slate">
+                                    <i class="fas fa-phone-alt"></i>
+                                </div>
+                                <div>
+                                    <div class="metric-name">Total Calls</div>
+                                    <div class="metric-desc">Today's volume</div>
+                                </div>
+                            </div>
+                            <div class="metric-value">
+                                <div class="metric-number">12,847</div>
+                                <div class="metric-change positive">+8.5% vs yesterday</div>
+                            </div>
+                        </div>
+
+                        <div class="metric-row">
+                            <div class="metric-info">
+                                <div class="metric-icon slate">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                </div>
+                                <div>
+                                    <div class="metric-name">Errored Calls</div>
+                                    <div class="metric-desc">Failed connections</div>
+                                </div>
+                            </div>
+                            <div class="metric-value">
+                                <div class="metric-number">127</div>
+                                <div class="metric-change negative">+12 vs yesterday</div>
+                            </div>
+                        </div>
+
+                        <div class="metric-row">
+                            <div class="metric-info">
+                                <div class="metric-icon slate">
+                                    <i class="fas fa-signal"></i>
+                                </div>
+                                <div>
+                                    <div class="metric-name">Degraded Calls</div>
+                                    <div class="metric-desc">Quality issues</div>
+                                </div>
+                            </div>
+                            <div class="metric-value">
+                                <div class="metric-number">342</div>
+                                <div class="metric-change positive">-8.2% vs last week</div>
+                            </div>
+                        </div>
+
+                        <div class="metric-row">
+                            <div class="metric-info">
+                                <div class="metric-icon slate">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div>
+                                    <div class="metric-name">Avg Handle Time</div>
+                                    <div class="metric-desc">Target: 5:00</div>
+                                </div>
+                            </div>
+                            <div class="metric-value">
+                                <div class="metric-number">4:32</div>
+                                <div class="metric-change positive">-18s improvement</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Incident Resolution -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Incident Resolution</span>
+                    <span class="card-badge healthy">On Track</span>
+                </div>
+                <div class="card-body">
+                    <div class="severity-grid">
+                        <div class="severity-card">
+                            <div class="severity-label">Critical (P1)</div>
+                            <div class="severity-value">2</div>
+                            <div class="severity-time">Avg: 45m</div>
+                        </div>
+                        <div class="severity-card">
+                            <div class="severity-label">High (P2)</div>
+                            <div class="severity-value">5</div>
+                            <div class="severity-time">Avg: 2.1h</div>
+                        </div>
+                        <div class="severity-card">
+                            <div class="severity-label">Medium (P3)</div>
+                            <div class="severity-value">9</div>
+                            <div class="severity-time">Avg: 4.5h</div>
+                        </div>
+                        <div class="severity-card">
+                            <div class="severity-label">Low (P4)</div>
+                            <div class="severity-value">7</div>
+                            <div class="severity-time">Avg: 12h</div>
+                        </div>
+                    </div>
+
+                    <div class="quick-stats">
+                        <div class="quick-stat">
+                            <div class="quick-stat-value">2.4h</div>
+                            <div class="quick-stat-label">Avg Resolution</div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="quick-stat-value">12m</div>
+                            <div class="quick-stat-label">Avg Response</div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="quick-stat-value">94%</div>
+                            <div class="quick-stat-label">SLA Met</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vendor Performance -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Vendor Performance</span>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <table class="vendor-table">
+                        <thead>
+                            <tr>
+                                <th>Vendor</th>
+                                <th>Agents</th>
+                                <th>Calls</th>
+                                <th>Quality</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="vendor-name">
+                                        <span class="vendor-dot v1"></span>
+                                        Alpha Communications
+                                    </div>
+                                </td>
+                                <td>68</td>
+                                <td>3,421</td>
+                                <td>98.2%</td>
+                                <td><span class="score high">92</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="vendor-name">
+                                        <span class="vendor-dot v2"></span>
+                                        Beta Services
+                                    </div>
+                                </td>
+                                <td>54</td>
+                                <td>2,890</td>
+                                <td>97.8%</td>
+                                <td><span class="score high">89</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="vendor-name">
+                                        <span class="vendor-dot v3"></span>
+                                        Gamma Solutions
+                                    </div>
+                                </td>
+                                <td>72</td>
+                                <td>3,856</td>
+                                <td>96.1%</td>
+                                <td><span class="score medium">84</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="vendor-name">
+                                        <span class="vendor-dot v4"></span>
+                                        Delta Networks
+                                    </div>
+                                </td>
+                                <td>54</td>
+                                <td>2,680</td>
+                                <td>95.4%</td>
+                                <td><span class="score medium">81</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Top Agents -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Top Performers</span>
+                </div>
+                <div class="card-body">
+                    <div class="agent-grid">
+                        <div class="agent-card">
+                            <div class="agent-avatar">SM</div>
+                            <div class="agent-name">Sarah M.</div>
+                            <div class="agent-calls">142 calls</div>
+                            <div class="agent-score high">98.5</div>
+                        </div>
+                        <div class="agent-card">
+                            <div class="agent-avatar">JC</div>
+                            <div class="agent-name">James C.</div>
+                            <div class="agent-calls">138 calls</div>
+                            <div class="agent-score high">97.2</div>
+                        </div>
+                        <div class="agent-card">
+                            <div class="agent-avatar">EW</div>
+                            <div class="agent-name">Emma W.</div>
+                            <div class="agent-calls">135 calls</div>
+                            <div class="agent-score high">96.8</div>
+                        </div>
+                        <div class="agent-card">
+                            <div class="agent-avatar">MR</div>
+                            <div class="agent-name">Mike R.</div>
+                            <div class="agent-calls">131 calls</div>
+                            <div class="agent-score high">95.4</div>
+                        </div>
+                        <div class="agent-card">
+                            <div class="agent-avatar">LP</div>
+                            <div class="agent-name">Lisa P.</div>
+                            <div class="agent-calls">128 calls</div>
+                            <div class="agent-score medium">94.1</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Network Status - Full Width -->
+            <div class="card full-width">
+                <div class="card-header">
+                    <span class="card-title">Network Status</span>
+                    <span class="card-badge healthy">All Systems Normal</span>
+                </div>
+                <div class="card-body">
+                    <div class="metrics-list" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
+                        <div>
+                            <div class="metric-desc">Primary Link</div>
+                            <div class="metric-number">72%</div>
+                            <div class="metric-change positive">Normal utilization</div>
+                        </div>
+                        <div>
+                            <div class="metric-desc">Secondary Link</div>
+                            <div class="metric-number">45%</div>
+                            <div class="metric-change positive">Standby ready</div>
+                        </div>
+                        <div>
+                            <div class="metric-desc">Avg Latency</div>
+                            <div class="metric-number">24ms</div>
+                            <div class="metric-change positive">-4ms from avg</div>
+                        </div>
+                        <div>
+                            <div class="metric-desc">Peak Today</div>
+                            <div class="metric-number">89%</div>
+                            <div class="metric-change">at 2:30 PM</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            document.getElementById('currentTime').textContent = time;
+        }
+        updateTime();
+        setInterval(updateTime, 60000);
+    </script>
+</body>
+</html>
