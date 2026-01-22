@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Top 10 Leading Indicators Dashboard</title>
+    <title>Top 20 Leading Indicators - Contact Center Operations</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -290,7 +290,7 @@
 
         /* ========== MAIN CONTENT ========== */
         .main {
-            max-width: 1600px;
+            max-width: 1700px;
             margin: 0 auto;
             padding: 28px 32px;
         }
@@ -352,6 +352,71 @@
         .btn-primary:hover {
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
+
+        .btn-info {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+
+        .btn-info:hover {
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
+
+        /* ========== TECHNOLOGY STACK BAR ========== */
+        .tech-stack-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .tech-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+
+        .tech-badge .tech-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+        }
+
+        .tech-badge.genesys .tech-icon { background: #ff4f1f; }
+        .tech-badge.nuance .tech-icon { background: #00a3e0; }
+        .tech-badge.thousandeyes .tech-icon { background: #00bceb; }
+        .tech-badge.nexthink .tech-icon { background: #6366f1; }
+        .tech-badge.solarwinds .tech-icon { background: #f7941d; }
+        .tech-badge.inhouse .tech-icon { background: #475569; }
+        .tech-badge.citrix .tech-icon { background: #0033a0; }
+        .tech-badge.wfm .tech-icon { background: #059669; }
+
+        .source-tag.citrix { background: #e6ecf7; color: #0033a0; }
+        .source-tag.wfm { background: #d1fae5; color: #059669; }
+
+        .tech-badge .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: 4px;
+        }
+
+        .tech-badge .status-dot.healthy { background: var(--success); }
+        .tech-badge .status-dot.warning { background: var(--warning); }
+        .tech-badge .status-dot.critical { background: var(--danger); }
 
         /* ========== SUMMARY BAR ========== */
         .summary-bar {
@@ -456,16 +521,39 @@
         }
 
         .indicator-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 4px;
         }
 
         .indicator-subtitle {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
         }
+
+        .source-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .source-tag.genesys { background: #fff0ed; color: #ff4f1f; }
+        .source-tag.nuance { background: #e6f7fc; color: #00a3e0; }
+        .source-tag.thousandeyes { background: #e6f9fc; color: #00bceb; }
+        .source-tag.nexthink { background: #eef2ff; color: #6366f1; }
+        .source-tag.solarwinds { background: #fef3e2; color: #f7941d; }
+        .source-tag.inhouse { background: #f1f5f9; color: #475569; }
 
         .indicator-status {
             display: flex;
@@ -485,7 +573,7 @@
         .indicator-status i { font-size: 10px; }
 
         .indicator-body {
-            padding: 20px 24px;
+            padding: 16px 24px;
             display: flex;
             align-items: center;
             gap: 24px;
@@ -496,7 +584,7 @@
         }
 
         .indicator-value {
-            font-size: 36px;
+            font-size: 32px;
             font-weight: 700;
             color: var(--text-primary);
             line-height: 1;
@@ -513,16 +601,88 @@
         }
 
         .indicator-chart {
-            width: 140px;
-            height: 60px;
+            width: 120px;
+            height: 50px;
+        }
+
+        /* ========== WHY IT MATTERS SECTION ========== */
+        .indicator-importance {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-top: 1px solid var(--border);
+        }
+
+        .importance-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--info);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .importance-toggle i {
+            transition: transform 0.2s;
+        }
+
+        .importance-toggle.expanded i {
+            transform: rotate(180deg);
+        }
+
+        .importance-content {
+            display: none;
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .importance-content.show {
+            display: block;
+        }
+
+        .importance-content strong {
+            color: var(--text-primary);
+        }
+
+        .importance-content .impact-list {
+            margin: 8px 0;
+            padding-left: 16px;
+        }
+
+        .importance-content .impact-list li {
+            margin-bottom: 4px;
+        }
+
+        .calculation-box {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-top: 10px;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 11px;
+            color: var(--text-primary);
+        }
+
+        .calculation-box .label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            font-family: 'Inter', sans-serif;
         }
 
         .indicator-details {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            padding: 16px 24px;
-            background: #f8fafc;
+            gap: 12px;
+            padding: 14px 24px;
+            background: #fafbfc;
             border-top: 1px solid var(--border);
         }
 
@@ -531,7 +691,7 @@
         }
 
         .detail-value {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 2px;
@@ -556,7 +716,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
         }
 
@@ -580,16 +740,16 @@
 
         /* ========== PROGRESS BAR ========== */
         .progress-bar {
-            height: 8px;
+            height: 6px;
             background: #e2e8f0;
-            border-radius: 4px;
+            border-radius: 3px;
             overflow: hidden;
-            margin-top: 12px;
+            margin-top: 10px;
         }
 
         .progress-fill {
             height: 100%;
-            border-radius: 4px;
+            border-radius: 3px;
             transition: width 0.5s ease;
         }
 
@@ -598,29 +758,6 @@
         .progress-fill.red { background: linear-gradient(90deg, #ef4444, #dc2626); }
         .progress-fill.blue { background: linear-gradient(90deg, #3b82f6, #2563eb); }
         .progress-fill.purple { background: linear-gradient(90deg, #8b5cf6, #7c3aed); }
-
-        /* ========== GAUGE CHART ========== */
-        .gauge-container {
-            width: 100px;
-            height: 60px;
-            position: relative;
-        }
-
-        /* ========== FULL WIDTH CARD ========== */
-        .indicator-card.full-width {
-            grid-column: span 2;
-        }
-
-        .indicator-card.full-width .indicator-body {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 32px;
-        }
-
-        .indicator-card.full-width .indicator-chart {
-            width: 100%;
-            height: 120px;
-        }
 
         /* ========== TREND OVERVIEW ========== */
         .trend-overview {
@@ -667,17 +804,130 @@
             height: 280px;
         }
 
+        /* ========== DOCUMENTATION MODAL ========== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 85vh;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            background: #f1f5f9;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #e2e8f0;
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 28px;
+            overflow-y: auto;
+            max-height: calc(85vh - 80px);
+        }
+
+        .doc-section {
+            margin-bottom: 32px;
+        }
+
+        .doc-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .doc-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .doc-section h3 i {
+            color: var(--info);
+        }
+
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .doc-table th,
+        .doc-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .doc-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .doc-table td {
+            color: var(--text-secondary);
+        }
+
+        .doc-table code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Menlo', monospace;
+            font-size: 11px;
+        }
+
         /* ========== RESPONSIVE ========== */
         @media (max-width: 1400px) {
             .indicators-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .indicator-card.full-width {
-                grid-column: span 1;
-            }
-            
-            .indicator-card.full-width .indicator-body {
                 grid-template-columns: 1fr;
             }
         }
@@ -688,6 +938,10 @@
             }
             
             .nav-menu {
+                display: none;
+            }
+
+            .tech-stack-bar {
                 display: none;
             }
         }
@@ -709,15 +963,6 @@
         }
 
         /* ========== ANIMATIONS ========== */
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .pulse {
-            animation: pulse 2s ease-in-out infinite;
-        }
-
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -743,14 +988,60 @@
         .indicator-card:nth-child(8) { animation-delay: 0.4s; }
         .indicator-card:nth-child(9) { animation-delay: 0.45s; }
         .indicator-card:nth-child(10) { animation-delay: 0.5s; }
+        .indicator-card:nth-child(11) { animation-delay: 0.55s; }
+        .indicator-card:nth-child(12) { animation-delay: 0.6s; }
+        .indicator-card:nth-child(13) { animation-delay: 0.65s; }
+        .indicator-card:nth-child(14) { animation-delay: 0.7s; }
+        .indicator-card:nth-child(15) { animation-delay: 0.75s; }
+        .indicator-card:nth-child(16) { animation-delay: 0.8s; }
+        .indicator-card:nth-child(17) { animation-delay: 0.85s; }
+        .indicator-card:nth-child(18) { animation-delay: 0.9s; }
+        .indicator-card:nth-child(19) { animation-delay: 0.95s; }
+        .indicator-card:nth-child(20) { animation-delay: 1.0s; }
+
+        /* ========== SECTION DIVIDER ========== */
+        .section-divider {
+            grid-column: 1 / -1;
+            padding: 24px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .section-divider h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .section-divider .divider-line {
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, var(--border), transparent);
+        }
+
+        .section-divider .section-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .section-divider .section-icon.staffing { background: #d1fae5; color: #059669; }
+        .section-divider .section-icon.tools { background: #dbeafe; color: #3b82f6; }
+        .section-divider .section-icon.citrix { background: #e6ecf7; color: #0033a0; }
     </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-brand">
-            <div class="nav-logo"><i class="fas fa-chart-line"></i></div>
-            <div class="nav-title">Analytics Hub <span>| Leading Indicators</span></div>
+            <div class="nav-logo"><i class="fas fa-headset"></i></div>
+            <div class="nav-title">Contact Center Ops <span>| Top 20 Indicators</span></div>
         </div>
         
         <div class="nav-menu">
@@ -781,7 +1072,7 @@
                 <div class="avatar">JD</div>
                 <div class="user-info">
                     <span class="user-name">John Doe</span>
-                    <span class="user-role">Executive</span>
+                    <span class="user-role">Operations Manager</span>
                 </div>
             </div>
         </div>
@@ -792,29 +1083,28 @@
         <div class="breadcrumb-nav">
             <a href="#">Home</a>
             <i class="fas fa-chevron-right"></i>
-            <a href="#">Executive</a>
+            <a href="#">Operations</a>
             <i class="fas fa-chevron-right"></i>
-            <span>Top 10 Leading Indicators</span>
+            <span>Top 20 Leading Indicators</span>
         </div>
         
         <div class="filters">
             <div class="filter-group">
                 <span class="filter-label">Time Period:</span>
                 <select class="filter-select" id="timePeriod">
-                    <option value="today">Today</option>
-                    <option value="week" selected>This Week</option>
+                    <option value="realtime">Real-time</option>
+                    <option value="today" selected>Today</option>
+                    <option value="week">This Week</option>
                     <option value="month">This Month</option>
-                    <option value="quarter">This Quarter</option>
                 </select>
             </div>
             <div class="filter-group">
-                <span class="filter-label">Region:</span>
-                <select class="filter-select" id="region">
-                    <option value="all">All Regions</option>
-                    <option value="north">North</option>
-                    <option value="south">South</option>
-                    <option value="east">East</option>
-                    <option value="west">West</option>
+                <span class="filter-label">Site:</span>
+                <select class="filter-select" id="site">
+                    <option value="all">All Sites</option>
+                    <option value="primary">Primary DC</option>
+                    <option value="secondary">Secondary DC</option>
+                    <option value="dr">DR Site</option>
                 </select>
             </div>
         </div>
@@ -825,16 +1115,63 @@
         <!-- Page Header -->
         <div class="page-header">
             <div class="page-title-section">
-                <h1>Top 10 Leading Indicators</h1>
-                <p>Key metrics predicting future performance and business outcomes</p>
+                <h1>Top 20 Leading Indicators</h1>
+                <p>Key operational metrics for platform health, agent staffing, tools effectiveness, and Citrix virtual apps</p>
             </div>
             <div class="header-actions">
+                <button class="btn btn-info" onclick="openDocumentation()">
+                    <i class="fas fa-book"></i> Documentation
+                </button>
                 <button class="btn btn-secondary">
                     <i class="fas fa-download"></i> Export Report
                 </button>
-                <button class="btn btn-primary">
+                <button class="btn btn-primary" id="refreshBtn">
                     <i class="fas fa-sync-alt"></i> Refresh Data
                 </button>
+            </div>
+        </div>
+
+        <!-- Technology Stack Bar -->
+        <div class="tech-stack-bar">
+            <div class="tech-badge genesys">
+                <div class="tech-icon"><i class="fas fa-phone"></i></div>
+                Genesys Cloud
+                <div class="status-dot healthy"></div>
+            </div>
+            <div class="tech-badge nuance">
+                <div class="tech-icon"><i class="fas fa-microphone"></i></div>
+                Nuance
+                <div class="status-dot healthy"></div>
+            </div>
+            <div class="tech-badge thousandeyes">
+                <div class="tech-icon"><i class="fas fa-eye"></i></div>
+                ThousandEyes
+                <div class="status-dot warning"></div>
+            </div>
+            <div class="tech-badge nexthink">
+                <div class="tech-icon"><i class="fas fa-desktop"></i></div>
+                Nexthink
+                <div class="status-dot healthy"></div>
+            </div>
+            <div class="tech-badge solarwinds">
+                <div class="tech-icon"><i class="fas fa-server"></i></div>
+                SolarWinds
+                <div class="status-dot healthy"></div>
+            </div>
+            <div class="tech-badge inhouse">
+                <div class="tech-icon"><i class="fas fa-code"></i></div>
+                In-House Apps
+                <div class="status-dot healthy"></div>
+            </div>
+            <div class="tech-badge citrix">
+                <div class="tech-icon"><i class="fas fa-window-restore"></i></div>
+                Citrix Virtual Apps
+                <div class="status-dot healthy"></div>
+            </div>
+            <div class="tech-badge wfm">
+                <div class="tech-icon"><i class="fas fa-users-cog"></i></div>
+                WFM System
+                <div class="status-dot warning"></div>
             </div>
         </div>
 
@@ -843,49 +1180,53 @@
             <div class="summary-item">
                 <div class="summary-icon green"><i class="fas fa-check-circle"></i></div>
                 <div class="summary-content">
-                    <div class="summary-label">On Track</div>
-                    <div class="summary-value">7</div>
+                    <div class="summary-label">Healthy</div>
+                    <div class="summary-value">12</div>
                 </div>
             </div>
             <div class="summary-item">
                 <div class="summary-icon yellow"><i class="fas fa-exclamation-triangle"></i></div>
                 <div class="summary-content">
                     <div class="summary-label">At Risk</div>
-                    <div class="summary-value">2</div>
+                    <div class="summary-value">6</div>
                 </div>
             </div>
             <div class="summary-item">
                 <div class="summary-icon red"><i class="fas fa-times-circle"></i></div>
                 <div class="summary-content">
                     <div class="summary-label">Critical</div>
-                    <div class="summary-value">1</div>
+                    <div class="summary-value">2</div>
                 </div>
             </div>
             <div class="summary-item">
-                <div class="summary-icon blue"><i class="fas fa-bullseye"></i></div>
+                <div class="summary-icon blue"><i class="fas fa-server"></i></div>
                 <div class="summary-content">
-                    <div class="summary-label">Avg. Target Hit</div>
-                    <div class="summary-value">87%</div>
+                    <div class="summary-label">System Uptime</div>
+                    <div class="summary-value">99.94%</div>
                 </div>
             </div>
             <div class="summary-item">
-                <div class="summary-icon purple"><i class="fas fa-chart-line"></i></div>
+                <div class="summary-icon purple"><i class="fas fa-tachometer-alt"></i></div>
                 <div class="summary-content">
-                    <div class="summary-label">Overall Score</div>
-                    <div class="summary-value">8.4</div>
+                    <div class="summary-label">Ops Score</div>
+                    <div class="summary-value">8.2</div>
                 </div>
             </div>
         </div>
 
         <!-- Leading Indicators Grid -->
         <div class="indicators-grid">
-            <!-- Indicator 1: Customer Satisfaction Score -->
+            
+            <!-- Indicator 1: Genesys Platform Health -->
             <div class="indicator-card">
                 <div class="indicator-rank">1</div>
                 <div class="indicator-header">
                     <div class="indicator-info">
-                        <div class="indicator-title">Customer Satisfaction Score (CSAT)</div>
-                        <div class="indicator-subtitle">Real-time customer feedback metric</div>
+                        <div class="indicator-title">Genesys Platform Availability</div>
+                        <div class="indicator-subtitle">
+                            Core telephony platform uptime
+                            <span class="source-tag genesys">Genesys</span>
+                        </div>
                     </div>
                     <div class="indicator-status healthy">
                         <i class="fas fa-circle"></i> Healthy
@@ -893,413 +1234,134 @@
                 </div>
                 <div class="indicator-body">
                     <div class="indicator-metric">
-                        <div class="indicator-value">92.4%</div>
-                        <div class="indicator-target">Target: <strong>90%</strong></div>
+                        <div class="indicator-value">99.97%</div>
+                        <div class="indicator-target">Target: <strong>99.9%</strong></div>
                         <div class="progress-bar">
-                            <div class="progress-fill green" style="width: 92.4%"></div>
+                            <div class="progress-fill green" style="width: 99.97%"></div>
                         </div>
                     </div>
                     <div class="indicator-chart">
                         <canvas id="chart1"></canvas>
                     </div>
                 </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> Platform availability directly determines the contact center's ability to handle customer interactions. Every minute of downtime results in missed calls, lost revenue, and customer dissatisfaction.
+                        <ul class="impact-list">
+                            <li>1% downtime = ~14.4 minutes/day of lost service</li>
+                            <li>Affects all channels: voice, chat, email, SMS</li>
+                            <li>Cascading impact on agent productivity and SLAs</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>Availability % = ((Total Minutes - Downtime Minutes) / Total Minutes) × 100</code>
+                        </div>
+                    </div>
+                </div>
                 <div class="indicator-details">
                     <div class="detail-item">
-                        <div class="detail-value">4,521</div>
-                        <div class="detail-label">Responses</div>
+                        <div class="detail-value">1,440</div>
+                        <div class="detail-label">Total Minutes</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-value">+2.3%</div>
-                        <div class="detail-label">vs Last Week</div>
+                        <div class="detail-value">0.4</div>
+                        <div class="detail-label">Downtime (min)</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-value">4.6/5</div>
-                        <div class="detail-label">Avg Rating</div>
+                        <div class="detail-value">0</div>
+                        <div class="detail-label">Incidents</div>
                     </div>
                 </div>
                 <div class="indicator-footer">
                     <div class="indicator-trend up">
-                        <i class="fas fa-arrow-up"></i> +2.4% from last period
+                        <i class="fas fa-arrow-up"></i> +0.02% from yesterday
                     </div>
                     <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
                 </div>
             </div>
 
-            <!-- Indicator 2: Net Promoter Score -->
+            <!-- Indicator 2: Network Latency (ThousandEyes) -->
             <div class="indicator-card">
                 <div class="indicator-rank">2</div>
                 <div class="indicator-header">
                     <div class="indicator-info">
-                        <div class="indicator-title">Net Promoter Score (NPS)</div>
-                        <div class="indicator-subtitle">Customer loyalty predictor</div>
+                        <div class="indicator-title">Network Latency (Agent to Cloud)</div>
+                        <div class="indicator-subtitle">
+                            Round-trip time to Genesys Cloud
+                            <span class="source-tag thousandeyes">ThousandEyes</span>
+                        </div>
                     </div>
-                    <div class="indicator-status healthy">
-                        <i class="fas fa-circle"></i> Healthy
+                    <div class="indicator-status warning">
+                        <i class="fas fa-circle"></i> At Risk
                     </div>
                 </div>
                 <div class="indicator-body">
                     <div class="indicator-metric">
-                        <div class="indicator-value">+68</div>
-                        <div class="indicator-target">Target: <strong>+60</strong></div>
+                        <div class="indicator-value">142ms</div>
+                        <div class="indicator-target">Target: <strong>&lt; 120ms</strong></div>
                         <div class="progress-bar">
-                            <div class="progress-fill blue" style="width: 85%"></div>
+                            <div class="progress-fill yellow" style="width: 85%"></div>
                         </div>
                     </div>
                     <div class="indicator-chart">
                         <canvas id="chart2"></canvas>
                     </div>
                 </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> High latency causes voice quality degradation, delayed screen pops, and slow CTI integration. Agents experience lag in softphone controls affecting productivity.
+                        <ul class="impact-list">
+                            <li>Latency >150ms causes noticeable voice delay</li>
+                            <li>Affects CRM screen pop timing (customer wait perception)</li>
+                            <li>Impacts real-time reporting accuracy</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>Avg Latency = Σ(RTT for all agents) / Number of Active Agents</code><br>
+                            <code>RTT measured via ThousandEyes synthetic monitoring to Genesys endpoints</code>
+                        </div>
+                    </div>
+                </div>
                 <div class="indicator-details">
                     <div class="detail-item">
-                        <div class="detail-value">72%</div>
-                        <div class="detail-label">Promoters</div>
+                        <div class="detail-value">98ms</div>
+                        <div class="detail-label">Min Latency</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-value">24%</div>
-                        <div class="detail-label">Passives</div>
+                        <div class="detail-value">142ms</div>
+                        <div class="detail-label">Avg Latency</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-value">4%</div>
-                        <div class="detail-label">Detractors</div>
+                        <div class="detail-value">287ms</div>
+                        <div class="detail-label">Max Latency</div>
                     </div>
                 </div>
                 <div class="indicator-footer">
-                    <div class="indicator-trend up">
-                        <i class="fas fa-arrow-up"></i> +5 points from last period
+                    <div class="indicator-trend down">
+                        <i class="fas fa-arrow-up"></i> +18ms from baseline
                     </div>
                     <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
                 </div>
             </div>
 
-            <!-- Indicator 3: First Call Resolution -->
+            <!-- Indicator 3: Speech Recognition Accuracy (Nuance) -->
             <div class="indicator-card">
                 <div class="indicator-rank">3</div>
                 <div class="indicator-header">
                     <div class="indicator-info">
-                        <div class="indicator-title">First Call Resolution (FCR)</div>
-                        <div class="indicator-subtitle">Issue resolution efficiency</div>
-                    </div>
-                    <div class="indicator-status warning">
-                        <i class="fas fa-circle"></i> At Risk
-                    </div>
-                </div>
-                <div class="indicator-body">
-                    <div class="indicator-metric">
-                        <div class="indicator-value">78.2%</div>
-                        <div class="indicator-target">Target: <strong>85%</strong></div>
-                        <div class="progress-bar">
-                            <div class="progress-fill yellow" style="width: 78.2%"></div>
+                        <div class="indicator-title">IVR Speech Recognition Accuracy</div>
+                        <div class="indicator-subtitle">
+                            ASR success rate for self-service
+                            <span class="source-tag nuance">Nuance</span>
                         </div>
-                    </div>
-                    <div class="indicator-chart">
-                        <canvas id="chart3"></canvas>
-                    </div>
-                </div>
-                <div class="indicator-details">
-                    <div class="detail-item">
-                        <div class="detail-value">12,847</div>
-                        <div class="detail-label">Total Calls</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-value">10,046</div>
-                        <div class="detail-label">Resolved First</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-value">2.1</div>
-                        <div class="detail-label">Avg Contacts</div>
-                    </div>
-                </div>
-                <div class="indicator-footer">
-                    <div class="indicator-trend down">
-                        <i class="fas fa-arrow-down"></i> -1.8% from last period
-                    </div>
-                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
-                </div>
-            </div>
-
-            <!-- Indicator 4: Agent Utilization -->
-            <div class="indicator-card">
-                <div class="indicator-rank">4</div>
-                <div class="indicator-header">
-                    <div class="indicator-info">
-                        <div class="indicator-title">Agent Utilization Rate</div>
-                        <div class="indicator-subtitle">Workforce efficiency metric</div>
-                    </div>
-                    <div class="indicator-status healthy">
-                        <i class="fas fa-circle"></i> Healthy
-                    </div>
-                </div>
-                <div class="indicator-body">
-                    <div class="indicator-metric">
-                        <div class="indicator-value">84.7%</div>
-                        <div class="indicator-target">Target: <strong>80-85%</strong></div>
-                        <div class="progress-bar">
-                            <div class="progress-fill green" style="width: 84.7%"></div>
-                        </div>
-                    </div>
-                    <div class="indicator-chart">
-                        <canvas id="chart4"></canvas>
-                    </div>
-                </div>
-                <div class="indicator-details">
-                    <div class="detail-item">
-                        <div class="detail-value">245</div>
-                        <div class="detail-label">Active Agents</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-value">6.8h</div>
-                        <div class="detail-label">Avg Talk Time</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-value">1.2h</div>
-                        <div class="detail-label">Idle Time</div>
-                    </div>
-                </div>
-                <div class="indicator-footer">
-                    <div class="indicator-trend up">
-                        <i class="fas fa-arrow-up"></i> +1.2% from last period
-                    </div>
-                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
-                </div>
-            </div>
-
-            <!-- Indicator 5: Average Handle Time -->
-            <div class="indicator-card">
-                <div class="indicator-rank">5</div>
-                <div class="indicator-header">
-                    <div class="indicator-info">
-                        <div class="indicator-title">Average Handle Time (AHT)</div>
-                        <div class="indicator-subtitle">Call duration efficiency</div>
-                    </div>
-                    <div class="indicator-status healthy">
-                        <i class="fas fa-circle"></i> Healthy
-                    </div>
-                </div>
-                <div class="indicator-body">
-                    <div class="indicator-metric">
-                        <div class="indicator-value">4:32</div>
-                        <div class="indicator-target">Target: <strong>&lt; 5:00</strong></div>
-                        <div class="progress-bar">
-                            <div class="progress-fill green" style="width: 90%"></div>
-                        </div>
-                    </div>
-                    <div class="indicator-chart">
-                        <canvas id="chart5"></canvas>
-                    </div>
-                </div>
-                <div class="indicator-details">
-                    <div class="detail-item">
-                        <div class="detail-value">2:45</div>
-                        <div class="detail-label">Talk Time</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-value">1:12</div>
-                        <div class="detail-label">Hold Time</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-value">0:35</div>
-                        <div class="detail-label">After Work</div>
-                    </div>
-                </div>
-                <div class="indicator-footer">
-                    <div class="indicator-trend up">
-                        <i class="fas fa-arrow-up"></i> Improved by 12s
-                    </div>
-                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
-                </div>
-            </div>
-
-            <!-- Indicator 6: Service Level -->
-            <div class="indicator-card">
-                <div class="indicator-rank">6</div>
-                <div class="indicator-header">
-                    <div class="indicator-info">
-                        <div class="indicator-title">Service Level (SLA)</div>
-                        <div class="indicator-subtitle">Calls answered within target time</div>
-                    </div>
-                    <div class="indicator-status critical">
-                        <i class="fas fa-circle"></i> Critical
-                    </div>
-                </div>
-                <div class="indicator-body">
-                    <div class="indicator-metric">
-                        <div class="indicator-value">72.8%</div>
-                        <div class="indicator-target">Target: <strong>80%</strong></div>
-                        <div class="progress-bar">
-                            <div class="progress-fill red" style="width: 72.8%"></div>
-                        </div>
-                    </div>
-                    <div class="indicator-chart">
-                        <canvas id="chart6"></canvas>
-                    </div>
-                </div>
-                <div class="indicator-details">
-                    <div class="detail-item">
-                        <div class="detail-value">20s</div>
-                        <div class="detail-label">Target Time</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-value">28s</div>
-                        <div class="detail-label">Avg Answer</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-value">5.2%</div>
-                        <div class="detail-label">Abandon Rate</div>
-                    </div>
-                </div>
-                <div class="indicator-footer">
-                    <div class="indicator-trend down">
-                        <i class="fas fa-arrow-down"></i> -4.2% from last period
-                    </div>
-                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
-                </div>
-            </div>
-
-            <!-- Indicator 7: Employee Engagement -->
-            <div class="indicator-card">
-                <div class="indicator-rank">7</div>
-                <div class="indicator-header">
-                    <div class="indicator-info">
-                        <div class="indicator-title">Employee Engagement Score</div>
-                        <div class="indicator-subtitle">Agent satisfaction & motivation</div>
-                    </div>
-                    <div class="indicator-status healthy">
-                        <i class="fas fa-circle"></i> Healthy
-                    </div>
-                </div>
-                <div class="indicator-body">
-                    <div class="indicator-metric">
-                        <div class="indicator-value">8.2/10</div>
-                        <div class="indicator-target">Target: <strong>8.0</strong></div>
-                        <div class="progress-bar">
-                            <div class="progress-fill purple" style="width: 82%"></div>
-                        </div>
-                    </div>
-                    <div class="indicator-chart">
-                        <canvas id="chart7"></canvas>
-                    </div>
-                </div>
-                <div class="indicator-details">
-                    <div class="detail-item">
-                        <div class="detail-value">94%</div>
-                        <div class="detail-label">Response Rate</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-value">12%</div>
-                        <div class="detail-label">Turnover</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-value">4.2%</div>
-                        <div class="detail-label">Absenteeism</div>
-                    </div>
-                </div>
-                <div class="indicator-footer">
-                    <div class="indicator-trend up">
-                        <i class="fas fa-arrow-up"></i> +0.3 from last survey
-                    </div>
-                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
-                </div>
-            </div>
-
-            <!-- Indicator 8: Quality Assurance -->
-            <div class="indicator-card">
-                <div class="indicator-rank">8</div>
-                <div class="indicator-header">
-                    <div class="indicator-info">
-                        <div class="indicator-title">Quality Assurance Score</div>
-                        <div class="indicator-subtitle">Call quality & compliance</div>
-                    </div>
-                    <div class="indicator-status healthy">
-                        <i class="fas fa-circle"></i> Healthy
-                    </div>
-                </div>
-                <div class="indicator-body">
-                    <div class="indicator-metric">
-                        <div class="indicator-value">91.3%</div>
-                        <div class="indicator-target">Target: <strong>90%</strong></div>
-                        <div class="progress-bar">
-                            <div class="progress-fill green" style="width: 91.3%"></div>
-                        </div>
-                    </div>
-                    <div class="indicator-chart">
-                        <canvas id="chart8"></canvas>
-                    </div>
-                </div>
-                <div class="indicator-details">
-                    <div class="detail-item">
-                        <div class="detail-value">2,340</div>
-                        <div class="detail-label">Calls Evaluated</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-value">98%</div>
-                        <div class="detail-label">Compliance</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-value">87%</div>
-                        <div class="detail-label">Script Adherence</div>
-                    </div>
-                </div>
-                <div class="indicator-footer">
-                    <div class="indicator-trend up">
-                        <i class="fas fa-arrow-up"></i> +1.1% from last period
-                    </div>
-                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
-                </div>
-            </div>
-
-            <!-- Indicator 9: Schedule Adherence -->
-            <div class="indicator-card">
-                <div class="indicator-rank">9</div>
-                <div class="indicator-header">
-                    <div class="indicator-info">
-                        <div class="indicator-title">Schedule Adherence</div>
-                        <div class="indicator-subtitle">Agent schedule compliance</div>
-                    </div>
-                    <div class="indicator-status warning">
-                        <i class="fas fa-circle"></i> At Risk
-                    </div>
-                </div>
-                <div class="indicator-body">
-                    <div class="indicator-metric">
-                        <div class="indicator-value">88.5%</div>
-                        <div class="indicator-target">Target: <strong>95%</strong></div>
-                        <div class="progress-bar">
-                            <div class="progress-fill yellow" style="width: 88.5%"></div>
-                        </div>
-                    </div>
-                    <div class="indicator-chart">
-                        <canvas id="chart9"></canvas>
-                    </div>
-                </div>
-                <div class="indicator-details">
-                    <div class="detail-item">
-                        <div class="detail-value">245</div>
-                        <div class="detail-label">Agents</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-value">217</div>
-                        <div class="detail-label">Compliant</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-value">28</div>
-                        <div class="detail-label">Non-Compliant</div>
-                    </div>
-                </div>
-                <div class="indicator-footer">
-                    <div class="indicator-trend neutral">
-                        <i class="fas fa-minus"></i> No change from last period
-                    </div>
-                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
-                </div>
-            </div>
-
-            <!-- Indicator 10: Call Volume Forecast Accuracy -->
-            <div class="indicator-card">
-                <div class="indicator-rank">10</div>
-                <div class="indicator-header">
-                    <div class="indicator-info">
-                        <div class="indicator-title">Forecast Accuracy</div>
-                        <div class="indicator-subtitle">Volume prediction accuracy</div>
                     </div>
                     <div class="indicator-status healthy">
                         <i class="fas fa-circle"></i> Healthy
@@ -1314,26 +1376,1234 @@
                         </div>
                     </div>
                     <div class="indicator-chart">
-                        <canvas id="chart10"></canvas>
+                        <canvas id="chart3"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> Poor speech recognition leads to IVR abandonment, increased agent calls, and frustrated customers. Directly impacts containment rate and cost per contact.
+                        <ul class="impact-list">
+                            <li>Each 1% drop in accuracy = ~3% increase in agent transfers</li>
+                            <li>Affects authentication success rate (voice biometrics)</li>
+                            <li>Key driver of self-service containment rate</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>ASR Accuracy % = (Correct Recognitions / Total Recognition Attempts) × 100</code><br>
+                            <code>Source: Nuance Analytics > Recognition Reports > Daily Accuracy</code>
+                        </div>
                     </div>
                 </div>
                 <div class="indicator-details">
                     <div class="detail-item">
-                        <div class="detail-value">12,500</div>
-                        <div class="detail-label">Forecasted</div>
+                        <div class="detail-value">45,231</div>
+                        <div class="detail-label">IVR Calls</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-value">12,847</div>
-                        <div class="detail-label">Actual</div>
+                        <div class="detail-value">42,608</div>
+                        <div class="detail-label">Successful</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-value">2.7%</div>
-                        <div class="detail-label">Variance</div>
+                        <div class="detail-value">68%</div>
+                        <div class="detail-label">Containment</div>
                     </div>
                 </div>
                 <div class="indicator-footer">
                     <div class="indicator-trend up">
-                        <i class="fas fa-arrow-up"></i> +1.5% from last period
+                        <i class="fas fa-arrow-up"></i> +0.8% from last week
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 4: Agent Desktop Performance (Nexthink) -->
+            <div class="indicator-card">
+                <div class="indicator-rank">4</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Agent Desktop Experience Score</div>
+                        <div class="indicator-subtitle">
+                            Endpoint performance & responsiveness
+                            <span class="source-tag nexthink">Nexthink</span>
+                        </div>
+                    </div>
+                    <div class="indicator-status healthy">
+                        <i class="fas fa-circle"></i> Healthy
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">8.4/10</div>
+                        <div class="indicator-target">Target: <strong>8.0</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill green" style="width: 84%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart4"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> Agent desktop performance directly affects handling time and agent satisfaction. Slow machines lead to longer calls, frustrated agents, and increased errors.
+                        <ul class="impact-list">
+                            <li>Poor DEX correlates with +15-20% higher AHT</li>
+                            <li>Affects application response time (CRM, softphone)</li>
+                            <li>Leading indicator for hardware refresh needs</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>DEX Score = Weighted Average of:</code><br>
+                            <code>  - Boot Time (15%) + App Response (25%) + Crash Rate (20%)</code><br>
+                            <code>  - Memory Usage (15%) + CPU Usage (15%) + Network Quality (10%)</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">245</div>
+                        <div class="detail-label">Endpoints</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">3.2s</div>
+                        <div class="detail-label">Avg App Launch</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">0.8%</div>
+                        <div class="detail-label">Crash Rate</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend up">
+                        <i class="fas fa-arrow-up"></i> +0.3 from last month
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 5: Queue Wait Time -->
+            <div class="indicator-card">
+                <div class="indicator-rank">5</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Average Queue Wait Time</div>
+                        <div class="indicator-subtitle">
+                            Time before agent connection
+                            <span class="source-tag genesys">Genesys</span>
+                        </div>
+                    </div>
+                    <div class="indicator-status critical">
+                        <i class="fas fa-circle"></i> Critical
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">3:42</div>
+                        <div class="indicator-target">Target: <strong>&lt; 2:00</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill red" style="width: 45%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart5"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> Long wait times are the #1 driver of customer dissatisfaction and abandonment. Each additional minute in queue exponentially increases abandon rate.
+                        <ul class="impact-list">
+                            <li>Wait times >2min see 40% higher abandon rates</li>
+                            <li>Strong correlation with CSAT scores (-0.85)</li>
+                            <li>Indicates staffing/forecasting accuracy issues</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>Avg Wait Time = Σ(Queue Time for Answered Calls) / Total Answered Calls</code><br>
+                            <code>Source: Genesys > Analytics > Queue Performance > Wait Time Metrics</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">1,247</div>
+                        <div class="detail-label">In Queue Now</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">12.4%</div>
+                        <div class="detail-label">Abandon Rate</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">-18</div>
+                        <div class="detail-label">Staffing Gap</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend down">
+                        <i class="fas fa-arrow-up"></i> +1:24 from target
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 6: Infrastructure CPU/Memory (SolarWinds) -->
+            <div class="indicator-card">
+                <div class="indicator-rank">6</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Core Infrastructure Health</div>
+                        <div class="indicator-subtitle">
+                            Server CPU, memory, and storage
+                            <span class="source-tag solarwinds">SolarWinds</span>
+                        </div>
+                    </div>
+                    <div class="indicator-status healthy">
+                        <i class="fas fa-circle"></i> Healthy
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">72%</div>
+                        <div class="indicator-target">Target: <strong>&lt; 80%</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill green" style="width: 72%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart6"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> Infrastructure resource utilization above 80% indicates risk of performance degradation. Proactive monitoring prevents outages during peak volumes.
+                        <ul class="impact-list">
+                            <li>CPU >85% causes application slowdowns</li>
+                            <li>Memory pressure leads to service crashes</li>
+                            <li>Storage at 90% requires immediate action</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>Health Score = 100 - MAX(CPU%, Memory%, Disk%)</code><br>
+                            <code>Aggregated from all contact center servers via SolarWinds NPM</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">68%</div>
+                        <div class="detail-label">Avg CPU</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">72%</div>
+                        <div class="detail-label">Avg Memory</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">54%</div>
+                        <div class="detail-label">Disk Usage</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend up">
+                        <i class="fas fa-arrow-down"></i> -4% from peak
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 7: CTI Integration Health -->
+            <div class="indicator-card">
+                <div class="indicator-rank">7</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">CTI/CRM Integration Health</div>
+                        <div class="indicator-subtitle">
+                            Screen pop and data sync success
+                            <span class="source-tag inhouse">In-House Apps</span>
+                        </div>
+                    </div>
+                    <div class="indicator-status warning">
+                        <i class="fas fa-circle"></i> At Risk
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">96.8%</div>
+                        <div class="indicator-target">Target: <strong>99%</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill yellow" style="width: 96.8%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart7"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> CTI failures mean agents don't get screen pops, must manually search for customers, increasing AHT by 30-60 seconds per call and reducing first-call resolution.
+                        <ul class="impact-list">
+                            <li>Failed screen pops add ~45s to each call</li>
+                            <li>Manual lookups increase data entry errors</li>
+                            <li>Impacts agent efficiency metrics</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>CTI Success Rate = (Successful Screen Pops / Total Inbound Calls) × 100</code><br>
+                            <code>Source: Integration Middleware Logs + Genesys CTI Events</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">8,421</div>
+                        <div class="detail-label">CTI Events</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">269</div>
+                        <div class="detail-label">Failed Pops</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">1.2s</div>
+                        <div class="detail-label">Avg Pop Time</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend down">
+                        <i class="fas fa-arrow-down"></i> -1.2% from baseline
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 8: Voice Quality MOS -->
+            <div class="indicator-card">
+                <div class="indicator-rank">8</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Voice Quality (MOS Score)</div>
+                        <div class="indicator-subtitle">
+                            Mean Opinion Score for calls
+                            <span class="source-tag genesys">Genesys</span>
+                            <span class="source-tag thousandeyes">ThousandEyes</span>
+                        </div>
+                    </div>
+                    <div class="indicator-status healthy">
+                        <i class="fas fa-circle"></i> Healthy
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">4.2</div>
+                        <div class="indicator-target">Target: <strong>≥ 4.0</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill green" style="width: 84%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart8"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> Poor voice quality leads to repeated information requests, longer calls, customer frustration, and impacts speech recognition accuracy for Nuance IVR.
+                        <ul class="impact-list">
+                            <li>MOS below 3.5 = "Poor" quality (audible issues)</li>
+                            <li>Affects customer perception of professionalism</li>
+                            <li>Can indicate network or codec issues</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>MOS = 1 to 5 scale based on R-Factor calculation:</code><br>
+                            <code>R = 93.2 - Id - Ie + A (where Id=delay, Ie=equipment, A=advantage)</code><br>
+                            <code>MOS = 1 + 0.035R + R(R-60)(100-R)×7×10⁻⁶</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">0.2%</div>
+                        <div class="detail-label">Packet Loss</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">18ms</div>
+                        <div class="detail-label">Jitter</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">98.4%</div>
+                        <div class="detail-label">Good Calls</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend up">
+                        <i class="fas fa-arrow-up"></i> +0.1 from yesterday
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 9: Agent Login/Authentication -->
+            <div class="indicator-card">
+                <div class="indicator-rank">9</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Agent Login Success Rate</div>
+                        <div class="indicator-subtitle">
+                            Authentication and session health
+                            <span class="source-tag genesys">Genesys</span>
+                            <span class="source-tag inhouse">SSO</span>
+                        </div>
+                    </div>
+                    <div class="indicator-status warning">
+                        <i class="fas fa-circle"></i> At Risk
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">97.2%</div>
+                        <div class="indicator-target">Target: <strong>99.5%</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill yellow" style="width: 97.2%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart9"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> Login failures delay agent availability during shift changes, directly impacting service levels. During peak periods, even 2% failures affect 5-10 agents.
+                        <ul class="impact-list">
+                            <li>Failed logins = lost productive minutes</li>
+                            <li>Session timeouts force customer disconnects</li>
+                            <li>Often indicates IdP/SSO infrastructure issues</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>Login Success % = (Successful Logins / Total Login Attempts) × 100</code><br>
+                            <code>Sources: SSO/IdP Logs + Genesys User Activity API</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">1,842</div>
+                        <div class="detail-label">Login Attempts</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">52</div>
+                        <div class="detail-label">Failures</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">4.2s</div>
+                        <div class="detail-label">Avg Login Time</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend down">
+                        <i class="fas fa-arrow-down"></i> -1.3% from yesterday
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 10: Real-time Reporting Lag -->
+            <div class="indicator-card">
+                <div class="indicator-rank">10</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Real-time Data Freshness</div>
+                        <div class="indicator-subtitle">
+                            Dashboard data latency
+                            <span class="source-tag inhouse">In-House Apps</span>
+                            <span class="source-tag genesys">Genesys</span>
+                        </div>
+                    </div>
+                    <div class="indicator-status healthy">
+                        <i class="fas fa-circle"></i> Healthy
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">8s</div>
+                        <div class="indicator-target">Target: <strong>&lt; 15s</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill green" style="width: 95%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart10"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> Stale real-time data means supervisors make decisions based on outdated information. During volume spikes, delayed data can result in late interventions.
+                        <ul class="impact-list">
+                            <li>Data lag >30s makes workforce adjustments ineffective</li>
+                            <li>Affects real-time adherence monitoring accuracy</li>
+                            <li>Impacts supervisor ability to manage queues</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>Data Freshness = Current Time - Timestamp of Last Data Update</code><br>
+                            <code>Measured at dashboard rendering layer vs source system timestamps</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">5</div>
+                        <div class="detail-label">Data Feeds</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">8s</div>
+                        <div class="detail-label">Avg Lag</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">99.8%</div>
+                        <div class="detail-label">Feed Uptime</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend up">
+                        <i class="fas fa-arrow-down"></i> -2s from yesterday
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Section Divider: Agent Staffing -->
+            <div class="section-divider">
+                <div class="section-icon staffing"><i class="fas fa-users"></i></div>
+                <h2>Agent Staffing & Workforce Indicators</h2>
+                <div class="divider-line"></div>
+            </div>
+
+            <!-- Indicator 11: Schedule Adherence -->
+            <div class="indicator-card">
+                <div class="indicator-rank">11</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Schedule Adherence</div>
+                        <div class="indicator-subtitle">
+                            Agents following scheduled activities
+                            <span class="source-tag genesys">Genesys</span>
+                            <span class="source-tag wfm">WFM</span>
+                        </div>
+                    </div>
+                    <div class="indicator-status warning">
+                        <i class="fas fa-circle"></i> At Risk
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">87.3%</div>
+                        <div class="indicator-target">Target: <strong>90%</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill yellow" style="width: 87.3%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart11"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> Poor adherence means agents aren't available when forecasted, directly impacting service levels. Each 1% drop can cause SLA breaches during peak intervals.
+                        <ul class="impact-list">
+                            <li>Low adherence = understaffing during critical intervals</li>
+                            <li>Impacts queue wait times and abandon rates</li>
+                            <li>Leading indicator for workforce management effectiveness</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>Adherence % = (Time in Scheduled Activity / Total Scheduled Time) × 100</code><br>
+                            <code>Source: WFM Real-time Adherence + Genesys Agent Activity</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">245</div>
+                        <div class="detail-label">Agents Scheduled</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">214</div>
+                        <div class="detail-label">In Adherence</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">31</div>
+                        <div class="detail-label">Out of Adherence</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend down">
+                        <i class="fas fa-arrow-down"></i> -2.7% from target
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 12: Agent Occupancy Rate -->
+            <div class="indicator-card">
+                <div class="indicator-rank">12</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Agent Occupancy Rate</div>
+                        <div class="indicator-subtitle">
+                            Time spent handling vs available
+                            <span class="source-tag genesys">Genesys</span>
+                        </div>
+                    </div>
+                    <div class="indicator-status healthy">
+                        <i class="fas fa-circle"></i> Healthy
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">78%</div>
+                        <div class="indicator-target">Target: <strong>75-85%</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill green" style="width: 78%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart12"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> Occupancy >85% leads to agent burnout and increased attrition. Below 70% indicates overstaffing and inefficiency. Optimal range is 75-85%.
+                        <ul class="impact-list">
+                            <li>High occupancy (>85%) = burnout risk, quality drops</li>
+                            <li>Low occupancy (<70%) = wasted labor costs</li>
+                            <li>Correlates with agent satisfaction and retention</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>Occupancy % = (Handle Time / (Handle Time + Available Time)) × 100</code><br>
+                            <code>Handle Time = Talk Time + Hold Time + After-Call Work</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">6.2h</div>
+                        <div class="detail-label">Avg Handle/Day</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">1.8h</div>
+                        <div class="detail-label">Avg Available</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">Normal</div>
+                        <div class="detail-label">Burnout Risk</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend up">
+                        <i class="fas fa-arrow-up"></i> Within optimal range
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 13: Staffing Gap (Forecast vs Actual) -->
+            <div class="indicator-card">
+                <div class="indicator-rank">13</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Staffing Gap (Forecast vs Actual)</div>
+                        <div class="indicator-subtitle">
+                            Real-time staffing deviation
+                            <span class="source-tag wfm">WFM</span>
+                            <span class="source-tag genesys">Genesys</span>
+                        </div>
+                    </div>
+                    <div class="indicator-status critical">
+                        <i class="fas fa-circle"></i> Critical
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">-18</div>
+                        <div class="indicator-target">Target: <strong>±5 agents</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill red" style="width: 30%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart13"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> Negative gap means understaffed = longer wait times, more abandons. Positive gap means overstaffed = wasted labor costs. Critical for real-time adjustments.
+                        <ul class="impact-list">
+                            <li>Each understaffed agent = ~15 more customers waiting</li>
+                            <li>Gap >10 requires immediate supervisor action</li>
+                            <li>Leading indicator for unplanned shrinkage</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>Staffing Gap = Actual Logged-In Agents - Forecasted Required Agents</code><br>
+                            <code>Source: WFM Forecast + Genesys Real-time Agent States</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">245</div>
+                        <div class="detail-label">Required</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">227</div>
+                        <div class="detail-label">Actual</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">7.3%</div>
+                        <div class="detail-label">Shrinkage</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend down">
+                        <i class="fas fa-arrow-down"></i> -18 agents understaffed
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 14: Unplanned Shrinkage -->
+            <div class="indicator-card">
+                <div class="indicator-rank">14</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Unplanned Shrinkage Rate</div>
+                        <div class="indicator-subtitle">
+                            Absences, late arrivals, early departures
+                            <span class="source-tag wfm">WFM</span>
+                        </div>
+                    </div>
+                    <div class="indicator-status warning">
+                        <i class="fas fa-circle"></i> At Risk
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">8.4%</div>
+                        <div class="indicator-target">Target: <strong>&lt; 6%</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill yellow" style="width: 70%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart14"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> Unplanned shrinkage directly reduces available staff, causing service level degradation. Persistent high shrinkage indicates morale or scheduling issues.
+                        <ul class="impact-list">
+                            <li>Each 1% increase = ~2-3 fewer agents available</li>
+                            <li>Leading indicator for attrition risk</li>
+                            <li>Affects forecast accuracy for future planning</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>Unplanned Shrinkage % = (Unplanned Absent Hours / Total Scheduled Hours) × 100</code><br>
+                            <code>Includes: Sick calls, no-shows, late arrivals >15min, early leaves</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">12</div>
+                        <div class="detail-label">Absent Today</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">8</div>
+                        <div class="detail-label">Late Arrivals</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">3</div>
+                        <div class="detail-label">Early Leaves</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend down">
+                        <i class="fas fa-arrow-up"></i> +2.4% above target
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Section Divider: Agent Tools -->
+            <div class="section-divider">
+                <div class="section-icon tools"><i class="fas fa-tools"></i></div>
+                <h2>Agent Tools & Application Performance</h2>
+                <div class="divider-line"></div>
+            </div>
+
+            <!-- Indicator 15: Knowledge Base Availability -->
+            <div class="indicator-card">
+                <div class="indicator-rank">15</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Knowledge Base Availability</div>
+                        <div class="indicator-subtitle">
+                            KB search and article access
+                            <span class="source-tag inhouse">In-House Apps</span>
+                        </div>
+                    </div>
+                    <div class="indicator-status healthy">
+                        <i class="fas fa-circle"></i> Healthy
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">99.8%</div>
+                        <div class="indicator-target">Target: <strong>99.5%</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill green" style="width: 99.8%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart15"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> Knowledge base is critical for First Call Resolution. When KB is down, agents must escalate or guess, increasing AHT and reducing quality.
+                        <ul class="impact-list">
+                            <li>KB downtime = 20-30% increase in escalations</li>
+                            <li>Affects new agent productivity significantly</li>
+                            <li>Direct impact on FCR and customer satisfaction</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>KB Availability = (Successful Searches / Total Search Requests) × 100</code><br>
+                            <code>Source: KB Application Logs + APM Monitoring</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">4,521</div>
+                        <div class="detail-label">Searches Today</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">1.2s</div>
+                        <div class="detail-label">Avg Response</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">82%</div>
+                        <div class="detail-label">First Result Hit</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend up">
+                        <i class="fas fa-arrow-up"></i> +0.3% from yesterday
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 16: CRM Response Time -->
+            <div class="indicator-card">
+                <div class="indicator-rank">16</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">CRM Response Time</div>
+                        <div class="indicator-subtitle">
+                            Customer record load performance
+                            <span class="source-tag inhouse">CRM</span>
+                            <span class="source-tag nexthink">Nexthink</span>
+                        </div>
+                    </div>
+                    <div class="indicator-status healthy">
+                        <i class="fas fa-circle"></i> Healthy
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">1.8s</div>
+                        <div class="indicator-target">Target: <strong>&lt; 3s</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill green" style="width: 90%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart16"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> Slow CRM increases handle time and causes dead air while agents wait. Every second of CRM delay adds directly to AHT across all calls.
+                        <ul class="impact-list">
+                            <li>CRM delay >3s adds ~10s to each call (agent waiting)</li>
+                            <li>Frustrates customers with "please hold" requests</li>
+                            <li>Correlates with agent frustration scores</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>Avg CRM Response = Σ(Page Load Times) / Total Page Loads</code><br>
+                            <code>Measured via Nexthink RUM + Application APM</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">12,847</div>
+                        <div class="detail-label">Page Loads</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">1.8s</div>
+                        <div class="detail-label">Avg Load Time</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">98.2%</div>
+                        <div class="detail-label">&lt; 3s SLA</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend up">
+                        <i class="fas fa-arrow-down"></i> -0.4s from last week
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 17: Softphone Health -->
+            <div class="indicator-card">
+                <div class="indicator-rank">17</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Softphone Application Health</div>
+                        <div class="indicator-subtitle">
+                            Genesys softphone stability
+                            <span class="source-tag genesys">Genesys</span>
+                            <span class="source-tag nexthink">Nexthink</span>
+                        </div>
+                    </div>
+                    <div class="indicator-status healthy">
+                        <i class="fas fa-circle"></i> Healthy
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">99.4%</div>
+                        <div class="indicator-target">Target: <strong>99%</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill green" style="width: 99.4%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart17"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> Softphone crashes disconnect active calls and force agents offline. Each crash loses ~5 minutes of productivity plus potential customer callback.
+                        <ul class="impact-list">
+                            <li>Softphone crash = dropped customer call</li>
+                            <li>Restart time averages 2-3 minutes</li>
+                            <li>Often indicates memory leaks or compatibility issues</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>Softphone Health = 100 - (Crash Events / Active Sessions × 100)</code><br>
+                            <code>Source: Genesys Client Logs + Nexthink Application Monitoring</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">245</div>
+                        <div class="detail-label">Active Sessions</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">2</div>
+                        <div class="detail-label">Crashes Today</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">142MB</div>
+                        <div class="detail-label">Avg Memory</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend up">
+                        <i class="fas fa-arrow-up"></i> +0.2% from yesterday
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Section Divider: Citrix -->
+            <div class="section-divider">
+                <div class="section-icon citrix"><i class="fas fa-window-restore"></i></div>
+                <h2>Citrix Virtual Apps & Desktop Indicators</h2>
+                <div class="divider-line"></div>
+            </div>
+
+            <!-- Indicator 18: Citrix Session Availability -->
+            <div class="indicator-card">
+                <div class="indicator-rank">18</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Citrix Session Availability</div>
+                        <div class="indicator-subtitle">
+                            VDA session launch success
+                            <span class="source-tag citrix">Citrix</span>
+                        </div>
+                    </div>
+                    <div class="indicator-status healthy">
+                        <i class="fas fa-circle"></i> Healthy
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">98.7%</div>
+                        <div class="indicator-target">Target: <strong>98%</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill green" style="width: 98.7%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart18"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> Failed Citrix sessions prevent agents from accessing any applications. During shift changes, session failures can delay dozens of agents from starting work.
+                        <ul class="impact-list">
+                            <li>Failed session = agent cannot work until resolved</li>
+                            <li>Average resolution time is 5-10 minutes</li>
+                            <li>Critical during shift change windows (high volume)</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>Session Availability = (Successful Launches / Total Launch Attempts) × 100</code><br>
+                            <code>Source: Citrix Director + StoreFront Logs</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">1,247</div>
+                        <div class="detail-label">Sessions Today</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">16</div>
+                        <div class="detail-label">Failed Launches</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">18</div>
+                        <div class="detail-label">Available VDAs</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend up">
+                        <i class="fas fa-arrow-up"></i> +0.5% from yesterday
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 19: Citrix Session Latency (ICA RTT) -->
+            <div class="indicator-card">
+                <div class="indicator-rank">19</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Citrix ICA Latency (RTT)</div>
+                        <div class="indicator-subtitle">
+                            Session responsiveness
+                            <span class="source-tag citrix">Citrix</span>
+                            <span class="source-tag nexthink">Nexthink</span>
+                        </div>
+                    </div>
+                    <div class="indicator-status warning">
+                        <i class="fas fa-circle"></i> At Risk
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">78ms</div>
+                        <div class="indicator-target">Target: <strong>&lt; 60ms</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill yellow" style="width: 77%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart19"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> High ICA latency causes lag in mouse/keyboard input and screen updates. Agents experience "sluggish" applications affecting typing speed and navigation.
+                        <ul class="impact-list">
+                            <li>RTT >100ms = noticeable typing lag</li>
+                            <li>Directly impacts agent efficiency and AHT</li>
+                            <li>High RTT often indicates bandwidth or VDA overload</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>ICA RTT = Round-Trip Time between endpoint and VDA</code><br>
+                            <code>Source: Citrix Director Session Metrics + HDX Monitor</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">245</div>
+                        <div class="detail-label">Active Sessions</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">78ms</div>
+                        <div class="detail-label">Avg RTT</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">156ms</div>
+                        <div class="detail-label">P95 RTT</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend down">
+                        <i class="fas fa-arrow-up"></i> +18ms above target
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 20: Citrix VDA Health -->
+            <div class="indicator-card">
+                <div class="indicator-rank">20</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Citrix VDA Resource Health</div>
+                        <div class="indicator-subtitle">
+                            Virtual delivery agent performance
+                            <span class="source-tag citrix">Citrix</span>
+                            <span class="source-tag solarwinds">SolarWinds</span>
+                        </div>
+                    </div>
+                    <div class="indicator-status healthy">
+                        <i class="fas fa-circle"></i> Healthy
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">92%</div>
+                        <div class="indicator-target">Target: <strong>≥ 85%</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill green" style="width: 92%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart20"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-importance">
+                    <div class="importance-toggle" onclick="toggleImportance(this)">
+                        <i class="fas fa-chevron-down"></i>
+                        <span>Why This Matters</span>
+                    </div>
+                    <div class="importance-content">
+                        <strong>Impact on Operations:</strong> VDA health indicates available capacity for agent sessions. Low health means VDAs are overloaded, causing session failures and poor performance.
+                        <ul class="impact-list">
+                            <li>VDA CPU >80% = session performance degradation</li>
+                            <li>Memory pressure causes application crashes</li>
+                            <li>Leading indicator for capacity planning</li>
+                        </ul>
+                        <div class="calculation-box">
+                            <div class="label">Calculation Formula</div>
+                            <code>VDA Health = 100 - MAX(Avg CPU%, Avg Memory%)</code><br>
+                            <code>Aggregated across all VDAs in delivery group</code><br>
+                            <code>Source: Citrix Director + SolarWinds VM Monitoring</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">18/20</div>
+                        <div class="detail-label">VDAs Online</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">68%</div>
+                        <div class="detail-label">Avg CPU</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">74%</div>
+                        <div class="detail-label">Avg Memory</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend up">
+                        <i class="fas fa-arrow-up"></i> +4% from yesterday
                     </div>
                     <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
                 </div>
@@ -1345,24 +2615,24 @@
             <div class="trend-header">
                 <div class="trend-title">
                     <i class="fas fa-chart-area" style="color: var(--info); margin-right: 10px;"></i>
-                    Leading Indicators Trend (30 Days)
+                    Operational Health Trend (24 Hours)
                 </div>
                 <div class="trend-legend">
                     <div class="legend-item">
-                        <div class="legend-dot" style="background: var(--success);"></div>
-                        CSAT
+                        <div class="legend-dot" style="background: #ff4f1f;"></div>
+                        Genesys
                     </div>
                     <div class="legend-item">
-                        <div class="legend-dot" style="background: var(--info);"></div>
-                        NPS
+                        <div class="legend-dot" style="background: #00bceb;"></div>
+                        Network
                     </div>
                     <div class="legend-item">
-                        <div class="legend-dot" style="background: var(--warning);"></div>
-                        FCR
+                        <div class="legend-dot" style="background: #059669;"></div>
+                        Staffing
                     </div>
                     <div class="legend-item">
-                        <div class="legend-dot" style="background: var(--purple);"></div>
-                        SLA
+                        <div class="legend-dot" style="background: #0033a0;"></div>
+                        Citrix
                     </div>
                 </div>
             </div>
@@ -1371,6 +2641,268 @@
             </div>
         </div>
     </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-book" style="color: var(--info); margin-right: 10px;"></i> Leading Indicators Documentation</h2>
+                <button class="modal-close" onclick="closeDocumentation()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="doc-section">
+                    <h3><i class="fas fa-info-circle"></i> Overview</h3>
+                    <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.7; margin-bottom: 16px;">
+                        This dashboard displays the top 20 leading indicators that directly impact contact center operations. 
+                        These metrics are <strong>predictive</strong> - they indicate potential issues before they affect customer experience. 
+                        The indicators are grouped into four categories: <strong>Platform Health</strong> (1-10), <strong>Agent Staffing</strong> (11-14), 
+                        <strong>Agent Tools</strong> (15-17), and <strong>Citrix Virtual Apps</strong> (18-20).
+                    </p>
+                </div>
+
+                <div class="doc-section">
+                    <h3><i class="fas fa-database"></i> Data Sources</h3>
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>System</th>
+                                <th>Data Provided</th>
+                                <th>Refresh Rate</th>
+                                <th>API/Method</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Genesys Cloud</strong></td>
+                                <td>Platform health, queue metrics, voice quality, agent states</td>
+                                <td>Real-time (5s)</td>
+                                <td><code>Analytics API</code>, <code>Notifications API</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Nuance</strong></td>
+                                <td>ASR accuracy, IVR containment, recognition logs</td>
+                                <td>5 minutes</td>
+                                <td><code>Nuance Analytics Export</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>ThousandEyes</strong></td>
+                                <td>Network latency, packet loss, path visualization</td>
+                                <td>1 minute</td>
+                                <td><code>ThousandEyes API v7</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Nexthink</strong></td>
+                                <td>DEX scores, endpoint health, application performance</td>
+                                <td>15 minutes</td>
+                                <td><code>Nexthink NXQL API</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>SolarWinds</strong></td>
+                                <td>Server CPU, memory, disk, network interface stats</td>
+                                <td>1 minute</td>
+                                <td><code>SolarWinds SWIS API</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>In-House Apps</strong></td>
+                                <td>CTI events, SSO logs, middleware health, KB availability</td>
+                                <td>Real-time</td>
+                                <td><code>Internal REST APIs</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>WFM System</strong></td>
+                                <td>Schedule adherence, forecasts, shrinkage, staffing gaps</td>
+                                <td>Real-time (15s)</td>
+                                <td><code>WFM RTA API</code>, <code>Intraday Reports</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Citrix Director</strong></td>
+                                <td>Session availability, ICA latency, VDA health, failures</td>
+                                <td>1 minute</td>
+                                <td><code>Citrix OData API</code>, <code>Director Monitoring</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="doc-section">
+                    <h3><i class="fas fa-calculator"></i> Calculation Methods</h3>
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>Indicator</th>
+                                <th>Formula</th>
+                                <th>Threshold (Target)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1. Genesys Availability</strong></td>
+                                <td><code>((Total Min - Downtime) / Total Min) × 100</code></td>
+                                <td>≥ 99.9%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>2. Network Latency</strong></td>
+                                <td><code>Avg RTT from agent sites to Genesys Cloud</code></td>
+                                <td>&lt; 120ms</td>
+                            </tr>
+                            <tr>
+                                <td><strong>3. ASR Accuracy</strong></td>
+                                <td><code>(Correct Recognitions / Total Attempts) × 100</code></td>
+                                <td>≥ 92%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4. DEX Score</strong></td>
+                                <td><code>Weighted: Boot(15%) + App(25%) + Crash(20%) + Mem(15%) + CPU(15%) + Net(10%)</code></td>
+                                <td>≥ 8.0/10</td>
+                            </tr>
+                            <tr>
+                                <td><strong>5. Queue Wait Time</strong></td>
+                                <td><code>Σ(Wait Time for Answered) / Answered Count</code></td>
+                                <td>&lt; 2:00</td>
+                            </tr>
+                            <tr>
+                                <td><strong>6. Infrastructure Health</strong></td>
+                                <td><code>100 - MAX(CPU%, Memory%, Disk%)</code></td>
+                                <td>≥ 20% headroom</td>
+                            </tr>
+                            <tr>
+                                <td><strong>7. CTI Success Rate</strong></td>
+                                <td><code>(Successful Screen Pops / Inbound Calls) × 100</code></td>
+                                <td>≥ 99%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>8. MOS Score</strong></td>
+                                <td><code>R-Factor based: MOS = 1 + 0.035R + R(R-60)(100-R)×7×10⁻⁶</code></td>
+                                <td>≥ 4.0</td>
+                            </tr>
+                            <tr>
+                                <td><strong>9. Login Success</strong></td>
+                                <td><code>(Successful Logins / Total Attempts) × 100</code></td>
+                                <td>≥ 99.5%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>10. Data Freshness</strong></td>
+                                <td><code>Current Time - Last Update Timestamp</code></td>
+                                <td>&lt; 15 seconds</td>
+                            </tr>
+                            <tr style="background: #f0fdf4;">
+                                <td colspan="3" style="font-weight: 600; color: #059669;">Agent Staffing & Workforce</td>
+                            </tr>
+                            <tr>
+                                <td><strong>11. Schedule Adherence</strong></td>
+                                <td><code>(Time in Scheduled Activity / Total Scheduled Time) × 100</code></td>
+                                <td>≥ 90%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>12. Agent Occupancy</strong></td>
+                                <td><code>(Handle Time / (Handle Time + Available Time)) × 100</code></td>
+                                <td>75-85%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>13. Staffing Gap</strong></td>
+                                <td><code>Actual Logged-In Agents - Forecasted Required Agents</code></td>
+                                <td>±5 agents</td>
+                            </tr>
+                            <tr>
+                                <td><strong>14. Unplanned Shrinkage</strong></td>
+                                <td><code>(Unplanned Absent Hours / Total Scheduled Hours) × 100</code></td>
+                                <td>&lt; 6%</td>
+                            </tr>
+                            <tr style="background: #eff6ff;">
+                                <td colspan="3" style="font-weight: 600; color: #3b82f6;">Agent Tools & Applications</td>
+                            </tr>
+                            <tr>
+                                <td><strong>15. KB Availability</strong></td>
+                                <td><code>(Successful Searches / Total Search Requests) × 100</code></td>
+                                <td>≥ 99.5%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>16. CRM Response Time</strong></td>
+                                <td><code>Σ(Page Load Times) / Total Page Loads</code></td>
+                                <td>&lt; 3 seconds</td>
+                            </tr>
+                            <tr>
+                                <td><strong>17. Softphone Health</strong></td>
+                                <td><code>100 - (Crash Events / Active Sessions × 100)</code></td>
+                                <td>≥ 99%</td>
+                            </tr>
+                            <tr style="background: #eef2ff;">
+                                <td colspan="3" style="font-weight: 600; color: #0033a0;">Citrix Virtual Apps</td>
+                            </tr>
+                            <tr>
+                                <td><strong>18. Session Availability</strong></td>
+                                <td><code>(Successful Launches / Total Launch Attempts) × 100</code></td>
+                                <td>≥ 98%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>19. ICA Latency (RTT)</strong></td>
+                                <td><code>Round-Trip Time between endpoint and VDA</code></td>
+                                <td>&lt; 60ms</td>
+                            </tr>
+                            <tr>
+                                <td><strong>20. VDA Resource Health</strong></td>
+                                <td><code>100 - MAX(Avg CPU%, Avg Memory%) across VDAs</code></td>
+                                <td>≥ 85%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="doc-section">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Alert Thresholds</h3>
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Criteria</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span style="color: #10b981; font-weight: 600;">● Healthy</span></td>
+                                <td>Metric is at or better than target</td>
+                                <td>Continue monitoring</td>
+                            </tr>
+                            <tr>
+                                <td><span style="color: #f59e0b; font-weight: 600;">● At Risk</span></td>
+                                <td>Metric is within 10% of threshold breach</td>
+                                <td>Investigate root cause, prepare mitigation</td>
+                            </tr>
+                            <tr>
+                                <td><span style="color: #ef4444; font-weight: 600;">● Critical</span></td>
+                                <td>Metric has breached threshold</td>
+                                <td>Immediate escalation, activate runbook</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="doc-section">
+                    <h3><i class="fas fa-link"></i> Related Runbooks</h3>
+                    <ul style="color: var(--text-secondary); font-size: 13px; line-height: 2; padding-left: 20px;">
+                        <li><a href="#" style="color: var(--info);">RB-001: Genesys Platform Outage Response</a></li>
+                        <li><a href="#" style="color: var(--info);">RB-002: Network Latency Troubleshooting</a></li>
+                        <li><a href="#" style="color: var(--info);">RB-003: IVR/Nuance Performance Degradation</a></li>
+                        <li><a href="#" style="color: var(--info);">RB-004: Agent Desktop Issues - Nexthink Remediation</a></li>
+                        <li><a href="#" style="color: var(--info);">RB-005: High Queue Wait Time - Staffing Escalation</a></li>
+                        <li><a href="#" style="color: var(--info);">RB-006: CTI Integration Failure Recovery</a></li>
+                        <li><a href="#" style="color: var(--info);">RB-007: Low Schedule Adherence Response</a></li>
+                        <li><a href="#" style="color: var(--info);">RB-008: Staffing Gap Emergency Procedures</a></li>
+                        <li><a href="#" style="color: var(--info);">RB-009: High Shrinkage Investigation</a></li>
+                        <li><a href="#" style="color: var(--info);">RB-010: Knowledge Base Outage Recovery</a></li>
+                        <li><a href="#" style="color: var(--info);">RB-011: CRM Performance Degradation</a></li>
+                        <li><a href="#" style="color: var(--info);">RB-012: Softphone Crash Investigation</a></li>
+                        <li><a href="#" style="color: var(--info);">RB-013: Citrix Session Launch Failures</a></li>
+                        <li><a href="#" style="color: var(--info);">RB-014: Citrix ICA Latency Troubleshooting</a></li>
+                        <li><a href="#" style="color: var(--info);">RB-015: VDA Resource Exhaustion Response</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Update current time
@@ -1382,12 +2914,13 @@
                 month: 'short', 
                 day: 'numeric',
                 hour: '2-digit', 
-                minute: '2-digit'
+                minute: '2-digit',
+                second: '2-digit'
             };
             document.getElementById('currentTime').textContent = now.toLocaleDateString('en-US', options);
         }
         updateTime();
-        setInterval(updateTime, 60000);
+        setInterval(updateTime, 1000);
 
         // Chart.js defaults
         Chart.defaults.font.family = "'Inter', sans-serif";
@@ -1409,7 +2942,7 @@
                         backgroundColor: color + '20',
                         tension: 0.4,
                         pointRadius: 0,
-                        pointHoverRadius: 4
+                        pointHoverRadius: 3
                     }]
                 },
                 options: {
@@ -1423,59 +2956,78 @@
         }
 
         // Create sparklines for each indicator
-        createSparkline('chart1', [88, 89, 90, 89.5, 91, 90.5, 92, 91.5, 92.4], '#10b981');
-        createSparkline('chart2', [58, 60, 62, 61, 64, 65, 66, 67, 68], '#3b82f6');
-        createSparkline('chart3', [82, 81, 80, 79.5, 79, 78.8, 78.5, 78.3, 78.2], '#f59e0b');
-        createSparkline('chart4', [80, 81, 82, 83, 83.5, 84, 84.2, 84.5, 84.7], '#10b981');
-        createSparkline('chart5', [5.2, 5.0, 4.9, 4.8, 4.7, 4.6, 4.5, 4.4, 4.5], '#10b981');
-        createSparkline('chart6', [80, 78, 77, 76, 75, 74, 73.5, 73, 72.8], '#ef4444');
-        createSparkline('chart7', [7.5, 7.6, 7.7, 7.8, 7.9, 8.0, 8.0, 8.1, 8.2], '#8b5cf6');
-        createSparkline('chart8', [88, 88.5, 89, 89.5, 90, 90.2, 90.5, 91, 91.3], '#10b981');
-        createSparkline('chart9', [90, 89.5, 89, 89, 88.8, 88.5, 88.5, 88.5, 88.5], '#f59e0b');
-        createSparkline('chart10', [90, 91, 91.5, 92, 92.5, 93, 93.5, 94, 94.2], '#10b981');
+        createSparkline('chart1', [99.95, 99.96, 99.97, 99.95, 99.98, 99.97, 99.96, 99.97, 99.97], '#10b981');
+        createSparkline('chart2', [118, 122, 128, 135, 140, 138, 145, 142, 142], '#f59e0b');
+        createSparkline('chart3', [92.5, 93.0, 93.2, 93.5, 93.8, 94.0, 94.1, 94.0, 94.2], '#10b981');
+        createSparkline('chart4', [7.9, 8.0, 8.1, 8.2, 8.1, 8.3, 8.4, 8.3, 8.4], '#10b981');
+        createSparkline('chart5', [2.1, 2.3, 2.5, 2.8, 3.0, 3.2, 3.4, 3.5, 3.7], '#ef4444');
+        createSparkline('chart6', [78, 76, 74, 72, 70, 71, 72, 73, 72], '#10b981');
+        createSparkline('chart7', [98.5, 98.2, 97.8, 97.5, 97.2, 97.0, 96.8, 96.9, 96.8], '#f59e0b');
+        createSparkline('chart8', [4.0, 4.1, 4.1, 4.2, 4.1, 4.2, 4.2, 4.1, 4.2], '#10b981');
+        createSparkline('chart9', [99.2, 98.8, 98.5, 98.2, 97.8, 97.5, 97.3, 97.2, 97.2], '#f59e0b');
+        createSparkline('chart10', [12, 10, 9, 8, 9, 8, 7, 8, 8], '#10b981');
+        // Staffing indicators
+        createSparkline('chart11', [90, 89, 88, 87, 86, 87, 87, 87, 87.3], '#f59e0b');
+        createSparkline('chart12', [75, 76, 77, 78, 79, 78, 77, 78, 78], '#10b981');
+        createSparkline('chart13', [-5, -8, -10, -12, -14, -15, -16, -17, -18], '#ef4444');
+        createSparkline('chart14', [6, 6.5, 7, 7.5, 8, 8.2, 8.3, 8.3, 8.4], '#f59e0b');
+        // Agent tools indicators
+        createSparkline('chart15', [99.5, 99.6, 99.7, 99.8, 99.7, 99.8, 99.9, 99.8, 99.8], '#10b981');
+        createSparkline('chart16', [2.2, 2.1, 2.0, 1.9, 1.8, 1.9, 1.8, 1.8, 1.8], '#10b981');
+        createSparkline('chart17', [99, 99.1, 99.2, 99.3, 99.2, 99.3, 99.4, 99.3, 99.4], '#10b981');
+        // Citrix indicators
+        createSparkline('chart18', [98, 98.2, 98.4, 98.5, 98.6, 98.5, 98.7, 98.6, 98.7], '#10b981');
+        createSparkline('chart19', [55, 58, 62, 68, 72, 74, 76, 77, 78], '#f59e0b');
+        createSparkline('chart20', [88, 89, 90, 91, 90, 91, 92, 91, 92], '#10b981');
 
         // Trend Chart
         const trendCtx = document.getElementById('trendChart').getContext('2d');
+        const hours = Array.from({length: 24}, (_, i) => `${String(i).padStart(2, '0')}:00`);
+        
         new Chart(trendCtx, {
             type: 'line',
             data: {
-                labels: Array.from({length: 30}, (_, i) => `Day ${i + 1}`),
+                labels: hours,
                 datasets: [
                     {
-                        label: 'CSAT',
-                        data: [88, 88.5, 89, 88.8, 89.2, 89.5, 89.8, 90, 90.2, 90.5, 90.3, 90.8, 91, 90.8, 91.2, 91.5, 91.3, 91.8, 92, 91.5, 92.2, 92, 92.3, 92.1, 92.4, 92.2, 92.5, 92.3, 92.4, 92.4],
-                        borderColor: '#10b981',
-                        backgroundColor: '#10b98120',
+                        label: 'Genesys',
+                        data: [99.98, 99.97, 99.99, 99.98, 99.97, 99.96, 99.95, 99.94, 99.95, 99.96, 99.97, 99.96, 99.95, 99.96, 99.97, 99.98, 99.97, 99.96, 99.97, 99.98, 99.97, 99.96, 99.97, 99.97],
+                        borderColor: '#ff4f1f',
+                        backgroundColor: '#ff4f1f20',
                         fill: false,
                         tension: 0.4,
-                        borderWidth: 2
+                        borderWidth: 2,
+                        yAxisID: 'y'
                     },
                     {
-                        label: 'NPS (Normalized)',
-                        data: [55, 56, 57, 58, 58, 59, 60, 60, 61, 62, 62, 63, 63, 64, 64, 65, 65, 66, 66, 66, 67, 67, 67, 68, 68, 68, 68, 68, 68, 68],
-                        borderColor: '#3b82f6',
-                        backgroundColor: '#3b82f620',
+                        label: 'Network (normalized)',
+                        data: [95, 94, 96, 95, 93, 92, 90, 88, 87, 86, 85, 84, 83, 84, 85, 86, 85, 84, 85, 86, 85, 84, 85, 86],
+                        borderColor: '#00bceb',
+                        backgroundColor: '#00bceb20',
                         fill: false,
                         tension: 0.4,
-                        borderWidth: 2
+                        borderWidth: 2,
+                        yAxisID: 'y'
                     },
                     {
-                        label: 'FCR',
-                        data: [82, 82, 81.5, 81.5, 81, 81, 80.5, 80.5, 80, 80, 79.8, 79.5, 79.5, 79.2, 79, 79, 78.8, 78.8, 78.5, 78.5, 78.5, 78.3, 78.3, 78.2, 78.2, 78.2, 78.2, 78.2, 78.2, 78.2],
-                        borderColor: '#f59e0b',
-                        backgroundColor: '#f59e0b20',
+                        label: 'Staffing (Adherence)',
+                        data: [91, 90, 89, 88, 87, 86, 85, 84, 85, 86, 87, 88, 89, 88, 87, 86, 87, 88, 87, 87, 87, 87, 87, 87.3],
+                        borderColor: '#059669',
+                        backgroundColor: '#05966920',
                         fill: false,
                         tension: 0.4,
-                        borderWidth: 2
+                        borderWidth: 2,
+                        yAxisID: 'y'
                     },
                     {
-                        label: 'SLA',
-                        data: [80, 79, 79, 78, 78, 77.5, 77, 77, 76.5, 76, 76, 75.5, 75, 75, 74.5, 74, 74, 73.8, 73.5, 73.5, 73.2, 73, 73, 73, 72.8, 72.8, 72.8, 72.8, 72.8, 72.8],
-                        borderColor: '#8b5cf6',
-                        backgroundColor: '#8b5cf620',
+                        label: 'Citrix (Session Avail)',
+                        data: [98, 98.2, 98.4, 98.3, 98.5, 98.4, 98.6, 98.5, 98.7, 98.6, 98.7, 98.6, 98.5, 98.6, 98.7, 98.8, 98.7, 98.6, 98.7, 98.8, 98.7, 98.6, 98.7, 98.7],
+                        borderColor: '#0033a0',
+                        backgroundColor: '#0033a020',
                         fill: false,
                         tension: 0.4,
-                        borderWidth: 2
+                        borderWidth: 2,
+                        yAxisID: 'y'
                     }
                 ]
             },
@@ -1491,32 +3043,20 @@
                         borderColor: '#e2e8f0',
                         borderWidth: 1,
                         padding: 12,
-                        displayColors: true,
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    label += context.parsed.y.toFixed(1) + '%';
-                                }
-                                return label;
-                            }
-                        }
+                        displayColors: true
                     }
                 },
                 scales: {
                     x: {
                         grid: { display: false },
                         ticks: {
-                            maxTicksLimit: 10,
+                            maxTicksLimit: 12,
                             color: '#a0aec0',
                             font: { size: 11 }
                         }
                     },
                     y: {
-                        min: 50,
+                        min: 80,
                         max: 100,
                         grid: { color: '#f1f5f9' },
                         ticks: {
@@ -1534,29 +3074,49 @@
             }
         });
 
+        // Toggle importance section
+        function toggleImportance(element) {
+            element.classList.toggle('expanded');
+            const content = element.nextElementSibling;
+            content.classList.toggle('show');
+        }
+
+        // Documentation modal
+        function openDocumentation() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocumentation() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Close modal on overlay click
+        document.getElementById('docModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDocumentation();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDocumentation();
+            }
+        });
+
         // Refresh button functionality
-        document.querySelector('.btn-primary').addEventListener('click', function() {
+        document.getElementById('refreshBtn').addEventListener('click', function() {
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
             setTimeout(() => {
                 this.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
-                // Add refresh animation to cards
                 document.querySelectorAll('.indicator-card').forEach(card => {
                     card.style.animation = 'none';
-                    card.offsetHeight; // Trigger reflow
+                    card.offsetHeight;
                     card.style.animation = '';
                 });
             }, 1500);
-        });
-
-        // Filter change handlers
-        document.getElementById('timePeriod').addEventListener('change', function() {
-            console.log('Time period changed to:', this.value);
-            // Add data refresh logic here
-        });
-
-        document.getElementById('region').addEventListener('change', function() {
-            console.log('Region changed to:', this.value);
-            // Add data refresh logic here
         });
     </script>
 </body>
