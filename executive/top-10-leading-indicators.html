@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 10 Leading Indicators Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #f0f4f8;
+            --card: #ffffff;
+            --border: #e2e8f0;
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --text-muted: #a0aec0;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --info: #3b82f6;
+            --info-light: #dbeafe;
+            --purple: #8b5cf6;
+            --purple-light: #ede9fe;
+            --teal: #14b8a6;
+            --teal-light: #ccfbf1;
+            --orange: #f97316;
+            --orange-light: #ffedd5;
+            --pink: #ec4899;
+            --pink-light: #fce7f3;
+            --navbar-bg: #0f172a;
+            --navbar-hover: rgba(255,255,255,0.1);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ========== NAVBAR ========== */
+        .navbar {
+            background: var(--navbar-bg);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-logo {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .nav-title span {
+            color: #64748b;
+            font-weight: 400;
+            font-size: 14px;
+            margin-left: 8px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 4px;
+        }
+
+        .nav-item {
+            color: #94a3b8;
+            text-decoration: none;
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-item:hover {
+            color: white;
+            background: var(--navbar-hover);
+        }
+
+        .nav-item.active {
+            color: white;
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .nav-item i {
+            font-size: 14px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-time {
+            font-size: 12px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-notifications {
+            position: relative;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .nav-notifications:hover {
+            background: var(--navbar-hover);
+        }
+
+        .nav-notifications i {
+            color: #94a3b8;
+            font-size: 18px;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+            border: 2px solid var(--navbar-bg);
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 6px 12px 6px 6px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .nav-user:hover {
+            background: var(--navbar-hover);
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 13px;
+            color: white;
+            font-weight: 500;
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        /* ========== TOOLBAR ========== */
+        .toolbar {
+            background: white;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .breadcrumb-nav a {
+            color: var(--info);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .breadcrumb-nav a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb-nav span {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .breadcrumb-nav i {
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .filter-select {
+            padding: 8px 32px 8px 12px;
+            font-size: 13px;
+            font-family: inherit;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: white;
+            color: var(--text-primary);
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            min-width: 140px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--info);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 28px 32px;
+        }
+
+        /* ========== PAGE HEADER ========== */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .page-title-section h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .page-title-section p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        /* ========== SUMMARY BAR ========== */
+        .summary-bar {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .summary-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .summary-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .summary-icon.green { background: var(--success-light); color: var(--success); }
+        .summary-icon.yellow { background: var(--warning-light); color: var(--warning); }
+        .summary-icon.red { background: var(--danger-light); color: var(--danger); }
+        .summary-icon.blue { background: var(--info-light); color: var(--info); }
+        .summary-icon.purple { background: var(--purple-light); color: var(--purple); }
+
+        .summary-content {
+            flex: 1;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .summary-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* ========== LEADING INDICATORS GRID ========== */
+        .indicators-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        /* ========== INDICATOR CARD ========== */
+        .indicator-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .indicator-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .indicator-rank {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+            z-index: 10;
+        }
+
+        .indicator-header {
+            padding: 20px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-left: 40px;
+        }
+
+        .indicator-info {
+            flex: 1;
+        }
+
+        .indicator-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .indicator-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .indicator-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        .indicator-status.healthy { background: var(--success-light); color: #059669; }
+        .indicator-status.warning { background: var(--warning-light); color: #b45309; }
+        .indicator-status.critical { background: var(--danger-light); color: #dc2626; }
+        .indicator-status.info { background: var(--info-light); color: #1d4ed8; }
+
+        .indicator-status i { font-size: 10px; }
+
+        .indicator-body {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .indicator-metric {
+            flex: 1;
+        }
+
+        .indicator-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .indicator-target {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .indicator-target strong {
+            color: var(--text-secondary);
+        }
+
+        .indicator-chart {
+            width: 140px;
+            height: 60px;
+        }
+
+        .indicator-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            padding: 16px 24px;
+            background: #f8fafc;
+            border-top: 1px solid var(--border);
+        }
+
+        .detail-item {
+            text-align: center;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .detail-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .indicator-footer {
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border);
+        }
+
+        .indicator-trend {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .indicator-trend.up { color: var(--success); }
+        .indicator-trend.down { color: var(--danger); }
+        .indicator-trend.neutral { color: var(--text-muted); }
+
+        .indicator-link {
+            color: var(--info);
+            font-size: 12px;
+            font-weight: 500;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .indicator-link:hover {
+            text-decoration: underline;
+        }
+
+        /* ========== PROGRESS BAR ========== */
+        .progress-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill.green { background: linear-gradient(90deg, #10b981, #059669); }
+        .progress-fill.yellow { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .progress-fill.red { background: linear-gradient(90deg, #ef4444, #dc2626); }
+        .progress-fill.blue { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+        .progress-fill.purple { background: linear-gradient(90deg, #8b5cf6, #7c3aed); }
+
+        /* ========== GAUGE CHART ========== */
+        .gauge-container {
+            width: 100px;
+            height: 60px;
+            position: relative;
+        }
+
+        /* ========== FULL WIDTH CARD ========== */
+        .indicator-card.full-width {
+            grid-column: span 2;
+        }
+
+        .indicator-card.full-width .indicator-body {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 32px;
+        }
+
+        .indicator-card.full-width .indicator-chart {
+            width: 100%;
+            height: 120px;
+        }
+
+        /* ========== TREND OVERVIEW ========== */
+        .trend-overview {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 24px;
+            margin-top: 28px;
+        }
+
+        .trend-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .trend-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .trend-legend {
+            display: flex;
+            gap: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .trend-chart-container {
+            height: 280px;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1400px) {
+            .indicators-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .indicator-card.full-width {
+                grid-column: span 1;
+            }
+            
+            .indicator-card.full-width .indicator-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 1000px) {
+            .summary-bar {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .nav-menu {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .summary-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .toolbar {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+            
+            .indicator-details {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* ========== ANIMATIONS ========== */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .indicator-card {
+            animation: slideIn 0.5s ease forwards;
+        }
+
+        .indicator-card:nth-child(1) { animation-delay: 0.05s; }
+        .indicator-card:nth-child(2) { animation-delay: 0.1s; }
+        .indicator-card:nth-child(3) { animation-delay: 0.15s; }
+        .indicator-card:nth-child(4) { animation-delay: 0.2s; }
+        .indicator-card:nth-child(5) { animation-delay: 0.25s; }
+        .indicator-card:nth-child(6) { animation-delay: 0.3s; }
+        .indicator-card:nth-child(7) { animation-delay: 0.35s; }
+        .indicator-card:nth-child(8) { animation-delay: 0.4s; }
+        .indicator-card:nth-child(9) { animation-delay: 0.45s; }
+        .indicator-card:nth-child(10) { animation-delay: 0.5s; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <div class="nav-logo"><i class="fas fa-chart-line"></i></div>
+            <div class="nav-title">Analytics Hub <span>| Leading Indicators</span></div>
+        </div>
+        
+        <div class="nav-menu">
+            <a href="../executive/executive-summary-dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="#" class="nav-item active">
+                <i class="fas fa-signal"></i> Leading Indicators
+            </a>
+            <a href="../analytics/vendor-analytics-dashboard.html" class="nav-item">
+                <i class="fas fa-chart-bar"></i> Analytics
+            </a>
+            <a href="../operations/operations-metrics-dashboard.html" class="nav-item">
+                <i class="fas fa-cogs"></i> Operations
+            </a>
+        </div>
+        
+        <div class="nav-right">
+            <div class="nav-time">
+                <i class="far fa-clock"></i>
+                <span id="currentTime">Loading...</span>
+            </div>
+            <div class="nav-notifications">
+                <i class="far fa-bell"></i>
+                <span class="notification-badge"></span>
+            </div>
+            <div class="nav-user">
+                <div class="avatar">JD</div>
+                <div class="user-info">
+                    <span class="user-name">John Doe</span>
+                    <span class="user-role">Executive</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <div class="breadcrumb-nav">
+            <a href="#">Home</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="#">Executive</a>
+            <i class="fas fa-chevron-right"></i>
+            <span>Top 10 Leading Indicators</span>
+        </div>
+        
+        <div class="filters">
+            <div class="filter-group">
+                <span class="filter-label">Time Period:</span>
+                <select class="filter-select" id="timePeriod">
+                    <option value="today">Today</option>
+                    <option value="week" selected>This Week</option>
+                    <option value="month">This Month</option>
+                    <option value="quarter">This Quarter</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Region:</span>
+                <select class="filter-select" id="region">
+                    <option value="all">All Regions</option>
+                    <option value="north">North</option>
+                    <option value="south">South</option>
+                    <option value="east">East</option>
+                    <option value="west">West</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title-section">
+                <h1>Top 10 Leading Indicators</h1>
+                <p>Key metrics predicting future performance and business outcomes</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary">
+                    <i class="fas fa-download"></i> Export Report
+                </button>
+                <button class="btn btn-primary">
+                    <i class="fas fa-sync-alt"></i> Refresh Data
+                </button>
+            </div>
+        </div>
+
+        <!-- Summary Bar -->
+        <div class="summary-bar">
+            <div class="summary-item">
+                <div class="summary-icon green"><i class="fas fa-check-circle"></i></div>
+                <div class="summary-content">
+                    <div class="summary-label">On Track</div>
+                    <div class="summary-value">7</div>
+                </div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-icon yellow"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="summary-content">
+                    <div class="summary-label">At Risk</div>
+                    <div class="summary-value">2</div>
+                </div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-icon red"><i class="fas fa-times-circle"></i></div>
+                <div class="summary-content">
+                    <div class="summary-label">Critical</div>
+                    <div class="summary-value">1</div>
+                </div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-icon blue"><i class="fas fa-bullseye"></i></div>
+                <div class="summary-content">
+                    <div class="summary-label">Avg. Target Hit</div>
+                    <div class="summary-value">87%</div>
+                </div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-icon purple"><i class="fas fa-chart-line"></i></div>
+                <div class="summary-content">
+                    <div class="summary-label">Overall Score</div>
+                    <div class="summary-value">8.4</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leading Indicators Grid -->
+        <div class="indicators-grid">
+            <!-- Indicator 1: Customer Satisfaction Score -->
+            <div class="indicator-card">
+                <div class="indicator-rank">1</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Customer Satisfaction Score (CSAT)</div>
+                        <div class="indicator-subtitle">Real-time customer feedback metric</div>
+                    </div>
+                    <div class="indicator-status healthy">
+                        <i class="fas fa-circle"></i> Healthy
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">92.4%</div>
+                        <div class="indicator-target">Target: <strong>90%</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill green" style="width: 92.4%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart1"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">4,521</div>
+                        <div class="detail-label">Responses</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">+2.3%</div>
+                        <div class="detail-label">vs Last Week</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">4.6/5</div>
+                        <div class="detail-label">Avg Rating</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend up">
+                        <i class="fas fa-arrow-up"></i> +2.4% from last period
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 2: Net Promoter Score -->
+            <div class="indicator-card">
+                <div class="indicator-rank">2</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Net Promoter Score (NPS)</div>
+                        <div class="indicator-subtitle">Customer loyalty predictor</div>
+                    </div>
+                    <div class="indicator-status healthy">
+                        <i class="fas fa-circle"></i> Healthy
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">+68</div>
+                        <div class="indicator-target">Target: <strong>+60</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill blue" style="width: 85%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart2"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">72%</div>
+                        <div class="detail-label">Promoters</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">24%</div>
+                        <div class="detail-label">Passives</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">4%</div>
+                        <div class="detail-label">Detractors</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend up">
+                        <i class="fas fa-arrow-up"></i> +5 points from last period
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 3: First Call Resolution -->
+            <div class="indicator-card">
+                <div class="indicator-rank">3</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">First Call Resolution (FCR)</div>
+                        <div class="indicator-subtitle">Issue resolution efficiency</div>
+                    </div>
+                    <div class="indicator-status warning">
+                        <i class="fas fa-circle"></i> At Risk
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">78.2%</div>
+                        <div class="indicator-target">Target: <strong>85%</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill yellow" style="width: 78.2%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart3"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">12,847</div>
+                        <div class="detail-label">Total Calls</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">10,046</div>
+                        <div class="detail-label">Resolved First</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">2.1</div>
+                        <div class="detail-label">Avg Contacts</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend down">
+                        <i class="fas fa-arrow-down"></i> -1.8% from last period
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 4: Agent Utilization -->
+            <div class="indicator-card">
+                <div class="indicator-rank">4</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Agent Utilization Rate</div>
+                        <div class="indicator-subtitle">Workforce efficiency metric</div>
+                    </div>
+                    <div class="indicator-status healthy">
+                        <i class="fas fa-circle"></i> Healthy
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">84.7%</div>
+                        <div class="indicator-target">Target: <strong>80-85%</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill green" style="width: 84.7%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart4"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">245</div>
+                        <div class="detail-label">Active Agents</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">6.8h</div>
+                        <div class="detail-label">Avg Talk Time</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">1.2h</div>
+                        <div class="detail-label">Idle Time</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend up">
+                        <i class="fas fa-arrow-up"></i> +1.2% from last period
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 5: Average Handle Time -->
+            <div class="indicator-card">
+                <div class="indicator-rank">5</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Average Handle Time (AHT)</div>
+                        <div class="indicator-subtitle">Call duration efficiency</div>
+                    </div>
+                    <div class="indicator-status healthy">
+                        <i class="fas fa-circle"></i> Healthy
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">4:32</div>
+                        <div class="indicator-target">Target: <strong>&lt; 5:00</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill green" style="width: 90%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart5"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">2:45</div>
+                        <div class="detail-label">Talk Time</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">1:12</div>
+                        <div class="detail-label">Hold Time</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">0:35</div>
+                        <div class="detail-label">After Work</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend up">
+                        <i class="fas fa-arrow-up"></i> Improved by 12s
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 6: Service Level -->
+            <div class="indicator-card">
+                <div class="indicator-rank">6</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Service Level (SLA)</div>
+                        <div class="indicator-subtitle">Calls answered within target time</div>
+                    </div>
+                    <div class="indicator-status critical">
+                        <i class="fas fa-circle"></i> Critical
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">72.8%</div>
+                        <div class="indicator-target">Target: <strong>80%</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill red" style="width: 72.8%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart6"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">20s</div>
+                        <div class="detail-label">Target Time</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">28s</div>
+                        <div class="detail-label">Avg Answer</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">5.2%</div>
+                        <div class="detail-label">Abandon Rate</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend down">
+                        <i class="fas fa-arrow-down"></i> -4.2% from last period
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 7: Employee Engagement -->
+            <div class="indicator-card">
+                <div class="indicator-rank">7</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Employee Engagement Score</div>
+                        <div class="indicator-subtitle">Agent satisfaction & motivation</div>
+                    </div>
+                    <div class="indicator-status healthy">
+                        <i class="fas fa-circle"></i> Healthy
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">8.2/10</div>
+                        <div class="indicator-target">Target: <strong>8.0</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill purple" style="width: 82%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart7"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">94%</div>
+                        <div class="detail-label">Response Rate</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">12%</div>
+                        <div class="detail-label">Turnover</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">4.2%</div>
+                        <div class="detail-label">Absenteeism</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend up">
+                        <i class="fas fa-arrow-up"></i> +0.3 from last survey
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 8: Quality Assurance -->
+            <div class="indicator-card">
+                <div class="indicator-rank">8</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Quality Assurance Score</div>
+                        <div class="indicator-subtitle">Call quality & compliance</div>
+                    </div>
+                    <div class="indicator-status healthy">
+                        <i class="fas fa-circle"></i> Healthy
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">91.3%</div>
+                        <div class="indicator-target">Target: <strong>90%</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill green" style="width: 91.3%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart8"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">2,340</div>
+                        <div class="detail-label">Calls Evaluated</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">98%</div>
+                        <div class="detail-label">Compliance</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">87%</div>
+                        <div class="detail-label">Script Adherence</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend up">
+                        <i class="fas fa-arrow-up"></i> +1.1% from last period
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 9: Schedule Adherence -->
+            <div class="indicator-card">
+                <div class="indicator-rank">9</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Schedule Adherence</div>
+                        <div class="indicator-subtitle">Agent schedule compliance</div>
+                    </div>
+                    <div class="indicator-status warning">
+                        <i class="fas fa-circle"></i> At Risk
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">88.5%</div>
+                        <div class="indicator-target">Target: <strong>95%</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill yellow" style="width: 88.5%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart9"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">245</div>
+                        <div class="detail-label">Agents</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">217</div>
+                        <div class="detail-label">Compliant</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">28</div>
+                        <div class="detail-label">Non-Compliant</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend neutral">
+                        <i class="fas fa-minus"></i> No change from last period
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Indicator 10: Call Volume Forecast Accuracy -->
+            <div class="indicator-card">
+                <div class="indicator-rank">10</div>
+                <div class="indicator-header">
+                    <div class="indicator-info">
+                        <div class="indicator-title">Forecast Accuracy</div>
+                        <div class="indicator-subtitle">Volume prediction accuracy</div>
+                    </div>
+                    <div class="indicator-status healthy">
+                        <i class="fas fa-circle"></i> Healthy
+                    </div>
+                </div>
+                <div class="indicator-body">
+                    <div class="indicator-metric">
+                        <div class="indicator-value">94.2%</div>
+                        <div class="indicator-target">Target: <strong>92%</strong></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill green" style="width: 94.2%"></div>
+                        </div>
+                    </div>
+                    <div class="indicator-chart">
+                        <canvas id="chart10"></canvas>
+                    </div>
+                </div>
+                <div class="indicator-details">
+                    <div class="detail-item">
+                        <div class="detail-value">12,500</div>
+                        <div class="detail-label">Forecasted</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">12,847</div>
+                        <div class="detail-label">Actual</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-value">2.7%</div>
+                        <div class="detail-label">Variance</div>
+                    </div>
+                </div>
+                <div class="indicator-footer">
+                    <div class="indicator-trend up">
+                        <i class="fas fa-arrow-up"></i> +1.5% from last period
+                    </div>
+                    <a href="#" class="indicator-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trend Overview -->
+        <div class="trend-overview">
+            <div class="trend-header">
+                <div class="trend-title">
+                    <i class="fas fa-chart-area" style="color: var(--info); margin-right: 10px;"></i>
+                    Leading Indicators Trend (30 Days)
+                </div>
+                <div class="trend-legend">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: var(--success);"></div>
+                        CSAT
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: var(--info);"></div>
+                        NPS
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: var(--warning);"></div>
+                        FCR
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: var(--purple);"></div>
+                        SLA
+                    </div>
+                </div>
+            </div>
+            <div class="trend-chart-container">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit'
+            };
+            document.getElementById('currentTime').textContent = now.toLocaleDateString('en-US', options);
+        }
+        updateTime();
+        setInterval(updateTime, 60000);
+
+        // Chart.js defaults
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.responsive = true;
+        Chart.defaults.maintainAspectRatio = false;
+
+        // Sparkline chart configuration
+        function createSparkline(canvasId, data, color) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map((_, i) => i),
+                    datasets: [{
+                        data: data,
+                        borderColor: color,
+                        borderWidth: 2,
+                        fill: true,
+                        backgroundColor: color + '20',
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 4
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { display: false }
+                    }
+                }
+            });
+        }
+
+        // Create sparklines for each indicator
+        createSparkline('chart1', [88, 89, 90, 89.5, 91, 90.5, 92, 91.5, 92.4], '#10b981');
+        createSparkline('chart2', [58, 60, 62, 61, 64, 65, 66, 67, 68], '#3b82f6');
+        createSparkline('chart3', [82, 81, 80, 79.5, 79, 78.8, 78.5, 78.3, 78.2], '#f59e0b');
+        createSparkline('chart4', [80, 81, 82, 83, 83.5, 84, 84.2, 84.5, 84.7], '#10b981');
+        createSparkline('chart5', [5.2, 5.0, 4.9, 4.8, 4.7, 4.6, 4.5, 4.4, 4.5], '#10b981');
+        createSparkline('chart6', [80, 78, 77, 76, 75, 74, 73.5, 73, 72.8], '#ef4444');
+        createSparkline('chart7', [7.5, 7.6, 7.7, 7.8, 7.9, 8.0, 8.0, 8.1, 8.2], '#8b5cf6');
+        createSparkline('chart8', [88, 88.5, 89, 89.5, 90, 90.2, 90.5, 91, 91.3], '#10b981');
+        createSparkline('chart9', [90, 89.5, 89, 89, 88.8, 88.5, 88.5, 88.5, 88.5], '#f59e0b');
+        createSparkline('chart10', [90, 91, 91.5, 92, 92.5, 93, 93.5, 94, 94.2], '#10b981');
+
+        // Trend Chart
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 30}, (_, i) => `Day ${i + 1}`),
+                datasets: [
+                    {
+                        label: 'CSAT',
+                        data: [88, 88.5, 89, 88.8, 89.2, 89.5, 89.8, 90, 90.2, 90.5, 90.3, 90.8, 91, 90.8, 91.2, 91.5, 91.3, 91.8, 92, 91.5, 92.2, 92, 92.3, 92.1, 92.4, 92.2, 92.5, 92.3, 92.4, 92.4],
+                        borderColor: '#10b981',
+                        backgroundColor: '#10b98120',
+                        fill: false,
+                        tension: 0.4,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'NPS (Normalized)',
+                        data: [55, 56, 57, 58, 58, 59, 60, 60, 61, 62, 62, 63, 63, 64, 64, 65, 65, 66, 66, 66, 67, 67, 67, 68, 68, 68, 68, 68, 68, 68],
+                        borderColor: '#3b82f6',
+                        backgroundColor: '#3b82f620',
+                        fill: false,
+                        tension: 0.4,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'FCR',
+                        data: [82, 82, 81.5, 81.5, 81, 81, 80.5, 80.5, 80, 80, 79.8, 79.5, 79.5, 79.2, 79, 79, 78.8, 78.8, 78.5, 78.5, 78.5, 78.3, 78.3, 78.2, 78.2, 78.2, 78.2, 78.2, 78.2, 78.2],
+                        borderColor: '#f59e0b',
+                        backgroundColor: '#f59e0b20',
+                        fill: false,
+                        tension: 0.4,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'SLA',
+                        data: [80, 79, 79, 78, 78, 77.5, 77, 77, 76.5, 76, 76, 75.5, 75, 75, 74.5, 74, 74, 73.8, 73.5, 73.5, 73.2, 73, 73, 73, 72.8, 72.8, 72.8, 72.8, 72.8, 72.8],
+                        borderColor: '#8b5cf6',
+                        backgroundColor: '#8b5cf620',
+                        fill: false,
+                        tension: 0.4,
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'white',
+                        titleColor: '#1a202c',
+                        bodyColor: '#4a5568',
+                        borderColor: '#e2e8f0',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y.toFixed(1) + '%';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            maxTicksLimit: 10,
+                            color: '#a0aec0',
+                            font: { size: 11 }
+                        }
+                    },
+                    y: {
+                        min: 50,
+                        max: 100,
+                        grid: { color: '#f1f5f9' },
+                        ticks: {
+                            callback: value => value + '%',
+                            color: '#a0aec0',
+                            font: { size: 11 }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                }
+            }
+        });
+
+        // Refresh button functionality
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
+                // Add refresh animation to cards
+                document.querySelectorAll('.indicator-card').forEach(card => {
+                    card.style.animation = 'none';
+                    card.offsetHeight; // Trigger reflow
+                    card.style.animation = '';
+                });
+            }, 1500);
+        });
+
+        // Filter change handlers
+        document.getElementById('timePeriod').addEventListener('change', function() {
+            console.log('Time period changed to:', this.value);
+            // Add data refresh logic here
+        });
+
+        document.getElementById('region').addEventListener('change', function() {
+            console.log('Region changed to:', this.value);
+            // Add data refresh logic here
+        });
+    </script>
+</body>
+</html>
