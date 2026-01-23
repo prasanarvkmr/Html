@@ -1,0 +1,3156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Leading Indicators - Contact Center Operations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            /* Material Design Light Theme */
+            --bg: #f5f5f5;
+            --bg-secondary: #fafafa;
+            --card: #ffffff;
+            --card-hover: #f8f9fa;
+            --border: #e0e0e0;
+            --border-light: #eeeeee;
+            --text-primary: #212121;
+            --text-secondary: #616161;
+            --text-muted: #9e9e9e;
+            
+            /* Material Colors */
+            --success: #4caf50;
+            --success-light: #e8f5e9;
+            --warning: #ff9800;
+            --warning-light: #fff3e0;
+            --danger: #f44336;
+            --danger-light: #ffebee;
+            --info: #2196f3;
+            --info-light: #e3f2fd;
+            --purple: #9c27b0;
+            --purple-light: #f3e5f5;
+            --teal: #009688;
+            --teal-light: #e0f2f1;
+            --orange: #ff5722;
+            --orange-light: #fbe9e7;
+            --pink: #e91e63;
+            --pink-light: #fce4ec;
+            --cyan: #00bcd4;
+            --cyan-light: #e0f7fa;
+            --indigo: #3f51b5;
+            --indigo-light: #e8eaf6;
+            
+            /* Material Elevation Shadows */
+            --shadow-1: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-2: 0 3px 6px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-3: 0 10px 20px rgba(0,0,0,0.08), 0 3px 6px rgba(0,0,0,0.06);
+            --shadow-4: 0 15px 25px rgba(0,0,0,0.10), 0 5px 10px rgba(0,0,0,0.06);
+            
+            /* Legacy shadow mapping */
+            --shadow-sm: var(--shadow-1);
+            --shadow-md: var(--shadow-2);
+            --shadow-lg: var(--shadow-3);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ========== NAVBAR ========== */
+        .navbar {
+            background: var(--card);
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-2);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--info);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .nav-title span {
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .nav-center {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--bg);
+            padding: 4px;
+            border-radius: 10px;
+        }
+
+        .nav-tab {
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: var(--card);
+        }
+
+        .nav-tab.active {
+            color: white;
+            background: var(--info);
+            box-shadow: var(--shadow-1);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .enterprise-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: var(--purple-light);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--purple);
+        }
+
+        .enterprise-badge i {
+            font-size: 14px;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--success);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .nav-time {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ========== COMMAND CENTER HEADER ========== */
+        .command-header {
+            background: var(--card);
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        .header-title h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .header-title p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-ghost {
+            background: var(--bg);
+            color: var(--text-secondary);
+            box-shadow: var(--shadow-1);
+        }
+
+        .btn-ghost:hover {
+            background: var(--border);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-2);
+        }
+
+        .btn-primary {
+            background: var(--info);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #1976d2;
+            box-shadow: var(--shadow-2);
+        }
+
+        /* ========== ENTERPRISE METRICS BAR ========== */
+        .enterprise-metrics {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+        }
+
+        .metric-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 16px 20px;
+            border: none;
+            box-shadow: var(--shadow-1);
+            position: relative;
+            overflow: hidden;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .metric-card:hover {
+            box-shadow: var(--shadow-2);
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .metric-card.green::before { background: var(--success); }
+        .metric-card.yellow::before { background: var(--warning); }
+        .metric-card.red::before { background: var(--danger); }
+        .metric-card.blue::before { background: var(--info); }
+        .metric-card.purple::before { background: var(--purple); }
+        .metric-card.cyan::before { background: var(--cyan); }
+
+        .metric-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .metric-detail {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .metric-detail.up { color: var(--success); }
+        .metric-detail.down { color: var(--danger); }
+
+        /* ========== MAIN CONTENT ========== */
+        .main {
+            padding: 28px 32px;
+            max-width: 1900px;
+            margin: 0 auto;
+        }
+
+        /* ========== DOMAIN SECTION ========== */
+        .domain-section {
+            margin-bottom: 32px;
+        }
+
+        .domain-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .domain-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .domain-icon.platform { background: var(--info-light); color: var(--info); }
+        .domain-icon.network { background: var(--cyan-light); color: var(--cyan); }
+        .domain-icon.voice { background: var(--purple-light); color: var(--purple); }
+        .domain-icon.workforce { background: var(--success-light); color: var(--success); }
+        .domain-icon.desktop { background: var(--orange-light); color: var(--orange); }
+        .domain-icon.selfservice { background: var(--teal-light); color: var(--teal); }
+        .domain-icon.integration { background: var(--pink-light); color: var(--pink); }
+        .domain-icon.security { background: var(--danger-light); color: var(--danger); }
+        .domain-icon.cx { background: #fff8e1; color: #ff8f00; }
+        .domain-icon.efficiency { background: #e1f5fe; color: #0277bd; }
+        .domain-icon.agent { background: #f3e5f5; color: #7b1fa2; }
+        .domain-icon.financial { background: #e8f5e9; color: #2e7d32; }
+        .domain-icon.channel { background: #e0f2f1; color: #00695c; }
+        .domain-icon.compliance { background: #fce4ec; color: #c2185b; }
+
+        .domain-info {
+            flex: 1;
+        }
+
+        .domain-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .domain-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .domain-status {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pill.healthy { background: var(--success-light); color: var(--success); }
+        .status-pill.warning { background: var(--warning-light); color: var(--warning); }
+        .status-pill.critical { background: var(--danger-light); color: var(--danger); }
+
+        .status-pill i { font-size: 10px; }
+
+        /* ========== INDICATOR CARDS GRID ========== */
+        .indicators-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .indicator-card {
+            background: var(--card);
+            border-radius: 12px;
+            border: none;
+            box-shadow: var(--shadow-1);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .indicator-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-3);
+        }
+
+        .indicator-card.healthy { border-left: 4px solid var(--success); }
+        .indicator-card.warning { border-left: 4px solid var(--warning); }
+        .indicator-card.critical { border-left: 4px solid var(--danger); }
+
+        .indicator-header {
+            padding: 16px 18px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .indicator-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .indicator-sources {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .source-tag {
+            font-size: 9px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .source-tag.genesys { background: #ffebee; color: #c62828; }
+        .source-tag.nuance { background: #e3f2fd; color: #1565c0; }
+        .source-tag.thousandeyes { background: #e0f7fa; color: #00838f; }
+        .source-tag.nexthink { background: #e8eaf6; color: #3949ab; }
+        .source-tag.solarwinds { background: #fff3e0; color: #e65100; }
+        .source-tag.citrix { background: #e3f2fd; color: #1565c0; }
+        .source-tag.wfm { background: #e8f5e9; color: #2e7d32; }
+        .source-tag.inhouse { background: #eceff1; color: #546e7a; }
+        .source-tag.servicenow { background: #f3e5f5; color: #7b1fa2; }
+        .source-tag.splunk { background: #e8f5e9; color: #388e3c; }
+        .source-tag.crm { background: #e3f2fd; color: #1565c0; }
+        .source-tag.speech { background: #fff3e0; color: #ef6c00; }
+        .source-tag.qa { background: #f3e5f5; color: #8e24aa; }
+        .source-tag.finance { background: #e8f5e9; color: #43a047; }
+        .source-tag.privacy { background: #fce4ec; color: #d81b60; }
+        .source-tag.dialer { background: #e0f7fa; color: #00838f; }
+        .source-tag.lms { background: #fff8e1; color: #ffa000; }
+        .source-tag.hris { background: #e8eaf6; color: #5c6bc0; }
+        .source-tag.survey { background: #f1f8e9; color: #7cb342; }
+        .source-tag.digital { background: #e0f2f1; color: #00897b; }
+
+        .indicator-status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .indicator-status-badge.healthy { background: var(--success-light); color: var(--success); }
+        .indicator-status-badge.warning { background: var(--warning-light); color: var(--warning); }
+        .indicator-status-badge.critical { background: var(--danger-light); color: var(--danger); }
+
+        .indicator-body {
+            padding: 0 18px 16px;
+            display: flex;
+            align-items: flex-end;
+            gap: 16px;
+        }
+
+        .indicator-value-section {
+            flex: 1;
+        }
+
+        .indicator-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .indicator-target {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .indicator-target strong {
+            color: var(--text-secondary);
+        }
+
+        .indicator-sparkline {
+            width: 100px;
+            height: 40px;
+        }
+
+        .indicator-footer {
+            padding: 10px 18px;
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border);
+        }
+
+        .indicator-trend {
+            font-size: 11px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .indicator-trend.up { color: var(--success); }
+        .indicator-trend.down { color: var(--danger); }
+        .indicator-trend.neutral { color: var(--text-muted); }
+
+        .indicator-impact {
+            font-size: 10px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .indicator-impact .impact-high { color: var(--danger); }
+        .indicator-impact .impact-medium { color: var(--warning); }
+        .indicator-impact .impact-low { color: var(--success); }
+
+        /* ========== REGIONAL BREAKDOWN ========== */
+        .regional-section {
+            background: var(--card);
+            border-radius: 12px;
+            border: none;
+            box-shadow: var(--shadow-1);
+            padding: 24px;
+            margin-top: 28px;
+        }
+
+        .regional-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .regional-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .regional-title i {
+            color: var(--info);
+        }
+
+        .regional-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+        }
+
+        .region-card {
+            background: var(--bg);
+            border-radius: 10px;
+            padding: 16px;
+            border: none;
+            text-align: center;
+            box-shadow: var(--shadow-1);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .region-card:hover {
+            box-shadow: var(--shadow-2);
+        }
+
+        .region-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .region-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .region-stat {
+            padding: 8px;
+            background: var(--card);
+            border-radius: 8px;
+        }
+
+        .region-stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .region-stat-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .region-status-bar {
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .region-status-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+
+        .region-status-fill.green { background: var(--success); }
+        .region-status-fill.yellow { background: var(--warning); }
+        .region-status-fill.red { background: var(--danger); }
+
+        /* ========== DOCUMENTATION MODAL ========== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--card);
+            border-radius: 16px;
+            width: 95%;
+            max-width: 1100px;
+            max-height: 90vh;
+            overflow: hidden;
+            border: none;
+            box-shadow: var(--shadow-4);
+        }
+
+        .modal-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg);
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-header h2 i {
+            color: var(--info);
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            background: var(--bg);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .modal-body {
+            padding: 28px;
+            overflow-y: auto;
+            max-height: calc(90vh - 80px);
+        }
+
+        .doc-section {
+            margin-bottom: 32px;
+        }
+
+        .doc-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .doc-section h3 i {
+            color: var(--info);
+        }
+
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .doc-table th,
+        .doc-table td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .doc-table th {
+            background: var(--bg);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .doc-table td {
+            color: var(--text-secondary);
+        }
+
+        .doc-table code {
+            background: var(--bg);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Menlo', monospace;
+            font-size: 10px;
+            color: var(--info);
+        }
+
+        .doc-table .domain-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .doc-table .domain-badge.platform { background: var(--info-light); color: var(--info); }
+        .doc-table .domain-badge.network { background: var(--cyan-light); color: var(--cyan); }
+        .doc-table .domain-badge.voice { background: var(--purple-light); color: var(--purple); }
+        .doc-table .domain-badge.workforce { background: var(--success-light); color: var(--success); }
+        .doc-table .domain-badge.desktop { background: var(--orange-light); color: var(--orange); }
+        .doc-table .domain-badge.selfservice { background: var(--teal-light); color: var(--teal); }
+        .doc-table .domain-badge.integration { background: var(--pink-light); color: var(--pink); }
+        .doc-table .domain-badge.security { background: var(--danger-light); color: var(--danger); }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1600px) {
+            .indicators-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .regional-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .indicators-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .enterprise-metrics {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .indicators-grid {
+                grid-template-columns: 1fr;
+            }
+            .enterprise-metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .regional-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* ========== ANIMATIONS ========== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .indicator-card {
+            animation: fadeInUp 0.4s ease forwards;
+            opacity: 0;
+        }
+
+        .domain-section:nth-child(1) .indicator-card { animation-delay: 0.1s; }
+        .domain-section:nth-child(2) .indicator-card { animation-delay: 0.15s; }
+        .domain-section:nth-child(3) .indicator-card { animation-delay: 0.2s; }
+        .domain-section:nth-child(4) .indicator-card { animation-delay: 0.25s; }
+        .domain-section:nth-child(5) .indicator-card { animation-delay: 0.3s; }
+        .domain-section:nth-child(6) .indicator-card { animation-delay: 0.35s; }
+        .domain-section:nth-child(7) .indicator-card { animation-delay: 0.4s; }
+        .domain-section:nth-child(8) .indicator-card { animation-delay: 0.45s; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <div class="nav-logo"><i class="fas fa-satellite-dish"></i></div>
+            <div class="nav-title">Operations Command Center <span>| Enterprise View</span></div>
+        </div>
+
+        <div class="nav-center">
+            <a href="#" class="nav-tab active">Leading Indicators</a>
+            <a href="../executive/executive-summary-dashboard.html" class="nav-tab">Executive Summary</a>
+            <a href="../analytics/vendor-analytics-dashboard.html" class="nav-tab">Vendor Analytics</a>
+            <a href="../operations/operations-metrics-dashboard.html" class="nav-tab">Operations</a>
+        </div>
+
+        <div class="nav-right">
+            <div class="enterprise-badge">
+                <i class="fas fa-building"></i>
+                56 KPIs | 14 Domains | 50K Agents
+            </div>
+            <div class="live-indicator">
+                <div class="live-dot"></div>
+                LIVE
+            </div>
+            <div class="nav-time">
+                <i class="far fa-clock"></i>
+                <span id="currentTime">Loading...</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Command Center Header -->
+    <div class="command-header">
+        <div class="header-top">
+            <div class="header-title">
+                <h1>Enterprise Leading Indicators</h1>
+                <p>56 real-time KPIs across 14 domains — Platform, CX, Finance, Compliance & more</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-ghost" onclick="openDocumentation()">
+                    <i class="fas fa-book"></i> Documentation
+                </button>
+                <button class="btn btn-ghost">
+                    <i class="fas fa-sliders-h"></i> Configure Thresholds
+                </button>
+                <button class="btn btn-primary" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Enterprise Metrics Bar - Row 1 -->
+        <div class="enterprise-metrics">
+            <div class="metric-card green">
+                <div class="metric-label">Enterprise Health</div>
+                <div class="metric-value">94.2%</div>
+                <div class="metric-detail up"><i class="fas fa-check-circle"></i> 48/56 indicators healthy</div>
+            </div>
+            <div class="metric-card blue">
+                <div class="metric-label">Agents Online</div>
+                <div class="metric-value">47,832</div>
+                <div class="metric-detail up"><i class="fas fa-users"></i> 95.7% of 50K scheduled</div>
+            </div>
+            <div class="metric-card green">
+                <div class="metric-label">Platform Uptime</div>
+                <div class="metric-value">99.97%</div>
+                <div class="metric-detail up"><i class="fas fa-server"></i> All regions online</div>
+            </div>
+            <div class="metric-card yellow">
+                <div class="metric-label">Active Incidents</div>
+                <div class="metric-value">7</div>
+                <div class="metric-detail"><i class="fas fa-exclamation-triangle"></i> 3 P1 | 4 P2</div>
+            </div>
+            <div class="metric-card green">
+                <div class="metric-label">Service Level</div>
+                <div class="metric-value">81.2%</div>
+                <div class="metric-detail down"><i class="fas fa-phone-alt"></i> Target: 85%</div>
+            </div>
+            <div class="metric-card cyan">
+                <div class="metric-label">Calls in Queue</div>
+                <div class="metric-value">2,847</div>
+                <div class="metric-detail"><i class="fas fa-clock"></i> Avg Wait: 2:34</div>
+            </div>
+        </div>
+
+        <!-- Enterprise Metrics Bar - Row 2 -->
+        <div class="enterprise-metrics" style="margin-top: 12px;">
+            <div class="metric-card green">
+                <div class="metric-label">FCR Predictor</div>
+                <div class="metric-value">87.2%</div>
+                <div class="metric-detail up"><i class="fas fa-bullseye"></i> +2.1% vs baseline</div>
+            </div>
+            <div class="metric-card yellow">
+                <div class="metric-label">Customer Effort</div>
+                <div class="metric-value">72</div>
+                <div class="metric-detail"><i class="fas fa-hand-paper"></i> Medium (target ≥75)</div>
+            </div>
+            <div class="metric-card green">
+                <div class="metric-label">NPS Predictor</div>
+                <div class="metric-value">68</div>
+                <div class="metric-detail up"><i class="fas fa-smile"></i> Passive zone</div>
+            </div>
+            <div class="metric-card green">
+                <div class="metric-label">Cost Per Contact</div>
+                <div class="metric-value">$8.41</div>
+                <div class="metric-detail up"><i class="fas fa-dollar-sign"></i> -$0.34 vs target</div>
+            </div>
+            <div class="metric-card yellow">
+                <div class="metric-label">Avoidable Contacts</div>
+                <div class="metric-value">21.5%</div>
+                <div class="metric-detail down"><i class="fas fa-redo"></i> $87.5K/day waste</div>
+            </div>
+            <div class="metric-card green">
+                <div class="metric-label">Compliance</div>
+                <div class="metric-value">99.2%</div>
+                <div class="metric-detail up"><i class="fas fa-shield-alt"></i> PCI/TCPA passing</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main">
+
+        <!-- DOMAIN 1: Platform & Infrastructure Availability -->
+        <div class="domain-section">
+            <div class="domain-header">
+                <div class="domain-icon platform"><i class="fas fa-server"></i></div>
+                <div class="domain-info">
+                    <div class="domain-title">Platform & Infrastructure Availability</div>
+                    <div class="domain-subtitle">Core system health, uptime, and disaster recovery readiness across all data centers</div>
+                </div>
+                <div class="domain-status">
+                    <div class="status-pill healthy"><i class="fas fa-circle"></i> 3 Healthy</div>
+                    <div class="status-pill warning"><i class="fas fa-circle"></i> 1 At Risk</div>
+                </div>
+            </div>
+            <div class="indicators-grid">
+                <!-- P1: Genesys Cloud Global Availability -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Genesys Cloud Global Availability</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag genesys">Genesys</span>
+                                <span class="source-tag solarwinds">SolarWinds</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">99.97%</div>
+                            <div class="indicator-target">Target: <strong>99.9%</strong> | All Regions</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkP1"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-up"></i> +0.02% MTD</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+
+                <!-- P2: DR Readiness Score -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Disaster Recovery Readiness</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag solarwinds">SolarWinds</span>
+                                <span class="source-tag inhouse">DR Monitor</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">98.5%</div>
+                            <div class="indicator-target">Target: <strong>95%</strong> | RTO: 4hr</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkP2"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-check"></i> Last test: 48h ago</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+
+                <!-- P3: Core Infrastructure Health -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Core Infrastructure Headroom</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag solarwinds">SolarWinds</span>
+                                <span class="source-tag splunk">Splunk</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">32%</div>
+                            <div class="indicator-target">Target: <strong>≥20%</strong> headroom</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkP3"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-up"></i> +5% from peak</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+
+                <!-- P4: Active P1/P2 Incidents -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Active P1/P2 Incidents</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag servicenow">ServiceNow</span>
+                                <span class="source-tag splunk">Splunk</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">7</div>
+                            <div class="indicator-target">Target: <strong>≤3</strong> | MTTR: 42min</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkP4"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-up"></i> +4 vs normal</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMAIN 2: Network & Connectivity -->
+        <div class="domain-section">
+            <div class="domain-header">
+                <div class="domain-icon network"><i class="fas fa-network-wired"></i></div>
+                <div class="domain-info">
+                    <div class="domain-title">Network & Connectivity</div>
+                    <div class="domain-subtitle">WAN performance, site connectivity, and bandwidth utilization across 12 global regions</div>
+                </div>
+                <div class="domain-status">
+                    <div class="status-pill healthy"><i class="fas fa-circle"></i> 2 Healthy</div>
+                    <div class="status-pill warning"><i class="fas fa-circle"></i> 2 At Risk</div>
+                </div>
+            </div>
+            <div class="indicators-grid">
+                <!-- N1: Global Network Latency -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Global Avg Network Latency</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag thousandeyes">ThousandEyes</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">138ms</div>
+                            <div class="indicator-target">Target: <strong>&lt;120ms</strong> | P95: 187ms</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkN1"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-up"></i> +18ms vs baseline</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+
+                <!-- N2: Site Connectivity -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Site Connectivity (All Regions)</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag thousandeyes">ThousandEyes</span>
+                                <span class="source-tag solarwinds">SolarWinds</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">98/100</div>
+                            <div class="indicator-target">Target: <strong>100%</strong> | 2 degraded</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkN2"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend neutral"><i class="fas fa-minus"></i> 2 sites degraded</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+
+                <!-- N3: WAN Bandwidth Utilization -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">WAN Bandwidth Utilization</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag solarwinds">SolarWinds</span>
+                                <span class="source-tag thousandeyes">ThousandEyes</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">78%</div>
+                            <div class="indicator-target">Target: <strong>&lt;70%</strong> avg</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkN3"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-up"></i> Peak: 92%</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> High Impact</div>
+                    </div>
+                </div>
+
+                <!-- N4: Packet Loss Rate -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Global Packet Loss Rate</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag thousandeyes">ThousandEyes</span>
+                                <span class="source-tag genesys">Genesys</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">0.12%</div>
+                            <div class="indicator-target">Target: <strong>&lt;0.5%</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkN4"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-down"></i> -0.08% vs yesterday</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMAIN 3: Voice Quality & Telephony -->
+        <div class="domain-section">
+            <div class="domain-header">
+                <div class="domain-icon voice"><i class="fas fa-phone-volume"></i></div>
+                <div class="domain-info">
+                    <div class="domain-title">Voice Quality & Telephony</div>
+                    <div class="domain-subtitle">Call quality metrics, MOS scores, and telephony infrastructure health</div>
+                </div>
+                <div class="domain-status">
+                    <div class="status-pill healthy"><i class="fas fa-circle"></i> 3 Healthy</div>
+                    <div class="status-pill critical"><i class="fas fa-circle"></i> 1 Critical</div>
+                </div>
+            </div>
+            <div class="indicators-grid">
+                <!-- V1: Global MOS Score -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Global Voice Quality (MOS)</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag genesys">Genesys</span>
+                                <span class="source-tag thousandeyes">ThousandEyes</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">4.21</div>
+                            <div class="indicator-target">Target: <strong>≥4.0</strong> | P10: 3.8</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkV1"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-up"></i> +0.05 vs last week</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+
+                <!-- V2: Poor Call Rate -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Poor Call Rate (MOS &lt;3.5)</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag genesys">Genesys</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">1.8%</div>
+                            <div class="indicator-target">Target: <strong>&lt;3%</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkV2"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-down"></i> -0.4% vs yesterday</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> High Impact</div>
+                    </div>
+                </div>
+
+                <!-- V3: SIP Trunk Utilization -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">SIP Trunk Capacity Utilization</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag genesys">Genesys</span>
+                                <span class="source-tag solarwinds">SolarWinds</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">62%</div>
+                            <div class="indicator-target">Target: <strong>&lt;80%</strong> | Peak: 74%</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkV3"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-down"></i> 38% headroom</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+
+                <!-- V4: Avg Queue Wait Time -->
+                <div class="indicator-card critical">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Enterprise Avg Queue Wait Time</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag genesys">Genesys</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge critical">Critical</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">2:34</div>
+                            <div class="indicator-target">Target: <strong>&lt;1:30</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkV4"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-up"></i> +64s vs target</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMAIN 4: Workforce & Capacity Management -->
+        <div class="domain-section">
+            <div class="domain-header">
+                <div class="domain-icon workforce"><i class="fas fa-users"></i></div>
+                <div class="domain-info">
+                    <div class="domain-title">Workforce & Capacity Management</div>
+                    <div class="domain-subtitle">Staffing levels, schedule adherence, and workforce optimization across 50,000 agents</div>
+                </div>
+                <div class="domain-status">
+                    <div class="status-pill healthy"><i class="fas fa-circle"></i> 1 Healthy</div>
+                    <div class="status-pill warning"><i class="fas fa-circle"></i> 2 At Risk</div>
+                    <div class="status-pill critical"><i class="fas fa-circle"></i> 1 Critical</div>
+                </div>
+            </div>
+            <div class="indicators-grid">
+                <!-- W1: Global Staffing Gap -->
+                <div class="indicator-card critical">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Global Staffing Gap (FTE)</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag wfm">WFM</span>
+                                <span class="source-tag genesys">Genesys</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge critical">Critical</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">-847</div>
+                            <div class="indicator-target">Target: <strong>±200</strong> FTE</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkW1"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-down"></i> 1.7% understaffed</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+
+                <!-- W2: Schedule Adherence -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Global Schedule Adherence</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag wfm">WFM</span>
+                                <span class="source-tag genesys">Genesys</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">87.4%</div>
+                            <div class="indicator-target">Target: <strong>≥92%</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkW2"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-down"></i> -4.6% vs target</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+
+                <!-- W3: Agent Occupancy -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Global Agent Occupancy</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag genesys">Genesys</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">79%</div>
+                            <div class="indicator-target">Target: <strong>75-85%</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkW3"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-check"></i> Within optimal range</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> High Impact</div>
+                    </div>
+                </div>
+
+                <!-- W4: Unplanned Shrinkage -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Unplanned Shrinkage Rate</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag wfm">WFM</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">8.2%</div>
+                            <div class="indicator-target">Target: <strong>&lt;6%</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkW4"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-up"></i> +2.2% above target</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> High Impact</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMAIN 5: Agent Desktop & Virtual Environment -->
+        <div class="domain-section">
+            <div class="domain-header">
+                <div class="domain-icon desktop"><i class="fas fa-desktop"></i></div>
+                <div class="domain-info">
+                    <div class="domain-title">Agent Desktop & Virtual Environment</div>
+                    <div class="domain-subtitle">Citrix VDI performance, endpoint health, and agent tool availability</div>
+                </div>
+                <div class="domain-status">
+                    <div class="status-pill healthy"><i class="fas fa-circle"></i> 3 Healthy</div>
+                    <div class="status-pill warning"><i class="fas fa-circle"></i> 1 At Risk</div>
+                </div>
+            </div>
+            <div class="indicators-grid">
+                <!-- D1: Citrix Session Success Rate -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Citrix Session Success Rate</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag citrix">Citrix</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">98.9%</div>
+                            <div class="indicator-target">Target: <strong>≥98%</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkD1"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-up"></i> +0.3% vs yesterday</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+
+                <!-- D2: Citrix ICA RTT -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Citrix ICA Latency (Global Avg)</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag citrix">Citrix</span>
+                                <span class="source-tag nexthink">Nexthink</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">72ms</div>
+                            <div class="indicator-target">Target: <strong>&lt;60ms</strong> | P95: 124ms</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkD2"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-up"></i> +12ms vs baseline</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> High Impact</div>
+                    </div>
+                </div>
+
+                <!-- D3: Agent DEX Score -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Agent Digital Experience Score</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag nexthink">Nexthink</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">8.2/10</div>
+                            <div class="indicator-target">Target: <strong>≥8.0</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkD3"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-up"></i> +0.2 vs last month</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> High Impact</div>
+                    </div>
+                </div>
+
+                <!-- D4: VDA Resource Health -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">VDA Resource Health (All Farms)</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag citrix">Citrix</span>
+                                <span class="source-tag solarwinds">SolarWinds</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">91%</div>
+                            <div class="indicator-target">Target: <strong>≥85%</strong> | VDAs: 842/850</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkD4"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-up"></i> +3% vs yesterday</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMAIN 6: IVR & Self-Service -->
+        <div class="domain-section">
+            <div class="domain-header">
+                <div class="domain-icon selfservice"><i class="fas fa-robot"></i></div>
+                <div class="domain-info">
+                    <div class="domain-title">IVR & Self-Service Automation</div>
+                    <div class="domain-subtitle">Speech recognition, containment rates, and automation effectiveness</div>
+                </div>
+                <div class="domain-status">
+                    <div class="status-pill healthy"><i class="fas fa-circle"></i> 3 Healthy</div>
+                    <div class="status-pill warning"><i class="fas fa-circle"></i> 1 At Risk</div>
+                </div>
+            </div>
+            <div class="indicators-grid">
+                <!-- S1: IVR Containment Rate -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">IVR Containment Rate</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag nuance">Nuance</span>
+                                <span class="source-tag genesys">Genesys</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">62%</div>
+                            <div class="indicator-target">Target: <strong>≥68%</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkS1"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-down"></i> -6% vs target</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+
+                <!-- S2: ASR Accuracy -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Speech Recognition Accuracy</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag nuance">Nuance</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">94.7%</div>
+                            <div class="indicator-target">Target: <strong>≥92%</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkS2"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-up"></i> +0.8% vs last week</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> High Impact</div>
+                    </div>
+                </div>
+
+                <!-- S3: Chatbot Resolution Rate -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Chatbot Resolution Rate</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag genesys">Genesys</span>
+                                <span class="source-tag inhouse">Bot Platform</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">71%</div>
+                            <div class="indicator-target">Target: <strong>≥65%</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkS3"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-up"></i> +4% vs last month</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> High Impact</div>
+                    </div>
+                </div>
+
+                <!-- S4: Self-Service Deflection -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Self-Service Deflection Rate</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag genesys">Genesys</span>
+                                <span class="source-tag nuance">Nuance</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">38%</div>
+                            <div class="indicator-target">Target: <strong>≥35%</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkS4"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-up"></i> +3% YoY</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMAIN 7: Integration & Data Flow -->
+        <div class="domain-section">
+            <div class="domain-header">
+                <div class="domain-icon integration"><i class="fas fa-plug"></i></div>
+                <div class="domain-info">
+                    <div class="domain-title">Integration & Data Flow</div>
+                    <div class="domain-subtitle">CTI, CRM, middleware, and API health across enterprise systems</div>
+                </div>
+                <div class="domain-status">
+                    <div class="status-pill healthy"><i class="fas fa-circle"></i> 2 Healthy</div>
+                    <div class="status-pill warning"><i class="fas fa-circle"></i> 2 At Risk</div>
+                </div>
+            </div>
+            <div class="indicators-grid">
+                <!-- I1: CTI Screen Pop Success -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">CTI Screen Pop Success Rate</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag inhouse">CTI Middleware</span>
+                                <span class="source-tag genesys">Genesys</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">96.4%</div>
+                            <div class="indicator-target">Target: <strong>≥99%</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkI1"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-down"></i> -2.6% vs target</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> High Impact</div>
+                    </div>
+                </div>
+
+                <!-- I2: CRM Response Time -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">CRM Avg Response Time</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag inhouse">CRM</span>
+                                <span class="source-tag nexthink">Nexthink</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">1.9s</div>
+                            <div class="indicator-target">Target: <strong>&lt;3s</strong> | P95: 2.8s</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkI2"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-down"></i> -0.3s vs last week</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> High Impact</div>
+                    </div>
+                </div>
+
+                <!-- I3: Real-time Data Freshness -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Real-time Data Freshness</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag inhouse">Data Platform</span>
+                                <span class="source-tag genesys">Genesys</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">7s</div>
+                            <div class="indicator-target">Target: <strong>&lt;15s</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkI3"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-down"></i> -2s vs yesterday</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> High Impact</div>
+                    </div>
+                </div>
+
+                <!-- I4: API Error Rate -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">API Gateway Error Rate</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag splunk">Splunk</span>
+                                <span class="source-tag inhouse">API Gateway</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">0.8%</div>
+                            <div class="indicator-target">Target: <strong>&lt;0.5%</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkI4"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-up"></i> +0.3% vs baseline</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> High Impact</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMAIN 8: Security & Access Management -->
+        <div class="domain-section">
+            <div class="domain-header">
+                <div class="domain-icon security"><i class="fas fa-shield-alt"></i></div>
+                <div class="domain-info">
+                    <div class="domain-title">Security & Access Management</div>
+                    <div class="domain-subtitle">Authentication success, session health, and security compliance</div>
+                </div>
+                <div class="domain-status">
+                    <div class="status-pill healthy"><i class="fas fa-circle"></i> 3 Healthy</div>
+                    <div class="status-pill warning"><i class="fas fa-circle"></i> 1 At Risk</div>
+                </div>
+            </div>
+            <div class="indicators-grid">
+                <!-- A1: SSO Authentication Success -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">SSO Authentication Success</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag inhouse">IdP/SSO</span>
+                                <span class="source-tag splunk">Splunk</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">97.8%</div>
+                            <div class="indicator-target">Target: <strong>≥99.5%</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkA1"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-down"></i> -1.7% vs target</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+
+                <!-- A2: MFA Compliance -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">MFA Compliance Rate</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag inhouse">IdP/SSO</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">99.9%</div>
+                            <div class="indicator-target">Target: <strong>100%</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkA2"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-check"></i> Compliant</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+
+                <!-- A3: Session Timeout Events -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Abnormal Session Terminations</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag genesys">Genesys</span>
+                                <span class="source-tag citrix">Citrix</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">0.4%</div>
+                            <div class="indicator-target">Target: <strong>&lt;1%</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkA3"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-down"></i> -0.2% vs yesterday</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> High Impact</div>
+                    </div>
+                </div>
+
+                <!-- A4: Security Incident Count -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Security Incidents (24h)</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag splunk">Splunk SIEM</span>
+                                <span class="source-tag servicenow">ServiceNow</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">0</div>
+                            <div class="indicator-target">Target: <strong>0</strong> P1/P2</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkA4"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-check"></i> No incidents</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Business Critical</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMAIN 9: Customer Experience Predictors -->
+        <div class="domain-section">
+            <div class="domain-header">
+                <div class="domain-icon cx"><i class="fas fa-heart"></i></div>
+                <div class="domain-info">
+                    <div class="domain-title">Customer Experience Predictors</div>
+                    <div class="domain-subtitle">Real-time CX prediction before surveys - FCR, effort, NPS, and repeat contact indicators</div>
+                </div>
+                <div class="domain-status">
+                    <div class="status-pill healthy"><i class="fas fa-circle"></i> 2 Healthy</div>
+                    <div class="status-pill warning"><i class="fas fa-circle"></i> 2 At Risk</div>
+                </div>
+            </div>
+            <div class="indicators-grid">
+                <!-- CX1: First Contact Resolution Predictor -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">First Contact Resolution Predictor</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag genesys">Genesys</span>
+                                <span class="source-tag speech">Speech Analytics</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">87.2%</div>
+                            <div class="indicator-target">Target: <strong>≥85%</strong> | Saves $276K/1% ↑</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkCX1"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-up"></i> +2.1% vs baseline</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Revenue Impact</div>
+                    </div>
+                </div>
+
+                <!-- CX2: Customer Effort Score Predictor -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Customer Effort Score Predictor</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag crm">CRM</span>
+                                <span class="source-tag genesys">Genesys</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">72</div>
+                            <div class="indicator-target">Target: <strong>≥75</strong> | <60 = Intervention</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkCX2"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-down"></i> -3 vs target</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Retention Risk</div>
+                    </div>
+                </div>
+
+                <!-- CX3: NPS Predictor -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Net Promoter Score Predictor</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag speech">Speech Analytics</span>
+                                <span class="source-tag crm">CRM</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">68</div>
+                            <div class="indicator-target">Target: <strong>≥65</strong> | Passive zone</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkCX3"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-up"></i> +4 vs last week</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Growth Impact</div>
+                    </div>
+                </div>
+
+                <!-- CX4: Repeat Contact Rate -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Repeat Contact Rate (7-day)</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag crm">CRM</span>
+                                <span class="source-tag genesys">Genesys</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">24.8%</div>
+                            <div class="indicator-target">Target: <strong><20%</strong> | Billing: 31%</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkCX4"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-up"></i> +4.8% above target</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Cost Driver</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMAIN 10: Operational Efficiency -->
+        <div class="domain-section">
+            <div class="domain-header">
+                <div class="domain-icon efficiency"><i class="fas fa-tachometer-alt"></i></div>
+                <div class="domain-info">
+                    <div class="domain-title">Operational Efficiency</div>
+                    <div class="domain-subtitle">Resource utilization, shrinkage variance, AHT trends, and schedule optimization</div>
+                </div>
+                <div class="domain-status">
+                    <div class="status-pill healthy"><i class="fas fa-circle"></i> 2 Healthy</div>
+                    <div class="status-pill warning"><i class="fas fa-circle"></i> 1 At Risk</div>
+                    <div class="status-pill critical"><i class="fas fa-circle"></i> 1 Critical</div>
+                </div>
+            </div>
+            <div class="indicators-grid">
+                <!-- EF1: Shrinkage Variance -->
+                <div class="indicator-card critical">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Shrinkage Real-Time Variance</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag wfm">WFM</span>
+                                <span class="source-tag genesys">Genesys</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge critical">Critical</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">+5.2%</div>
+                            <div class="indicator-target">Target: <strong>±2%</strong> | 514 FTE impact</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkEF1"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-exclamation-triangle"></i> Over shrinkage</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Capacity Loss</div>
+                    </div>
+                </div>
+
+                <!-- EF2: AHT Trend Deviation -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">AHT Trend Deviation</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag genesys">Genesys</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">+7.8%</div>
+                            <div class="indicator-target">Target: <strong>±5%</strong> | Talk +12%</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkEF2"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-up"></i> Above baseline</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> Capacity Impact</div>
+                    </div>
+                </div>
+
+                <!-- EF3: Occupancy Rate Balance -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Occupancy Rate Balance</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag genesys">Genesys</span>
+                                <span class="source-tag wfm">WFM</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">82%</div>
+                            <div class="indicator-target">Target: <strong>80-85%</strong> | Optimal</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkEF3"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-check"></i> Balanced</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> Burnout Risk</div>
+                    </div>
+                </div>
+
+                <!-- EF4: Schedule Efficiency Index -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Schedule Efficiency Index</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag wfm">WFM</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">96.2%</div>
+                            <div class="indicator-target">Target: <strong>≥95%</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkEF4"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-up"></i> +1.2% vs target</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> Labor Cost</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMAIN 11: Agent Performance Predictors -->
+        <div class="domain-section">
+            <div class="domain-header">
+                <div class="domain-icon agent"><i class="fas fa-user-chart"></i></div>
+                <div class="domain-info">
+                    <div class="domain-title">Agent Performance Predictors</div>
+                    <div class="domain-subtitle">Real-time QA prediction, attrition risk, readiness index, and coaching opportunities</div>
+                </div>
+                <div class="domain-status">
+                    <div class="status-pill healthy"><i class="fas fa-circle"></i> 2 Healthy</div>
+                    <div class="status-pill warning"><i class="fas fa-circle"></i> 2 At Risk</div>
+                </div>
+            </div>
+            <div class="indicators-grid">
+                <!-- AP1: Quality Score Predictor -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Quality Score Predictor (QA-P)</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag speech">Speech Analytics</span>
+                                <span class="source-tag qa">QA System</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">86.4</div>
+                            <div class="indicator-target">Target: <strong>≥85</strong> | Meets expectations</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkAP1"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-up"></i> +1.8 vs last week</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> Quality Driver</div>
+                    </div>
+                </div>
+
+                <!-- AP2: Agent Attrition Risk -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Agent Attrition Risk Score</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag hris">HRIS</span>
+                                <span class="source-tag wfm">WFM</span>
+                                <span class="source-tag survey">Surveys</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">2,847</div>
+                            <div class="indicator-target">Agents at risk | <strong>5.7%</strong> of workforce</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkAP2"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-up"></i> +342 vs last month</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> $28.5M at risk</div>
+                    </div>
+                </div>
+
+                <!-- AP3: Agent Readiness Index -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Agent Readiness Index</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag lms">LMS</span>
+                                <span class="source-tag nexthink">Nexthink</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">91.2%</div>
+                            <div class="indicator-target">Target: <strong>≥90%</strong> | Fully ready</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkAP3"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-check"></i> Skills + Tools ready</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> Efficiency</div>
+                    </div>
+                </div>
+
+                <!-- AP4: Coaching Opportunity Score -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Coaching Opportunity Score</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag qa">QA System</span>
+                                <span class="source-tag lms">LMS</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">4,218</div>
+                            <div class="indicator-target">High priority agents | <strong>8.4%</strong> need coaching</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkAP4"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend neutral"><i class="fas fa-graduation-cap"></i> Schedule coaching</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> Performance</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMAIN 12: Financial Impact -->
+        <div class="domain-section">
+            <div class="domain-header">
+                <div class="domain-icon financial"><i class="fas fa-dollar-sign"></i></div>
+                <div class="domain-info">
+                    <div class="domain-title">Financial Impact Indicators</div>
+                    <div class="domain-subtitle">Cost per contact, revenue protection, labor efficiency, and avoidable contact costs</div>
+                </div>
+                <div class="domain-status">
+                    <div class="status-pill healthy"><i class="fas fa-circle"></i> 3 Healthy</div>
+                    <div class="status-pill warning"><i class="fas fa-circle"></i> 1 At Risk</div>
+                </div>
+            </div>
+            <div class="indicators-grid">
+                <!-- FI1: Cost Per Contact -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Cost Per Contact (Real-Time)</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag finance">Finance</span>
+                                <span class="source-tag wfm">WFM</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">$8.41</div>
+                            <div class="indicator-target">Target: <strong>≤$8.75</strong> | -4% vs target</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkFI1"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-down"></i> -$0.34 vs baseline</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Cost Savings</div>
+                    </div>
+                </div>
+
+                <!-- FI2: Revenue Protection Score -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Revenue Protection Score</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag finance">Finance</span>
+                                <span class="source-tag genesys">Genesys</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">97.4%</div>
+                            <div class="indicator-target">Target: <strong>≥97%</strong> | $15.2K at risk/hr</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkFI2"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-shield-alt"></i> Revenue protected</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Revenue</div>
+                    </div>
+                </div>
+
+                <!-- FI3: Labor Efficiency Ratio -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Labor Efficiency Ratio</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag wfm">WFM</span>
+                                <span class="source-tag qa">QA System</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">4.12</div>
+                            <div class="indicator-target">Target: <strong>≥4.0</strong> contacts/paid hr</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkFI3"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-up"></i> +0.12 vs target</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> Productivity</div>
+                    </div>
+                </div>
+
+                <!-- FI4: Avoidable Contact Cost -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Avoidable Contact Cost (Daily)</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag crm">CRM</span>
+                                <span class="source-tag speech">Speech Analytics</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">$87.5K</div>
+                            <div class="indicator-target">Target: <strong><$65K</strong> | 21.5% avoidable</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkFI4"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-up"></i> +$22.5K over target</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Waste</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMAIN 13: Channel Performance -->
+        <div class="domain-section">
+            <div class="domain-header">
+                <div class="domain-icon channel"><i class="fas fa-random"></i></div>
+                <div class="domain-info">
+                    <div class="domain-title">Channel Performance</div>
+                    <div class="domain-subtitle">Omnichannel containment, digital shift, cross-channel resolution, and digital experience</div>
+                </div>
+                <div class="domain-status">
+                    <div class="status-pill healthy"><i class="fas fa-circle"></i> 2 Healthy</div>
+                    <div class="status-pill warning"><i class="fas fa-circle"></i> 2 At Risk</div>
+                </div>
+            </div>
+            <div class="indicators-grid">
+                <!-- CH1: Channel Containment Rate -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Channel Containment Rate</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag genesys">Genesys</span>
+                                <span class="source-tag digital">Digital</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">78%</div>
+                            <div class="indicator-target">Target: IVR <strong>≥40%</strong> | Chat <strong>≥85%</strong></div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkCH1"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-down"></i> IVR at 35% (below)</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Cost Driver</div>
+                    </div>
+                </div>
+
+                <!-- CH2: Channel Shift Velocity -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Channel Shift Velocity (QoQ)</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag digital">Digital</span>
+                                <span class="source-tag genesys">Genesys</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">-4%</div>
+                            <div class="indicator-target">Voice share ↓ | <strong>$312K/mo</strong> saved</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkCH2"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-up"></i> Digital adoption ↑</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Strategic</div>
+                    </div>
+                </div>
+
+                <!-- CH3: Cross-Channel Resolution -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Cross-Channel Resolution Rate</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag crm">CRM</span>
+                                <span class="source-tag genesys">Genesys</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">72%</div>
+                            <div class="indicator-target">Target: <strong>≥80%</strong> | Chat→Voice: 72%</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkCH3"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-arrow-down"></i> -8% vs target</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-medium"></i> CX Impact</div>
+                    </div>
+                </div>
+
+                <!-- CH4: Digital Experience Score -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Digital Experience Score (DXS)</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag digital">Digital</span>
+                                <span class="source-tag survey">Surveys</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">81.8</div>
+                            <div class="indicator-target">Target: <strong>≥80</strong> | Good</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkCH4"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-arrow-up"></i> +2.3 vs last month</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Digital Strategy</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMAIN 14: Compliance & Risk -->
+        <div class="domain-section">
+            <div class="domain-header">
+                <div class="domain-icon compliance"><i class="fas fa-gavel"></i></div>
+                <div class="domain-info">
+                    <div class="domain-title">Compliance & Risk Indicators</div>
+                    <div class="domain-subtitle">PCI, TCPA, privacy compliance, and regulatory disclosure monitoring</div>
+                </div>
+                <div class="domain-status">
+                    <div class="status-pill healthy"><i class="fas fa-circle"></i> 3 Healthy</div>
+                    <div class="status-pill warning"><i class="fas fa-circle"></i> 1 At Risk</div>
+                </div>
+            </div>
+            <div class="indicators-grid">
+                <!-- CR1: PCI Compliance Rate -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">PCI Compliance Rate</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag privacy">Privacy</span>
+                                <span class="source-tag qa">QA System</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">99.64%</div>
+                            <div class="indicator-target">Target: <strong>100%</strong> | 30 violations today</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkCR1"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-lock"></i> Investigating violations</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Regulatory</div>
+                    </div>
+                </div>
+
+                <!-- CR2: TCPA Consent Verification -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">TCPA Consent Verification</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag dialer">Dialer</span>
+                                <span class="source-tag privacy">Privacy</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">99.6%</div>
+                            <div class="indicator-target">Target: <strong>100%</strong> | 180 blocked</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkCR2"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend up"><i class="fas fa-phone-slash"></i> Violations prevented</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Legal Risk</div>
+                    </div>
+                </div>
+
+                <!-- CR3: Data Privacy Compliance -->
+                <div class="indicator-card healthy">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Data Privacy Compliance Score</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag privacy">Privacy</span>
+                                <span class="source-tag splunk">Splunk DLP</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge healthy">Healthy</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">97.8%</div>
+                            <div class="indicator-target">Target: <strong>≥98%</strong> | GDPR/CCPA</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkCR3"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend neutral"><i class="fas fa-user-shield"></i> Minor gap</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> 4% revenue risk</div>
+                    </div>
+                </div>
+
+                <!-- CR4: Regulatory Disclosure Compliance -->
+                <div class="indicator-card warning">
+                    <div class="indicator-header">
+                        <div>
+                            <div class="indicator-title">Regulatory Disclosure Compliance</div>
+                            <div class="indicator-sources">
+                                <span class="source-tag speech">Speech Analytics</span>
+                                <span class="source-tag qa">QA System</span>
+                            </div>
+                        </div>
+                        <span class="indicator-status-badge warning">At Risk</span>
+                    </div>
+                    <div class="indicator-body">
+                        <div class="indicator-value-section">
+                            <div class="indicator-value">98.2%</div>
+                            <div class="indicator-target">Target: <strong>100%</strong> | Recording: 99.5%</div>
+                        </div>
+                        <div class="indicator-sparkline"><canvas id="sparkCR4"></canvas></div>
+                    </div>
+                    <div class="indicator-footer">
+                        <div class="indicator-trend down"><i class="fas fa-exclamation"></i> Mini-Miranda gaps</div>
+                        <div class="indicator-impact"><i class="fas fa-bolt impact-high"></i> Legal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Regional Breakdown -->
+        <div class="regional-section">
+            <div class="regional-header">
+                <div class="regional-title">
+                    <i class="fas fa-globe-americas"></i>
+                    Regional Health Overview
+                </div>
+                <button class="btn btn-ghost">
+                    <i class="fas fa-expand"></i> Expand
+                </button>
+            </div>
+            <div class="regional-grid">
+                <div class="region-card">
+                    <div class="region-name">North America</div>
+                    <div class="region-stats">
+                        <div class="region-stat">
+                            <div class="region-stat-value">18,420</div>
+                            <div class="region-stat-label">Agents</div>
+                        </div>
+                        <div class="region-stat">
+                            <div class="region-stat-value">99.8%</div>
+                            <div class="region-stat-label">Uptime</div>
+                        </div>
+                        <div class="region-stat">
+                            <div class="region-stat-value">82ms</div>
+                            <div class="region-stat-label">Latency</div>
+                        </div>
+                        <div class="region-stat">
+                            <div class="region-stat-value">83%</div>
+                            <div class="region-stat-label">SL</div>
+                        </div>
+                    </div>
+                    <div class="region-status-bar">
+                        <div class="region-status-fill green" style="width: 95%;"></div>
+                    </div>
+                </div>
+                <div class="region-card">
+                    <div class="region-name">Europe (EMEA)</div>
+                    <div class="region-stats">
+                        <div class="region-stat">
+                            <div class="region-stat-value">12,847</div>
+                            <div class="region-stat-label">Agents</div>
+                        </div>
+                        <div class="region-stat">
+                            <div class="region-stat-value">99.6%</div>
+                            <div class="region-stat-label">Uptime</div>
+                        </div>
+                        <div class="region-stat">
+                            <div class="region-stat-value">118ms</div>
+                            <div class="region-stat-label">Latency</div>
+                        </div>
+                        <div class="region-stat">
+                            <div class="region-stat-value">79%</div>
+                            <div class="region-stat-label">SL</div>
+                        </div>
+                    </div>
+                    <div class="region-status-bar">
+                        <div class="region-status-fill yellow" style="width: 78%;"></div>
+                    </div>
+                </div>
+                <div class="region-card">
+                    <div class="region-name">Asia Pacific</div>
+                    <div class="region-stats">
+                        <div class="region-stat">
+                            <div class="region-stat-value">10,234</div>
+                            <div class="region-stat-label">Agents</div>
+                        </div>
+                        <div class="region-stat">
+                            <div class="region-stat-value">99.9%</div>
+                            <div class="region-stat-label">Uptime</div>
+                        </div>
+                        <div class="region-stat">
+                            <div class="region-stat-value">156ms</div>
+                            <div class="region-stat-label">Latency</div>
+                        </div>
+                        <div class="region-stat">
+                            <div class="region-stat-value">81%</div>
+                            <div class="region-stat-label">SL</div>
+                        </div>
+                    </div>
+                    <div class="region-status-bar">
+                        <div class="region-status-fill green" style="width: 88%;"></div>
+                    </div>
+                </div>
+                <div class="region-card">
+                    <div class="region-name">Latin America</div>
+                    <div class="region-stats">
+                        <div class="region-stat">
+                            <div class="region-stat-value">4,892</div>
+                            <div class="region-stat-label">Agents</div>
+                        </div>
+                        <div class="region-stat">
+                            <div class="region-stat-value">99.4%</div>
+                            <div class="region-stat-label">Uptime</div>
+                        </div>
+                        <div class="region-stat">
+                            <div class="region-stat-value">142ms</div>
+                            <div class="region-stat-label">Latency</div>
+                        </div>
+                        <div class="region-stat">
+                            <div class="region-stat-value">77%</div>
+                            <div class="region-stat-label">SL</div>
+                        </div>
+                    </div>
+                    <div class="region-status-bar">
+                        <div class="region-status-fill yellow" style="width: 72%;"></div>
+                    </div>
+                </div>
+                <div class="region-card">
+                    <div class="region-name">India (Offshore)</div>
+                    <div class="region-stats">
+                        <div class="region-stat">
+                            <div class="region-stat-value">1,439</div>
+                            <div class="region-stat-label">Agents</div>
+                        </div>
+                        <div class="region-stat">
+                            <div class="region-stat-value">99.7%</div>
+                            <div class="region-stat-label">Uptime</div>
+                        </div>
+                        <div class="region-stat">
+                            <div class="region-stat-value">178ms</div>
+                            <div class="region-stat-label">Latency</div>
+                        </div>
+                        <div class="region-stat">
+                            <div class="region-stat-value">84%</div>
+                            <div class="region-stat-label">SL</div>
+                        </div>
+                    </div>
+                    <div class="region-status-bar">
+                        <div class="region-status-fill green" style="width: 90%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-book"></i> Enterprise Leading Indicators Documentation</h2>
+                <button class="modal-close" onclick="closeDocumentation()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="doc-section">
+                    <h3><i class="fas fa-info-circle"></i> Overview</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.8; margin-bottom: 16px;">
+                        This enterprise-grade dashboard monitors <strong>56 leading indicators</strong> across <strong>14 operational domains</strong> 
+                        for a 50,000 agent global contact center operation. These indicators are specifically designed to:
+                    </p>
+                    <ul style="color: var(--text-secondary); font-size: 13px; line-height: 1.8; padding-left: 20px; margin-bottom: 16px;">
+                        <li><strong>Predict</strong> customer experience outcomes before surveys are collected</li>
+                        <li><strong>Identify</strong> cost drivers and revenue risks in real-time</li>
+                        <li><strong>Enable</strong> proactive capacity management across 12 global regions</li>
+                        <li><strong>Optimize</strong> multi-vendor technology stack performance</li>
+                        <li><strong>Monitor</strong> compliance with PCI, TCPA, GDPR, and CCPA regulations</li>
+                        <li><strong>Support</strong> real-time decision making for operations leadership</li>
+                    </ul>
+                </div>
+
+                <div class="doc-section">
+                    <h3><i class="fas fa-layer-group"></i> Domain Structure (14 Domains, 56 Indicators)</h3>
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>Domain</th>
+                                <th>Focus Area</th>
+                                <th>#</th>
+                                <th>Business Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="domain-badge platform">Platform & Infrastructure</span></td>
+                                <td>System availability, DR readiness, incidents</td>
+                                <td>4</td>
+                                <td>Service continuity, SLA compliance</td>
+                            </tr>
+                            <tr>
+                                <td><span class="domain-badge network">Network & Connectivity</span></td>
+                                <td>Latency, site connectivity, bandwidth</td>
+                                <td>4</td>
+                                <td>Voice quality, agent productivity</td>
+                            </tr>
+                            <tr>
+                                <td><span class="domain-badge voice">Voice Quality & Telephony</span></td>
+                                <td>MOS scores, queue times, trunk capacity</td>
+                                <td>4</td>
+                                <td>Customer experience, NPS</td>
+                            </tr>
+                            <tr>
+                                <td><span class="domain-badge workforce">Workforce & Capacity</span></td>
+                                <td>Staffing, adherence, occupancy, shrinkage</td>
+                                <td>4</td>
+                                <td>Service level, labor costs</td>
+                            </tr>
+                            <tr>
+                                <td><span class="domain-badge desktop">Agent Desktop & VDI</span></td>
+                                <td>Citrix, DEX scores, VDA health</td>
+                                <td>4</td>
+                                <td>Agent efficiency, AHT</td>
+                            </tr>
+                            <tr>
+                                <td><span class="domain-badge selfservice">IVR & Self-Service</span></td>
+                                <td>Containment, ASR accuracy, deflection</td>
+                                <td>4</td>
+                                <td>Cost per contact, automation ROI</td>
+                            </tr>
+                            <tr>
+                                <td><span class="domain-badge integration">Integration & Data Flow</span></td>
+                                <td>CTI, CRM, APIs, data freshness</td>
+                                <td>4</td>
+                                <td>Agent productivity, FCR</td>
+                            </tr>
+                            <tr>
+                                <td><span class="domain-badge security">Security & Access</span></td>
+                                <td>Authentication, MFA, session health</td>
+                                <td>4</td>
+                                <td>Compliance, risk mitigation</td>
+                            </tr>
+                            <tr style="background: #fff8e1;">
+                                <td><span style="background: #fff8e1; color: #ff8f00; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600;">Customer Experience</span></td>
+                                <td>FCR, CES, NPS predictors, repeat contacts</td>
+                                <td>4</td>
+                                <td>Retention, revenue, satisfaction</td>
+                            </tr>
+                            <tr style="background: #e1f5fe;">
+                                <td><span style="background: #e1f5fe; color: #0277bd; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600;">Operational Efficiency</span></td>
+                                <td>Shrinkage, AHT, occupancy, schedule</td>
+                                <td>4</td>
+                                <td>Labor cost, capacity</td>
+                            </tr>
+                            <tr style="background: #f3e5f5;">
+                                <td><span style="background: #f3e5f5; color: #7b1fa2; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600;">Agent Performance</span></td>
+                                <td>QA prediction, attrition risk, readiness</td>
+                                <td>4</td>
+                                <td>Quality, retention, training</td>
+                            </tr>
+                            <tr style="background: #e8f5e9;">
+                                <td><span style="background: #e8f5e9; color: #2e7d32; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600;">Financial Impact</span></td>
+                                <td>CPC, revenue protection, efficiency</td>
+                                <td>4</td>
+                                <td>P&L, unit economics</td>
+                            </tr>
+                            <tr style="background: #e0f2f1;">
+                                <td><span style="background: #e0f2f1; color: #00695c; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600;">Channel Performance</span></td>
+                                <td>Containment, channel shift, digital CX</td>
+                                <td>4</td>
+                                <td>Digital transformation</td>
+                            </tr>
+                            <tr style="background: #fce4ec;">
+                                <td><span style="background: #fce4ec; color: #c2185b; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600;">Compliance & Risk</span></td>
+                                <td>PCI, TCPA, privacy, disclosures</td>
+                                <td>4</td>
+                                <td>Regulatory, legal risk</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="doc-section">
+                    <h3><i class="fas fa-database"></i> Data Sources</h3>
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>System</th>
+                                <th>Data Provided</th>
+                                <th>Refresh</th>
+                                <th>API/Method</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Genesys Cloud</strong></td>
+                                <td>Platform health, queues, voice quality, agent states</td>
+                                <td>5s</td>
+                                <td><code>Analytics API</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>ThousandEyes</strong></td>
+                                <td>Network latency, packet loss, path analysis</td>
+                                <td>1min</td>
+                                <td><code>ThousandEyes API v7</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Citrix Director</strong></td>
+                                <td>Session health, ICA RTT, VDA metrics</td>
+                                <td>1min</td>
+                                <td><code>OData API</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Nexthink</strong></td>
+                                <td>DEX scores, endpoint health, app performance</td>
+                                <td>15min</td>
+                                <td><code>NXQL API</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>SolarWinds</strong></td>
+                                <td>Infrastructure metrics, bandwidth, server health</td>
+                                <td>1min</td>
+                                <td><code>SWIS API</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>WFM System</strong></td>
+                                <td>Forecasts, adherence, staffing, shrinkage</td>
+                                <td>15s</td>
+                                <td><code>WFM RTA API</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Nuance</strong></td>
+                                <td>ASR accuracy, IVR containment, recognition logs</td>
+                                <td>5min</td>
+                                <td><code>Analytics Export</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>ServiceNow</strong></td>
+                                <td>Incidents, changes, problem tickets</td>
+                                <td>1min</td>
+                                <td><code>Table API</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Splunk</strong></td>
+                                <td>Logs, security events, API metrics</td>
+                                <td>Real-time</td>
+                                <td><code>Search API</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="doc-section">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Threshold Guidelines</h3>
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Definition</th>
+                                <th>Response</th>
+                                <th>Escalation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span style="color: var(--success); font-weight: 600;">● Healthy</span></td>
+                                <td>Within target thresholds</td>
+                                <td>Monitor, no action required</td>
+                                <td>None</td>
+                            </tr>
+                            <tr>
+                                <td><span style="color: var(--warning); font-weight: 600;">● At Risk</span></td>
+                                <td>Within 15% of threshold breach</td>
+                                <td>Investigate root cause, prepare mitigation</td>
+                                <td>Team Lead notification</td>
+                            </tr>
+                            <tr>
+                                <td><span style="color: var(--danger); font-weight: 600;">● Critical</span></td>
+                                <td>Threshold breached</td>
+                                <td>Immediate action, activate runbook</td>
+                                <td>Operations Manager + Bridge call</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+            document.getElementById('currentTime').textContent = now.toLocaleDateString('en-US', options);
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Chart.js defaults
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.responsive = true;
+        Chart.defaults.maintainAspectRatio = false;
+
+        // Sparkline configuration
+        function createSparkline(canvasId, data, color, trend = 'neutral') {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 40);
+            gradient.addColorStop(0, color + '40');
+            gradient.addColorStop(1, color + '00');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map((_, i) => i),
+                    datasets: [{
+                        data: data,
+                        borderColor: color,
+                        borderWidth: 2,
+                        fill: true,
+                        backgroundColor: gradient,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 3
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { display: false }
+                    }
+                }
+            });
+        }
+
+        // Create all sparklines
+        // Platform
+        createSparkline('sparkP1', [99.95, 99.96, 99.97, 99.96, 99.98, 99.97, 99.96, 99.97, 99.97], '#10b981');
+        createSparkline('sparkP2', [97, 97.5, 98, 98, 98.2, 98.4, 98.3, 98.5, 98.5], '#10b981');
+        createSparkline('sparkP3', [28, 29, 30, 31, 32, 31, 32, 33, 32], '#10b981');
+        createSparkline('sparkP4', [3, 4, 5, 6, 7, 8, 7, 7, 7], '#f59e0b');
+        
+        // Network
+        createSparkline('sparkN1', [115, 118, 125, 130, 135, 138, 140, 142, 138], '#f59e0b');
+        createSparkline('sparkN2', [100, 100, 99, 99, 98, 98, 98, 98, 98], '#10b981');
+        createSparkline('sparkN3', [65, 68, 72, 75, 78, 80, 82, 78, 78], '#f59e0b');
+        createSparkline('sparkN4', [0.2, 0.18, 0.15, 0.14, 0.12, 0.13, 0.12, 0.11, 0.12], '#10b981');
+        
+        // Voice
+        createSparkline('sparkV1', [4.15, 4.16, 4.18, 4.19, 4.20, 4.21, 4.20, 4.21, 4.21], '#10b981');
+        createSparkline('sparkV2', [2.4, 2.2, 2.1, 2.0, 1.9, 1.8, 1.9, 1.8, 1.8], '#10b981');
+        createSparkline('sparkV3', [58, 60, 62, 64, 65, 63, 62, 61, 62], '#10b981');
+        createSparkline('sparkV4', [1.5, 1.8, 2.0, 2.2, 2.4, 2.5, 2.6, 2.5, 2.57], '#ef4444');
+        
+        // Workforce
+        createSparkline('sparkW1', [-200, -350, -500, -600, -700, -800, -850, -847, -847], '#ef4444');
+        createSparkline('sparkW2', [91, 90, 89, 88, 87, 87, 87, 87, 87.4], '#f59e0b');
+        createSparkline('sparkW3', [76, 77, 78, 79, 80, 79, 78, 79, 79], '#10b981');
+        createSparkline('sparkW4', [6, 6.5, 7, 7.5, 8, 8.2, 8.3, 8.2, 8.2], '#f59e0b');
+        
+        // Desktop
+        createSparkline('sparkD1', [98.2, 98.4, 98.6, 98.7, 98.8, 98.7, 98.9, 98.8, 98.9], '#10b981');
+        createSparkline('sparkD2', [58, 60, 64, 68, 70, 72, 74, 72, 72], '#f59e0b');
+        createSparkline('sparkD3', [7.8, 7.9, 8.0, 8.1, 8.2, 8.1, 8.2, 8.2, 8.2], '#10b981');
+        createSparkline('sparkD4', [87, 88, 89, 90, 91, 90, 91, 91, 91], '#10b981');
+        
+        // Self-Service
+        createSparkline('sparkS1', [68, 66, 64, 63, 62, 61, 62, 62, 62], '#f59e0b');
+        createSparkline('sparkS2', [93.5, 93.8, 94.0, 94.2, 94.4, 94.5, 94.6, 94.7, 94.7], '#10b981');
+        createSparkline('sparkS3', [65, 66, 68, 69, 70, 71, 71, 71, 71], '#10b981');
+        createSparkline('sparkS4', [34, 35, 36, 37, 38, 37, 38, 38, 38], '#10b981');
+        
+        // Integration
+        createSparkline('sparkI1', [99, 98.5, 98, 97.5, 97, 96.5, 96.4, 96.4, 96.4], '#f59e0b');
+        createSparkline('sparkI2', [2.4, 2.3, 2.2, 2.1, 2.0, 1.9, 1.9, 1.9, 1.9], '#10b981');
+        createSparkline('sparkI3', [12, 10, 9, 8, 8, 7, 7, 7, 7], '#10b981');
+        createSparkline('sparkI4', [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.8, 0.8, 0.8], '#f59e0b');
+        
+        // Security
+        createSparkline('sparkA1', [99.2, 99.0, 98.8, 98.5, 98.2, 98.0, 97.8, 97.8, 97.8], '#f59e0b');
+        createSparkline('sparkA2', [99.8, 99.9, 99.9, 99.9, 99.9, 99.9, 99.9, 99.9, 99.9], '#10b981');
+        createSparkline('sparkA3', [0.8, 0.7, 0.6, 0.5, 0.5, 0.4, 0.4, 0.4, 0.4], '#10b981');
+        createSparkline('sparkA4', [0, 0, 1, 0, 0, 0, 0, 0, 0], '#10b981');
+
+        // Customer Experience
+        createSparkline('sparkCX1', [84, 85, 85.5, 86, 86.5, 87, 87, 87.2, 87.2], '#10b981');
+        createSparkline('sparkCX2', [78, 76, 75, 74, 73, 72, 71, 72, 72], '#f59e0b');
+        createSparkline('sparkCX3', [62, 63, 64, 65, 66, 67, 68, 68, 68], '#10b981');
+        createSparkline('sparkCX4', [20, 21, 22, 23, 24, 25, 24.5, 24.8, 24.8], '#f59e0b');
+
+        // Operational Efficiency
+        createSparkline('sparkEF1', [2, 2.5, 3, 3.5, 4, 4.5, 5, 5.2, 5.2], '#ef4444');
+        createSparkline('sparkEF2', [4, 5, 5.5, 6, 6.5, 7, 7.5, 7.8, 7.8], '#f59e0b');
+        createSparkline('sparkEF3', [78, 79, 80, 81, 82, 83, 82, 82, 82], '#10b981');
+        createSparkline('sparkEF4', [94, 94.5, 95, 95.5, 96, 96, 96.2, 96.2, 96.2], '#10b981');
+
+        // Agent Performance
+        createSparkline('sparkAP1', [83, 84, 84.5, 85, 85.5, 86, 86.2, 86.4, 86.4], '#10b981');
+        createSparkline('sparkAP2', [2200, 2350, 2500, 2600, 2700, 2750, 2800, 2847, 2847], '#f59e0b');
+        createSparkline('sparkAP3', [88, 89, 89.5, 90, 90.5, 91, 91, 91.2, 91.2], '#10b981');
+        createSparkline('sparkAP4', [3800, 3900, 4000, 4100, 4150, 4200, 4210, 4218, 4218], '#f59e0b');
+
+        // Financial Impact
+        createSparkline('sparkFI1', [9.2, 9.0, 8.8, 8.7, 8.6, 8.5, 8.45, 8.41, 8.41], '#10b981');
+        createSparkline('sparkFI2', [96.5, 96.8, 97, 97.2, 97.3, 97.4, 97.4, 97.4, 97.4], '#10b981');
+        createSparkline('sparkFI3', [3.8, 3.9, 4.0, 4.05, 4.1, 4.1, 4.12, 4.12, 4.12], '#10b981');
+        createSparkline('sparkFI4', [65, 70, 75, 80, 82, 85, 87, 87.5, 87.5], '#f59e0b');
+
+        // Channel Performance
+        createSparkline('sparkCH1', [82, 81, 80, 79, 78, 78, 78, 78, 78], '#f59e0b');
+        createSparkline('sparkCH2', [-1, -1.5, -2, -2.5, -3, -3.5, -4, -4, -4], '#10b981');
+        createSparkline('sparkCH3', [78, 76, 75, 74, 73, 72, 72, 72, 72], '#f59e0b');
+        createSparkline('sparkCH4', [78, 79, 79.5, 80, 80.5, 81, 81.5, 81.8, 81.8], '#10b981');
+
+        // Compliance & Risk
+        createSparkline('sparkCR1', [99.5, 99.55, 99.6, 99.62, 99.63, 99.64, 99.64, 99.64, 99.64], '#10b981');
+        createSparkline('sparkCR2', [99.4, 99.45, 99.5, 99.55, 99.58, 99.6, 99.6, 99.6, 99.6], '#10b981');
+        createSparkline('sparkCR3', [97, 97.2, 97.4, 97.5, 97.6, 97.7, 97.8, 97.8, 97.8], '#10b981');
+        createSparkline('sparkCR4', [99, 98.8, 98.6, 98.5, 98.4, 98.3, 98.2, 98.2, 98.2], '#f59e0b');
+
+        // Documentation modal
+        function openDocumentation() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocumentation() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('docModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDocumentation();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeDocumentation();
+        });
+
+        // Refresh button
+        document.getElementById('refreshBtn').addEventListener('click', function() {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing';
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+                // Re-animate cards
+                document.querySelectorAll('.indicator-card').forEach(card => {
+                    card.style.animation = 'none';
+                    card.offsetHeight;
+                    card.style.animation = '';
+                });
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

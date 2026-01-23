@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Health Dashboard - Synthetic Monitoring</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            /* Material Design Light Theme */
+            --bg: #f5f5f5;
+            --bg-secondary: #fafafa;
+            --card: #ffffff;
+            --border: #e0e0e0;
+            --text-primary: #212121;
+            --text-secondary: #616161;
+            --text-muted: #9e9e9e;
+            
+            /* Status Colors */
+            --healthy: #4caf50;
+            --healthy-bg: #e8f5e9;
+            --warning: #ff9800;
+            --warning-bg: #fff3e0;
+            --critical: #f44336;
+            --critical-bg: #ffebee;
+            --info: #2196f3;
+            --info-bg: #e3f2fd;
+            
+            /* CRM Brand Colors */
+            --crm-primary: #1976d2;
+            --crm-secondary: #42a5f5;
+            --crm-accent: #0d47a1;
+            
+            /* Shadows */
+            --shadow-1: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-2: 0 3px 6px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-3: 0 10px 20px rgba(0,0,0,0.08), 0 3px 6px rgba(0,0,0,0.06);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ========== NAVBAR ========== */
+        .navbar {
+            background: var(--card);
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-2);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--crm-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .nav-title span {
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--healthy);
+            font-weight: 500;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--healthy);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .nav-time {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--crm-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--crm-accent);
+            box-shadow: var(--shadow-2);
+        }
+
+        .btn-ghost {
+            background: var(--bg);
+            color: var(--text-secondary);
+        }
+
+        .btn-ghost:hover {
+            background: var(--border);
+        }
+
+        /* ========== HEADER ========== */
+        .page-header {
+            background: var(--card);
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        .header-title h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .header-title p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* ========== SUMMARY METRICS ========== */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+        }
+
+        .summary-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 18px 20px;
+            box-shadow: var(--shadow-1);
+            position: relative;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        .summary-card:hover {
+            box-shadow: var(--shadow-2);
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .summary-card.healthy::before { background: var(--healthy); }
+        .summary-card.warning::before { background: var(--warning); }
+        .summary-card.critical::before { background: var(--critical); }
+        .summary-card.info::before { background: var(--info); }
+
+        .summary-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .summary-detail {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .summary-detail.up { color: var(--healthy); }
+        .summary-detail.down { color: var(--critical); }
+
+        /* ========== MAIN CONTENT ========== */
+        .main {
+            padding: 28px 32px;
+            max-width: 1900px;
+            margin: 0 auto;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 24px;
+        }
+
+        /* ========== SECTION CARDS ========== */
+        .section-card {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: var(--shadow-1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--crm-primary);
+        }
+
+        .section-body {
+            padding: 20px 24px;
+        }
+
+        /* ========== MZ OVERVIEW TABLE ========== */
+        .mz-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .mz-table th,
+        .mz-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .mz-table th {
+            background: var(--bg);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mz-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .mz-table tr:hover td {
+            background: var(--bg-secondary);
+        }
+
+        .mz-name {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .mz-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .mz-icon.healthy { background: var(--healthy-bg); color: var(--healthy); }
+        .mz-icon.warning { background: var(--warning-bg); color: var(--warning); }
+        .mz-icon.critical { background: var(--critical-bg); color: var(--critical); }
+
+        .mz-info {
+            flex: 1;
+        }
+
+        .mz-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .mz-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-badge.healthy { background: var(--healthy-bg); color: var(--healthy); }
+        .status-badge.warning { background: var(--warning-bg); color: var(--warning); }
+        .status-badge.critical { background: var(--critical-bg); color: var(--critical); }
+
+        .status-badge i { font-size: 8px; }
+
+        .latency-value {
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'SF Mono', 'Consolas', monospace;
+        }
+
+        .latency-value.good { color: var(--healthy); }
+        .latency-value.moderate { color: var(--warning); }
+        .latency-value.slow { color: var(--critical); }
+
+        .entity-count {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .entity-pill {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .entity-pill.services { background: #e3f2fd; color: #1565c0; }
+        .entity-pill.hosts { background: #f3e5f5; color: #7b1fa2; }
+        .entity-pill.dbs { background: #fff3e0; color: #e65100; }
+
+        .trend-mini {
+            width: 60px;
+            height: 24px;
+        }
+
+        /* ========== ENTITY BREAKDOWN ========== */
+        .entity-section {
+            margin-bottom: 20px;
+        }
+
+        .entity-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .entity-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--bg);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .entity-header:hover {
+            background: var(--border);
+        }
+
+        .entity-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .entity-mz-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .entity-mz-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .entity-header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .entity-count-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: var(--info-bg);
+            color: var(--info);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .expand-icon {
+            color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+
+        .entity-section.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .entity-list {
+            display: none;
+            padding: 12px 0;
+        }
+
+        .entity-section.expanded .entity-list {
+            display: block;
+        }
+
+        .entity-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            margin: 4px 0;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .entity-item:hover {
+            background: var(--bg);
+        }
+
+        .entity-item-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .entity-type-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+        }
+
+        .entity-type-icon.service { background: #e3f2fd; color: #1565c0; }
+        .entity-type-icon.host { background: #f3e5f5; color: #7b1fa2; }
+        .entity-type-icon.database { background: #fff3e0; color: #e65100; }
+        .entity-type-icon.process { background: #e8f5e9; color: #2e7d32; }
+
+        .entity-item-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .entity-item-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .entity-metric {
+            text-align: right;
+        }
+
+        .entity-metric-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .entity-metric-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .entity-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .entity-status.healthy { background: var(--healthy); }
+        .entity-status.warning { background: var(--warning); }
+        .entity-status.critical { background: var(--critical); }
+
+        /* ========== LATENCY CHART ========== */
+        .chart-container {
+            height: 280px;
+            position: relative;
+        }
+
+        /* ========== ALERTS PANEL ========== */
+        .alerts-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+
+        .alert-item:last-child {
+            border-bottom: none;
+        }
+
+        .alert-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .alert-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .alert-icon.critical { background: var(--critical-bg); color: var(--critical); }
+        .alert-icon.warning { background: var(--warning-bg); color: var(--warning); }
+
+        .alert-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .alert-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .alert-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert-time {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ========== LATENCY MZ CARDS ========== */
+        .latency-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .latency-card {
+            background: var(--bg);
+            border-radius: 10px;
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .latency-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .latency-card.good::before { background: var(--healthy); }
+        .latency-card.moderate::before { background: var(--warning); }
+        .latency-card.slow::before { background: var(--critical); }
+
+        .latency-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .latency-card-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .latency-card-value {
+            font-size: 20px;
+            font-weight: 700;
+            font-family: 'SF Mono', 'Consolas', monospace;
+        }
+
+        .latency-card-value.good { color: var(--healthy); }
+        .latency-card-value.moderate { color: var(--warning); }
+        .latency-card-value.slow { color: var(--critical); }
+
+        .latency-card-stats {
+            display: flex;
+            gap: 16px;
+        }
+
+        .latency-stat {
+            flex: 1;
+        }
+
+        .latency-stat-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .latency-stat-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* ========== HEALTH SCORE GAUGE ========== */
+        .health-gauge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .gauge-circle {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--healthy) 0deg calc(var(--health-percent) * 3.6deg),
+                var(--border) calc(var(--health-percent) * 3.6deg) 360deg
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .gauge-inner {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: var(--card);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gauge-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .gauge-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .gauge-legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.healthy { background: var(--healthy); }
+        .legend-dot.warning { background: var(--warning); }
+        .legend-dot.critical { background: var(--critical); }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1400px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            .summary-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .latency-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ========== ANIMATIONS ========== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-card {
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .mz-table tr {
+            animation: fadeIn 0.3s ease forwards;
+            opacity: 0;
+        }
+
+        .mz-table tr:nth-child(1) { animation-delay: 0.1s; }
+        .mz-table tr:nth-child(2) { animation-delay: 0.15s; }
+        .mz-table tr:nth-child(3) { animation-delay: 0.2s; }
+        .mz-table tr:nth-child(4) { animation-delay: 0.25s; }
+        .mz-table tr:nth-child(5) { animation-delay: 0.3s; }
+        .mz-table tr:nth-child(6) { animation-delay: 0.35s; }
+        .mz-table tr:nth-child(7) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <div class="nav-logo"><i class="fas fa-database"></i></div>
+            <div class="nav-title">CRM Health Monitor <span>| Synthetic Monitoring</span></div>
+        </div>
+
+        <div class="nav-right">
+            <div class="live-indicator">
+                <div class="live-dot"></div>
+                LIVE MONITORING
+            </div>
+            <div class="nav-time">
+                <i class="far fa-clock"></i>
+                <span id="currentTime">Loading...</span>
+            </div>
+            <button class="btn btn-ghost">
+                <i class="fas fa-cog"></i> Settings
+            </button>
+            <button class="btn btn-primary" id="refreshBtn">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1>CRM Application Health</h1>
+                <p>Real-time synthetic monitoring across 7 Management Zones with 142 monitored entities</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-ghost">
+                    <i class="fas fa-download"></i> Export Report
+                </button>
+                <button class="btn btn-ghost">
+                    <i class="fas fa-history"></i> View History
+                </button>
+            </div>
+        </div>
+
+        <!-- Summary Metrics -->
+        <div class="summary-grid">
+            <div class="summary-card healthy">
+                <div class="summary-label">Overall Health</div>
+                <div class="summary-value">94.2%</div>
+                <div class="summary-detail up"><i class="fas fa-check-circle"></i> 6/7 MZs healthy</div>
+            </div>
+            <div class="summary-card info">
+                <div class="summary-label">Management Zones</div>
+                <div class="summary-value">7</div>
+                <div class="summary-detail"><i class="fas fa-layer-group"></i> All monitored</div>
+            </div>
+            <div class="summary-card info">
+                <div class="summary-label">Total Entities</div>
+                <div class="summary-value">142</div>
+                <div class="summary-detail"><i class="fas fa-cubes"></i> Services, Hosts, DBs</div>
+            </div>
+            <div class="summary-card healthy">
+                <div class="summary-label">Avg Response Time</div>
+                <div class="summary-value">187ms</div>
+                <div class="summary-detail up"><i class="fas fa-tachometer-alt"></i> Within SLA</div>
+            </div>
+            <div class="summary-card warning">
+                <div class="summary-label">Active Alerts</div>
+                <div class="summary-value">3</div>
+                <div class="summary-detail"><i class="fas fa-bell"></i> 1 critical, 2 warning</div>
+            </div>
+            <div class="summary-card healthy">
+                <div class="summary-label">Uptime (30d)</div>
+                <div class="summary-value">99.87%</div>
+                <div class="summary-detail up"><i class="fas fa-signal"></i> +0.12% vs target</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="content-grid">
+            <!-- Left Column -->
+            <div class="left-column">
+                <!-- MZ Overview -->
+                <div class="section-card" style="margin-bottom: 24px;">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fas fa-th-large"></i>
+                            Management Zone Overview
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <span class="status-badge healthy"><i class="fas fa-circle"></i> 5 Healthy</span>
+                            <span class="status-badge warning"><i class="fas fa-circle"></i> 1 Warning</span>
+                            <span class="status-badge critical"><i class="fas fa-circle"></i> 1 Critical</span>
+                        </div>
+                    </div>
+                    <div class="section-body" style="padding: 0;">
+                        <table class="mz-table">
+                            <thead>
+                                <tr>
+                                    <th>Management Zone</th>
+                                    <th>Status</th>
+                                    <th>Entities</th>
+                                    <th>Avg Latency</th>
+                                    <th>P95 Latency</th>
+                                    <th>Error Rate</th>
+                                    <th>Trend</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="mz-name">
+                                            <div class="mz-icon healthy"><i class="fas fa-check"></i></div>
+                                            <div class="mz-info">
+                                                <div class="mz-title">CRM-Core-Services</div>
+                                                <div class="mz-subtitle">Primary business logic layer</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="status-badge healthy"><i class="fas fa-circle"></i> Healthy</span></td>
+                                    <td>
+                                        <div class="entity-count">
+                                            <span class="entity-pill services">12 Svc</span>
+                                            <span class="entity-pill hosts">8 Host</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="latency-value good">142ms</span></td>
+                                    <td><span class="latency-value good">218ms</span></td>
+                                    <td><span class="latency-value good">0.12%</span></td>
+                                    <td><canvas class="trend-mini" id="trend1"></canvas></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="mz-name">
+                                            <div class="mz-icon healthy"><i class="fas fa-check"></i></div>
+                                            <div class="mz-info">
+                                                <div class="mz-title">CRM-API-Gateway</div>
+                                                <div class="mz-subtitle">External API endpoints</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="status-badge healthy"><i class="fas fa-circle"></i> Healthy</span></td>
+                                    <td>
+                                        <div class="entity-count">
+                                            <span class="entity-pill services">8 Svc</span>
+                                            <span class="entity-pill hosts">4 Host</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="latency-value good">89ms</span></td>
+                                    <td><span class="latency-value good">156ms</span></td>
+                                    <td><span class="latency-value good">0.08%</span></td>
+                                    <td><canvas class="trend-mini" id="trend2"></canvas></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="mz-name">
+                                            <div class="mz-icon warning"><i class="fas fa-exclamation"></i></div>
+                                            <div class="mz-info">
+                                                <div class="mz-title">CRM-Database-Cluster</div>
+                                                <div class="mz-subtitle">SQL & NoSQL databases</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="status-badge warning"><i class="fas fa-circle"></i> Warning</span></td>
+                                    <td>
+                                        <div class="entity-count">
+                                            <span class="entity-pill dbs">6 DB</span>
+                                            <span class="entity-pill hosts">6 Host</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="latency-value moderate">287ms</span></td>
+                                    <td><span class="latency-value moderate">412ms</span></td>
+                                    <td><span class="latency-value good">0.21%</span></td>
+                                    <td><canvas class="trend-mini" id="trend3"></canvas></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="mz-name">
+                                            <div class="mz-icon healthy"><i class="fas fa-check"></i></div>
+                                            <div class="mz-info">
+                                                <div class="mz-title">CRM-Integration-Hub</div>
+                                                <div class="mz-subtitle">Third-party integrations</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="status-badge healthy"><i class="fas fa-circle"></i> Healthy</span></td>
+                                    <td>
+                                        <div class="entity-count">
+                                            <span class="entity-pill services">15 Svc</span>
+                                            <span class="entity-pill hosts">5 Host</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="latency-value good">198ms</span></td>
+                                    <td><span class="latency-value good">342ms</span></td>
+                                    <td><span class="latency-value good">0.15%</span></td>
+                                    <td><canvas class="trend-mini" id="trend4"></canvas></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="mz-name">
+                                            <div class="mz-icon critical"><i class="fas fa-times"></i></div>
+                                            <div class="mz-info">
+                                                <div class="mz-title">CRM-Reporting-Engine</div>
+                                                <div class="mz-subtitle">Analytics & reporting services</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="status-badge critical"><i class="fas fa-circle"></i> Critical</span></td>
+                                    <td>
+                                        <div class="entity-count">
+                                            <span class="entity-pill services">9 Svc</span>
+                                            <span class="entity-pill hosts">4 Host</span>
+                                            <span class="entity-pill dbs">2 DB</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="latency-value slow">892ms</span></td>
+                                    <td><span class="latency-value slow">1.4s</span></td>
+                                    <td><span class="latency-value slow">2.34%</span></td>
+                                    <td><canvas class="trend-mini" id="trend5"></canvas></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="mz-name">
+                                            <div class="mz-icon healthy"><i class="fas fa-check"></i></div>
+                                            <div class="mz-info">
+                                                <div class="mz-title">CRM-Auth-Services</div>
+                                                <div class="mz-subtitle">Authentication & authorization</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="status-badge healthy"><i class="fas fa-circle"></i> Healthy</span></td>
+                                    <td>
+                                        <div class="entity-count">
+                                            <span class="entity-pill services">6 Svc</span>
+                                            <span class="entity-pill hosts">4 Host</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="latency-value good">67ms</span></td>
+                                    <td><span class="latency-value good">112ms</span></td>
+                                    <td><span class="latency-value good">0.05%</span></td>
+                                    <td><canvas class="trend-mini" id="trend6"></canvas></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="mz-name">
+                                            <div class="mz-icon healthy"><i class="fas fa-check"></i></div>
+                                            <div class="mz-info">
+                                                <div class="mz-title">CRM-Cache-Layer</div>
+                                                <div class="mz-subtitle">Redis & Memcached clusters</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="status-badge healthy"><i class="fas fa-circle"></i> Healthy</span></td>
+                                    <td>
+                                        <div class="entity-count">
+                                            <span class="entity-pill services">4 Svc</span>
+                                            <span class="entity-pill hosts">8 Host</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="latency-value good">12ms</span></td>
+                                    <td><span class="latency-value good">28ms</span></td>
+                                    <td><span class="latency-value good">0.02%</span></td>
+                                    <td><canvas class="trend-mini" id="trend7"></canvas></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Latency Trend Chart -->
+                <div class="section-card" style="margin-bottom: 24px;">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fas fa-chart-line"></i>
+                            Latency Trends by Management Zone (Last 24h)
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-ghost" style="padding: 6px 12px; font-size: 11px;">1H</button>
+                            <button class="btn btn-ghost" style="padding: 6px 12px; font-size: 11px;">6H</button>
+                            <button class="btn btn-primary" style="padding: 6px 12px; font-size: 11px;">24H</button>
+                            <button class="btn btn-ghost" style="padding: 6px 12px; font-size: 11px;">7D</button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="chart-container">
+                            <canvas id="latencyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Entity Breakdown -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fas fa-sitemap"></i>
+                            Entity Breakdown by Management Zone
+                        </div>
+                        <span style="font-size: 12px; color: var(--text-muted);">Click to expand</span>
+                    </div>
+                    <div class="section-body">
+                        <!-- MZ 1: CRM-Core-Services -->
+                        <div class="entity-section" id="mz-core">
+                            <div class="entity-header" onclick="toggleSection('mz-core')">
+                                <div class="entity-header-left">
+                                    <div class="entity-mz-icon" style="background: var(--healthy-bg); color: var(--healthy);"><i class="fas fa-check"></i></div>
+                                    <span class="entity-mz-name">CRM-Core-Services</span>
+                                </div>
+                                <div class="entity-header-right">
+                                    <span class="entity-count-badge">20 Entities</span>
+                                    <i class="fas fa-chevron-down expand-icon"></i>
+                                </div>
+                            </div>
+                            <div class="entity-list">
+                                <div class="entity-item">
+                                    <div class="entity-item-left">
+                                        <div class="entity-type-icon service"><i class="fas fa-cog"></i></div>
+                                        <span class="entity-item-name">customer-service-api</span>
+                                    </div>
+                                    <div class="entity-item-right">
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value">124ms</div>
+                                            <div class="entity-metric-label">Latency</div>
+                                        </div>
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value">0.08%</div>
+                                            <div class="entity-metric-label">Error</div>
+                                        </div>
+                                        <div class="entity-status healthy"></div>
+                                    </div>
+                                </div>
+                                <div class="entity-item">
+                                    <div class="entity-item-left">
+                                        <div class="entity-type-icon service"><i class="fas fa-cog"></i></div>
+                                        <span class="entity-item-name">account-management-svc</span>
+                                    </div>
+                                    <div class="entity-item-right">
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value">156ms</div>
+                                            <div class="entity-metric-label">Latency</div>
+                                        </div>
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value">0.12%</div>
+                                            <div class="entity-metric-label">Error</div>
+                                        </div>
+                                        <div class="entity-status healthy"></div>
+                                    </div>
+                                </div>
+                                <div class="entity-item">
+                                    <div class="entity-item-left">
+                                        <div class="entity-type-icon service"><i class="fas fa-cog"></i></div>
+                                        <span class="entity-item-name">lead-scoring-engine</span>
+                                    </div>
+                                    <div class="entity-item-right">
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value">198ms</div>
+                                            <div class="entity-metric-label">Latency</div>
+                                        </div>
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value">0.15%</div>
+                                            <div class="entity-metric-label">Error</div>
+                                        </div>
+                                        <div class="entity-status healthy"></div>
+                                    </div>
+                                </div>
+                                <div class="entity-item">
+                                    <div class="entity-item-left">
+                                        <div class="entity-type-icon host"><i class="fas fa-server"></i></div>
+                                        <span class="entity-item-name">crm-core-node-01</span>
+                                    </div>
+                                    <div class="entity-item-right">
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value">42%</div>
+                                            <div class="entity-metric-label">CPU</div>
+                                        </div>
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value">68%</div>
+                                            <div class="entity-metric-label">Memory</div>
+                                        </div>
+                                        <div class="entity-status healthy"></div>
+                                    </div>
+                                </div>
+                                <div class="entity-item">
+                                    <div class="entity-item-left">
+                                        <div class="entity-type-icon host"><i class="fas fa-server"></i></div>
+                                        <span class="entity-item-name">crm-core-node-02</span>
+                                    </div>
+                                    <div class="entity-item-right">
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value">38%</div>
+                                            <div class="entity-metric-label">CPU</div>
+                                        </div>
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value">71%</div>
+                                            <div class="entity-metric-label">Memory</div>
+                                        </div>
+                                        <div class="entity-status healthy"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MZ 2: CRM-Reporting-Engine (Critical) -->
+                        <div class="entity-section expanded" id="mz-reporting">
+                            <div class="entity-header" onclick="toggleSection('mz-reporting')">
+                                <div class="entity-header-left">
+                                    <div class="entity-mz-icon" style="background: var(--critical-bg); color: var(--critical);"><i class="fas fa-times"></i></div>
+                                    <span class="entity-mz-name">CRM-Reporting-Engine</span>
+                                </div>
+                                <div class="entity-header-right">
+                                    <span class="entity-count-badge" style="background: var(--critical-bg); color: var(--critical);">15 Entities</span>
+                                    <i class="fas fa-chevron-down expand-icon"></i>
+                                </div>
+                            </div>
+                            <div class="entity-list">
+                                <div class="entity-item">
+                                    <div class="entity-item-left">
+                                        <div class="entity-type-icon service"><i class="fas fa-cog"></i></div>
+                                        <span class="entity-item-name">report-generator-svc</span>
+                                    </div>
+                                    <div class="entity-item-right">
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value" style="color: var(--critical);">1.2s</div>
+                                            <div class="entity-metric-label">Latency</div>
+                                        </div>
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value" style="color: var(--critical);">3.2%</div>
+                                            <div class="entity-metric-label">Error</div>
+                                        </div>
+                                        <div class="entity-status critical"></div>
+                                    </div>
+                                </div>
+                                <div class="entity-item">
+                                    <div class="entity-item-left">
+                                        <div class="entity-type-icon service"><i class="fas fa-cog"></i></div>
+                                        <span class="entity-item-name">analytics-aggregator</span>
+                                    </div>
+                                    <div class="entity-item-right">
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value" style="color: var(--critical);">945ms</div>
+                                            <div class="entity-metric-label">Latency</div>
+                                        </div>
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value" style="color: var(--warning);">1.8%</div>
+                                            <div class="entity-metric-label">Error</div>
+                                        </div>
+                                        <div class="entity-status critical"></div>
+                                    </div>
+                                </div>
+                                <div class="entity-item">
+                                    <div class="entity-item-left">
+                                        <div class="entity-type-icon database"><i class="fas fa-database"></i></div>
+                                        <span class="entity-item-name">reporting-db-primary</span>
+                                    </div>
+                                    <div class="entity-item-right">
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value" style="color: var(--warning);">687ms</div>
+                                            <div class="entity-metric-label">Query Time</div>
+                                        </div>
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value" style="color: var(--critical);">94%</div>
+                                            <div class="entity-metric-label">Connections</div>
+                                        </div>
+                                        <div class="entity-status warning"></div>
+                                    </div>
+                                </div>
+                                <div class="entity-item">
+                                    <div class="entity-item-left">
+                                        <div class="entity-type-icon host"><i class="fas fa-server"></i></div>
+                                        <span class="entity-item-name">report-node-01</span>
+                                    </div>
+                                    <div class="entity-item-right">
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value" style="color: var(--critical);">92%</div>
+                                            <div class="entity-metric-label">CPU</div>
+                                        </div>
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value" style="color: var(--critical);">89%</div>
+                                            <div class="entity-metric-label">Memory</div>
+                                        </div>
+                                        <div class="entity-status critical"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MZ 3: CRM-Database-Cluster (Warning) -->
+                        <div class="entity-section" id="mz-database">
+                            <div class="entity-header" onclick="toggleSection('mz-database')">
+                                <div class="entity-header-left">
+                                    <div class="entity-mz-icon" style="background: var(--warning-bg); color: var(--warning);"><i class="fas fa-exclamation"></i></div>
+                                    <span class="entity-mz-name">CRM-Database-Cluster</span>
+                                </div>
+                                <div class="entity-header-right">
+                                    <span class="entity-count-badge" style="background: var(--warning-bg); color: var(--warning);">12 Entities</span>
+                                    <i class="fas fa-chevron-down expand-icon"></i>
+                                </div>
+                            </div>
+                            <div class="entity-list">
+                                <div class="entity-item">
+                                    <div class="entity-item-left">
+                                        <div class="entity-type-icon database"><i class="fas fa-database"></i></div>
+                                        <span class="entity-item-name">crm-sqlserver-primary</span>
+                                    </div>
+                                    <div class="entity-item-right">
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value" style="color: var(--warning);">312ms</div>
+                                            <div class="entity-metric-label">Query Time</div>
+                                        </div>
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value">78%</div>
+                                            <div class="entity-metric-label">Connections</div>
+                                        </div>
+                                        <div class="entity-status warning"></div>
+                                    </div>
+                                </div>
+                                <div class="entity-item">
+                                    <div class="entity-item-left">
+                                        <div class="entity-type-icon database"><i class="fas fa-database"></i></div>
+                                        <span class="entity-item-name">crm-mongodb-cluster</span>
+                                    </div>
+                                    <div class="entity-item-right">
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value">145ms</div>
+                                            <div class="entity-metric-label">Query Time</div>
+                                        </div>
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value">62%</div>
+                                            <div class="entity-metric-label">Connections</div>
+                                        </div>
+                                        <div class="entity-status healthy"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MZ 4: CRM-API-Gateway -->
+                        <div class="entity-section" id="mz-api">
+                            <div class="entity-header" onclick="toggleSection('mz-api')">
+                                <div class="entity-header-left">
+                                    <div class="entity-mz-icon" style="background: var(--healthy-bg); color: var(--healthy);"><i class="fas fa-check"></i></div>
+                                    <span class="entity-mz-name">CRM-API-Gateway</span>
+                                </div>
+                                <div class="entity-header-right">
+                                    <span class="entity-count-badge">12 Entities</span>
+                                    <i class="fas fa-chevron-down expand-icon"></i>
+                                </div>
+                            </div>
+                            <div class="entity-list">
+                                <div class="entity-item">
+                                    <div class="entity-item-left">
+                                        <div class="entity-type-icon service"><i class="fas fa-cog"></i></div>
+                                        <span class="entity-item-name">api-gateway-main</span>
+                                    </div>
+                                    <div class="entity-item-right">
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value">78ms</div>
+                                            <div class="entity-metric-label">Latency</div>
+                                        </div>
+                                        <div class="entity-metric">
+                                            <div class="entity-metric-value">0.04%</div>
+                                            <div class="entity-metric-label">Error</div>
+                                        </div>
+                                        <div class="entity-status healthy"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column">
+                <!-- Health Gauge -->
+                <div class="section-card" style="margin-bottom: 24px;">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fas fa-heartbeat"></i>
+                            CRM Health Score
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="health-gauge">
+                            <div class="gauge-circle" style="--health-percent: 94.2;">
+                                <div class="gauge-inner">
+                                    <div class="gauge-value">94.2%</div>
+                                    <div class="gauge-label">Overall Health</div>
+                                </div>
+                            </div>
+                            <div class="gauge-legend">
+                                <div class="legend-item">
+                                    <div class="legend-dot healthy"></div>
+                                    <span>5 Healthy</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot warning"></div>
+                                    <span>1 Warning</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot critical"></div>
+                                    <span>1 Critical</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Latency by MZ -->
+                <div class="section-card" style="margin-bottom: 24px;">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fas fa-stopwatch"></i>
+                            Latency by Management Zone
+                        </div>
+                    </div>
+                    <div class="section-body" style="padding-top: 8px;">
+                        <div class="latency-grid">
+                            <div class="latency-card good">
+                                <div class="latency-card-header">
+                                    <div class="latency-card-name">Cache-Layer</div>
+                                    <div class="latency-card-value good">12ms</div>
+                                </div>
+                                <div class="latency-card-stats">
+                                    <div class="latency-stat">
+                                        <div class="latency-stat-value">28ms</div>
+                                        <div class="latency-stat-label">P95</div>
+                                    </div>
+                                    <div class="latency-stat">
+                                        <div class="latency-stat-value">0.02%</div>
+                                        <div class="latency-stat-label">Error</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="latency-card good">
+                                <div class="latency-card-header">
+                                    <div class="latency-card-name">Auth-Services</div>
+                                    <div class="latency-card-value good">67ms</div>
+                                </div>
+                                <div class="latency-card-stats">
+                                    <div class="latency-stat">
+                                        <div class="latency-stat-value">112ms</div>
+                                        <div class="latency-stat-label">P95</div>
+                                    </div>
+                                    <div class="latency-stat">
+                                        <div class="latency-stat-value">0.05%</div>
+                                        <div class="latency-stat-label">Error</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="latency-card good">
+                                <div class="latency-card-header">
+                                    <div class="latency-card-name">API-Gateway</div>
+                                    <div class="latency-card-value good">89ms</div>
+                                </div>
+                                <div class="latency-card-stats">
+                                    <div class="latency-stat">
+                                        <div class="latency-stat-value">156ms</div>
+                                        <div class="latency-stat-label">P95</div>
+                                    </div>
+                                    <div class="latency-stat">
+                                        <div class="latency-stat-value">0.08%</div>
+                                        <div class="latency-stat-label">Error</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="latency-card good">
+                                <div class="latency-card-header">
+                                    <div class="latency-card-name">Core-Services</div>
+                                    <div class="latency-card-value good">142ms</div>
+                                </div>
+                                <div class="latency-card-stats">
+                                    <div class="latency-stat">
+                                        <div class="latency-stat-value">218ms</div>
+                                        <div class="latency-stat-label">P95</div>
+                                    </div>
+                                    <div class="latency-stat">
+                                        <div class="latency-stat-value">0.12%</div>
+                                        <div class="latency-stat-label">Error</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="latency-card moderate">
+                                <div class="latency-card-header">
+                                    <div class="latency-card-name">Database-Cluster</div>
+                                    <div class="latency-card-value moderate">287ms</div>
+                                </div>
+                                <div class="latency-card-stats">
+                                    <div class="latency-stat">
+                                        <div class="latency-stat-value">412ms</div>
+                                        <div class="latency-stat-label">P95</div>
+                                    </div>
+                                    <div class="latency-stat">
+                                        <div class="latency-stat-value">0.21%</div>
+                                        <div class="latency-stat-label">Error</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="latency-card slow">
+                                <div class="latency-card-header">
+                                    <div class="latency-card-name">Reporting-Engine</div>
+                                    <div class="latency-card-value slow">892ms</div>
+                                </div>
+                                <div class="latency-card-stats">
+                                    <div class="latency-stat">
+                                        <div class="latency-stat-value">1.4s</div>
+                                        <div class="latency-stat-label">P95</div>
+                                    </div>
+                                    <div class="latency-stat">
+                                        <div class="latency-stat-value">2.34%</div>
+                                        <div class="latency-stat-label">Error</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Alerts -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fas fa-bell"></i>
+                            Active Alerts
+                        </div>
+                        <span class="status-badge critical" style="font-size: 10px;">3 Active</span>
+                    </div>
+                    <div class="section-body" style="padding: 0;">
+                        <div class="alerts-list">
+                            <div class="alert-item">
+                                <div class="alert-icon critical">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <div class="alert-title">High latency on CRM-Reporting-Engine</div>
+                                    <div class="alert-meta">
+                                        <span>report-generator-svc</span>
+                                        <span>•</span>
+                                        <span class="alert-time"><i class="far fa-clock"></i> 12 min ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="alert-item">
+                                <div class="alert-icon warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <div class="alert-title">Database connection pool near capacity</div>
+                                    <div class="alert-meta">
+                                        <span>reporting-db-primary</span>
+                                        <span>•</span>
+                                        <span class="alert-time"><i class="far fa-clock"></i> 28 min ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="alert-item">
+                                <div class="alert-icon warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <div class="alert-title">Elevated query times on SQL Server</div>
+                                    <div class="alert-meta">
+                                        <span>crm-sqlserver-primary</span>
+                                        <span>•</span>
+                                        <span class="alert-time"><i class="far fa-clock"></i> 45 min ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+            document.getElementById('currentTime').textContent = now.toLocaleDateString('en-US', options);
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Toggle entity sections
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.classList.toggle('expanded');
+        }
+
+        // Chart.js setup
+        Chart.defaults.font.family = "'Inter', sans-serif";
+
+        // Main latency chart
+        const latencyCtx = document.getElementById('latencyChart').getContext('2d');
+        new Chart(latencyCtx, {
+            type: 'line',
+            data: {
+                labels: ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'],
+                datasets: [
+                    {
+                        label: 'Core-Services',
+                        data: [135, 142, 138, 145, 152, 148, 142, 138, 145, 142, 140, 142],
+                        borderColor: '#4caf50',
+                        backgroundColor: '#4caf5020',
+                        tension: 0.4,
+                        fill: false,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'API-Gateway',
+                        data: [82, 88, 85, 92, 95, 89, 85, 88, 92, 89, 86, 89],
+                        borderColor: '#2196f3',
+                        backgroundColor: '#2196f320',
+                        tension: 0.4,
+                        fill: false,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Database-Cluster',
+                        data: [245, 268, 278, 295, 312, 298, 285, 275, 292, 287, 280, 287],
+                        borderColor: '#ff9800',
+                        backgroundColor: '#ff980020',
+                        tension: 0.4,
+                        fill: false,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Reporting-Engine',
+                        data: [420, 485, 512, 678, 824, 912, 945, 892, 856, 912, 878, 892],
+                        borderColor: '#f44336',
+                        backgroundColor: '#f4433620',
+                        tension: 0.4,
+                        fill: false,
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: { size: 11 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#fff',
+                        titleColor: '#212121',
+                        bodyColor: '#616161',
+                        borderColor: '#e0e0e0',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.raw + 'ms';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#9e9e9e', font: { size: 10 } }
+                    },
+                    y: {
+                        grid: { color: '#f0f0f0' },
+                        ticks: { 
+                            color: '#9e9e9e', 
+                            font: { size: 10 },
+                            callback: function(value) { return value + 'ms'; }
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Mini trend sparklines
+        function createTrendMini(canvasId, data, color) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map((_, i) => i),
+                    datasets: [{
+                        data: data,
+                        borderColor: color,
+                        borderWidth: 1.5,
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { display: false }
+                    }
+                }
+            });
+        }
+
+        createTrendMini('trend1', [138, 142, 140, 145, 142, 138, 140, 142], '#4caf50');
+        createTrendMini('trend2', [85, 88, 92, 89, 86, 88, 90, 89], '#4caf50');
+        createTrendMini('trend3', [265, 278, 295, 302, 298, 285, 290, 287], '#ff9800');
+        createTrendMini('trend4', [185, 192, 198, 205, 198, 195, 200, 198], '#4caf50');
+        createTrendMini('trend5', [520, 645, 782, 856, 912, 878, 892, 892], '#f44336');
+        createTrendMini('trend6', [62, 65, 68, 70, 67, 65, 68, 67], '#4caf50');
+        createTrendMini('trend7', [10, 12, 11, 13, 12, 11, 12, 12], '#4caf50');
+
+        // Refresh button
+        document.getElementById('refreshBtn').addEventListener('click', function() {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing';
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

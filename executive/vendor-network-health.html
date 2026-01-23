@@ -1,0 +1,2068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Network Health - Contact Center Operations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            /* Material Design Light Theme */
+            --bg: #f5f5f5;
+            --bg-secondary: #fafafa;
+            --card: #ffffff;
+            --card-hover: #f8f9fa;
+            --border: #e0e0e0;
+            --border-light: #eeeeee;
+            --text-primary: #212121;
+            --text-secondary: #616161;
+            --text-muted: #9e9e9e;
+            
+            /* Material Colors */
+            --success: #4caf50;
+            --success-light: #e8f5e9;
+            --warning: #ff9800;
+            --warning-light: #fff3e0;
+            --danger: #f44336;
+            --danger-light: #ffebee;
+            --info: #2196f3;
+            --info-light: #e3f2fd;
+            --purple: #9c27b0;
+            --purple-light: #f3e5f5;
+            --teal: #009688;
+            --teal-light: #e0f2f1;
+            --cyan: #00bcd4;
+            --cyan-light: #e0f7fa;
+            --indigo: #3f51b5;
+            --indigo-light: #e8eaf6;
+            --orange: #ff5722;
+            --orange-light: #fbe9e7;
+            
+            /* Material Elevation Shadows */
+            --shadow-1: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-2: 0 3px 6px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-3: 0 10px 20px rgba(0,0,0,0.08), 0 3px 6px rgba(0,0,0,0.06);
+            --shadow-4: 0 15px 25px rgba(0,0,0,0.10), 0 5px 10px rgba(0,0,0,0.06);
+            
+            /* Vendor Colors */
+            --vendor-teleperformance: #e91e63;
+            --vendor-concentrix: #9c27b0;
+            --vendor-ttec: #2196f3;
+            --vendor-alorica: #ff9800;
+            --vendor-sitel: #4caf50;
+            --vendor-internal: #3f51b5;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ========== NAVBAR ========== */
+        .navbar {
+            background: var(--card);
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-2);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--cyan);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .nav-title span {
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .nav-center {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--bg);
+            padding: 4px;
+            border-radius: 10px;
+        }
+
+        .nav-tab {
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: var(--card);
+        }
+
+        .nav-tab.active {
+            color: white;
+            background: var(--cyan);
+            box-shadow: var(--shadow-1);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .nav-time {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ========== HEADER ========== */
+        .page-header {
+            background: var(--card);
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .header-title h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title h1 i {
+            color: var(--cyan);
+        }
+
+        .header-title p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-ghost {
+            background: var(--bg);
+            color: var(--text-secondary);
+            box-shadow: var(--shadow-1);
+        }
+
+        .btn-ghost:hover {
+            background: var(--border);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-2);
+        }
+
+        .btn-primary {
+            background: var(--cyan);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #00acc1;
+            box-shadow: var(--shadow-2);
+        }
+
+        /* ========== SUMMARY CARDS ========== */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+        }
+
+        .summary-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 16px 20px;
+            border: none;
+            box-shadow: var(--shadow-1);
+            position: relative;
+            overflow: hidden;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .summary-card:hover {
+            box-shadow: var(--shadow-2);
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .summary-card.green::before { background: var(--success); }
+        .summary-card.yellow::before { background: var(--warning); }
+        .summary-card.red::before { background: var(--danger); }
+        .summary-card.blue::before { background: var(--info); }
+        .summary-card.cyan::before { background: var(--cyan); }
+
+        .summary-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .summary-detail {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .summary-detail.positive { color: var(--success); }
+        .summary-detail.negative { color: var(--danger); }
+
+        /* ========== MAIN CONTENT ========== */
+        .main {
+            padding: 28px 32px;
+        }
+
+        /* ========== CARD STYLES ========== */
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            border: none;
+            box-shadow: var(--shadow-1);
+            overflow: hidden;
+            transition: box-shadow 0.2s ease;
+            margin-bottom: 24px;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-2);
+        }
+
+        .card-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--cyan);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .card-btn {
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            background: var(--bg);
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            box-shadow: var(--shadow-1);
+        }
+
+        .card-btn:hover {
+            background: var(--border);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-2);
+        }
+
+        .card-btn.active {
+            background: var(--cyan);
+            color: white;
+        }
+
+        .card-body {
+            padding: 22px;
+        }
+
+        /* ========== VENDOR NETWORK TABLE ========== */
+        .network-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .network-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .network-table th,
+        .network-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .network-table th {
+            background: var(--bg);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .network-table th.text-center,
+        .network-table td.text-center {
+            text-align: center;
+        }
+
+        .network-table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .network-table tbody tr:hover {
+            background: var(--bg);
+        }
+
+        .network-table td {
+            color: var(--text-secondary);
+        }
+
+        .network-table tfoot tr {
+            background: var(--bg);
+            border-top: 2px solid var(--border);
+        }
+
+        .network-table tfoot td {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .vendor-name-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .vendor-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .vendor-name-cell span {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .vendor-name-cell small {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* Metric Cells */
+        .metric-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .metric-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .metric-value.good { color: var(--success); }
+        .metric-value.warning { color: var(--warning); }
+        .metric-value.critical { color: var(--danger); }
+
+        .metric-bar {
+            width: 60px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .metric-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+        }
+
+        .metric-bar-fill.good { background: var(--success); }
+        .metric-bar-fill.warning { background: var(--warning); }
+        .metric-bar-fill.critical { background: var(--danger); }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-badge.healthy { background: var(--success-light); color: var(--success); }
+        .status-badge.degraded { background: var(--warning-light); color: var(--warning); }
+        .status-badge.critical { background: var(--danger-light); color: var(--danger); }
+
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* Connection Type Badge */
+        .connection-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .connection-badge.mpls { background: var(--purple-light); color: var(--purple); }
+        .connection-badge.vpn { background: var(--info-light); color: var(--info); }
+        .connection-badge.direct { background: var(--teal-light); color: var(--teal); }
+        .connection-badge.sd-wan { background: var(--indigo-light); color: var(--indigo); }
+
+        /* ========== VENDOR DETAIL CARDS ========== */
+        .vendor-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .vendor-detail-card {
+            background: var(--card);
+            border-radius: 12px;
+            border: none;
+            box-shadow: var(--shadow-1);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .vendor-detail-card:hover {
+            box-shadow: var(--shadow-3);
+            transform: translateY(-2px);
+        }
+
+        .vendor-detail-header {
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .vendor-detail-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .vendor-detail-body {
+            padding: 20px;
+        }
+
+        .network-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .network-metric {
+            background: var(--bg);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .network-metric-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 14px;
+        }
+
+        .network-metric-icon.latency { background: var(--info-light); color: var(--info); }
+        .network-metric-icon.jitter { background: var(--purple-light); color: var(--purple); }
+        .network-metric-icon.packet-loss { background: var(--danger-light); color: var(--danger); }
+        .network-metric-icon.mos { background: var(--success-light); color: var(--success); }
+        .network-metric-icon.bandwidth { background: var(--cyan-light); color: var(--cyan); }
+        .network-metric-icon.uptime { background: var(--teal-light); color: var(--teal); }
+
+        .network-metric-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .network-metric-value.good { color: var(--success); }
+        .network-metric-value.warning { color: var(--warning); }
+        .network-metric-value.critical { color: var(--danger); }
+
+        .network-metric-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .network-metric-threshold {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Site List */
+        .site-list {
+            border-top: 1px solid var(--border);
+            padding-top: 16px;
+        }
+
+        .site-list-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .site-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: var(--bg);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .site-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .site-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .site-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .site-status-dot.healthy { background: var(--success); }
+        .site-status-dot.degraded { background: var(--warning); }
+        .site-status-dot.down { background: var(--danger); }
+
+        .site-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .site-location {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .site-latency {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* ========== CHARTS SECTION ========== */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .chart-container {
+            height: 280px;
+            position: relative;
+        }
+
+        /* ========== ALERTS SECTION ========== */
+        .alerts-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+
+        .alert-item:hover {
+            background: var(--bg);
+        }
+
+        .alert-item:last-child {
+            border-bottom: none;
+        }
+
+        .alert-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .alert-icon.critical { background: var(--danger-light); color: var(--danger); }
+        .alert-icon.warning { background: var(--warning-light); color: var(--warning); }
+        .alert-icon.info { background: var(--info-light); color: var(--info); }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .alert-description {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .alert-meta {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .alert-meta span {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .alert-time {
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* ========== CRITICAL PARAMETERS SECTION ========== */
+        .params-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .param-card {
+            background: var(--bg);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .param-card:hover {
+            box-shadow: var(--shadow-1);
+        }
+
+        .param-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 18px;
+        }
+
+        .param-icon.blue { background: var(--info-light); color: var(--info); }
+        .param-icon.purple { background: var(--purple-light); color: var(--purple); }
+        .param-icon.teal { background: var(--teal-light); color: var(--teal); }
+        .param-icon.orange { background: var(--orange-light); color: var(--orange); }
+        .param-icon.cyan { background: var(--cyan-light); color: var(--cyan); }
+        .param-icon.green { background: var(--success-light); color: var(--success); }
+        .param-icon.red { background: var(--danger-light); color: var(--danger); }
+        .param-icon.indigo { background: var(--indigo-light); color: var(--indigo); }
+
+        .param-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .param-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .param-threshold {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .param-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 8px;
+        }
+
+        .param-status.good { background: var(--success-light); color: var(--success); }
+        .param-status.warning { background: var(--warning-light); color: var(--warning); }
+        .param-status.critical { background: var(--danger-light); color: var(--danger); }
+
+        /* ========== API REFERENCE ========== */
+        .api-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .api-card {
+            background: var(--card);
+            border-radius: 12px;
+            border: none;
+            box-shadow: var(--shadow-1);
+            padding: 18px;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .api-card:hover {
+            box-shadow: var(--shadow-2);
+        }
+
+        .api-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .api-method {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .api-method.get { background: var(--success-light); color: var(--success); }
+        .api-method.post { background: var(--info-light); color: var(--info); }
+
+        .api-endpoint {
+            font-family: 'Menlo', monospace;
+            font-size: 11px;
+            color: var(--info);
+            background: var(--bg);
+            padding: 6px 10px;
+            border-radius: 6px;
+            flex: 1;
+        }
+
+        .api-description {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .api-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .api-detail {
+            background: var(--bg);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .api-detail-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .api-detail-value {
+            font-size: 11px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1400px) {
+            .vendor-detail-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .summary-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .params-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .api-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .vendor-detail-grid {
+                grid-template-columns: 1fr;
+            }
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <div class="nav-logo"><i class="fas fa-network-wired"></i></div>
+            <div class="nav-title">Network Operations <span>| Vendor Health</span></div>
+        </div>
+
+        <div class="nav-center">
+            <a href="enterprise-leading-indicators.html" class="nav-tab">Leading Indicators</a>
+            <a href="agent-availability-productivity.html" class="nav-tab">Agent Availability</a>
+            <a href="#" class="nav-tab active">Network Health</a>
+            <a href="executive-summary-dashboard.html" class="nav-tab">Executive Summary</a>
+        </div>
+
+        <div class="nav-right">
+            <div class="live-indicator">
+                <div class="live-dot"></div>
+                LIVE | 30s refresh
+            </div>
+            <div class="nav-time">
+                <i class="far fa-clock"></i>
+                <span id="currentTime">Loading...</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-top">
+            <div class="header-title">
+                <h1><i class="fas fa-signal"></i> Vendor Network Health Dashboard</h1>
+                <p>Real-time network performance monitoring across all vendor sites • ThousandEyes & SolarWinds integration</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-ghost">
+                    <i class="fas fa-download"></i> Export Report
+                </button>
+                <button class="btn btn-primary" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="summary-card green">
+                <div class="summary-label">Overall Health</div>
+                <div class="summary-value">94.2%</div>
+                <div class="summary-detail positive"><i class="fas fa-arrow-up"></i> 1.3% from last hour</div>
+            </div>
+            <div class="summary-card cyan">
+                <div class="summary-label">Avg Latency</div>
+                <div class="summary-value">42ms</div>
+                <div class="summary-detail">Target: &lt;50ms</div>
+            </div>
+            <div class="summary-card blue">
+                <div class="summary-label">Avg MOS Score</div>
+                <div class="summary-value">4.21</div>
+                <div class="summary-detail positive"><i class="fas fa-check"></i> Above threshold</div>
+            </div>
+            <div class="summary-card yellow">
+                <div class="summary-label">Active Alerts</div>
+                <div class="summary-value">7</div>
+                <div class="summary-detail negative">3 critical, 4 warning</div>
+            </div>
+            <div class="summary-card red">
+                <div class="summary-label">Sites Degraded</div>
+                <div class="summary-value">4</div>
+                <div class="summary-detail negative">Out of 42 total sites</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Vendor Network Summary Table -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-table"></i>
+                    Vendor Network Summary
+                </div>
+                <div class="card-actions">
+                    <button class="card-btn active">Real-time</button>
+                    <button class="card-btn">Last Hour</button>
+                    <button class="card-btn">Today</button>
+                </div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <div class="network-table-wrapper">
+                    <table class="network-table">
+                        <thead>
+                            <tr>
+                                <th>Vendor</th>
+                                <th class="text-center">Connection</th>
+                                <th class="text-center">Latency</th>
+                                <th class="text-center">Jitter</th>
+                                <th class="text-center">Packet Loss</th>
+                                <th class="text-center">MOS Score</th>
+                                <th class="text-center">Bandwidth</th>
+                                <th class="text-center">Uptime</th>
+                                <th class="text-center">Sites</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="vendor-name-cell">
+                                        <div class="vendor-dot" style="background: var(--vendor-teleperformance);"></div>
+                                        <div>
+                                            <span>Teleperformance</span>
+                                            <small>12 sites across 4 regions</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center"><span class="connection-badge mpls">MPLS</span></td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value warning">58ms</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill warning" style="width: 72%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value good">12ms</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill good" style="width: 30%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value good">0.08%</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill good" style="width: 8%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="metric-value warning">3.89</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value good">67%</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill good" style="width: 67%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center"><span class="metric-value good">99.94%</span></td>
+                                <td class="text-center">12/12</td>
+                                <td class="text-center"><span class="status-badge degraded">Degraded</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="vendor-name-cell">
+                                        <div class="vendor-dot" style="background: var(--vendor-concentrix);"></div>
+                                        <div>
+                                            <span>Concentrix</span>
+                                            <small>8 sites across 3 regions</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center"><span class="connection-badge sd-wan">SD-WAN</span></td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value good">34ms</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill good" style="width: 42%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value good">8ms</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill good" style="width: 20%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value good">0.02%</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill good" style="width: 2%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="metric-value good">4.34</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value good">54%</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill good" style="width: 54%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center"><span class="metric-value good">99.99%</span></td>
+                                <td class="text-center">8/8</td>
+                                <td class="text-center"><span class="status-badge healthy">Healthy</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="vendor-name-cell">
+                                        <div class="vendor-dot" style="background: var(--vendor-ttec);"></div>
+                                        <div>
+                                            <span>TTEC</span>
+                                            <small>7 sites across 3 regions</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center"><span class="connection-badge vpn">VPN</span></td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value good">41ms</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill good" style="width: 51%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value good">15ms</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill good" style="width: 37%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value good">0.05%</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill good" style="width: 5%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="metric-value good">4.18</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value warning">78%</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill warning" style="width: 78%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center"><span class="metric-value good">99.97%</span></td>
+                                <td class="text-center">7/7</td>
+                                <td class="text-center"><span class="status-badge healthy">Healthy</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="vendor-name-cell">
+                                        <div class="vendor-dot" style="background: var(--vendor-alorica);"></div>
+                                        <div>
+                                            <span>Alorica</span>
+                                            <small>6 sites across 2 regions</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center"><span class="connection-badge mpls">MPLS</span></td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value critical">87ms</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill critical" style="width: 95%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value critical">45ms</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill critical" style="width: 90%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value critical">2.3%</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill critical" style="width: 100%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="metric-value critical">3.21</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value critical">92%</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill critical" style="width: 92%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center"><span class="metric-value warning">98.87%</span></td>
+                                <td class="text-center">4/6</td>
+                                <td class="text-center"><span class="status-badge critical">Critical</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="vendor-name-cell">
+                                        <div class="vendor-dot" style="background: var(--vendor-sitel);"></div>
+                                        <div>
+                                            <span>Foundever (Sitel)</span>
+                                            <small>5 sites across 2 regions</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center"><span class="connection-badge direct">Direct</span></td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value good">28ms</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill good" style="width: 35%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value good">6ms</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill good" style="width: 15%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value good">0.01%</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill good" style="width: 1%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="metric-value good">4.41</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value good">48%</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill good" style="width: 48%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center"><span class="metric-value good">99.99%</span></td>
+                                <td class="text-center">5/5</td>
+                                <td class="text-center"><span class="status-badge healthy">Healthy</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="vendor-name-cell">
+                                        <div class="vendor-dot" style="background: var(--vendor-internal);"></div>
+                                        <div>
+                                            <span>Internal (FTE)</span>
+                                            <small>4 sites across 2 regions</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center"><span class="connection-badge direct">Direct</span></td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value good">18ms</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill good" style="width: 22%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value good">4ms</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill good" style="width: 10%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value good">0.00%</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill good" style="width: 0%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="metric-value good">4.48</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="metric-cell">
+                                        <span class="metric-value good">35%</span>
+                                        <div class="metric-bar"><div class="metric-bar-fill good" style="width: 35%;"></div></div>
+                                    </div>
+                                </td>
+                                <td class="text-center"><span class="metric-value good">100%</span></td>
+                                <td class="text-center">4/4</td>
+                                <td class="text-center"><span class="status-badge healthy">Healthy</span></td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td><strong>AVERAGE / TOTAL</strong></td>
+                                <td class="text-center">—</td>
+                                <td class="text-center"><strong>42ms</strong></td>
+                                <td class="text-center"><strong>15ms</strong></td>
+                                <td class="text-center"><strong>0.41%</strong></td>
+                                <td class="text-center"><strong>4.09</strong></td>
+                                <td class="text-center"><strong>62%</strong></td>
+                                <td class="text-center"><strong>99.79%</strong></td>
+                                <td class="text-center"><strong>40/42</strong></td>
+                                <td class="text-center">—</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Critical Network Parameters -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Critical Network Parameters & Thresholds
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="params-grid">
+                    <div class="param-card">
+                        <div class="param-icon blue"><i class="fas fa-stopwatch"></i></div>
+                        <div class="param-label">Round-Trip Latency</div>
+                        <div class="param-value">42ms</div>
+                        <div class="param-threshold">Threshold: &lt;80ms (Good), &lt;150ms (Warning)</div>
+                        <span class="param-status good">Good</span>
+                    </div>
+                    <div class="param-card">
+                        <div class="param-icon purple"><i class="fas fa-wave-square"></i></div>
+                        <div class="param-label">Network Jitter</div>
+                        <div class="param-value">15ms</div>
+                        <div class="param-threshold">Threshold: &lt;30ms (Good), &lt;50ms (Warning)</div>
+                        <span class="param-status good">Good</span>
+                    </div>
+                    <div class="param-card">
+                        <div class="param-icon red"><i class="fas fa-chart-line"></i></div>
+                        <div class="param-label">Packet Loss Rate</div>
+                        <div class="param-value">0.41%</div>
+                        <div class="param-threshold">Threshold: &lt;1% (Good), &lt;3% (Warning)</div>
+                        <span class="param-status good">Good</span>
+                    </div>
+                    <div class="param-card">
+                        <div class="param-icon green"><i class="fas fa-microphone"></i></div>
+                        <div class="param-label">MOS Score (Voice)</div>
+                        <div class="param-value">4.09</div>
+                        <div class="param-threshold">Threshold: &gt;4.0 (Good), &gt;3.5 (Warning)</div>
+                        <span class="param-status good">Good</span>
+                    </div>
+                    <div class="param-card">
+                        <div class="param-icon cyan"><i class="fas fa-tachometer-alt"></i></div>
+                        <div class="param-label">Bandwidth Utilization</div>
+                        <div class="param-value">62%</div>
+                        <div class="param-threshold">Threshold: &lt;70% (Good), &lt;85% (Warning)</div>
+                        <span class="param-status good">Good</span>
+                    </div>
+                    <div class="param-card">
+                        <div class="param-icon teal"><i class="fas fa-server"></i></div>
+                        <div class="param-label">Network Uptime</div>
+                        <div class="param-value">99.79%</div>
+                        <div class="param-threshold">Threshold: &gt;99.9% (Good), &gt;99.5% (Warning)</div>
+                        <span class="param-status warning">Warning</span>
+                    </div>
+                    <div class="param-card">
+                        <div class="param-icon orange"><i class="fas fa-clock"></i></div>
+                        <div class="param-label">DNS Response Time</div>
+                        <div class="param-value">12ms</div>
+                        <div class="param-threshold">Threshold: &lt;50ms (Good), &lt;100ms (Warning)</div>
+                        <span class="param-status good">Good</span>
+                    </div>
+                    <div class="param-card">
+                        <div class="param-icon indigo"><i class="fas fa-shield-alt"></i></div>
+                        <div class="param-label">VPN Tunnel Status</div>
+                        <div class="param-value">23/24</div>
+                        <div class="param-threshold">Active tunnels / Total configured</div>
+                        <span class="param-status warning">1 Down</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts and Alerts Row -->
+        <div class="charts-grid">
+            <!-- Latency Trend Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-chart-area"></i>
+                        Latency Trend by Vendor (Last 24 Hours)
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="latencyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Alerts -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-bell"></i>
+                        Active Network Alerts
+                    </div>
+                    <span class="status-badge critical">7 Active</span>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <div class="alerts-list">
+                        <div class="alert-item">
+                            <div class="alert-icon critical"><i class="fas fa-exclamation-circle"></i></div>
+                            <div class="alert-content">
+                                <div class="alert-title">High Packet Loss - Alorica Manila</div>
+                                <div class="alert-description">Packet loss at 2.3% exceeds critical threshold of 1%. Affecting voice quality.</div>
+                                <div class="alert-meta">
+                                    <span><i class="fas fa-building"></i> Alorica</span>
+                                    <span><i class="fas fa-map-marker-alt"></i> Manila, PH</span>
+                                </div>
+                            </div>
+                            <div class="alert-time">3 min ago</div>
+                        </div>
+                        <div class="alert-item">
+                            <div class="alert-icon critical"><i class="fas fa-exclamation-circle"></i></div>
+                            <div class="alert-content">
+                                <div class="alert-title">High Latency - Alorica Cebu</div>
+                                <div class="alert-description">RTT latency at 87ms exceeds threshold. MPLS circuit investigation needed.</div>
+                                <div class="alert-meta">
+                                    <span><i class="fas fa-building"></i> Alorica</span>
+                                    <span><i class="fas fa-map-marker-alt"></i> Cebu, PH</span>
+                                </div>
+                            </div>
+                            <div class="alert-time">8 min ago</div>
+                        </div>
+                        <div class="alert-item">
+                            <div class="alert-icon critical"><i class="fas fa-exclamation-circle"></i></div>
+                            <div class="alert-content">
+                                <div class="alert-title">Site Unreachable - Alorica Davao</div>
+                                <div class="alert-description">Primary and backup circuits down. 342 agents affected.</div>
+                                <div class="alert-meta">
+                                    <span><i class="fas fa-building"></i> Alorica</span>
+                                    <span><i class="fas fa-map-marker-alt"></i> Davao, PH</span>
+                                </div>
+                            </div>
+                            <div class="alert-time">15 min ago</div>
+                        </div>
+                        <div class="alert-item">
+                            <div class="alert-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="alert-content">
+                                <div class="alert-title">Elevated Latency - Teleperformance Athens</div>
+                                <div class="alert-description">Latency increased to 58ms from baseline of 35ms.</div>
+                                <div class="alert-meta">
+                                    <span><i class="fas fa-building"></i> Teleperformance</span>
+                                    <span><i class="fas fa-map-marker-alt"></i> Athens, GR</span>
+                                </div>
+                            </div>
+                            <div class="alert-time">22 min ago</div>
+                        </div>
+                        <div class="alert-item">
+                            <div class="alert-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="alert-content">
+                                <div class="alert-title">Bandwidth Threshold - TTEC Denver</div>
+                                <div class="alert-description">Bandwidth utilization at 78%, approaching warning threshold.</div>
+                                <div class="alert-meta">
+                                    <span><i class="fas fa-building"></i> TTEC</span>
+                                    <span><i class="fas fa-map-marker-alt"></i> Denver, US</span>
+                                </div>
+                            </div>
+                            <div class="alert-time">45 min ago</div>
+                        </div>
+                        <div class="alert-item">
+                            <div class="alert-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="alert-content">
+                                <div class="alert-title">VPN Tunnel Flapping - TTEC Austin</div>
+                                <div class="alert-description">VPN tunnel has reconnected 3 times in the last hour.</div>
+                                <div class="alert-meta">
+                                    <span><i class="fas fa-building"></i> TTEC</span>
+                                    <span><i class="fas fa-map-marker-alt"></i> Austin, US</span>
+                                </div>
+                            </div>
+                            <div class="alert-time">1 hr ago</div>
+                        </div>
+                        <div class="alert-item">
+                            <div class="alert-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="alert-content">
+                                <div class="alert-title">Certificate Expiry Warning</div>
+                                <div class="alert-description">SSL certificate for vpn.alorica.com expires in 14 days.</div>
+                                <div class="alert-meta">
+                                    <span><i class="fas fa-building"></i> Alorica</span>
+                                    <span><i class="fas fa-shield-alt"></i> Security</span>
+                                </div>
+                            </div>
+                            <div class="alert-time">2 hrs ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vendor Detail Cards -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-building"></i>
+                    Vendor Network Details
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="vendor-detail-grid">
+                    <!-- Teleperformance -->
+                    <div class="vendor-detail-card">
+                        <div class="vendor-detail-header">
+                            <div class="vendor-detail-name">
+                                <div class="vendor-dot" style="background: var(--vendor-teleperformance);"></div>
+                                Teleperformance
+                            </div>
+                            <span class="status-badge degraded">Degraded</span>
+                        </div>
+                        <div class="vendor-detail-body">
+                            <div class="network-metrics-grid">
+                                <div class="network-metric">
+                                    <div class="network-metric-icon latency"><i class="fas fa-stopwatch"></i></div>
+                                    <div class="network-metric-value warning">58ms</div>
+                                    <div class="network-metric-label">Latency</div>
+                                </div>
+                                <div class="network-metric">
+                                    <div class="network-metric-icon jitter"><i class="fas fa-wave-square"></i></div>
+                                    <div class="network-metric-value good">12ms</div>
+                                    <div class="network-metric-label">Jitter</div>
+                                </div>
+                                <div class="network-metric">
+                                    <div class="network-metric-icon packet-loss"><i class="fas fa-chart-line"></i></div>
+                                    <div class="network-metric-value good">0.08%</div>
+                                    <div class="network-metric-label">Packet Loss</div>
+                                </div>
+                                <div class="network-metric">
+                                    <div class="network-metric-icon mos"><i class="fas fa-microphone"></i></div>
+                                    <div class="network-metric-value warning">3.89</div>
+                                    <div class="network-metric-label">MOS Score</div>
+                                </div>
+                            </div>
+                            <div class="site-list">
+                                <div class="site-list-title">Site Status (12 sites)</div>
+                                <div class="site-item">
+                                    <div class="site-info">
+                                        <div class="site-status-dot degraded"></div>
+                                        <div>
+                                            <div class="site-name">Athens, GR</div>
+                                            <div class="site-location">Europe</div>
+                                        </div>
+                                    </div>
+                                    <div class="site-latency">58ms</div>
+                                </div>
+                                <div class="site-item">
+                                    <div class="site-info">
+                                        <div class="site-status-dot healthy"></div>
+                                        <div>
+                                            <div class="site-name">Lisbon, PT</div>
+                                            <div class="site-location">Europe</div>
+                                        </div>
+                                    </div>
+                                    <div class="site-latency">32ms</div>
+                                </div>
+                                <div class="site-item">
+                                    <div class="site-info">
+                                        <div class="site-status-dot healthy"></div>
+                                        <div>
+                                            <div class="site-name">Bogota, CO</div>
+                                            <div class="site-location">LATAM</div>
+                                        </div>
+                                    </div>
+                                    <div class="site-latency">45ms</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Concentrix -->
+                    <div class="vendor-detail-card">
+                        <div class="vendor-detail-header">
+                            <div class="vendor-detail-name">
+                                <div class="vendor-dot" style="background: var(--vendor-concentrix);"></div>
+                                Concentrix
+                            </div>
+                            <span class="status-badge healthy">Healthy</span>
+                        </div>
+                        <div class="vendor-detail-body">
+                            <div class="network-metrics-grid">
+                                <div class="network-metric">
+                                    <div class="network-metric-icon latency"><i class="fas fa-stopwatch"></i></div>
+                                    <div class="network-metric-value good">34ms</div>
+                                    <div class="network-metric-label">Latency</div>
+                                </div>
+                                <div class="network-metric">
+                                    <div class="network-metric-icon jitter"><i class="fas fa-wave-square"></i></div>
+                                    <div class="network-metric-value good">8ms</div>
+                                    <div class="network-metric-label">Jitter</div>
+                                </div>
+                                <div class="network-metric">
+                                    <div class="network-metric-icon packet-loss"><i class="fas fa-chart-line"></i></div>
+                                    <div class="network-metric-value good">0.02%</div>
+                                    <div class="network-metric-label">Packet Loss</div>
+                                </div>
+                                <div class="network-metric">
+                                    <div class="network-metric-icon mos"><i class="fas fa-microphone"></i></div>
+                                    <div class="network-metric-value good">4.34</div>
+                                    <div class="network-metric-label">MOS Score</div>
+                                </div>
+                            </div>
+                            <div class="site-list">
+                                <div class="site-list-title">Site Status (8 sites)</div>
+                                <div class="site-item">
+                                    <div class="site-info">
+                                        <div class="site-status-dot healthy"></div>
+                                        <div>
+                                            <div class="site-name">Jacksonville, US</div>
+                                            <div class="site-location">North America</div>
+                                        </div>
+                                    </div>
+                                    <div class="site-latency">22ms</div>
+                                </div>
+                                <div class="site-item">
+                                    <div class="site-info">
+                                        <div class="site-status-dot healthy"></div>
+                                        <div>
+                                            <div class="site-name">Bangalore, IN</div>
+                                            <div class="site-location">APAC</div>
+                                        </div>
+                                    </div>
+                                    <div class="site-latency">48ms</div>
+                                </div>
+                                <div class="site-item">
+                                    <div class="site-info">
+                                        <div class="site-status-dot healthy"></div>
+                                        <div>
+                                            <div class="site-name">Montreal, CA</div>
+                                            <div class="site-location">North America</div>
+                                        </div>
+                                    </div>
+                                    <div class="site-latency">28ms</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alorica -->
+                    <div class="vendor-detail-card">
+                        <div class="vendor-detail-header">
+                            <div class="vendor-detail-name">
+                                <div class="vendor-dot" style="background: var(--vendor-alorica);"></div>
+                                Alorica
+                            </div>
+                            <span class="status-badge critical">Critical</span>
+                        </div>
+                        <div class="vendor-detail-body">
+                            <div class="network-metrics-grid">
+                                <div class="network-metric">
+                                    <div class="network-metric-icon latency"><i class="fas fa-stopwatch"></i></div>
+                                    <div class="network-metric-value critical">87ms</div>
+                                    <div class="network-metric-label">Latency</div>
+                                </div>
+                                <div class="network-metric">
+                                    <div class="network-metric-icon jitter"><i class="fas fa-wave-square"></i></div>
+                                    <div class="network-metric-value critical">45ms</div>
+                                    <div class="network-metric-label">Jitter</div>
+                                </div>
+                                <div class="network-metric">
+                                    <div class="network-metric-icon packet-loss"><i class="fas fa-chart-line"></i></div>
+                                    <div class="network-metric-value critical">2.3%</div>
+                                    <div class="network-metric-label">Packet Loss</div>
+                                </div>
+                                <div class="network-metric">
+                                    <div class="network-metric-icon mos"><i class="fas fa-microphone"></i></div>
+                                    <div class="network-metric-value critical">3.21</div>
+                                    <div class="network-metric-label">MOS Score</div>
+                                </div>
+                            </div>
+                            <div class="site-list">
+                                <div class="site-list-title">Site Status (6 sites - 2 down)</div>
+                                <div class="site-item">
+                                    <div class="site-info">
+                                        <div class="site-status-dot down"></div>
+                                        <div>
+                                            <div class="site-name">Davao, PH</div>
+                                            <div class="site-location">APAC - OFFLINE</div>
+                                        </div>
+                                    </div>
+                                    <div class="site-latency">—</div>
+                                </div>
+                                <div class="site-item">
+                                    <div class="site-info">
+                                        <div class="site-status-dot down"></div>
+                                        <div>
+                                            <div class="site-name">Iloilo, PH</div>
+                                            <div class="site-location">APAC - OFFLINE</div>
+                                        </div>
+                                    </div>
+                                    <div class="site-latency">—</div>
+                                </div>
+                                <div class="site-item">
+                                    <div class="site-info">
+                                        <div class="site-status-dot degraded"></div>
+                                        <div>
+                                            <div class="site-name">Manila, PH</div>
+                                            <div class="site-location">APAC</div>
+                                        </div>
+                                    </div>
+                                    <div class="site-latency">87ms</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Reference -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-code"></i>
+                    Critical Network APIs
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="api-grid">
+                    <div class="api-card">
+                        <div class="api-header">
+                            <span class="api-method get">GET</span>
+                            <span class="api-endpoint">/api/v1/thousandeyes/tests/network</span>
+                        </div>
+                        <div class="api-description">Retrieve network test results including latency, jitter, and packet loss from ThousandEyes agents.</div>
+                        <div class="api-details">
+                            <div class="api-detail">
+                                <div class="api-detail-label">Source</div>
+                                <div class="api-detail-value">ThousandEyes</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Refresh</div>
+                                <div class="api-detail-value">30 seconds</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Auth</div>
+                                <div class="api-detail-value">Bearer Token</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="api-card">
+                        <div class="api-header">
+                            <span class="api-method get">GET</span>
+                            <span class="api-endpoint">/api/v1/solarwinds/nodes/status</span>
+                        </div>
+                        <div class="api-description">Get node status, availability, and response time for all monitored network devices.</div>
+                        <div class="api-details">
+                            <div class="api-detail">
+                                <div class="api-detail-label">Source</div>
+                                <div class="api-detail-value">SolarWinds NPM</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Refresh</div>
+                                <div class="api-detail-value">60 seconds</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Auth</div>
+                                <div class="api-detail-value">API Key</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="api-card">
+                        <div class="api-header">
+                            <span class="api-method get">GET</span>
+                            <span class="api-endpoint">/api/v1/thousandeyes/voice/mos</span>
+                        </div>
+                        <div class="api-description">Retrieve MOS (Mean Opinion Score) metrics for voice quality assessment across all paths.</div>
+                        <div class="api-details">
+                            <div class="api-detail">
+                                <div class="api-detail-label">Source</div>
+                                <div class="api-detail-value">ThousandEyes</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Refresh</div>
+                                <div class="api-detail-value">60 seconds</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Auth</div>
+                                <div class="api-detail-value">Bearer Token</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="api-card">
+                        <div class="api-header">
+                            <span class="api-method get">GET</span>
+                            <span class="api-endpoint">/api/v1/solarwinds/interfaces/utilization</span>
+                        </div>
+                        <div class="api-description">Get bandwidth utilization metrics for all WAN interfaces by vendor site.</div>
+                        <div class="api-details">
+                            <div class="api-detail">
+                                <div class="api-detail-label">Source</div>
+                                <div class="api-detail-value">SolarWinds NPM</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Refresh</div>
+                                <div class="api-detail-value">5 minutes</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Auth</div>
+                                <div class="api-detail-value">API Key</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="api-card">
+                        <div class="api-header">
+                            <span class="api-method get">GET</span>
+                            <span class="api-endpoint">/api/v1/solarwinds/alerts/active</span>
+                        </div>
+                        <div class="api-description">Retrieve all active network alerts including severity, affected nodes, and trigger time.</div>
+                        <div class="api-details">
+                            <div class="api-detail">
+                                <div class="api-detail-label">Source</div>
+                                <div class="api-detail-value">SolarWinds NPM</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Refresh</div>
+                                <div class="api-detail-value">30 seconds</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Auth</div>
+                                <div class="api-detail-value">API Key</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="api-card">
+                        <div class="api-header">
+                            <span class="api-method get">GET</span>
+                            <span class="api-endpoint">/api/v1/thousandeyes/path-vis</span>
+                        </div>
+                        <div class="api-description">Get path visualization data showing hop-by-hop latency and packet loss for troubleshooting.</div>
+                        <div class="api-details">
+                            <div class="api-detail">
+                                <div class="api-detail-label">Source</div>
+                                <div class="api-detail-value">ThousandEyes</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Refresh</div>
+                                <div class="api-detail-value">On-demand</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Auth</div>
+                                <div class="api-detail-value">Bearer Token</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true 
+            });
+            const dateStr = now.toLocaleDateString('en-US', { 
+                weekday: 'short',
+                month: 'short', 
+                day: 'numeric'
+            });
+            document.getElementById('currentTime').textContent = `${dateStr} ${timeStr}`;
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Latency Trend Chart
+        const latencyCtx = document.getElementById('latencyChart').getContext('2d');
+        
+        const labels = [];
+        for (let i = 24; i >= 0; i--) {
+            labels.push(`${i}h ago`);
+        }
+
+        new Chart(latencyCtx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Teleperformance',
+                        data: [35, 36, 38, 40, 42, 45, 48, 52, 55, 58, 56, 54, 52, 50, 48, 50, 52, 55, 58, 56, 54, 56, 58, 57, 58],
+                        borderColor: '#e91e63',
+                        backgroundColor: 'rgba(233, 30, 99, 0.1)',
+                        tension: 0.3,
+                        fill: false,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Concentrix',
+                        data: [32, 33, 34, 33, 32, 34, 35, 34, 33, 34, 35, 34, 33, 32, 34, 35, 34, 33, 34, 35, 34, 33, 34, 34, 34],
+                        borderColor: '#9c27b0',
+                        backgroundColor: 'rgba(156, 39, 176, 0.1)',
+                        tension: 0.3,
+                        fill: false,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'TTEC',
+                        data: [40, 41, 42, 41, 40, 42, 43, 42, 41, 40, 42, 43, 42, 41, 40, 42, 43, 42, 41, 40, 42, 41, 40, 41, 41],
+                        borderColor: '#2196f3',
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        tension: 0.3,
+                        fill: false,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Alorica',
+                        data: [45, 48, 52, 58, 65, 72, 78, 82, 85, 88, 90, 92, 88, 85, 82, 80, 82, 85, 88, 90, 88, 86, 87, 88, 87],
+                        borderColor: '#ff9800',
+                        backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                        tension: 0.3,
+                        fill: false,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Foundever',
+                        data: [28, 27, 28, 29, 28, 27, 28, 29, 28, 27, 28, 29, 28, 27, 28, 29, 28, 27, 28, 29, 28, 27, 28, 28, 28],
+                        borderColor: '#4caf50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        tension: 0.3,
+                        fill: false,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Internal',
+                        data: [18, 17, 18, 19, 18, 17, 18, 19, 18, 17, 18, 19, 18, 17, 18, 19, 18, 17, 18, 19, 18, 17, 18, 18, 18],
+                        borderColor: '#3f51b5',
+                        backgroundColor: 'rgba(63, 81, 181, 0.1)',
+                        tension: 0.3,
+                        fill: false,
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: { size: 11 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'white',
+                        titleColor: '#212121',
+                        bodyColor: '#616161',
+                        borderColor: '#e0e0e0',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.raw}ms`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 0,
+                        max: 100,
+                        grid: {
+                            color: '#eeeeee'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + 'ms';
+                            },
+                            font: { size: 11 },
+                            color: '#9e9e9e'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: { size: 10 },
+                            color: '#9e9e9e',
+                            maxRotation: 0
+                        }
+                    }
+                }
+            }
+        });
+
+        // Refresh button
+        document.getElementById('refreshBtn').addEventListener('click', function() {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

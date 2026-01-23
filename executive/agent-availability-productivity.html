@@ -1,0 +1,2105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Availability & Productivity - Vendor Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            /* Material Design Light Theme */
+            --bg: #f5f5f5;
+            --bg-secondary: #fafafa;
+            --card: #ffffff;
+            --card-hover: #f8f9fa;
+            --border: #e0e0e0;
+            --border-light: #eeeeee;
+            --text-primary: #212121;
+            --text-secondary: #616161;
+            --text-muted: #9e9e9e;
+            
+            /* Material Colors */
+            --success: #4caf50;
+            --success-light: #e8f5e9;
+            --warning: #ff9800;
+            --warning-light: #fff3e0;
+            --danger: #f44336;
+            --danger-light: #ffebee;
+            --info: #2196f3;
+            --info-light: #e3f2fd;
+            --purple: #9c27b0;
+            --purple-light: #f3e5f5;
+            --cyan: #00bcd4;
+            --cyan-light: #e0f7fa;
+            --orange: #ff5722;
+            --pink: #e91e63;
+            
+            /* Material Elevation Shadows */
+            --shadow-1: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-2: 0 3px 6px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-3: 0 10px 20px rgba(0,0,0,0.08), 0 3px 6px rgba(0,0,0,0.06);
+            --shadow-4: 0 15px 25px rgba(0,0,0,0.10), 0 5px 10px rgba(0,0,0,0.06);
+            
+            /* Vendor Colors */
+            --vendor-teleperformance: #e91e63;
+            --vendor-concentrix: #9c27b0;
+            --vendor-ttec: #2196f3;
+            --vendor-alorica: #ff9800;
+            --vendor-sitel: #4caf50;
+            --vendor-internal: #3f51b5;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ========== NAVBAR ========== */
+        .navbar {
+            background: var(--card);
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-2);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--success);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .nav-title span {
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .nav-center {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--bg);
+            padding: 4px;
+            border-radius: 10px;
+        }
+
+        .nav-tab {
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: var(--card);
+        }
+
+        .nav-tab.active {
+            color: white;
+            background: var(--success);
+            box-shadow: var(--shadow-1);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--success);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .nav-time {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ========== HEADER ========== */
+        .page-header {
+            background: var(--card);
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .header-title h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title h1 i {
+            color: var(--success);
+        }
+
+        .header-title p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-ghost {
+            background: var(--bg);
+            color: var(--text-secondary);
+            box-shadow: var(--shadow-1);
+        }
+
+        .btn-ghost:hover {
+            background: var(--border);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-2);
+        }
+
+        .btn-primary {
+            background: var(--success);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #43a047;
+            box-shadow: var(--shadow-2);
+        }
+
+        /* ========== SUMMARY CARDS ========== */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+        }
+
+        .summary-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 16px 20px;
+            border: none;
+            box-shadow: var(--shadow-1);
+            position: relative;
+            overflow: hidden;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .summary-card:hover {
+            box-shadow: var(--shadow-2);
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .summary-card.green::before { background: var(--success); }
+        .summary-card.yellow::before { background: var(--warning); }
+        .summary-card.red::before { background: var(--danger); }
+        .summary-card.blue::before { background: var(--info); }
+        .summary-card.purple::before { background: var(--purple); }
+        .summary-card.cyan::before { background: var(--cyan); }
+
+        .summary-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .summary-detail {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .summary-detail.positive { color: var(--success); }
+        .summary-detail.negative { color: var(--danger); }
+
+        /* ========== MAIN CONTENT ========== */
+        .main {
+            padding: 28px 32px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* ========== CARD STYLES ========== */
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            border: none;
+            box-shadow: var(--shadow-1);
+            overflow: hidden;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-2);
+        }
+
+        .card-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--success);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .card-btn {
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            background: var(--bg);
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            box-shadow: var(--shadow-1);
+        }
+
+        .card-btn:hover {
+            background: var(--border);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-2);
+        }
+
+        .card-btn.active {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .card-body {
+            padding: 22px;
+        }
+
+        /* ========== VENDOR COMPARISON CHART ========== */
+        .vendor-chart-container {
+            height: 350px;
+            position: relative;
+        }
+
+        /* ========== VENDOR CARDS GRID ========== */
+        .vendor-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .vendor-card {
+            background: var(--bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 18px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .vendor-card:hover {
+            border-color: var(--text-muted);
+            transform: translateY(-2px);
+        }
+
+        .vendor-card.selected {
+            border-color: var(--success);
+            background: var(--success-light);
+        }
+
+        .vendor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 14px;
+        }
+
+        .vendor-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .vendor-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .vendor-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .vendor-status.healthy { background: var(--success-light); color: var(--success); }
+        .vendor-status.warning { background: var(--warning-light); color: var(--warning); }
+        .vendor-status.critical { background: var(--danger-light); color: var(--danger); }
+
+        .vendor-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .vendor-metric {
+            text-align: center;
+        }
+
+        .vendor-metric-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .vendor-metric-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .vendor-progress {
+            margin-top: 12px;
+        }
+
+        .vendor-progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .vendor-progress-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .vendor-progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* ========== VENDOR SUMMARY TABLE ========== */
+        .vendor-summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .vendor-summary-table th,
+        .vendor-summary-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .vendor-summary-table th {
+            background: var(--bg);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .vendor-summary-table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .vendor-summary-table tbody tr:hover {
+            background: var(--bg);
+        }
+
+        .vendor-summary-table td {
+            color: var(--text-secondary);
+        }
+
+        .vendor-summary-table tfoot tr {
+            background: var(--bg);
+            border-top: 2px solid var(--border);
+        }
+
+        .vendor-summary-table tfoot td {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .vendor-name-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vendor-name-cell span {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .staffing-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 120px;
+        }
+
+        .staffing-bar > div {
+            flex: 1;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .staffing-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .staffing-fill.success { background: var(--success); }
+        .staffing-fill.warning { background: var(--warning); }
+        .staffing-fill.danger { background: var(--danger); }
+
+        .staffing-bar span {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            min-width: 45px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-badge.healthy { background: var(--success-light); color: var(--success); }
+        .status-badge.warning { background: var(--warning-light); color: var(--warning); }
+        .status-badge.critical { background: var(--danger-light); color: var(--danger); }
+
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .text-center { text-align: center; }
+        .text-success { color: var(--success) !important; }
+        .text-info { color: var(--info) !important; }
+        .text-warning { color: var(--warning) !important; }
+        .text-danger { color: var(--danger) !important; }
+        .text-purple { color: var(--purple) !important; }
+        .font-medium { font-weight: 500; }
+        .font-bold { font-weight: 700; }
+
+        /* ========== AGENT LIST TABLE ========== */
+        .agent-table-wrapper {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .agent-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .agent-table th,
+        .agent-table td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .agent-table th {
+            background: var(--bg);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .agent-table tbody tr:hover {
+            background: var(--card-hover);
+        }
+
+        .agent-table td {
+            color: var(--text-secondary);
+        }
+
+        .agent-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .agent-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .agent-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .agent-info strong {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .agent-info span {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .agent-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .agent-status.available { background: var(--success-light); color: var(--success); }
+        .agent-status.on-call { background: var(--info-light); color: var(--info); }
+        .agent-status.acw { background: var(--purple-light); color: var(--purple); }
+        .agent-status.break { background: var(--warning-light); color: var(--warning); }
+        .agent-status.offline { background: var(--danger-light); color: var(--danger); }
+        .agent-status.training { background: var(--cyan-light); color: var(--cyan); }
+
+        .agent-status::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .adherence-badge {
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .adherence-badge.good { background: var(--success-light); color: var(--success); }
+        .adherence-badge.warning { background: var(--warning-light); color: var(--warning); }
+        .adherence-badge.poor { background: var(--danger-light); color: var(--danger); }
+
+        /* ========== PRODUCTIVITY METRICS ========== */
+        .productivity-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+
+        .productivity-card {
+            background: var(--bg);
+            border-radius: 10px;
+            padding: 16px;
+            border: none;
+            text-align: center;
+            box-shadow: var(--shadow-1);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .productivity-card:hover {
+            box-shadow: var(--shadow-2);
+        }
+
+        .productivity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 16px;
+        }
+
+        .productivity-icon.green { background: var(--success-light); color: var(--success); }
+        .productivity-icon.blue { background: var(--info-light); color: var(--info); }
+        .productivity-icon.purple { background: var(--purple-light); color: var(--purple); }
+        .productivity-icon.orange { background: var(--warning-light); color: var(--warning); }
+
+        .productivity-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .productivity-label {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* ========== FILTER BAR ========== */
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 16px 22px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .filter-select {
+            padding: 10px 14px;
+            font-size: 13px;
+            border-radius: 8px;
+            border: none;
+            background: var(--card);
+            color: var(--text-primary);
+            cursor: pointer;
+            min-width: 150px;
+            box-shadow: var(--shadow-1);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            box-shadow: var(--shadow-2), 0 0 0 2px var(--success-light);
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 300px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            font-size: 13px;
+            border-radius: 8px;
+            border: none;
+            background: var(--card);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-1);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            box-shadow: var(--shadow-2), 0 0 0 2px var(--success-light);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        /* ========== API REFERENCE SECTION ========== */
+        .api-section {
+            margin-top: 24px;
+        }
+
+        .api-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .api-card {
+            background: var(--card);
+            border-radius: 12px;
+            border: none;
+            box-shadow: var(--shadow-1);
+            padding: 18px;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .api-card:hover {
+            box-shadow: var(--shadow-2);
+        }
+
+        .api-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .api-method {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .api-method.get { background: var(--success-light); color: var(--success); }
+        .api-method.post { background: var(--info-light); color: var(--info); }
+        .api-method.ws { background: var(--purple-light); color: var(--purple); }
+
+        .api-endpoint {
+            font-family: 'Menlo', monospace;
+            font-size: 11px;
+            color: var(--info);
+            background: var(--bg);
+            padding: 6px 10px;
+            border-radius: 6px;
+            flex: 1;
+        }
+
+        .api-description {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .api-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .api-detail {
+            background: var(--card);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .api-detail-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .api-detail-value {
+            font-size: 11px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* ========== MODAL ========== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--card);
+            border-radius: 16px;
+            width: 95%;
+            max-width: 900px;
+            max-height: 85vh;
+            overflow: hidden;
+            border: none;
+            box-shadow: var(--shadow-4);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg);
+        }
+
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: var(--bg);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            max-height: calc(85vh - 70px);
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1400px) {
+            .vendor-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .summary-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+            .api-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .vendor-grid {
+                grid-template-columns: 1fr;
+            }
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .productivity-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <div class="nav-logo"><i class="fas fa-users-gear"></i></div>
+            <div class="nav-title">Workforce Command Center <span>| Agent Availability</span></div>
+        </div>
+
+        <div class="nav-center">
+            <a href="enterprise-leading-indicators.html" class="nav-tab">Leading Indicators</a>
+            <a href="#" class="nav-tab active">Agent Availability</a>
+            <a href="executive-summary-dashboard.html" class="nav-tab">Executive Summary</a>
+            <a href="../analytics/vendor-analytics-dashboard.html" class="nav-tab">Vendor Analytics</a>
+        </div>
+
+        <div class="nav-right">
+            <div class="live-indicator">
+                <div class="live-dot"></div>
+                LIVE | 15s refresh
+            </div>
+            <div class="nav-time">
+                <i class="far fa-clock"></i>
+                <span id="currentTime">Loading...</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-top">
+            <div class="header-title">
+                <h1><i class="fas fa-user-check"></i> Agent Availability & Productivity</h1>
+                <p>Real-time staffing analysis across all vendors • Scheduled vs Actual comparison • Individual agent tracking</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-ghost" onclick="openApiModal()">
+                    <i class="fas fa-code"></i> API Reference
+                </button>
+                <button class="btn btn-ghost">
+                    <i class="fas fa-download"></i> Export
+                </button>
+                <button class="btn btn-primary" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="summary-card blue">
+                <div class="summary-label">Total Scheduled</div>
+                <div class="summary-value">12,847</div>
+                <div class="summary-detail">Current interval (15 min)</div>
+            </div>
+            <div class="summary-card green">
+                <div class="summary-label">Agents Online</div>
+                <div class="summary-value">11,924</div>
+                <div class="summary-detail positive"><i class="fas fa-arrow-up"></i> 92.8% of scheduled</div>
+            </div>
+            <div class="summary-card cyan">
+                <div class="summary-label">Available Now</div>
+                <div class="summary-value">3,847</div>
+                <div class="summary-detail">Ready to take calls</div>
+            </div>
+            <div class="summary-card purple">
+                <div class="summary-label">On Active Calls</div>
+                <div class="summary-value">6,234</div>
+                <div class="summary-detail">52.3% utilization</div>
+            </div>
+            <div class="summary-card yellow">
+                <div class="summary-label">Staffing Gap</div>
+                <div class="summary-value">-923</div>
+                <div class="summary-detail negative"><i class="fas fa-arrow-down"></i> 7.2% understaffed</div>
+            </div>
+            <div class="summary-card red">
+                <div class="summary-label">Non-Adherent</div>
+                <div class="summary-value">847</div>
+                <div class="summary-detail negative">7.1% out of adherence</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Scheduled vs Actual Chart -->
+        <div class="card full-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Scheduled vs Actual Agents by Vendor
+                </div>
+                <div class="card-actions">
+                    <button class="card-btn active" data-view="current">Current</button>
+                    <button class="card-btn" data-view="hourly">Hourly</button>
+                    <button class="card-btn" data-view="daily">Daily</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="vendor-chart-container">
+                    <canvas id="vendorComparisonChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vendor Staffing Summary Table -->
+        <div class="card full-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-building"></i>
+                    Vendor Staffing Summary
+                </div>
+                <div class="card-actions">
+                    <button class="card-btn" onclick="exportVendorTable()"><i class="fas fa-download"></i> Export</button>
+                </div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <div class="table-wrapper">
+                    <table class="vendor-summary-table">
+                        <thead>
+                            <tr>
+                                <th>Vendor</th>
+                                <th class="text-center">Scheduled</th>
+                                <th class="text-center">Online</th>
+                                <th class="text-center">Available</th>
+                                <th class="text-center">On Calls</th>
+                                <th class="text-center">ACW</th>
+                                <th class="text-center">Break</th>
+                                <th class="text-center">Gap</th>
+                                <th class="text-center">Staffing %</th>
+                                <th class="text-center">Adherence</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-vendor="teleperformance">
+                                <td>
+                                    <div class="vendor-name-cell">
+                                        <div class="vendor-dot" style="background: var(--vendor-teleperformance);"></div>
+                                        <span>Teleperformance</span>
+                                    </div>
+                                </td>
+                                <td class="text-center font-medium">3,245</td>
+                                <td class="text-center font-medium">2,891</td>
+                                <td class="text-center text-success">892</td>
+                                <td class="text-center text-info">1,534</td>
+                                <td class="text-center text-purple">287</td>
+                                <td class="text-center text-warning">178</td>
+                                <td class="text-center text-danger font-medium">-354</td>
+                                <td class="text-center">
+                                    <div class="staffing-bar">
+                                        <div class="staffing-fill warning" style="width: 89.1%;"></div>
+                                        <span>89.1%</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="adherence-badge warning">86.2%</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="status-badge warning">At Risk</span>
+                                </td>
+                            </tr>
+                            <tr data-vendor="concentrix">
+                                <td>
+                                    <div class="vendor-name-cell">
+                                        <div class="vendor-dot" style="background: var(--vendor-concentrix);"></div>
+                                        <span>Concentrix</span>
+                                    </div>
+                                </td>
+                                <td class="text-center font-medium">2,890</td>
+                                <td class="text-center font-medium">2,801</td>
+                                <td class="text-center text-success">823</td>
+                                <td class="text-center text-info">1,456</td>
+                                <td class="text-center text-purple">312</td>
+                                <td class="text-center text-warning">210</td>
+                                <td class="text-center text-danger font-medium">-89</td>
+                                <td class="text-center">
+                                    <div class="staffing-bar">
+                                        <div class="staffing-fill success" style="width: 96.9%;"></div>
+                                        <span>96.9%</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="adherence-badge good">94.1%</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="status-badge healthy">Healthy</span>
+                                </td>
+                            </tr>
+                            <tr data-vendor="ttec">
+                                <td>
+                                    <div class="vendor-name-cell">
+                                        <div class="vendor-dot" style="background: var(--vendor-ttec);"></div>
+                                        <span>TTEC</span>
+                                    </div>
+                                </td>
+                                <td class="text-center font-medium">2,456</td>
+                                <td class="text-center font-medium">2,389</td>
+                                <td class="text-center text-success">698</td>
+                                <td class="text-center text-info">1,287</td>
+                                <td class="text-center text-purple">245</td>
+                                <td class="text-center text-warning">159</td>
+                                <td class="text-center text-danger font-medium">-67</td>
+                                <td class="text-center">
+                                    <div class="staffing-bar">
+                                        <div class="staffing-fill success" style="width: 97.3%;"></div>
+                                        <span>97.3%</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="adherence-badge good">93.8%</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="status-badge healthy">Healthy</span>
+                                </td>
+                            </tr>
+                            <tr data-vendor="alorica">
+                                <td>
+                                    <div class="vendor-name-cell">
+                                        <div class="vendor-dot" style="background: var(--vendor-alorica);"></div>
+                                        <span>Alorica</span>
+                                    </div>
+                                </td>
+                                <td class="text-center font-medium">2,124</td>
+                                <td class="text-center font-medium">1,782</td>
+                                <td class="text-center text-success">412</td>
+                                <td class="text-center text-info">987</td>
+                                <td class="text-center text-purple">198</td>
+                                <td class="text-center text-warning">185</td>
+                                <td class="text-center text-danger font-medium">-342</td>
+                                <td class="text-center">
+                                    <div class="staffing-bar">
+                                        <div class="staffing-fill danger" style="width: 83.9%;"></div>
+                                        <span>83.9%</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="adherence-badge poor">81.4%</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="status-badge critical">Critical</span>
+                                </td>
+                            </tr>
+                            <tr data-vendor="sitel">
+                                <td>
+                                    <div class="vendor-name-cell">
+                                        <div class="vendor-dot" style="background: var(--vendor-sitel);"></div>
+                                        <span>Foundever (Sitel)</span>
+                                    </div>
+                                </td>
+                                <td class="text-center font-medium">1,456</td>
+                                <td class="text-center font-medium">1,423</td>
+                                <td class="text-center text-success">534</td>
+                                <td class="text-center text-info">678</td>
+                                <td class="text-center text-purple">134</td>
+                                <td class="text-center text-warning">77</td>
+                                <td class="text-center text-danger font-medium">-33</td>
+                                <td class="text-center">
+                                    <div class="staffing-bar">
+                                        <div class="staffing-fill success" style="width: 97.7%;"></div>
+                                        <span>97.7%</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="adherence-badge good">95.2%</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="status-badge healthy">Healthy</span>
+                                </td>
+                            </tr>
+                            <tr data-vendor="internal">
+                                <td>
+                                    <div class="vendor-name-cell">
+                                        <div class="vendor-dot" style="background: var(--vendor-internal);"></div>
+                                        <span>Internal (FTE)</span>
+                                    </div>
+                                </td>
+                                <td class="text-center font-medium">676</td>
+                                <td class="text-center font-medium">638</td>
+                                <td class="text-center text-success">188</td>
+                                <td class="text-center text-info">292</td>
+                                <td class="text-center text-purple">89</td>
+                                <td class="text-center text-warning">69</td>
+                                <td class="text-center text-danger font-medium">-38</td>
+                                <td class="text-center">
+                                    <div class="staffing-bar">
+                                        <div class="staffing-fill warning" style="width: 94.4%;"></div>
+                                        <span>94.4%</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="adherence-badge warning">89.7%</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="status-badge warning">At Risk</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="total-row">
+                                <td><strong>TOTAL</strong></td>
+                                <td class="text-center font-bold">12,847</td>
+                                <td class="text-center font-bold">11,924</td>
+                                <td class="text-center font-bold text-success">3,547</td>
+                                <td class="text-center font-bold text-info">6,234</td>
+                                <td class="text-center font-bold text-purple">1,265</td>
+                                <td class="text-center font-bold text-warning">878</td>
+                                <td class="text-center font-bold text-danger">-923</td>
+                                <td class="text-center">
+                                    <div class="staffing-bar">
+                                        <div class="staffing-fill success" style="width: 92.8%;"></div>
+                                        <span>92.8%</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="adherence-badge good">91.2%</span>
+                                </td>
+                                <td class="text-center">—</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Productivity Metrics -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-gauge-high"></i>
+                    Productivity Metrics (All Vendors)
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="productivity-grid">
+                    <div class="productivity-card">
+                        <div class="productivity-icon green"><i class="fas fa-phone"></i></div>
+                        <div class="productivity-value">78.4%</div>
+                        <div class="productivity-label">Occupancy Rate</div>
+                    </div>
+                    <div class="productivity-card">
+                        <div class="productivity-icon blue"><i class="fas fa-clock"></i></div>
+                        <div class="productivity-value">7:42</div>
+                        <div class="productivity-label">Avg Handle Time</div>
+                    </div>
+                    <div class="productivity-card">
+                        <div class="productivity-icon purple"><i class="fas fa-comments"></i></div>
+                        <div class="productivity-value">8.4</div>
+                        <div class="productivity-label">Calls/Agent/Hr</div>
+                    </div>
+                    <div class="productivity-card">
+                        <div class="productivity-icon orange"><i class="fas fa-user-clock"></i></div>
+                        <div class="productivity-value">91.2%</div>
+                        <div class="productivity-label">Schedule Adherence</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agent List -->
+        <div class="card full-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-list"></i>
+                    Agent Details by Vendor
+                </div>
+                <div class="card-actions">
+                    <span style="font-size: 12px; color: var(--text-muted); margin-right: 10px;">
+                        Showing <strong id="agentCount">100</strong> of <strong>11,924</strong> agents
+                    </span>
+                </div>
+            </div>
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label class="filter-label">Vendor:</label>
+                    <select class="filter-select" id="vendorFilter">
+                        <option value="all">All Vendors</option>
+                        <option value="teleperformance">Teleperformance</option>
+                        <option value="concentrix">Concentrix</option>
+                        <option value="ttec">TTEC</option>
+                        <option value="alorica">Alorica</option>
+                        <option value="sitel">Foundever (Sitel)</option>
+                        <option value="internal">Internal (FTE)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Status:</label>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="all">All Statuses</option>
+                        <option value="available">Available</option>
+                        <option value="on-call">On Call</option>
+                        <option value="acw">After Call Work</option>
+                        <option value="break">On Break</option>
+                        <option value="offline">Offline</option>
+                        <option value="training">Training</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Adherence:</label>
+                    <select class="filter-select" id="adherenceFilter">
+                        <option value="all">All</option>
+                        <option value="good">Good (≥95%)</option>
+                        <option value="warning">Warning (85-95%)</option>
+                        <option value="poor">Poor (<85%)</option>
+                    </select>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search agent name or ID..." id="agentSearch">
+                </div>
+            </div>
+            <div class="agent-table-wrapper">
+                <table class="agent-table" id="agentTable">
+                    <thead>
+                        <tr>
+                            <th>Agent</th>
+                            <th>Vendor</th>
+                            <th>Status</th>
+                            <th>Time in Status</th>
+                            <th>Calls Today</th>
+                            <th>AHT</th>
+                            <th>Adherence</th>
+                            <th>Scheduled</th>
+                            <th>Skill Group</th>
+                        </tr>
+                    </thead>
+                    <tbody id="agentTableBody">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Critical APIs Section -->
+        <div class="card full-width api-section">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-code"></i>
+                    Critical APIs for Agent Availability
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="api-grid">
+                    <!-- Genesys User Presence API -->
+                    <div class="api-card">
+                        <div class="api-header">
+                            <span class="api-method get">GET</span>
+                            <span class="api-endpoint">/api/v2/users/{userId}/presences</span>
+                        </div>
+                        <div class="api-description">
+                            Returns real-time presence/status for agents including Available, On Queue, Busy, Away, Break, Offline states. Critical for live agent state monitoring.
+                        </div>
+                        <div class="api-details">
+                            <div class="api-detail">
+                                <div class="api-detail-label">Source</div>
+                                <div class="api-detail-value">Genesys Cloud</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Refresh</div>
+                                <div class="api-detail-value">Real-time (WebSocket)</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Rate Limit</div>
+                                <div class="api-detail-value">300/min</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Genesys Routing Status -->
+                    <div class="api-card">
+                        <div class="api-header">
+                            <span class="api-method get">GET</span>
+                            <span class="api-endpoint">/api/v2/users/{userId}/routingstatus</span>
+                        </div>
+                        <div class="api-description">
+                            Returns agent routing status (ON_QUEUE, OFF_QUEUE, INTERACTING) and determines if agent can receive calls. Essential for availability tracking.
+                        </div>
+                        <div class="api-details">
+                            <div class="api-detail">
+                                <div class="api-detail-label">Source</div>
+                                <div class="api-detail-value">Genesys Cloud</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Refresh</div>
+                                <div class="api-detail-value">Real-time (WebSocket)</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Rate Limit</div>
+                                <div class="api-detail-value">300/min</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WFM Adherence API -->
+                    <div class="api-card">
+                        <div class="api-header">
+                            <span class="api-method get">GET</span>
+                            <span class="api-endpoint">/api/v2/workforcemanagement/adherence</span>
+                        </div>
+                        <div class="api-description">
+                            Returns real-time adherence data comparing scheduled activities vs actual agent states. Tracks conformance, exception time, and adherence percentage.
+                        </div>
+                        <div class="api-details">
+                            <div class="api-detail">
+                                <div class="api-detail-label">Source</div>
+                                <div class="api-detail-value">Genesys WFM</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Refresh</div>
+                                <div class="api-detail-value">15 seconds</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Rate Limit</div>
+                                <div class="api-detail-value">60/min</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WFM Schedule API -->
+                    <div class="api-card">
+                        <div class="api-header">
+                            <span class="api-method get">GET</span>
+                            <span class="api-endpoint">/api/v2/workforcemanagement/managementunits/{muId}/schedules</span>
+                        </div>
+                        <div class="api-description">
+                            Returns scheduled shifts and activities for agents by management unit. Used to determine expected staffing levels for comparison with actuals.
+                        </div>
+                        <div class="api-details">
+                            <div class="api-detail">
+                                <div class="api-detail-label">Source</div>
+                                <div class="api-detail-value">Genesys WFM</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Refresh</div>
+                                <div class="api-detail-value">On-demand</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Rate Limit</div>
+                                <div class="api-detail-value">30/min</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Queue Observation -->
+                    <div class="api-card">
+                        <div class="api-header">
+                            <span class="api-method post">POST</span>
+                            <span class="api-endpoint">/api/v2/analytics/queues/observations/query</span>
+                        </div>
+                        <div class="api-description">
+                            Returns real-time queue metrics including agents on queue, available agents, interacting agents. Critical for capacity monitoring per skill/queue.
+                        </div>
+                        <div class="api-details">
+                            <div class="api-detail">
+                                <div class="api-detail-label">Source</div>
+                                <div class="api-detail-value">Genesys Analytics</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Refresh</div>
+                                <div class="api-detail-value">5 seconds</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Rate Limit</div>
+                                <div class="api-detail-value">60/min</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Aggregates -->
+                    <div class="api-card">
+                        <div class="api-header">
+                            <span class="api-method post">POST</span>
+                            <span class="api-endpoint">/api/v2/analytics/users/aggregates/query</span>
+                        </div>
+                        <div class="api-description">
+                            Returns aggregated user performance metrics including handle time, calls handled, occupancy, utilization. Essential for productivity dashboards.
+                        </div>
+                        <div class="api-details">
+                            <div class="api-detail">
+                                <div class="api-detail-label">Source</div>
+                                <div class="api-detail-value">Genesys Analytics</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Refresh</div>
+                                <div class="api-detail-value">1 minute</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Rate Limit</div>
+                                <div class="api-detail-value">60/min</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WebSocket Notifications -->
+                    <div class="api-card">
+                        <div class="api-header">
+                            <span class="api-method ws">WS</span>
+                            <span class="api-endpoint">wss://streaming.{region}.pure.cloud/v2/...</span>
+                        </div>
+                        <div class="api-description">
+                            WebSocket channel for real-time notifications including presence changes, routing status updates, and conversation events. Required for live dashboards.
+                        </div>
+                        <div class="api-details">
+                            <div class="api-detail">
+                                <div class="api-detail-label">Source</div>
+                                <div class="api-detail-value">Genesys Notifications</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Refresh</div>
+                                <div class="api-detail-value">Push (instant)</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Topics</div>
+                                <div class="api-detail-value">1000/channel</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- External WFM Integration -->
+                    <div class="api-card">
+                        <div class="api-header">
+                            <span class="api-method get">GET</span>
+                            <span class="api-endpoint">/api/wfm/v1/agents/schedules/current</span>
+                        </div>
+                        <div class="api-description">
+                            External WFM system API (NICE, Verint, Calabrio) for schedule data when using third-party workforce management. Returns current interval schedules.
+                        </div>
+                        <div class="api-details">
+                            <div class="api-detail">
+                                <div class="api-detail-label">Source</div>
+                                <div class="api-detail-value">External WFM</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Refresh</div>
+                                <div class="api-detail-value">15 seconds</div>
+                            </div>
+                            <div class="api-detail">
+                                <div class="api-detail-label">Auth</div>
+                                <div class="api-detail-value">OAuth 2.0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- API Reference Modal -->
+    <div class="modal-overlay" id="apiModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-code"></i> API Integration Reference</h2>
+                <button class="modal-close" onclick="closeApiModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h3 style="font-size: 16px; color: var(--text-primary); margin-bottom: 16px;">Sample API Request - Get Agent Presence</h3>
+                <pre style="background: var(--bg); padding: 16px; border-radius: 10px; font-family: 'Menlo', monospace; font-size: 12px; color: var(--text-secondary); overflow-x: auto; margin-bottom: 24px;">
+GET /api/v2/users/presences HTTP/1.1
+Host: api.mypurecloud.com
+Authorization: Bearer {access_token}
+Content-Type: application/json
+
+// Response
+{
+  "entities": [
+    {
+      "id": "user-123",
+      "name": "John Smith",
+      "presence": {
+        "presenceDefinition": {
+          "systemPresence": "AVAILABLE"
+        },
+        "source": "PURECLOUD",
+        "modifiedDate": "2026-01-22T14:30:00Z"
+      }
+    }
+  ]
+}
+                </pre>
+
+                <h3 style="font-size: 16px; color: var(--text-primary); margin-bottom: 16px;">Sample API Request - Queue Observations</h3>
+                <pre style="background: var(--bg); padding: 16px; border-radius: 10px; font-family: 'Menlo', monospace; font-size: 12px; color: var(--text-secondary); overflow-x: auto; margin-bottom: 24px;">
+POST /api/v2/analytics/queues/observations/query HTTP/1.1
+Host: api.mypurecloud.com
+Authorization: Bearer {access_token}
+Content-Type: application/json
+
+{
+  "filter": {
+    "type": "or",
+    "predicates": [
+      { "dimension": "queueId", "value": "queue-sales-001" },
+      { "dimension": "queueId", "value": "queue-support-001" }
+    ]
+  },
+  "metrics": ["oOnQueueUsers", "oInteracting", "oWaiting"]
+}
+
+// Response
+{
+  "results": [
+    {
+      "group": { "queueId": "queue-sales-001" },
+      "data": [
+        { "metric": "oOnQueueUsers", "stats": { "current": 45 } },
+        { "metric": "oInteracting", "stats": { "current": 38 } },
+        { "metric": "oWaiting", "stats": { "current": 12 } }
+      ]
+    }
+  ]
+}
+                </pre>
+
+                <h3 style="font-size: 16px; color: var(--text-primary); margin-bottom: 16px;">WebSocket Subscription - Presence Updates</h3>
+                <pre style="background: var(--bg); padding: 16px; border-radius: 10px; font-family: 'Menlo', monospace; font-size: 12px; color: var(--text-secondary); overflow-x: auto;">
+// Subscribe to presence updates
+{
+  "channel": "v2.users.{userId}.presence",
+  "body": {
+    "presenceDefinition": {
+      "id": "presence-id",
+      "systemPresence": "ON_QUEUE"
+    },
+    "message": "Ready for calls",
+    "modifiedDate": "2026-01-22T14:32:15.000Z"
+  }
+}
+
+// Subscribe topics for bulk monitoring
+Topics to subscribe:
+- v2.users.*.presence (all user presence changes)
+- v2.users.*.routingStatus (routing status changes)
+- v2.users.*.conversations (conversation events)
+- v2.analytics.queues.{queueId}.observations (queue metrics)
+                </pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== TIME UPDATE ==========
+        function updateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+            document.getElementById('currentTime').textContent = now.toLocaleDateString('en-US', options);
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // ========== CHART.JS SETUP ==========
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#94a3b8';
+
+        // Vendor Comparison Chart
+        const vendorCtx = document.getElementById('vendorComparisonChart').getContext('2d');
+        new Chart(vendorCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Teleperformance', 'Concentrix', 'TTEC', 'Alorica', 'Foundever', 'Internal'],
+                datasets: [
+                    {
+                        label: 'Scheduled',
+                        data: [3245, 2890, 2456, 2124, 1456, 676],
+                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                        borderColor: '#3b82f6',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
+                    },
+                    {
+                        label: 'Actual Online',
+                        data: [2891, 2801, 2389, 1782, 1423, 638],
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        borderColor: '#10b981',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
+                    },
+                    {
+                        label: 'Available',
+                        data: [892, 934, 756, 512, 478, 275],
+                        backgroundColor: 'rgba(6, 182, 212, 0.8)',
+                        borderColor: '#06b6d4',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#1e293b',
+                        titleColor: '#f1f5f9',
+                        bodyColor: '#94a3b8',
+                        borderColor: '#334155',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        padding: 12
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { size: 11 } }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(51, 65, 85, 0.5)' },
+                        ticks: { font: { size: 11 } }
+                    }
+                }
+            }
+        });
+
+        // ========== AGENT DATA GENERATION ==========
+        const vendors = [
+            { name: 'Teleperformance', code: 'TP', color: '#e11d48' },
+            { name: 'Concentrix', code: 'CX', color: '#8b5cf6' },
+            { name: 'TTEC', code: 'TT', color: '#0ea5e9' },
+            { name: 'Alorica', code: 'AL', color: '#f59e0b' },
+            { name: 'Foundever', code: 'FE', color: '#10b981' },
+            { name: 'Internal', code: 'IN', color: '#6366f1' }
+        ];
+
+        const statuses = [
+            { name: 'Available', class: 'available', weight: 25 },
+            { name: 'On Call', class: 'on-call', weight: 40 },
+            { name: 'After Call Work', class: 'acw', weight: 15 },
+            { name: 'On Break', class: 'break', weight: 10 },
+            { name: 'Offline', class: 'offline', weight: 5 },
+            { name: 'Training', class: 'training', weight: 5 }
+        ];
+
+        const skillGroups = ['Sales', 'Support', 'Billing', 'Technical', 'Retention', 'General'];
+
+        const firstNames = ['James', 'Maria', 'John', 'Sarah', 'Michael', 'Emma', 'David', 'Lisa', 'Robert', 'Jennifer', 'William', 'Linda', 'Richard', 'Patricia', 'Joseph', 'Elizabeth', 'Thomas', 'Barbara', 'Charles', 'Susan'];
+        const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Anderson', 'Taylor', 'Thomas', 'Moore', 'Jackson', 'Martin', 'Lee', 'Thompson', 'White', 'Harris'];
+
+        function generateAgents(count) {
+            const agents = [];
+            for (let i = 0; i < count; i++) {
+                const vendor = vendors[Math.floor(Math.random() * vendors.length)];
+                const status = getWeightedStatus();
+                const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+                const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+                const adherence = Math.floor(Math.random() * 30) + 70;
+                
+                agents.push({
+                    id: `${vendor.code}${String(i + 1000).padStart(5, '0')}`,
+                    name: `${firstName} ${lastName}`,
+                    initials: `${firstName[0]}${lastName[0]}`,
+                    vendor: vendor.name,
+                    vendorCode: vendor.code,
+                    vendorColor: vendor.color,
+                    status: status.name,
+                    statusClass: status.class,
+                    timeInStatus: generateTimeInStatus(),
+                    callsToday: Math.floor(Math.random() * 45) + 10,
+                    aht: generateAHT(),
+                    adherence: adherence,
+                    adherenceClass: adherence >= 95 ? 'good' : adherence >= 85 ? 'warning' : 'poor',
+                    scheduled: generateScheduledTime(),
+                    skillGroup: skillGroups[Math.floor(Math.random() * skillGroups.length)]
+                });
+            }
+            return agents;
+        }
+
+        function getWeightedStatus() {
+            const totalWeight = statuses.reduce((sum, s) => sum + s.weight, 0);
+            let random = Math.random() * totalWeight;
+            for (const status of statuses) {
+                if (random < status.weight) return status;
+                random -= status.weight;
+            }
+            return statuses[0];
+        }
+
+        function generateTimeInStatus() {
+            const minutes = Math.floor(Math.random() * 120);
+            const seconds = Math.floor(Math.random() * 60);
+            return `${minutes}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function generateAHT() {
+            const minutes = Math.floor(Math.random() * 8) + 4;
+            const seconds = Math.floor(Math.random() * 60);
+            return `${minutes}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function generateScheduledTime() {
+            const startHour = Math.floor(Math.random() * 8) + 6;
+            const endHour = startHour + 8;
+            return `${String(startHour).padStart(2, '0')}:00 - ${String(endHour).padStart(2, '0')}:00`;
+        }
+
+        // Generate 100 agents
+        const allAgents = generateAgents(100);
+
+        // Render agents to table
+        function renderAgents(agents) {
+            const tbody = document.getElementById('agentTableBody');
+            tbody.innerHTML = agents.map(agent => `
+                <tr>
+                    <td>
+                        <div class="agent-name">
+                            <div class="agent-avatar" style="background: ${agent.vendorColor}20; color: ${agent.vendorColor};">${agent.initials}</div>
+                            <div class="agent-info">
+                                <strong>${agent.name}</strong>
+                                <span>${agent.id}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span style="color: ${agent.vendorColor}; font-weight: 500;">${agent.vendor}</span></td>
+                    <td><span class="agent-status ${agent.statusClass}">${agent.status}</span></td>
+                    <td>${agent.timeInStatus}</td>
+                    <td>${agent.callsToday}</td>
+                    <td>${agent.aht}</td>
+                    <td><span class="adherence-badge ${agent.adherenceClass}">${agent.adherence}%</span></td>
+                    <td>${agent.scheduled}</td>
+                    <td>${agent.skillGroup}</td>
+                </tr>
+            `).join('');
+            
+            document.getElementById('agentCount').textContent = agents.length;
+        }
+
+        // Initial render
+        renderAgents(allAgents);
+
+        // Filter functionality
+        function filterAgents() {
+            const vendorFilter = document.getElementById('vendorFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const adherenceFilter = document.getElementById('adherenceFilter').value;
+            const searchTerm = document.getElementById('agentSearch').value.toLowerCase();
+
+            let filtered = allAgents;
+
+            if (vendorFilter !== 'all') {
+                filtered = filtered.filter(a => a.vendor.toLowerCase().includes(vendorFilter));
+            }
+
+            if (statusFilter !== 'all') {
+                filtered = filtered.filter(a => a.statusClass === statusFilter);
+            }
+
+            if (adherenceFilter !== 'all') {
+                filtered = filtered.filter(a => a.adherenceClass === adherenceFilter);
+            }
+
+            if (searchTerm) {
+                filtered = filtered.filter(a => 
+                    a.name.toLowerCase().includes(searchTerm) || 
+                    a.id.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            renderAgents(filtered);
+        }
+
+        document.getElementById('vendorFilter').addEventListener('change', filterAgents);
+        document.getElementById('statusFilter').addEventListener('change', filterAgents);
+        document.getElementById('adherenceFilter').addEventListener('change', filterAgents);
+        document.getElementById('agentSearch').addEventListener('input', filterAgents);
+
+        // Vendor card selection
+        document.querySelectorAll('.vendor-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                const vendor = this.dataset.vendor;
+                const select = document.getElementById('vendorFilter');
+                
+                if (this.classList.contains('selected')) {
+                    // If only this card is selected, filter by it
+                    const selectedCards = document.querySelectorAll('.vendor-card.selected');
+                    if (selectedCards.length === 1) {
+                        select.value = vendor;
+                        filterAgents();
+                    }
+                } else {
+                    select.value = 'all';
+                    filterAgents();
+                }
+            });
+        });
+
+        function selectAllVendors() {
+            document.querySelectorAll('.vendor-card').forEach(card => {
+                card.classList.add('selected');
+            });
+            document.getElementById('vendorFilter').value = 'all';
+            filterAgents();
+        }
+
+        // View buttons
+        document.querySelectorAll('.card-btn[data-view]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.card-btn[data-view]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Refresh button
+        document.getElementById('refreshBtn').addEventListener('click', function() {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing';
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+            }, 1500);
+        });
+
+        // API Modal
+        function openApiModal() {
+            document.getElementById('apiModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeApiModal() {
+            document.getElementById('apiModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('apiModal').addEventListener('click', function(e) {
+            if (e.target === this) closeApiModal();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeApiModal();
+        });
+    </script>
+</body>
+</html>
