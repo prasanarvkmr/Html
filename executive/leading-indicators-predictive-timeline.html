@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictive Timeline — Leading Indicators</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #f8f9fb;
+            --bg-card: #ffffff;
+            --bg-muted: #f1f3f5;
+            --border: #e9ecef;
+            --text: #1a1a2e;
+            --text-secondary: #5a607f;
+            --text-muted: #9ca3b4;
+            --green: #22c55e;
+            --green-bg: #f0fdf4;
+            --yellow: #f59e0b;
+            --yellow-bg: #fffbeb;
+            --red: #ef4444;
+            --red-bg: #fef2f2;
+            --blue: #3b82f6;
+            --blue-bg: #eff6ff;
+            --purple: #8b5cf6;
+            --purple-bg: #f5f3ff;
+            --cyan: #06b6d4;
+            --cyan-bg: #ecfeff;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg); color: var(--text);
+            min-height: 100vh; display: flex; flex-direction: column;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            height: 56px; background: var(--bg-card); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px; flex-shrink: 0; position: sticky; top: 0; z-index: 100;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 12px; }
+        .topbar-logo { width: 32px; height: 32px; background: linear-gradient(135deg, var(--blue), var(--purple)); border-radius: 8px; display: grid; place-items: center; font-size: 14px; color: white; }
+        .topbar-title { font-size: 15px; font-weight: 600; }
+        .topbar-title span { color: var(--text-muted); font-weight: 400; font-size: 13px; margin-left: 8px; }
+        .topbar-center { display: flex; gap: 2px; background: var(--bg-muted); padding: 3px; border-radius: 8px; }
+        .topbar-tab { padding: 6px 14px; font-size: 12px; font-weight: 500; color: var(--text-muted); border-radius: 6px; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+        .topbar-tab:hover { color: var(--text); background: var(--bg-card); }
+        .topbar-tab.active { background: var(--text); color: white; box-shadow: var(--shadow-sm); }
+        .topbar-right { display: flex; align-items: center; gap: 16px; font-size: 12px; color: var(--text-muted); }
+        .live-badge { display: flex; align-items: center; gap: 6px; color: var(--green); font-weight: 600; font-size: 11px; }
+        .live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        .content { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+
+        /* ===== HERO ROW: Probability + Insights side by side ===== */
+        .hero-row {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 16px;
+            align-items: stretch;
+        }
+
+        /* ===== PROBABILITY HERO ===== */
+        .prob-hero {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); box-shadow: var(--shadow-sm);
+            padding: 24px 28px; display: flex; align-items: center;
+            gap: 24px; flex-wrap: wrap;
+        }
+
+        .prob-main { text-align: center; min-width: 200px; }
+        .prob-label {
+            font-size: 11px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 4px;
+        }
+        .prob-value { font-size: 56px; font-weight: 800; line-height: 1; }
+        .prob-value.low { color: var(--green); }
+        .prob-value.medium { color: var(--yellow); }
+        .prob-value.high { color: var(--red); }
+        .prob-sub { font-size: 13px; color: var(--text-secondary); margin-top: 6px; }
+
+        .prob-chart { flex: 1; min-width: 300px; height: 120px; position: relative; overflow: hidden; }
+
+        .prob-breakdown { display: flex; flex-direction: column; gap: 8px; min-width: 180px; flex-shrink: 0; }
+
+        .prob-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 12px; border-radius: 8px; background: var(--bg-muted);
+        }
+        .prob-item .pi-label { font-size: 12px; color: var(--text-secondary); flex: 1; }
+        .prob-item .pi-val { font-size: 14px; font-weight: 700; }
+        .prob-item.green .pi-val { color: var(--green); }
+        .prob-item.yellow .pi-val { color: var(--yellow); }
+        .prob-item.red .pi-val { color: var(--red); }
+
+        /* ===== SIGNAL SPARKLINES ===== */
+        .sparkline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+        }
+
+        .spark-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 16px 18px;
+            box-shadow: var(--shadow-sm); transition: all 0.2s;
+            cursor: pointer;
+        }
+        .spark-card:hover { box-shadow: var(--shadow-md); }
+
+        .spark-header {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 8px;
+        }
+
+        .spark-name {
+            font-size: 12px; font-weight: 600;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .spark-name i { font-size: 10px; color: var(--text-muted); }
+
+        .spark-status {
+            font-size: 9px; font-weight: 700; padding: 2px 8px;
+            border-radius: 4px; text-transform: uppercase;
+        }
+        .spark-status.healthy { background: var(--green-bg); color: var(--green); }
+        .spark-status.warning { background: var(--yellow-bg); color: var(--yellow); }
+        .spark-status.critical { background: var(--red-bg); color: var(--red); }
+
+        .spark-body {
+            display: flex; align-items: flex-end; gap: 12px;
+        }
+
+        .spark-value-block { min-width: 70px; }
+        .spark-current { font-size: 24px; font-weight: 700; line-height: 1; }
+        .spark-trend { font-size: 10px; margin-top: 2px; }
+        .spark-trend.up { color: var(--green); }
+        .spark-trend.down { color: var(--red); }
+        .spark-trend.flat { color: var(--text-muted); }
+
+        .spark-chart { flex: 1; height: 48px; min-width: 0; position: relative; overflow: hidden; }
+
+        .spark-prediction {
+            display: flex; align-items: center; gap: 6px;
+            margin-top: 8px; padding-top: 8px;
+            border-top: 1px solid var(--border);
+            font-size: 10px; color: var(--text-muted);
+        }
+
+        .spark-prediction .pred-icon { font-size: 10px; }
+        .spark-prediction .pred-warn { color: var(--yellow); font-weight: 600; }
+        .spark-prediction .pred-ok { color: var(--green); }
+
+        /* ===== DOMAIN OUTLOOK ===== */
+        .domain-outlook {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+        }
+
+        .outlook-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 20px;
+            box-shadow: var(--shadow-sm); text-align: center;
+        }
+
+        .outlook-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
+        .outlook-score { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+        .outlook-forecast { font-size: 11px; color: var(--text-muted); }
+        .outlook-chart { height: 60px; margin-top: 8px; position: relative; overflow: hidden; }
+
+        .outlook-card.agent .outlook-score { color: var(--purple); }
+        .outlook-card.app .outlook-score { color: var(--cyan); }
+        .outlook-card.genesys .outlook-score { color: var(--blue); }
+
+        /* Signal-health tags inside domain outlook cards */
+        .ol-signals { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-top: 8px; }
+        .ol-sig-tag {
+            font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 4px;
+            cursor: pointer; transition: all 0.15s; white-space: nowrap;
+        }
+        .ol-sig-tag:hover { transform: scale(1.05); }
+        .ol-sig-tag.healthy { background: var(--green-bg); color: var(--green); }
+        .ol-sig-tag.warning { background: var(--yellow-bg); color: var(--yellow); }
+        .ol-sig-tag.critical { background: var(--red-bg); color: var(--red); }
+
+        /* Sub-signal tags inside signal spark cards */
+        .sub-signals { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+        .sub-tag {
+            font-size: 8px; font-weight: 600; padding: 1px 6px; border-radius: 3px;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .sub-tag:hover { transform: scale(1.05); }
+        .sub-tag.healthy { background: var(--green-bg); color: var(--green); }
+        .sub-tag.warning { background: var(--yellow-bg); color: var(--yellow); }
+        .sub-tag.critical { background: var(--red-bg); color: var(--red); }
+
+        /* Custom tooltip — non-intrusive floating panel */
+        .tip-anchor { position: relative; display: inline-flex; }
+        .custom-tip {
+            display: none; position: absolute; z-index: 200;
+            bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+            background: var(--text); color: #fff; border-radius: 8px;
+            padding: 10px 14px; min-width: 180px; max-width: 260px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+            pointer-events: none;
+        }
+        .custom-tip::after {
+            content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            border: 5px solid transparent; border-top-color: var(--text);
+        }
+        .tip-anchor:hover .custom-tip { display: block; }
+        .tip-title { font-size: 11px; font-weight: 700; margin-bottom: 6px; letter-spacing: 0.3px; }
+        .tip-row { display: flex; align-items: center; gap: 6px; font-size: 10px; padding: 2px 0; }
+        .tip-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .tip-dot.healthy { background: var(--green); }
+        .tip-dot.warning { background: var(--yellow); }
+        .tip-dot.critical { background: var(--red); }
+        .tip-name { flex: 1; opacity: 0.9; }
+        .tip-val { font-weight: 600; opacity: 1; }
+
+        /* ===== INSIGHTS PANEL (right column of hero row) ===== */
+        .insights-panel {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); box-shadow: var(--shadow-sm);
+            padding: 18px 20px; display: flex; flex-direction: column;
+            max-height: 100%; overflow-y: auto;
+        }
+        .insights-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .insights-title {
+            font-size: 14px; font-weight: 600; color: var(--text);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .insights-title i { color: var(--purple); font-size: 14px; }
+        .insights-badge {
+            font-size: 10px; font-weight: 700; padding: 3px 10px;
+            border-radius: 6px; background: var(--purple-bg); color: var(--purple);
+        }
+        .insights-list { display: flex; flex-direction: column; gap: 8px; }
+        .insight-item {
+            display: flex; gap: 10px; padding: 10px 12px;
+            border-radius: 10px; background: var(--bg-muted);
+            transition: all 0.3s;
+        }
+        .insight-item:hover { background: var(--bg); box-shadow: var(--shadow-sm); }
+        /* Collapsed: hide items beyond 2 */
+        .insights-panel.collapsed .insight-item:nth-child(n+3) {
+            display: none;
+        }
+        .insights-toggle {
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            margin-top: 8px; padding: 6px 0; cursor: pointer;
+            font-size: 12px; font-weight: 500; color: var(--text-muted);
+            border: none; background: none; width: 100%;
+            transition: color 0.2s;
+        }
+        .insights-toggle:hover { color: var(--purple); }
+        .insights-toggle i { font-size: 10px; transition: transform 0.3s; }
+        .insights-panel:not(.collapsed) .insights-toggle i { transform: rotate(180deg); }
+        .insight-icon {
+            width: 28px; height: 28px; border-radius: 8px;
+            display: grid; place-items: center; font-size: 12px; flex-shrink: 0;
+        }
+        .insight-icon.crit { background: var(--red-bg); color: var(--red); }
+        .insight-icon.warn { background: var(--yellow-bg); color: var(--yellow); }
+        .insight-icon.info { background: var(--blue-bg); color: var(--blue); }
+        .insight-icon.ok   { background: var(--green-bg); color: var(--green); }
+        .insight-body { flex: 1; }
+        .insight-text { font-size: 11px; color: var(--text); line-height: 1.4; }
+        .insight-text strong { font-weight: 600; }
+        .insight-meta { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        .insight-meta .tag {
+            display: inline-block; font-size: 9px; font-weight: 700;
+            padding: 1px 6px; border-radius: 3px; margin-left: 6px;
+            text-transform: uppercase;
+        }
+        .insight-meta .tag.agent { background: var(--purple-bg); color: var(--purple); }
+        .insight-meta .tag.app { background: var(--cyan-bg); color: var(--cyan); }
+        .insight-meta .tag.genesys { background: var(--blue-bg); color: var(--blue); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .hero-row { grid-template-columns: 1fr; }
+            .domain-outlook { grid-template-columns: 1fr 1fr 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .topbar { padding: 0 16px; }
+            .topbar-center { display: none; }
+            .topbar-title span { display: none; }
+            .content { padding: 16px; gap: 16px; }
+            .prob-hero { padding: 16px 20px; gap: 20px; flex-direction: column; align-items: stretch; }
+            .prob-main { min-width: unset; }
+            .prob-value { font-size: 40px; }
+            .prob-chart { min-width: unset; }
+            .domain-outlook { grid-template-columns: 1fr; }
+            .sparkline-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            .topbar { height: 48px; }
+            .prob-value { font-size: 32px; }
+            .spark-current { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="topbar-logo"><i class="fas fa-chart-line"></i></div>
+            <div class="topbar-title">Predict <span>Leading Indicators</span></div>
+        </div>
+        <div class="topbar-center">
+            <a class="topbar-tab" href="leading-indicators-nerve-center.html">Nerve Center</a>
+            <a class="topbar-tab" href="leading-indicators-signal-matrix.html">Matrix</a>
+            <a class="topbar-tab" href="leading-indicators-traffic-light.html">Domains</a>
+            <a class="topbar-tab active" href="leading-indicators-predictive-timeline.html">Predict</a>
+            <a class="topbar-tab" href="leading-indicators-hybrid.html">Command</a>
+        </div>
+        <div class="topbar-right">
+            <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+            <span><i class="far fa-clock"></i>&nbsp; <span id="clock">--:--</span></span>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- Hero Row: Probability + Insights side by side -->
+        <div class="hero-row">
+            <!-- Probability Hero -->
+            <div class="prob-hero">
+                <div class="prob-main">
+                    <div class="prob-label">Outage Probability — Next 60 min</div>
+                    <div class="prob-value low">12%</div>
+                    <div class="prob-sub">Moderate risk from MOS degradation &amp; SLA drift</div>
+                </div>
+                <div class="prob-chart">
+                    <canvas id="probChart"></canvas>
+                </div>
+                <div class="prob-breakdown">
+                    <div class="prob-item green">
+                        <div class="pi-label">Low risk (0–15%)</div>
+                        <div class="pi-val">Now</div>
+                    </div>
+                    <div class="prob-item yellow">
+                        <div class="pi-label">Medium (15–40%)</div>
+                        <div class="pi-val">+25m</div>
+                    </div>
+                    <div class="prob-item red">
+                        <div class="pi-label">High (&gt;40%)</div>
+                        <div class="pi-val">+48m</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Insights (right top) -->
+            <div class="insights-panel collapsed" id="insightsPanel">
+                <div class="insights-header">
+                    <div class="insights-title"><i class="fas fa-brain"></i> AI-Generated Insights</div>
+                    <span class="insights-badge">4 new</span>
+                </div>
+                <div class="insights-list">
+                    <div class="insight-item">
+                        <div class="insight-icon crit"><i class="fas fa-microphone-alt"></i></div>
+                        <div class="insight-body">
+                            <div class="insight-text"><strong>Call Quality MOS</strong> dropped from 4.2 → 3.2 in the last 25 minutes. At current trajectory, MOS will breach the 2.8 threshold in ~18 minutes triggering automatic call routing failover.</div>
+                            <div class="insight-meta">2 min ago · Critical priority <span class="tag genesys">Genesys</span></div>
+                        </div>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-icon warn"><i class="fas fa-phone-alt"></i></div>
+                        <div class="insight-body">
+                            <div class="insight-text"><strong>LOB SLA degradation</strong> in Sales and Billing queues is correlated with the 4-incident spike during the last 15 minutes. Recommend preemptive agent rebalancing from Service → Sales.</div>
+                            <div class="insight-meta">5 min ago · Action recommended <span class="tag agent">Agent</span> <span class="tag genesys">Genesys</span></div>
+                        </div>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-icon info"><i class="fas fa-chart-line"></i></div>
+                        <div class="insight-body">
+                            <div class="insight-text"><strong>Pattern detected:</strong> Current signal trajectory matches the pre-outage signature from Jan 28 incident (MOS drop + incident surge + SLA drift). Outage probability escalating from 12% → projected 42% within 48 min.</div>
+                            <div class="insight-meta">8 min ago · Pattern match 87% confidence <span class="tag app">App</span> <span class="tag genesys">Genesys</span></div>
+                        </div>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-icon ok"><i class="fas fa-shield-alt"></i></div>
+                        <div class="insight-body">
+                            <div class="insight-text"><strong>No risk detected</strong> for Agent Connectivity, Genesys Platform, and Core Systems. All three signals have been stable for 4+ hours with no forecast deviation.</div>
+                            <div class="insight-meta">12 min ago · Informational <span class="tag agent">Agent</span> <span class="tag app">App</span></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="insights-toggle" id="insightsToggle">
+                    <span>Show 2 more insights</span> <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Domain Outlook (horizontal row) — JS-rendered with signal dots -->
+        <div class="domain-outlook" id="domainOutlook"></div>
+
+        <!-- Signal Sparkline Grid -->
+        <div class="sparkline-grid" id="sparkGrid"></div>
+
+    </div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Chart defaults
+        Chart.defaults.font.family = 'Inter';
+        Chart.defaults.animation.duration = 600;
+
+        // Time labels: -60m to +60m
+        const timeLabels = [];
+        for (let i = -60; i <= 60; i += 5) {
+            timeLabels.push(i === 0 ? 'Now' : (i > 0 ? `+${i}m` : `${i}m`));
+        }
+
+        // Simulated outage probability data
+        const probData = [6,5,7,8,7,6,5,6,8,9,10,12, 12,15,19,24,28,33,38,42,48,52,56,58,60];
+
+        // Probability chart
+        new Chart(document.getElementById('probChart'), {
+            type: 'line',
+            data: {
+                labels: timeLabels,
+                datasets: [{
+                    data: probData,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59,130,246,0.08)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    borderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1a1a2e',
+                        titleFont: { size: 11 },
+                        bodyFont: { size: 11 },
+                        callbacks: {
+                            label: ctx => `${ctx.raw}% probability`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { size: 9 }, color: '#9ca3b4', maxTicksLimit: 10 },
+                        border: { display: false }
+                    },
+                    y: {
+                        min: 0, max: 100,
+                        grid: { color: '#f1f3f5' },
+                        ticks: { font: { size: 9 }, color: '#9ca3b4', callback: v => v + '%' },
+                        border: { display: false }
+                    }
+                },
+                interaction: { intersect: false, mode: 'index' }
+            },
+            plugins: [{
+                afterDraw(chart) {
+                    const ctx = chart.ctx;
+                    const xScale = chart.scales.x;
+                    const yScale = chart.scales.y;
+                    // "Now" line
+                    const nowIdx = timeLabels.indexOf('Now');
+                    if (nowIdx >= 0) {
+                        const x = xScale.getPixelForValue(nowIdx);
+                        ctx.save();
+                        ctx.setLineDash([4, 4]);
+                        ctx.strokeStyle = '#9ca3b4';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(x, yScale.top);
+                        ctx.lineTo(x, yScale.bottom);
+                        ctx.stroke();
+                        ctx.restore();
+                        ctx.fillStyle = '#5a607f';
+                        ctx.font = '600 10px Inter';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('NOW', x, yScale.top - 6);
+                    }
+                }
+            }]
+        });
+
+        // Signal data with sparkline trajectories + sub-signals + domain mapping
+        const signals = [
+            { name: 'Agent Online', icon: 'fa-users', value: '95.7%', trend: '+1.2%', dir: 'up', status: 'healthy', domains: ['agent','genesys'],
+              history: [94,94.5,95,95.2,95.5,95.7], forecast: [95.5,95.2,94.8,94.5,94.2], prediction: 'Slight decline expected',
+              subs: [{name:'Voice Agents',value:'96.2%',status:'healthy'},{name:'Chat Agents',value:'94.1%',status:'healthy'},{name:'Email Agents',value:'91.3%',status:'warning'}] },
+            { name: 'Active Incidents', icon: 'fa-exclamation-triangle', value: '7', trend: '+4', dir: 'down', status: 'warning', domains: ['app','genesys'],
+              history: [2,3,3,4,5,7], forecast: [8,9,10,11,12], prediction: 'Trending up — escalation likely',
+              subs: [{name:'P1 Critical',value:'3',status:'critical'},{name:'P2 High',value:'2',status:'warning'},{name:'P3 Medium',value:'2',status:'healthy'}] },
+            { name: 'App Health', icon: 'fa-heartbeat', value: '97.2%', trend: '+0.5%', dir: 'up', status: 'healthy', domains: ['app'],
+              history: [96.5,96.7,96.8,97,97.1,97.2], forecast: [97.2,97.1,97.0,97.0,96.9], prediction: 'Stable outlook',
+              subs: [{name:'CRM',value:'98.1%',status:'healthy'},{name:'WFM',value:'96.8%',status:'healthy'},{name:'Reporting',value:'97.0%',status:'healthy'}] },
+            { name: 'Core Systems', icon: 'fa-server', value: '99.1%', trend: 'Stable', dir: 'flat', status: 'healthy', domains: ['app','genesys'],
+              history: [99.0,99.0,99.1,99.1,99.1,99.1], forecast: [99.1,99.1,99.0,99.0,99.0], prediction: 'No risk detected' },
+            { name: 'Call LOB SLA', icon: 'fa-phone-alt', value: '81.2%', trend: '-3.8%', dir: 'down', status: 'warning', domains: ['agent','genesys'],
+              history: [87,86,85,84,82.5,81.2], forecast: [80,78.5,77,75.5,74], prediction: 'Breach risk in ~20m',
+              subs: [{name:'Sales',value:'78.4%',status:'critical'},{name:'Billing',value:'79.1%',status:'warning'},{name:'Service',value:'86.2%',status:'healthy'},{name:'Retention',value:'84.5%',status:'healthy'}] },
+            { name: 'Queue Sufficiency', icon: 'fa-layer-group', value: '88.4%', trend: '+2.1%', dir: 'up', status: 'healthy', domains: ['agent'],
+              history: [85,86,86.5,87,87.8,88.4], forecast: [88.5,88.2,87.8,87.5,87.2], prediction: 'Stable' },
+            { name: 'Presence — Vendor', icon: 'fa-building', value: '94.7%', trend: 'Nominal', dir: 'flat', status: 'healthy', domains: ['agent'],
+              history: [94.5,94.6,94.6,94.7,94.7,94.7], forecast: [94.7,94.6,94.5,94.5,94.4], prediction: 'No risk',
+              subs: [{name:'Vendor A',value:'96.2%',status:'healthy'},{name:'Vendor B',value:'93.1%',status:'healthy'},{name:'Vendor C',value:'94.8%',status:'healthy'}] },
+            { name: 'Presence — Location', icon: 'fa-map-marker-alt', value: '93.1%', trend: '1 low', dir: 'flat', status: 'healthy', domains: ['agent'],
+              history: [93.5,93.4,93.3,93.2,93.1,93.1], forecast: [93.0,92.8,92.6,92.5,92.3], prediction: 'Manila site trending low',
+              subs: [{name:'US East',value:'96.8%',status:'healthy'},{name:'US West',value:'95.2%',status:'healthy'},{name:'Manila',value:'84.3%',status:'warning'},{name:'India',value:'93.5%',status:'healthy'}] },
+            { name: 'Agent Connectivity', icon: 'fa-wifi', value: '96.3%', trend: '+0.8%', dir: 'up', status: 'healthy', domains: ['agent','genesys'],
+              history: [95.2,95.5,95.8,96,96.1,96.3], forecast: [96.3,96.2,96.0,95.8,95.7], prediction: 'Stable' },
+            { name: 'Genesys Platform', icon: 'fa-cloud', value: '99.8%', trend: 'Stable', dir: 'flat', status: 'healthy', domains: ['genesys'],
+              history: [99.8,99.8,99.8,99.8,99.8,99.8], forecast: [99.8,99.8,99.8,99.8,99.8], prediction: 'No risk' },
+            { name: 'IVR / Self-Service', icon: 'fa-robot', value: '98.1%', trend: '+0.3%', dir: 'up', status: 'healthy', domains: ['app','genesys'],
+              history: [97.5,97.6,97.8,97.9,98,98.1], forecast: [98.1,98.0,97.9,97.8,97.8], prediction: 'Stable',
+              subs: [{name:'IVR Completion',value:'97.8%',status:'healthy'},{name:'Chatbot',value:'98.5%',status:'healthy'}] },
+            { name: 'Call Quality (MOS)', icon: 'fa-microphone-alt', value: '3.2', trend: '-0.8', dir: 'down', status: 'critical', domains: ['genesys'],
+              history: [4.2,4.0,3.8,3.6,3.4,3.2], forecast: [3.1,2.9,2.8,2.7,2.6], prediction: 'Critical — degrading fast',
+              subs: [{name:'MOS Score',value:'3.2',status:'critical'},{name:'Jitter',value:'18ms',status:'warning'},{name:'Packet Loss',value:'0.4%',status:'healthy'}] },
+            { name: 'Network Latency', icon: 'fa-network-wired', value: '24ms', trend: 'Normal', dir: 'flat', status: 'healthy', domains: ['app','genesys'],
+              history: [22,23,23,24,24,24], forecast: [24,25,25,26,26], prediction: 'Slight increase expected' },
+            { name: 'Desktop / Endpoint', icon: 'fa-desktop', value: '97.6%', trend: '+0.2%', dir: 'up', status: 'healthy', domains: ['agent','app'],
+              history: [97.2,97.3,97.4,97.5,97.5,97.6], forecast: [97.6,97.5,97.5,97.4,97.4], prediction: 'Stable',
+              subs: [{name:'Citrix',value:'98.1%',status:'healthy'},{name:'Browser',value:'97.2%',status:'healthy'},{name:'Softphone',value:'97.4%',status:'healthy'}] },
+        ];
+
+        // Domain outlook definitions
+        const domainOutlooks = [
+            { key: 'agent', cls: 'agent', label: 'Agent Health Outlook', score: '93.8', forecast: '<i class="fas fa-arrow-down"></i> Projected 91.2 in 30m', canvasId: 'agentOutlook' },
+            { key: 'app', cls: 'app', label: 'Application Health Outlook', score: '95.4', forecast: '<i class="fas fa-minus"></i> Projected 95.1 in 30m', canvasId: 'appOutlook' },
+            { key: 'genesys', cls: 'genesys', label: 'Genesys Health Outlook', score: '92.1', forecast: '<i class="fas fa-arrow-down"></i> Projected 89.4 in 30m', canvasId: 'genesysOutlook' },
+        ];
+
+        // Render domain outlook cards with signal-health dots + tooltip
+        const domOutlookEl = document.getElementById('domainOutlook');
+        domainOutlooks.forEach(d => {
+            const domSignals = signals.filter(s => s.domains && s.domains.includes(d.key));
+            const tipRows = domSignals.map(s =>
+                `<div class="tip-row"><span class="tip-dot ${s.status}"></span><span class="tip-name">${s.name}</span><span class="tip-val">${s.value}</span></div>`
+            ).join('');
+            const card = document.createElement('div');
+            card.className = `outlook-card ${d.cls}`;
+            card.innerHTML = `
+                <div class="outlook-label">${d.label}</div>
+                <div class="outlook-score">${d.score}</div>
+                <div class="outlook-forecast">${d.forecast}</div>
+                <div class="outlook-chart"><canvas id="${d.canvasId}"></canvas></div>
+                <div class="tip-anchor" style="justify-content:center">
+                    <div class="ol-signals">
+                        ${domSignals.map(s => `<span class="ol-sig-tag ${s.status}">${s.name}</span>`).join('')}
+                    </div>
+                    <div class="custom-tip">
+                        <div class="tip-title">${d.label.replace(' Outlook','')} — Signals</div>
+                        ${tipRows}
+                    </div>
+                </div>
+            `;
+            domOutlookEl.appendChild(card);
+        });
+
+        // Build sparkline cards
+        const grid = document.getElementById('sparkGrid');
+        signals.forEach((s, idx) => {
+            const card = document.createElement('div');
+            card.className = 'spark-card';
+            const isWarn = s.prediction.includes('risk') || s.prediction.includes('Breach') || s.prediction.includes('Critical') || s.prediction.includes('escalation');
+            const subsHtml = s.subs ? `
+                <div class="tip-anchor">
+                    <div class="sub-signals">
+                        ${s.subs.map(sub => `<span class="sub-tag ${sub.status}">${sub.name}</span>`).join('')}
+                    </div>
+                    <div class="custom-tip">
+                        <div class="tip-title">${s.name} — Sub-signals</div>
+                        ${s.subs.map(sub => `<div class="tip-row"><span class="tip-dot ${sub.status}"></span><span class="tip-name">${sub.name}</span><span class="tip-val">${sub.value}</span></div>`).join('')}
+                    </div>
+                </div>` : '';
+            card.innerHTML = `
+                <div class="spark-header">
+                    <div class="spark-name"><i class="fas ${s.icon}"></i> ${s.name}</div>
+                    <span class="spark-status ${s.status}">${s.status}</span>
+                </div>
+                <div class="spark-body">
+                    <div class="spark-value-block">
+                        <div class="spark-current">${s.value}</div>
+                        <div class="spark-trend ${s.dir}">
+                            ${s.dir === 'up' ? '<i class="fas fa-arrow-up"></i>' : s.dir === 'down' ? '<i class="fas fa-arrow-down"></i>' : '<i class="fas fa-minus"></i>'}
+                            ${s.trend}
+                        </div>
+                    </div>
+                    <div class="spark-chart"><canvas id="spark${idx}"></canvas></div>
+                </div>
+                ${subsHtml}
+                <div class="spark-prediction">
+                    <i class="fas fa-crystal-ball pred-icon" style="color:var(--text-muted)"></i>
+                    <i class="fas ${isWarn ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i>
+                    <span class="${isWarn ? 'pred-warn' : 'pred-ok'}">${s.prediction}</span>
+                </div>
+            `;
+            grid.appendChild(card);
+
+            // Sparkline chart
+            const labels = ['-25m','-20m','-15m','-10m','-5m','Now','+10m','+20m','+30m','+40m','+50m'];
+            const allData = [...s.history, ...s.forecast];
+
+            new Chart(document.getElementById(`spark${idx}`), {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            data: [...s.history, null, null, null, null, null],
+                            borderColor: s.status === 'critical' ? '#ef4444' : s.status === 'warning' ? '#f59e0b' : '#22c55e',
+                            borderWidth: 2, pointRadius: 0, tension: 0.4,
+                        },
+                        {
+                            data: [null, null, null, null, null, s.history[s.history.length-1], ...s.forecast],
+                            borderColor: '#9ca3b4',
+                            borderWidth: 1.5, borderDash: [4,3], pointRadius: 0, tension: 0.4,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { display: false }
+                    }
+                }
+            });
+        });
+
+        // Domain outlook mini-charts
+        function miniChart(id, color, data, forecast) {
+            const labels = ['-30','-25','-20','-15','-10','-5','Now','+5','+10','+15','+20','+25','+30'];
+            new Chart(document.getElementById(id), {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        { data: [...data, null, null, null, null, null, null], borderColor: color, borderWidth: 2, pointRadius: 0, tension: 0.4 },
+                        { data: [null,null,null,null,null,null, data[data.length-1], ...forecast], borderColor: '#9ca3b4', borderWidth: 1.5, borderDash: [4,3], pointRadius: 0, tension: 0.4 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    scales: { x: { display: false }, y: { display: false } }
+                }
+            });
+        }
+
+        miniChart('agentOutlook', '#8b5cf6', [92.5,93.0,93.2,93.5,93.6,93.7,93.8], [93.5,93.0,92.5,92.0,91.5,91.2]);
+        miniChart('appOutlook', '#06b6d4', [94.8,95.0,95.1,95.2,95.3,95.3,95.4], [95.4,95.3,95.2,95.2,95.1,95.1]);
+        miniChart('genesysOutlook', '#3b82f6', [94.0,93.5,93.2,92.8,92.5,92.3,92.1], [91.8,91.2,90.5,90.0,89.5,89.4]);
+
+        // Insights toggle
+        const insPanel = document.getElementById('insightsPanel');
+        const insToggle = document.getElementById('insightsToggle');
+        insToggle.addEventListener('click', () => {
+            const collapsed = insPanel.classList.toggle('collapsed');
+            insToggle.querySelector('span').textContent = collapsed ? 'Show 2 more insights' : 'Show less';
+        });
+    </script>
+</body>
+</html>

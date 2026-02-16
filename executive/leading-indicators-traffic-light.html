@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain Health — Leading Indicators</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #f8f9fb;
+            --bg-card: #ffffff;
+            --bg-muted: #f1f3f5;
+            --border: #e9ecef;
+            --text: #1a1a2e;
+            --text-secondary: #5a607f;
+            --text-muted: #9ca3b4;
+            --green: #22c55e;
+            --green-bg: #f0fdf4;
+            --yellow: #f59e0b;
+            --yellow-bg: #fffbeb;
+            --red: #ef4444;
+            --red-bg: #fef2f2;
+            --blue: #3b82f6;
+            --blue-bg: #eff6ff;
+            --purple: #8b5cf6;
+            --purple-bg: #f5f3ff;
+            --cyan: #06b6d4;
+            --cyan-bg: #ecfeff;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg); color: var(--text);
+            min-height: 100vh; display: flex; flex-direction: column;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            height: 56px; background: var(--bg-card); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px; flex-shrink: 0; position: sticky; top: 0; z-index: 100;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 12px; }
+        .topbar-logo { width: 32px; height: 32px; background: linear-gradient(135deg, var(--blue), var(--purple)); border-radius: 8px; display: grid; place-items: center; font-size: 14px; color: white; }
+        .topbar-title { font-size: 15px; font-weight: 600; }
+        .topbar-title span { color: var(--text-muted); font-weight: 400; font-size: 13px; margin-left: 8px; }
+        .topbar-center { display: flex; gap: 2px; background: var(--bg-muted); padding: 3px; border-radius: 8px; }
+        .topbar-tab { padding: 6px 14px; font-size: 12px; font-weight: 500; color: var(--text-muted); border-radius: 6px; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+        .topbar-tab:hover { color: var(--text); background: var(--bg-card); }
+        .topbar-tab.active { background: var(--text); color: white; box-shadow: var(--shadow-sm); }
+        .topbar-right { display: flex; align-items: center; gap: 16px; font-size: 12px; color: var(--text-muted); }
+        .live-badge { display: flex; align-items: center; gap: 6px; color: var(--green); font-weight: 600; font-size: 11px; }
+        .live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* ===== CONTENT ===== */
+        .content { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+
+        /* ===== DOMAIN LANE ===== */
+        .domain-lane {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); box-shadow: var(--shadow-sm);
+            overflow: hidden; transition: all 0.2s;
+        }
+        .domain-lane:hover { box-shadow: var(--shadow-md); }
+
+        .lane-header {
+            display: flex; align-items: center; gap: 16px;
+            padding: 16px 24px;
+            cursor: pointer; user-select: none;
+        }
+
+        .lane-gauge {
+            width: 56px; height: 56px; position: relative; flex-shrink: 0;
+        }
+
+        .lane-gauge svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+
+        .lane-gauge-bg { fill: none; stroke: var(--bg-muted); stroke-width: 4; }
+        .lane-gauge-fill { fill: none; stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease; }
+
+        .lane-gauge-value {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 14px; font-weight: 800; line-height: 1;
+        }
+
+        .lane-info { flex: 1; }
+        .lane-title { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+        .lane-subtitle { font-size: 12px; color: var(--text-muted); }
+
+        .lane-status {
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .lane-count {
+            display: flex; align-items: center; gap: 4px;
+            font-size: 11px; font-weight: 600; padding: 4px 10px;
+            border-radius: 8px;
+        }
+        .lane-count.g { background: var(--green-bg); color: var(--green); }
+        .lane-count.y { background: var(--yellow-bg); color: var(--yellow); }
+        .lane-count.r { background: var(--red-bg); color: var(--red); }
+
+        .lane-toggle {
+            font-size: 14px; color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+        .domain-lane.collapsed .lane-toggle { transform: rotate(-90deg); }
+
+        /* ===== SIGNAL STRIP ===== */
+        .signal-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px; padding: 0 24px 20px;
+        }
+
+        .domain-lane.collapsed .signal-strip { display: none; }
+
+        .strip-card {
+            background: var(--bg-muted); border-radius: 10px;
+            padding: 14px 16px; position: relative;
+            transition: all 0.2s; cursor: pointer;
+        }
+        .strip-card:hover { background: var(--bg); box-shadow: var(--shadow-sm); }
+
+        .strip-card::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
+            height: 3px; border-radius: 10px 10px 0 0;
+        }
+        .strip-card.healthy::after { background: var(--green); }
+        .strip-card.warning::after { background: var(--yellow); }
+        .strip-card.critical::after { background: var(--red); }
+
+        .strip-name {
+            font-size: 11px; font-weight: 600; color: var(--text-secondary);
+            margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+        }
+        .strip-name i { font-size: 10px; color: var(--text-muted); }
+
+        .strip-value { font-size: 22px; font-weight: 700; margin-bottom: 2px; }
+
+        .strip-meta { font-size: 10px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+        .strip-meta .up { color: var(--green); }
+        .strip-meta .down { color: var(--red); }
+
+        /* Shared signal indicator */
+        .shared-badge {
+            position: absolute; top: 10px; right: 10px;
+            font-size: 8px; font-weight: 700; padding: 2px 5px;
+            border-radius: 3px; text-transform: uppercase;
+            background: var(--blue-bg); color: var(--blue);
+        }
+
+        /* ===== CONNECTOR LINES (visual) ===== */
+        .lane-divider {
+            display: flex; align-items: center; justify-content: center;
+            position: relative; height: 1px;
+        }
+        .lane-divider::before {
+            content: ''; position: absolute; left: 40px; right: 40px;
+            height: 1px; background: var(--border);
+        }
+        .lane-divider .shared-label {
+            background: var(--bg); padding: 0 12px;
+            font-size: 10px; color: var(--text-muted); z-index: 1;
+            font-weight: 500;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .signal-strip { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+        }
+
+        @media (max-width: 768px) {
+            .topbar { padding: 0 16px; }
+            .topbar-center { display: none; }
+            .topbar-title span { display: none; }
+            .content { padding: 16px; }
+            .lane-header { padding: 12px 16px; gap: 12px; }
+            .lane-gauge { width: 44px; height: 44px; }
+            .lane-gauge-value { font-size: 12px; }
+            .lane-title { font-size: 14px; }
+            .signal-strip { padding: 0 16px 16px; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+            .strip-value { font-size: 18px; }
+        }
+
+        @media (max-width: 480px) {
+            .topbar { height: 48px; }
+            .signal-strip { grid-template-columns: 1fr 1fr; }
+            .lane-status { flex-wrap: wrap; gap: 4px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="topbar-logo"><i class="fas fa-traffic-light"></i></div>
+            <div class="topbar-title">Domain Health <span>Leading Indicators</span></div>
+        </div>
+        <div class="topbar-center">
+            <a class="topbar-tab" href="leading-indicators-nerve-center.html">Nerve Center</a>
+            <a class="topbar-tab" href="leading-indicators-signal-matrix.html">Matrix</a>
+            <a class="topbar-tab active" href="leading-indicators-traffic-light.html">Domains</a>
+            <a class="topbar-tab" href="leading-indicators-predictive-timeline.html">Predict</a>
+            <a class="topbar-tab" href="leading-indicators-hybrid.html">Command</a>
+        </div>
+        <div class="topbar-right">
+            <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+            <span><i class="far fa-clock"></i>&nbsp; <span id="clock">--:--</span></span>
+        </div>
+    </div>
+
+    <div class="content" id="domainContent"></div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        const domains = [
+            {
+                name: 'Agent Health', score: 93.8, color: 'var(--purple)',
+                subtitle: 'Workforce readiness, presence, and connectivity',
+                signals: [
+                    { name: 'Agent Online', icon: 'fa-users', value: '95.7%', trend: '+1.2%', dir: 'up', status: 'healthy', shared: ['Genesys'] },
+                    { name: 'Call LOB SLA', icon: 'fa-phone-alt', value: '81.2%', trend: '-3.8%', dir: 'down', status: 'warning', shared: ['Genesys'] },
+                    { name: 'Queue Sufficiency', icon: 'fa-layer-group', value: '88.4%', trend: '+2.1%', dir: 'up', status: 'healthy', shared: [] },
+                    { name: 'Presence — Vendor', icon: 'fa-building', value: '94.7%', trend: 'Nominal', dir: 'flat', status: 'healthy', shared: [] },
+                    { name: 'Presence — Location', icon: 'fa-map-marker-alt', value: '93.1%', trend: '1 low', dir: 'flat', status: 'healthy', shared: [] },
+                    { name: 'Agent Connectivity', icon: 'fa-wifi', value: '96.3%', trend: '+0.8%', dir: 'up', status: 'healthy', shared: ['Genesys'] },
+                    { name: 'Desktop / Endpoint', icon: 'fa-desktop', value: '97.6%', trend: '+0.2%', dir: 'up', status: 'healthy', shared: ['App'] },
+                ]
+            },
+            {
+                name: 'Application Health', score: 95.4, color: 'var(--cyan)',
+                subtitle: 'Application performance, infrastructure, and integrations',
+                signals: [
+                    { name: 'App Health Score', icon: 'fa-heartbeat', value: '97.2%', trend: '+0.5%', dir: 'up', status: 'healthy', shared: [] },
+                    { name: 'Core Systems', icon: 'fa-server', value: '99.1%', trend: 'Stable', dir: 'flat', status: 'healthy', shared: ['Genesys'] },
+                    { name: 'Active Incidents', icon: 'fa-exclamation-triangle', value: '7', trend: '+4', dir: 'down', status: 'warning', shared: ['Genesys'] },
+                    { name: 'IVR / Self-Service', icon: 'fa-robot', value: '98.1%', trend: '+0.3%', dir: 'up', status: 'healthy', shared: ['Genesys'] },
+                    { name: 'Network Latency', icon: 'fa-network-wired', value: '24ms', trend: 'Normal', dir: 'flat', status: 'healthy', shared: ['Genesys'] },
+                    { name: 'Desktop / Endpoint', icon: 'fa-desktop', value: '97.6%', trend: '+0.2%', dir: 'up', status: 'healthy', shared: ['Agent'] },
+                ]
+            },
+            {
+                name: 'Genesys Health', score: 92.1, color: 'var(--blue)',
+                subtitle: 'Platform availability, call quality, and telephony infrastructure',
+                signals: [
+                    { name: 'Genesys Platform', icon: 'fa-cloud', value: '99.8%', trend: 'Stable', dir: 'flat', status: 'healthy', shared: [] },
+                    { name: 'Call Quality (MOS)', icon: 'fa-microphone-alt', value: '3.2', trend: '-0.8', dir: 'down', status: 'critical', shared: [] },
+                    { name: 'Agent Online', icon: 'fa-users', value: '95.7%', trend: '+1.2%', dir: 'up', status: 'healthy', shared: ['Agent'] },
+                    { name: 'Core Systems', icon: 'fa-server', value: '99.1%', trend: 'Stable', dir: 'flat', status: 'healthy', shared: ['App'] },
+                    { name: 'Active Incidents', icon: 'fa-exclamation-triangle', value: '7', trend: '+4', dir: 'down', status: 'warning', shared: ['App'] },
+                    { name: 'Call LOB SLA', icon: 'fa-phone-alt', value: '81.2%', trend: '-3.8%', dir: 'down', status: 'warning', shared: ['Agent'] },
+                    { name: 'Agent Connectivity', icon: 'fa-wifi', value: '96.3%', trend: '+0.8%', dir: 'up', status: 'healthy', shared: ['Agent'] },
+                    { name: 'IVR / Self-Service', icon: 'fa-robot', value: '98.1%', trend: '+0.3%', dir: 'up', status: 'healthy', shared: ['App'] },
+                    { name: 'Network Latency', icon: 'fa-network-wired', value: '24ms', trend: 'Normal', dir: 'flat', status: 'healthy', shared: ['App'] },
+                ]
+            }
+        ];
+
+        function buildGaugeSVG(score, color) {
+            const r = 22, c = 2 * Math.PI * r;
+            const offset = c - (score / 100) * c;
+            return `
+                <svg viewBox="0 0 56 56">
+                    <circle class="lane-gauge-bg" cx="28" cy="28" r="${r}"/>
+                    <circle class="lane-gauge-fill" cx="28" cy="28" r="${r}"
+                        stroke="${color}"
+                        stroke-dasharray="${c}"
+                        stroke-dashoffset="${offset}"/>
+                </svg>
+                <div class="lane-gauge-value" style="color:${color}">${score}</div>
+            `;
+        }
+
+        const content = document.getElementById('domainContent');
+
+        domains.forEach((d, idx) => {
+            const healthy = d.signals.filter(s => s.status === 'healthy').length;
+            const warning = d.signals.filter(s => s.status === 'warning').length;
+            const critical = d.signals.filter(s => s.status === 'critical').length;
+
+            const lane = document.createElement('div');
+            lane.className = 'domain-lane';
+            lane.innerHTML = `
+                <div class="lane-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                    <div class="lane-gauge">${buildGaugeSVG(d.score, d.color)}</div>
+                    <div class="lane-info">
+                        <div class="lane-title">${d.name}</div>
+                        <div class="lane-subtitle">${d.subtitle}</div>
+                    </div>
+                    <div class="lane-status">
+                        ${healthy ? `<span class="lane-count g"><i class="fas fa-check-circle"></i> ${healthy}</span>` : ''}
+                        ${warning ? `<span class="lane-count y"><i class="fas fa-exclamation-circle"></i> ${warning}</span>` : ''}
+                        ${critical ? `<span class="lane-count r"><i class="fas fa-times-circle"></i> ${critical}</span>` : ''}
+                    </div>
+                    <div class="lane-toggle"><i class="fas fa-chevron-down"></i></div>
+                </div>
+                <div class="signal-strip">
+                    ${d.signals.map(s => `
+                        <div class="strip-card ${s.status}">
+                            ${s.shared.length ? `<div class="shared-badge">+ ${s.shared.join(', ')}</div>` : ''}
+                            <div class="strip-name"><i class="fas ${s.icon}"></i> ${s.name}</div>
+                            <div class="strip-value">${s.value}</div>
+                            <div class="strip-meta">
+                                <span class="${s.dir === 'up' ? 'up' : s.dir === 'down' ? 'down' : ''}">
+                                    ${s.dir === 'up' ? '<i class="fas fa-arrow-up"></i>' : s.dir === 'down' ? '<i class="fas fa-arrow-down"></i>' : '<i class="fas fa-minus"></i>'}
+                                    ${s.trend}
+                                </span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            content.appendChild(lane);
+        });
+    </script>
+</body>
+</html>

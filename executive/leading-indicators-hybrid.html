@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Center — Leading Indicators</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #f8f9fb;
+            --bg-card: #ffffff;
+            --bg-muted: #f1f3f5;
+            --border: #e9ecef;
+            --text: #1a1a2e;
+            --text-secondary: #5a607f;
+            --text-muted: #9ca3b4;
+            --green: #22c55e;
+            --green-bg: #f0fdf4;
+            --yellow: #f59e0b;
+            --yellow-bg: #fffbeb;
+            --red: #ef4444;
+            --red-bg: #fef2f2;
+            --blue: #3b82f6;
+            --blue-bg: #eff6ff;
+            --purple: #8b5cf6;
+            --purple-bg: #f5f3ff;
+            --cyan: #06b6d4;
+            --cyan-bg: #ecfeff;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg); color: var(--text);
+            min-height: 100vh; display: flex; flex-direction: column;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            height: 56px; background: var(--bg-card); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px; flex-shrink: 0; position: sticky; top: 0; z-index: 100;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 12px; }
+        .topbar-logo { width: 32px; height: 32px; background: linear-gradient(135deg, var(--blue), var(--purple)); border-radius: 8px; display: grid; place-items: center; font-size: 14px; color: white; }
+        .topbar-title { font-size: 15px; font-weight: 600; }
+        .topbar-title span { color: var(--text-muted); font-weight: 400; font-size: 13px; margin-left: 8px; }
+        .topbar-center { display: flex; gap: 2px; background: var(--bg-muted); padding: 3px; border-radius: 8px; }
+        .topbar-tab { padding: 6px 14px; font-size: 12px; font-weight: 500; color: var(--text-muted); border-radius: 6px; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+        .topbar-tab:hover { color: var(--text); background: var(--bg-card); }
+        .topbar-tab.active { background: var(--text); color: white; box-shadow: var(--shadow-sm); }
+        .topbar-right { display: flex; align-items: center; gap: 16px; font-size: 12px; color: var(--text-muted); }
+        .live-badge { display: flex; align-items: center; gap: 6px; color: var(--green); font-weight: 600; font-size: 11px; }
+        .live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        .content { flex: 1; padding: 20px 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+
+        /* ===== TOP ROW: Score + Prediction + Insights ===== */
+        .top-row {
+            display: grid;
+            grid-template-columns: 220px 1fr 340px;
+            gap: 16px;
+            align-items: stretch;
+        }
+
+        /* Enterprise Score */
+        .score-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); box-shadow: var(--shadow-sm);
+            padding: 20px; text-align: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        .score-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted); margin-bottom: 6px; }
+        .score-value { font-size: 52px; font-weight: 800; line-height: 1; color: var(--text); }
+        .score-sub { font-size: 11px; color: var(--text-secondary); margin-top: 6px; }
+        .score-badges { display: flex; gap: 8px; margin-top: 10px; }
+        .score-badge { font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 8px; }
+        .score-badge.g { background: var(--green-bg); color: var(--green); }
+        .score-badge.y { background: var(--yellow-bg); color: var(--yellow); }
+        .score-badge.r { background: var(--red-bg); color: var(--red); }
+
+        /* Prediction hero — matches Predict page style */
+        .predict-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); box-shadow: var(--shadow-sm);
+            padding: 20px 24px; display: flex; align-items: center;
+            gap: 20px; flex-wrap: wrap;
+        }
+
+        .predict-main { text-align: center; min-width: 140px; }
+        .predict-label {
+            font-size: 10px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 1.2px; color: var(--text-muted); margin-bottom: 4px;
+        }
+        .predict-value { font-size: 48px; font-weight: 800; line-height: 1; }
+        .predict-value.low { color: var(--green); }
+        .predict-value.medium { color: var(--yellow); }
+        .predict-value.high { color: var(--red); }
+        .predict-sub { font-size: 11px; color: var(--text-secondary); margin-top: 6px; }
+
+        .predict-chart-area { flex: 1; min-width: 200px; height: 110px; position: relative; overflow: hidden; }
+
+        .predict-breakdown { display: flex; flex-direction: column; gap: 6px; min-width: 150px; flex-shrink: 0; }
+        .predict-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 10px; border-radius: 8px; background: var(--bg-muted);
+        }
+        .predict-item .pi-label { font-size: 11px; color: var(--text-secondary); flex: 1; }
+        .predict-item .pi-val { font-size: 13px; font-weight: 700; }
+        .predict-item.green .pi-val { color: var(--green); }
+        .predict-item.yellow .pi-val { color: var(--yellow); }
+        .predict-item.red .pi-val { color: var(--red); }
+
+        /* Domain row — horizontal under top row */
+        .domain-row {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+        }
+
+        /* Domain trio (legacy container) */
+        .domain-trio {
+            display: flex; flex-direction: column; gap: 10px;
+        }
+
+        .domain-mini {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 18px 20px;
+            box-shadow: var(--shadow-sm); display: flex;
+            align-items: flex-start; gap: 14px; flex: 1; transition: all 0.2s;
+            min-height: 120px;
+        }
+        .domain-mini:hover { box-shadow: var(--shadow-md); }
+
+        .dm-score {
+            width: 48px; height: 48px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800; flex-shrink: 0;
+        }
+        .dm-score.agent { background: var(--purple-bg); color: var(--purple); border: 2px solid rgba(139,92,246,0.2); }
+        .dm-score.app { background: var(--cyan-bg); color: var(--cyan); border: 2px solid rgba(6,182,212,0.2); }
+        .dm-score.genesys { background: var(--blue-bg); color: var(--blue); border: 2px solid rgba(59,130,246,0.2); }
+
+        .dm-info { flex: 1; }
+        .dm-name { font-size: 13px; font-weight: 600; margin-bottom: 1px; }
+        .dm-detail { font-size: 10px; color: var(--text-muted); }
+
+        .dm-spark { width: 90px; height: 48px; position: relative; overflow: hidden; align-self: center; }
+
+        /* Signal-health tags inside domain cards */
+        .dm-signals { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+        .dm-sig-tag {
+            font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 4px;
+            cursor: pointer; transition: all 0.15s; white-space: nowrap;
+        }
+        .dm-sig-tag:hover { transform: scale(1.05); }
+        .dm-sig-tag.healthy { background: var(--green-bg); color: var(--green); }
+        .dm-sig-tag.warning { background: var(--yellow-bg); color: var(--yellow); }
+        .dm-sig-tag.critical { background: var(--red-bg); color: var(--red); }
+
+        /* Sub-signal tags inside signal cards */
+        .sub-signals { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+        .sub-tag {
+            font-size: 8px; font-weight: 600; padding: 1px 6px; border-radius: 3px;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .sub-tag:hover { transform: scale(1.05); }
+        .sub-tag.healthy { background: var(--green-bg); color: var(--green); }
+        .sub-tag.warning { background: var(--yellow-bg); color: var(--yellow); }
+        .sub-tag.critical { background: var(--red-bg); color: var(--red); }
+
+        /* Custom tooltip — non-intrusive floating panel */
+        .tip-anchor { position: relative; display: inline-flex; }
+        .custom-tip {
+            display: none; position: absolute; z-index: 200;
+            bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+            background: var(--text); color: #fff; border-radius: 8px;
+            padding: 10px 14px; min-width: 180px; max-width: 260px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+            pointer-events: none;
+        }
+        .custom-tip::after {
+            content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            border: 5px solid transparent; border-top-color: var(--text);
+        }
+        .tip-anchor:hover .custom-tip { display: block; }
+        .tip-title { font-size: 11px; font-weight: 700; margin-bottom: 6px; letter-spacing: 0.3px; }
+        .tip-row { display: flex; align-items: center; gap: 6px; font-size: 10px; padding: 2px 0; }
+        .tip-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .tip-dot.healthy { background: var(--green); }
+        .tip-dot.warning { background: var(--yellow); }
+        .tip-dot.critical { background: var(--red); }
+        .tip-name { flex: 1; opacity: 0.9; }
+        .tip-val { font-weight: 600; opacity: 1; }
+
+        /* ===== MAIN GRID: Signals ===== */
+        .signals-section-title {
+            font-size: 12px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--text-muted);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .signals-section-title::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+
+        .signals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 12px;
+        }
+
+        .sig-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 14px 16px;
+            box-shadow: var(--shadow-sm); transition: all 0.2s;
+            cursor: pointer; position: relative; overflow: hidden;
+        }
+        .sig-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+        .sig-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        }
+        .sig-card.healthy::before { background: var(--green); }
+        .sig-card.warning::before { background: var(--yellow); }
+        .sig-card.critical::before { background: var(--red); }
+
+        .sig-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .sig-name { font-size: 11px; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+        .sig-name i { font-size: 10px; color: var(--text-muted); }
+
+        .sig-status { font-size: 8px; font-weight: 700; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; }
+        .sig-status.healthy { background: var(--green-bg); color: var(--green); }
+        .sig-status.warning { background: var(--yellow-bg); color: var(--yellow); }
+        .sig-status.critical { background: var(--red-bg); color: var(--red); }
+
+        .sig-body { display: flex; align-items: flex-end; gap: 10px; }
+        .sig-val { font-size: 24px; font-weight: 700; line-height: 1; }
+        .sig-chart { flex: 1; height: 36px; min-width: 0; position: relative; overflow: hidden; }
+
+        .sig-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--border);
+        }
+
+        .sig-trend { font-size: 10px; display: flex; align-items: center; gap: 3px; }
+        .sig-trend.up { color: var(--green); }
+        .sig-trend.down { color: var(--red); }
+        .sig-trend.flat { color: var(--text-muted); }
+
+        .sig-domains { display: flex; gap: 3px; }
+        .sig-dtag { font-size: 7px; font-weight: 700; padding: 1px 5px; border-radius: 3px; text-transform: uppercase; }
+        .sig-dtag.agent { background: var(--purple-bg); color: var(--purple); }
+        .sig-dtag.app { background: var(--cyan-bg); color: var(--cyan); }
+        .sig-dtag.genesys { background: var(--blue-bg); color: var(--blue); }
+
+        /* ===== BOTTOM: TIMELINE + ALERTS ===== */
+        .bottom-row { display: grid; grid-template-columns: 1fr 380px; gap: 16px; }
+
+        .timeline-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 16px 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tl-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .tl-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+        .tl-legend { display: flex; gap: 12px; font-size: 10px; color: var(--text-muted); }
+        .tl-legend span { display: flex; align-items: center; gap: 4px; }
+        .tl-dot { width: 6px; height: 6px; border-radius: 50%; }
+        .tl-dot.g { background: var(--green); }
+        .tl-dot.y { background: var(--yellow); }
+        .tl-dot.r { background: var(--red); }
+
+        .tl-segments { display: flex; width: 100%; height: 10px; border-radius: 5px; overflow: hidden; gap: 1px; }
+        .tl-seg { flex: 1; border-radius: 2px; cursor: pointer; transition: transform 0.2s; }
+        .tl-seg:hover { transform: scaleY(2); }
+        .tl-seg.g { background: var(--green); opacity: 0.5; }
+        .tl-seg.y { background: var(--yellow); opacity: 0.5; }
+        .tl-seg.r { background: var(--red); opacity: 0.5; }
+
+        .alerts-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 16px;
+            box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 8px;
+        }
+
+        .alerts-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
+
+        .alert-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px; border-radius: 8px; background: var(--bg-muted);
+            font-size: 12px;
+        }
+
+        .alert-row .a-icon {
+            width: 24px; height: 24px; border-radius: 6px;
+            display: grid; place-items: center; font-size: 10px; flex-shrink: 0;
+        }
+        .alert-row.crit .a-icon { background: var(--red-bg); color: var(--red); }
+        .alert-row.warn .a-icon { background: var(--yellow-bg); color: var(--yellow); }
+        .alert-row.info .a-icon { background: var(--blue-bg); color: var(--blue); }
+
+        .alert-row .a-text { flex: 1; color: var(--text-secondary); }
+        .alert-row .a-text strong { color: var(--text); }
+        .alert-row .a-time { font-size: 9px; color: var(--text-muted); white-space: nowrap; }
+
+        /* ===== INSIGHTS PANEL (right column of top row) ===== */
+        .insights-section {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); box-shadow: var(--shadow-sm);
+            padding: 16px 18px; display: flex; flex-direction: column;
+            max-height: 100%; overflow-y: auto;
+        }
+        .insights-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .insights-title {
+            font-size: 13px; font-weight: 600; color: var(--text);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .insights-title i { color: var(--purple); font-size: 13px; }
+        .insights-badge {
+            font-size: 10px; font-weight: 700; padding: 3px 10px;
+            border-radius: 6px; background: var(--purple-bg); color: var(--purple);
+        }
+        .insight-row {
+            display: flex; gap: 8px; padding: 8px 10px;
+            border-radius: 8px; background: var(--bg-muted);
+            margin-bottom: 6px; transition: all 0.3s;
+        }
+        .insight-row:last-child { margin-bottom: 0; }
+        .insight-row:hover { background: var(--bg); box-shadow: var(--shadow-sm); }
+        /* Collapsed: hide items beyond 2 */
+        .insights-section.collapsed .insight-row:nth-child(n+3) {
+            display: none;
+        }
+        .insights-toggle {
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            margin-top: 8px; padding: 5px 0; cursor: pointer;
+            font-size: 11px; font-weight: 500; color: var(--text-muted);
+            border: none; background: none; width: 100%;
+            transition: color 0.2s;
+        }
+        .insights-toggle:hover { color: var(--purple); }
+        .insights-toggle i { font-size: 9px; transition: transform 0.3s; }
+        .insights-section:not(.collapsed) .insights-toggle i { transform: rotate(180deg); }
+        .ins-icon {
+            width: 26px; height: 26px; border-radius: 6px;
+            display: grid; place-items: center; font-size: 11px; flex-shrink: 0;
+        }
+        .ins-icon.crit { background: var(--red-bg); color: var(--red); }
+        .ins-icon.warn { background: var(--yellow-bg); color: var(--yellow); }
+        .ins-icon.info { background: var(--blue-bg); color: var(--blue); }
+        .ins-icon.ok   { background: var(--green-bg); color: var(--green); }
+        .ins-body { flex: 1; }
+        .ins-text { font-size: 11px; color: var(--text); line-height: 1.4; }
+        .ins-text strong { font-weight: 600; }
+        .ins-meta { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        .ins-meta .itag {
+            display: inline-block; font-size: 8px; font-weight: 700;
+            padding: 1px 5px; border-radius: 3px; margin-left: 4px;
+            text-transform: uppercase;
+        }
+        .ins-meta .itag.agent { background: var(--purple-bg); color: var(--purple); }
+        .ins-meta .itag.app { background: var(--cyan-bg); color: var(--cyan); }
+        .ins-meta .itag.genesys { background: var(--blue-bg); color: var(--blue); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1200px) {
+            .top-row { grid-template-columns: 1fr 1fr; }
+            .top-row .insights-section { grid-column: 1 / -1; }
+            .domain-row { grid-template-columns: 1fr 1fr 1fr; }
+            .bottom-row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .topbar { padding: 0 16px; }
+            .topbar-center { display: none; }
+            .topbar-title span { display: none; }
+            .content { padding: 12px 16px; gap: 12px; }
+            .top-row { grid-template-columns: 1fr; }
+            .domain-row { grid-template-columns: 1fr; }
+            .signals-grid { grid-template-columns: 1fr 1fr; }
+            .bottom-row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            .topbar { height: 48px; }
+            .score-value { font-size: 36px; }
+            .signals-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="topbar-logo"><i class="fas fa-shield-alt"></i></div>
+            <div class="topbar-title">Command Center <span>Leading Indicators</span></div>
+        </div>
+        <div class="topbar-center">
+            <a class="topbar-tab" href="leading-indicators-nerve-center.html">Nerve Center</a>
+            <a class="topbar-tab" href="leading-indicators-signal-matrix.html">Matrix</a>
+            <a class="topbar-tab" href="leading-indicators-traffic-light.html">Domains</a>
+            <a class="topbar-tab" href="leading-indicators-predictive-timeline.html">Predict</a>
+            <a class="topbar-tab active" href="leading-indicators-hybrid.html">Command</a>
+        </div>
+        <div class="topbar-right">
+            <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+            <span><i class="far fa-clock"></i>&nbsp; <span id="clock">--:--</span></span>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- TOP ROW: Score + Prediction + Insights -->
+        <div class="top-row">
+            <!-- Enterprise Score -->
+            <div class="score-card">
+                <div class="score-label">Enterprise Health</div>
+                <div class="score-value">94.2</div>
+                <div class="score-sub">14 signals monitored</div>
+                <div class="score-badges">
+                    <span class="score-badge g"><i class="fas fa-check"></i> 11</span>
+                    <span class="score-badge y"><i class="fas fa-exclamation"></i> 2</span>
+                    <span class="score-badge r"><i class="fas fa-times"></i> 1</span>
+                </div>
+            </div>
+
+            <!-- Prediction Hero -->
+            <div class="predict-card">
+                <div class="predict-main">
+                    <div class="predict-label">Outage Probability</div>
+                    <div class="predict-value low">12%</div>
+                    <div class="predict-sub">Next 60 min forecast</div>
+                </div>
+                <div class="predict-chart-area"><canvas id="probChart"></canvas></div>
+                <div class="predict-breakdown">
+                    <div class="predict-item green">
+                        <span class="pi-label">Current Risk</span>
+                        <span class="pi-val">12%</span>
+                    </div>
+                    <div class="predict-item yellow">
+                        <span class="pi-label">30-min Forecast</span>
+                        <span class="pi-val">33%</span>
+                    </div>
+                    <div class="predict-item red">
+                        <span class="pi-label">Peak Projected</span>
+                        <span class="pi-val">60%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Insights (right top) -->
+            <div class="insights-section collapsed" id="insightsSection">
+                <div class="insights-header">
+                    <div class="insights-title"><i class="fas fa-brain"></i> AI Insights</div>
+                    <span class="insights-badge">3 active</span>
+                </div>
+                <div class="insight-row">
+                    <div class="ins-icon crit"><i class="fas fa-microphone-alt"></i></div>
+                    <div class="ins-body">
+                        <div class="ins-text"><strong>Call Quality MOS</strong> declining rapidly (4.2→3.2 in 25m). Breach of 2.8 threshold projected in ~18 minutes.</div>
+                        <div class="ins-meta">2 min ago <span class="itag genesys">Genesys</span></div>
+                    </div>
+                </div>
+                <div class="insight-row">
+                    <div class="ins-icon warn"><i class="fas fa-phone-alt"></i></div>
+                    <div class="ins-body">
+                        <div class="ins-text"><strong>SLA + Incidents correlated</strong> — LOB SLA drop in Sales/Billing aligns with P1 incident surge. Agent rebalancing recommended.</div>
+                        <div class="ins-meta">5 min ago <span class="itag agent">Agent</span> <span class="itag genesys">Genesys</span></div>
+                    </div>
+                </div>
+                <div class="insight-row">
+                    <div class="ins-icon info"><i class="fas fa-chart-line"></i></div>
+                    <div class="ins-body">
+                        <div class="ins-text"><strong>Pattern match:</strong> Signal trajectory 87% similar to Jan 28 pre-outage. Probability escalating 12%→42% within 48m.</div>
+                        <div class="ins-meta">8 min ago <span class="itag app">App</span> <span class="itag genesys">Genesys</span></div>
+                    </div>
+                </div>
+                <button class="insights-toggle" id="insightsToggle">
+                    <span>Show 1 more insight</span> <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- DOMAIN ROW (horizontal) — JS-rendered -->
+        <div class="domain-row" id="domainRow"></div>
+
+        <!-- SIGNALS HEADER -->
+        <div class="signals-section-title">14 Signals</div>
+
+        <!-- SIGNAL GRID -->
+        <div class="signals-grid" id="sigGrid"></div>
+
+        <!-- BOTTOM ROW -->
+        <div class="bottom-row">
+            <div class="timeline-card">
+                <div class="tl-header">
+                    <div class="tl-title"><i class="fas fa-history"></i>&nbsp; Health Timeline — Last 4 Hours</div>
+                    <div class="tl-legend">
+                        <span><div class="tl-dot g"></div> 92%</span>
+                        <span><div class="tl-dot y"></div> 6%</span>
+                        <span><div class="tl-dot r"></div> 2%</span>
+                    </div>
+                </div>
+                <div class="tl-segments" id="tlSegments"></div>
+            </div>
+            <div class="alerts-card">
+                <div class="alerts-title"><i class="fas fa-bell"></i>&nbsp; Active Alerts</div>
+                <div class="alert-row crit">
+                    <div class="a-icon"><i class="fas fa-microphone-alt"></i></div>
+                    <div class="a-text"><strong>Call Quality</strong> MOS 3.2 — degrades fast</div>
+                    <div class="a-time">8m</div>
+                </div>
+                <div class="alert-row warn">
+                    <div class="a-icon"><i class="fas fa-phone-slash"></i></div>
+                    <div class="a-text"><strong>LOB SLA</strong> below 85% in 2 LOBs</div>
+                    <div class="a-time">12m</div>
+                </div>
+                <div class="alert-row warn">
+                    <div class="a-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="a-text"><strong>Incidents</strong> 7 active — 3 P1</div>
+                    <div class="a-time">4m</div>
+                </div>
+                <div class="alert-row info">
+                    <div class="a-icon"><i class="fas fa-info-circle"></i></div>
+                    <div class="a-text"><strong>Connectivity</strong> stable post-APAC dip</div>
+                    <div class="a-time">22m</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        Chart.defaults.font.family = 'Inter';
+        Chart.defaults.animation.duration = 500;
+
+        // Mini spark helper
+        function miniSpark(id, color, data) {
+            new Chart(document.getElementById(id), {
+                type: 'line',
+                data: {
+                    labels: data.map((_,i) => i),
+                    datasets: [{ data, borderColor: color, borderWidth: 2, pointRadius: 0, tension: 0.4, fill: false }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    scales: { x: { display: false }, y: { display: false } }
+                }
+            });
+        }
+
+        // Domain spark data (rendered after cards are created)
+        const domainSparkData = {
+            dmAgent: { color: '#8b5cf6', data: [92.5,93,93.2,93.5,93.6,93.7,93.8] },
+            dmApp: { color: '#06b6d4', data: [94.8,95,95.1,95.2,95.3,95.3,95.4] },
+            dmGenesys: { color: '#3b82f6', data: [94,93.5,93.2,92.8,92.5,92.3,92.1] },
+        };
+
+        // Probability chart
+        const probLabels = [];
+        for (let i = -60; i <= 60; i += 5) probLabels.push(i === 0 ? 'Now' : (i > 0 ? `+${i}m` : `${i}m`));
+        const probData = [6,5,7,8,7,6,5,6,8,9,10,12,12,15,19,24,28,33,38,42,48,52,56,58,60];
+
+        new Chart(document.getElementById('probChart'), {
+            type: 'line',
+            data: {
+                labels: probLabels,
+                datasets: [{
+                    data: probData,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59,130,246,0.06)',
+                    fill: true, tension: 0.4,
+                    pointRadius: 0, borderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1a1a2e', titleFont: { size: 10 }, bodyFont: { size: 10 }, callbacks: { label: ctx => ctx.raw + '% risk' } } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 9 }, color: '#9ca3b4', maxTicksLimit: 8 }, border: { display: false } },
+                    y: { min: 0, max: 100, grid: { color: '#f1f3f5' }, ticks: { font: { size: 9 }, color: '#9ca3b4', callback: v => v + '%' }, border: { display: false } }
+                },
+                interaction: { intersect: false, mode: 'index' }
+            },
+            plugins: [{
+                afterDraw(chart) {
+                    const ctx = chart.ctx, xScale = chart.scales.x, yScale = chart.scales.y;
+                    const nowIdx = probLabels.indexOf('Now');
+                    if (nowIdx >= 0) {
+                        const x = xScale.getPixelForValue(nowIdx);
+                        ctx.save(); ctx.setLineDash([3,3]); ctx.strokeStyle = '#9ca3b4'; ctx.lineWidth = 1;
+                        ctx.beginPath(); ctx.moveTo(x, yScale.top); ctx.lineTo(x, yScale.bottom); ctx.stroke(); ctx.restore();
+                    }
+                }
+            }]
+        });
+
+        // Signals (with optional sub-signals)
+        const signals = [
+            { name: 'Agent Online', icon: 'fa-users', value: '95.7%', trend: '+1.2%', dir: 'up', status: 'healthy', domains: ['agent','genesys'], spark: [94,94.5,95,95.2,95.5,95.7],
+              subs: [{name:'Voice Agents',value:'96.2%',status:'healthy'},{name:'Chat Agents',value:'94.1%',status:'healthy'},{name:'Email Agents',value:'91.3%',status:'warning'}] },
+            { name: 'Incidents', icon: 'fa-exclamation-triangle', value: '7', trend: '+4', dir: 'down', status: 'warning', domains: ['app','genesys'], spark: [2,3,3,4,5,7],
+              subs: [{name:'P1 Critical',value:'3',status:'critical'},{name:'P2 High',value:'2',status:'warning'},{name:'P3 Medium',value:'2',status:'healthy'}] },
+            { name: 'App Health', icon: 'fa-heartbeat', value: '97.2%', trend: '+0.5%', dir: 'up', status: 'healthy', domains: ['app'], spark: [96.5,96.7,96.8,97,97.1,97.2],
+              subs: [{name:'CRM',value:'98.1%',status:'healthy'},{name:'WFM',value:'96.8%',status:'healthy'},{name:'Reporting',value:'97.0%',status:'healthy'}] },
+            { name: 'Core Systems', icon: 'fa-server', value: '99.1%', trend: 'Stable', dir: 'flat', status: 'healthy', domains: ['app','genesys'], spark: [99,99,99.1,99.1,99.1,99.1] },
+            { name: 'Call LOB SLA', icon: 'fa-phone-alt', value: '81.2%', trend: '-3.8%', dir: 'down', status: 'warning', domains: ['agent','genesys'], spark: [87,86,85,84,82.5,81.2],
+              subs: [{name:'Sales',value:'78.4%',status:'critical'},{name:'Billing',value:'79.1%',status:'warning'},{name:'Service',value:'86.2%',status:'healthy'},{name:'Retention',value:'84.5%',status:'healthy'}] },
+            { name: 'Queue Sufficiency', icon: 'fa-layer-group', value: '88.4%', trend: '+2.1%', dir: 'up', status: 'healthy', domains: ['agent'], spark: [85,86,86.5,87,87.8,88.4] },
+            { name: 'Presence — Vendor', icon: 'fa-building', value: '94.7%', trend: 'Nominal', dir: 'flat', status: 'healthy', domains: ['agent'], spark: [94.5,94.6,94.6,94.7,94.7,94.7],
+              subs: [{name:'Vendor A',value:'96.2%',status:'healthy'},{name:'Vendor B',value:'93.1%',status:'healthy'},{name:'Vendor C',value:'94.8%',status:'healthy'}] },
+            { name: 'Presence — Location', icon: 'fa-map-marker-alt', value: '93.1%', trend: '1 low', dir: 'flat', status: 'healthy', domains: ['agent'], spark: [93.5,93.4,93.3,93.2,93.1,93.1],
+              subs: [{name:'US East',value:'96.8%',status:'healthy'},{name:'US West',value:'95.2%',status:'healthy'},{name:'Manila',value:'84.3%',status:'warning'},{name:'India',value:'93.5%',status:'healthy'}] },
+            { name: 'Connectivity', icon: 'fa-wifi', value: '96.3%', trend: '+0.8%', dir: 'up', status: 'healthy', domains: ['agent','genesys'], spark: [95.2,95.5,95.8,96,96.1,96.3] },
+            { name: 'Genesys Platform', icon: 'fa-cloud', value: '99.8%', trend: 'Stable', dir: 'flat', status: 'healthy', domains: ['genesys'], spark: [99.8,99.8,99.8,99.8,99.8,99.8] },
+            { name: 'IVR / Self-Service', icon: 'fa-robot', value: '98.1%', trend: '+0.3%', dir: 'up', status: 'healthy', domains: ['app','genesys'], spark: [97.5,97.6,97.8,97.9,98,98.1],
+              subs: [{name:'IVR Completion',value:'97.8%',status:'healthy'},{name:'Chatbot',value:'98.5%',status:'healthy'}] },
+            { name: 'Call Quality', icon: 'fa-microphone-alt', value: '3.2', trend: '-0.8', dir: 'down', status: 'critical', domains: ['genesys'], spark: [4.2,4.0,3.8,3.6,3.4,3.2],
+              subs: [{name:'MOS Score',value:'3.2',status:'critical'},{name:'Jitter',value:'18ms',status:'warning'},{name:'Packet Loss',value:'0.4%',status:'healthy'}] },
+            { name: 'Network Latency', icon: 'fa-network-wired', value: '24ms', trend: 'Normal', dir: 'flat', status: 'healthy', domains: ['app','genesys'], spark: [22,23,23,24,24,24] },
+            { name: 'Desktop / Endpoint', icon: 'fa-desktop', value: '97.6%', trend: '+0.2%', dir: 'up', status: 'healthy', domains: ['agent','app'], spark: [97.2,97.3,97.4,97.5,97.5,97.6],
+              subs: [{name:'Citrix',value:'98.1%',status:'healthy'},{name:'Browser',value:'97.2%',status:'healthy'},{name:'Softphone',value:'97.4%',status:'healthy'}] },
+        ];
+
+        // Domain definitions with canvas IDs and colors
+        const domains = [
+            { key: 'agent', name: 'Agent Health', score: '93.8', cls: 'agent', canvasId: 'dmAgent', color: '#8b5cf6' },
+            { key: 'app', name: 'App Health', score: '95.4', cls: 'app', canvasId: 'dmApp', color: '#06b6d4' },
+            { key: 'genesys', name: 'Genesys Health', score: '92.1', cls: 'genesys', canvasId: 'dmGenesys', color: '#3b82f6' },
+        ];
+
+        // Draw domain row with signal-health dots + tooltip
+        const domainRow = document.getElementById('domainRow');
+        domains.forEach(d => {
+            const domSignals = signals.filter(s => s.domains.includes(d.key));
+            const hCount = domSignals.filter(s => s.status === 'healthy').length;
+            const wCount = domSignals.filter(s => s.status === 'warning').length;
+            const cCount = domSignals.filter(s => s.status === 'critical').length;
+            const detail = `${domSignals.length} signals · ${hCount} ok${wCount ? ', '+wCount+' warn' : ''}${cCount ? ', '+cCount+' crit' : ''}`;
+            const tipRows = domSignals.map(s =>
+                `<div class="tip-row"><span class="tip-dot ${s.status}"></span><span class="tip-name">${s.name}</span><span class="tip-val">${s.value}</span></div>`
+            ).join('');
+            const card = document.createElement('div');
+            card.className = 'domain-mini';
+            card.innerHTML = `
+                <div class="dm-score ${d.cls}">${d.score}</div>
+                <div class="dm-info">
+                    <div class="dm-name">${d.name}</div>
+                    <div class="dm-detail">${detail}</div>
+                    <div class="tip-anchor">
+                        <div class="dm-signals">
+                            ${domSignals.map(s => `<span class="dm-sig-tag ${s.status}">${s.name}</span>`).join('')}
+                        </div>
+                        <div class="custom-tip">
+                            <div class="tip-title">${d.name} — Signals</div>
+                            ${tipRows}
+                        </div>
+                    </div>
+                </div>
+                <div class="dm-spark"><canvas id="${d.canvasId}"></canvas></div>
+            `;
+            domainRow.appendChild(card);
+            // Render domain spark after canvas is in DOM
+            const sparkInfo = domainSparkData[d.canvasId];
+            if (sparkInfo) miniSpark(d.canvasId, sparkInfo.color, sparkInfo.data);
+        });
+
+        const sigGrid = document.getElementById('sigGrid');
+        signals.forEach((s, idx) => {
+            const card = document.createElement('div');
+            card.className = `sig-card ${s.status}`;
+            const subsHtml = s.subs ? `
+                <div class="tip-anchor">
+                    <div class="sub-signals">
+                        ${s.subs.map(sub => `<span class="sub-tag ${sub.status}">${sub.name}</span>`).join('')}
+                    </div>
+                    <div class="custom-tip">
+                        <div class="tip-title">${s.name} — Sub-signals</div>
+                        ${s.subs.map(sub => `<div class="tip-row"><span class="tip-dot ${sub.status}"></span><span class="tip-name">${sub.name}</span><span class="tip-val">${sub.value}</span></div>`).join('')}
+                    </div>
+                </div>` : '';
+            card.innerHTML = `
+                <div class="sig-top">
+                    <div class="sig-name"><i class="fas ${s.icon}"></i> ${s.name}</div>
+                    <span class="sig-status ${s.status}">${s.status}</span>
+                </div>
+                <div class="sig-body">
+                    <div class="sig-val">${s.value}</div>
+                    <div class="sig-chart"><canvas id="sig${idx}"></canvas></div>
+                </div>
+                ${subsHtml}
+                <div class="sig-footer">
+                    <div class="sig-trend ${s.dir}">
+                        ${s.dir === 'up' ? '<i class="fas fa-arrow-up"></i>' : s.dir === 'down' ? '<i class="fas fa-arrow-down"></i>' : '<i class="fas fa-minus"></i>'}
+                        ${s.trend}
+                    </div>
+                    <div class="sig-domains">
+                        ${s.domains.map(d => `<span class="sig-dtag ${d}">${d}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+            sigGrid.appendChild(card);
+
+            const color = s.status === 'critical' ? '#ef4444' : s.status === 'warning' ? '#f59e0b' : '#22c55e';
+            miniSpark(`sig${idx}`, color, s.spark);
+        });
+
+        // Timeline
+        const tlContainer = document.getElementById('tlSegments');
+        for (let i = 0; i < 60; i++) {
+            const r = Math.random();
+            const el = document.createElement('div');
+            el.className = 'tl-seg ' + (r < 0.04 ? 'r' : r < 0.12 ? 'y' : 'g');
+            tlContainer.appendChild(el);
+        }
+
+        // Insights toggle
+        const insSection = document.getElementById('insightsSection');
+        const insToggle = document.getElementById('insightsToggle');
+        insToggle.addEventListener('click', () => {
+            const collapsed = insSection.classList.toggle('collapsed');
+            insToggle.querySelector('span').textContent = collapsed ? 'Show 1 more insight' : 'Show less';
+        });
+    </script>
+</body>
+</html>

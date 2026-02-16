@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signal Matrix — Leading Indicators</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #f8f9fb;
+            --bg-card: #ffffff;
+            --bg-muted: #f1f3f5;
+            --border: #e9ecef;
+            --text: #1a1a2e;
+            --text-secondary: #5a607f;
+            --text-muted: #9ca3b4;
+            --green: #22c55e;
+            --green-bg: #f0fdf4;
+            --yellow: #f59e0b;
+            --yellow-bg: #fffbeb;
+            --red: #ef4444;
+            --red-bg: #fef2f2;
+            --blue: #3b82f6;
+            --blue-bg: #eff6ff;
+            --purple: #8b5cf6;
+            --purple-bg: #f5f3ff;
+            --cyan: #06b6d4;
+            --cyan-bg: #ecfeff;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== TOP BAR ===== */
+        .topbar {
+            height: 56px; background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px; flex-shrink: 0; position: sticky; top: 0; z-index: 100;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 12px; }
+        .topbar-logo {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            border-radius: 8px; display: grid; place-items: center;
+            font-size: 14px; color: white;
+        }
+        .topbar-title { font-size: 15px; font-weight: 600; }
+        .topbar-title span { color: var(--text-muted); font-weight: 400; font-size: 13px; margin-left: 8px; }
+        .topbar-center { display: flex; gap: 2px; background: var(--bg-muted); padding: 3px; border-radius: 8px; }
+        .topbar-tab {
+            padding: 6px 14px; font-size: 12px; font-weight: 500; color: var(--text-muted);
+            border-radius: 6px; cursor: pointer; transition: all 0.2s; text-decoration: none;
+        }
+        .topbar-tab:hover { color: var(--text); background: var(--bg-card); }
+        .topbar-tab.active { background: var(--text); color: white; box-shadow: var(--shadow-sm); }
+        .topbar-right { display: flex; align-items: center; gap: 16px; font-size: 12px; color: var(--text-muted); }
+        .live-badge { display: flex; align-items: center; gap: 6px; color: var(--green); font-weight: 600; font-size: 11px; }
+        .live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34,197,94,0.3); }
+            50% { opacity: 0.7; box-shadow: 0 0 0 4px rgba(34,197,94,0); }
+        }
+
+        /* ===== CONTENT ===== */
+        .content { flex: 1; padding: 24px; overflow-y: auto; }
+
+        /* ===== DOMAIN SUMMARY CARDS ===== */
+        .domain-cards {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 16px; margin-bottom: 24px;
+        }
+
+        .domain-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 20px 24px;
+            box-shadow: var(--shadow-sm); display: flex;
+            align-items: center; gap: 16px; transition: all 0.2s;
+        }
+        .domain-card:hover { box-shadow: var(--shadow-md); }
+
+        .domain-score-circle {
+            width: 64px; height: 64px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: 800; flex-shrink: 0;
+        }
+        .domain-score-circle.agent { background: var(--purple-bg); color: var(--purple); border: 2px solid rgba(139,92,246,0.2); }
+        .domain-score-circle.app { background: var(--cyan-bg); color: var(--cyan); border: 2px solid rgba(6,182,212,0.2); }
+        .domain-score-circle.genesys { background: var(--blue-bg); color: var(--blue); border: 2px solid rgba(59,130,246,0.2); }
+
+        .domain-card-info h3 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+        .domain-card-info p { font-size: 12px; color: var(--text-muted); }
+
+        /* ===== MATRIX TABLE ===== */
+        .matrix-wrapper {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); box-shadow: var(--shadow-sm);
+            overflow-x: auto;
+        }
+
+        .matrix-table {
+            width: 100%; border-collapse: collapse;
+            font-size: 13px; min-width: 800px;
+        }
+
+        .matrix-table thead th {
+            padding: 14px 16px; text-align: left;
+            font-size: 11px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.5px; color: var(--text-muted);
+            background: var(--bg-muted); border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 10;
+        }
+
+        .matrix-table thead th.domain-col {
+            text-align: center; min-width: 130px;
+        }
+
+        .matrix-table tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: all 0.15s;
+        }
+        .matrix-table tbody tr:hover { background: var(--bg-muted); }
+        .matrix-table tbody tr:last-child { border-bottom: none; }
+
+        .matrix-table td { padding: 12px 16px; vertical-align: middle; }
+
+        .signal-cell { display: flex; align-items: center; gap: 10px; }
+
+        .signal-status-dot {
+            width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+        }
+        .signal-status-dot.healthy { background: var(--green); }
+        .signal-status-dot.warning { background: var(--yellow); }
+        .signal-status-dot.critical { background: var(--red); }
+
+        .signal-info .sig-name { font-weight: 600; font-size: 13px; margin-bottom: 1px; }
+        .signal-info .sig-source { font-size: 10px; color: var(--text-muted); }
+
+        .value-cell { text-align: center; font-weight: 700; font-size: 15px; }
+        .trend-cell { text-align: center; font-size: 12px; }
+        .trend-cell.up { color: var(--green); }
+        .trend-cell.down { color: var(--red); }
+        .trend-cell.flat { color: var(--text-muted); }
+
+        /* Domain contribution cells */
+        .contrib-cell { text-align: center; }
+
+        .contrib-badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 4px 10px; border-radius: 6px;
+            font-size: 11px; font-weight: 600; min-width: 60px;
+        }
+
+        .contrib-badge.active-agent { background: var(--purple-bg); color: var(--purple); }
+        .contrib-badge.active-app { background: var(--cyan-bg); color: var(--cyan); }
+        .contrib-badge.active-genesys { background: var(--blue-bg); color: var(--blue); }
+        .contrib-badge.inactive { background: var(--bg-muted); color: var(--text-muted); font-weight: 400; }
+
+        .status-pill {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 10px; border-radius: 12px;
+            font-size: 10px; font-weight: 600; text-transform: uppercase;
+        }
+        .status-pill.healthy { background: var(--green-bg); color: var(--green); }
+        .status-pill.warning { background: var(--yellow-bg); color: var(--yellow); }
+        .status-pill.critical { background: var(--red-bg); color: var(--red); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .domain-cards { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .topbar { padding: 0 16px; }
+            .topbar-center { display: none; }
+            .topbar-title span { display: none; }
+            .content { padding: 16px; }
+            .domain-cards { gap: 10px; }
+            .domain-card { padding: 14px 16px; }
+            .domain-score-circle { width: 48px; height: 48px; font-size: 18px; }
+        }
+
+        @media (max-width: 480px) {
+            .topbar { height: 48px; }
+            .topbar-logo { width: 28px; height: 28px; font-size: 12px; }
+            .topbar-title { font-size: 13px; }
+            .content { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="topbar-logo"><i class="fas fa-th"></i></div>
+            <div class="topbar-title">Signal Matrix <span>Leading Indicators</span></div>
+        </div>
+        <div class="topbar-center">
+            <a class="topbar-tab" href="leading-indicators-nerve-center.html">Nerve Center</a>
+            <a class="topbar-tab active" href="leading-indicators-signal-matrix.html">Matrix</a>
+            <a class="topbar-tab" href="leading-indicators-traffic-light.html">Domains</a>
+            <a class="topbar-tab" href="leading-indicators-predictive-timeline.html">Predict</a>
+            <a class="topbar-tab" href="leading-indicators-hybrid.html">Command</a>
+        </div>
+        <div class="topbar-right">
+            <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+            <span><i class="far fa-clock"></i>&nbsp; <span id="clock">--:--</span></span>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- Domain Summary -->
+        <div class="domain-cards">
+            <div class="domain-card">
+                <div class="domain-score-circle agent">93.8</div>
+                <div class="domain-card-info">
+                    <h3>Agent Health</h3>
+                    <p>7 contributing signals · 5 healthy, 2 at risk</p>
+                </div>
+            </div>
+            <div class="domain-card">
+                <div class="domain-score-circle app">95.4</div>
+                <div class="domain-card-info">
+                    <h3>Application Health</h3>
+                    <p>5 contributing signals · 4 healthy, 1 warning</p>
+                </div>
+            </div>
+            <div class="domain-card">
+                <div class="domain-score-circle genesys">92.1</div>
+                <div class="domain-card-info">
+                    <h3>Genesys Health</h3>
+                    <p>8 contributing signals · 5 healthy, 2 at risk, 1 degraded</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signal × Domain Matrix -->
+        <div class="matrix-wrapper">
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th style="min-width:200px;">Signal</th>
+                        <th>Value</th>
+                        <th>Trend</th>
+                        <th>Status</th>
+                        <th class="domain-col"><span style="color:var(--purple)"><i class="fas fa-users"></i></span> Agent</th>
+                        <th class="domain-col"><span style="color:var(--cyan)"><i class="fas fa-heartbeat"></i></span> App</th>
+                        <th class="domain-col"><span style="color:var(--blue)"><i class="fas fa-cloud"></i></span> Genesys</th>
+                    </tr>
+                </thead>
+                <tbody id="matrixBody"></tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        // Clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Signal data model
+        const signals = [
+            { name: 'Agent Online', icon: 'fa-users', value: '95.7%', trend: '+1.2%', trendDir: 'up', status: 'healthy', source: 'Genesys', agent: true, app: false, genesys: true },
+            { name: 'Active Incidents', icon: 'fa-exclamation-triangle', value: '7', trend: '+4', trendDir: 'down', status: 'warning', source: 'ServiceNow', agent: false, app: true, genesys: true },
+            { name: 'App Health Score', icon: 'fa-heartbeat', value: '97.2%', trend: '+0.5%', trendDir: 'up', status: 'healthy', source: 'Dynatrace', agent: false, app: true, genesys: false },
+            { name: 'Core Systems', icon: 'fa-server', value: '99.1%', trend: 'Stable', trendDir: 'flat', status: 'healthy', source: 'Dynatrace', agent: false, app: true, genesys: true },
+            { name: 'Call LOB SLA', icon: 'fa-phone-alt', value: '81.2%', trend: '-3.8%', trendDir: 'down', status: 'warning', source: 'Genesys', agent: true, app: false, genesys: true },
+            { name: 'Queue Sufficiency', icon: 'fa-layer-group', value: '88.4%', trend: '+2.1%', trendDir: 'up', status: 'healthy', source: 'Genesys WFM', agent: true, app: false, genesys: false },
+            { name: 'Presence — Vendor', icon: 'fa-building', value: '94.7%', trend: 'Nominal', trendDir: 'flat', status: 'healthy', source: 'Genesys', agent: true, app: false, genesys: false },
+            { name: 'Presence — Location', icon: 'fa-map-marker-alt', value: '93.1%', trend: '1 low', trendDir: 'flat', status: 'healthy', source: 'Genesys', agent: true, app: false, genesys: false },
+            { name: 'Agent Connectivity', icon: 'fa-wifi', value: '96.3%', trend: '+0.8%', trendDir: 'up', status: 'healthy', source: 'ThousandEyes', agent: true, app: false, genesys: true },
+            { name: 'Genesys Platform', icon: 'fa-cloud', value: '99.8%', trend: 'Stable', trendDir: 'flat', status: 'healthy', source: 'Genesys Status', agent: false, app: false, genesys: true },
+            { name: 'IVR / Self-Service', icon: 'fa-robot', value: '98.1%', trend: '+0.3%', trendDir: 'up', status: 'healthy', source: 'Genesys / Nuance', agent: false, app: true, genesys: true },
+            { name: 'Call Quality (MOS)', icon: 'fa-microphone-alt', value: '3.2', trend: '-0.8', trendDir: 'down', status: 'critical', source: 'Genesys', agent: false, app: false, genesys: true },
+            { name: 'Network Latency', icon: 'fa-network-wired', value: '24ms', trend: 'Normal', trendDir: 'flat', status: 'healthy', source: 'ThousandEyes', agent: false, app: true, genesys: true },
+            { name: 'Desktop / Endpoint', icon: 'fa-desktop', value: '97.6%', trend: '+0.2%', trendDir: 'up', status: 'healthy', source: 'Nexthink', agent: true, app: true, genesys: false },
+        ];
+
+        const tbody = document.getElementById('matrixBody');
+        signals.forEach(s => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>
+                    <div class="signal-cell">
+                        <div class="signal-status-dot ${s.status}"></div>
+                        <div class="signal-info">
+                            <div class="sig-name"><i class="fas ${s.icon}" style="color:var(--text-muted);margin-right:6px;font-size:11px;"></i>${s.name}</div>
+                            <div class="sig-source">${s.source}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="value-cell">${s.value}</td>
+                <td class="trend-cell ${s.trendDir}">
+                    ${s.trendDir === 'up' ? '<i class="fas fa-arrow-up"></i>' : s.trendDir === 'down' ? '<i class="fas fa-arrow-down"></i>' : '<i class="fas fa-minus"></i>'}
+                    ${s.trend}
+                </td>
+                <td><span class="status-pill ${s.status}">${s.status}</span></td>
+                <td class="contrib-cell">
+                    <span class="contrib-badge ${s.agent ? 'active-agent' : 'inactive'}">${s.agent ? s.value : '—'}</span>
+                </td>
+                <td class="contrib-cell">
+                    <span class="contrib-badge ${s.app ? 'active-app' : 'inactive'}">${s.app ? s.value : '—'}</span>
+                </td>
+                <td class="contrib-cell">
+                    <span class="contrib-badge ${s.genesys ? 'active-genesys' : 'inactive'}">${s.genesys ? s.value : '—'}</span>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    </script>
+</body>
+</html>

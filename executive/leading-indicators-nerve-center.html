@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nerve Center — Leading Indicators</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #f8f9fb;
+            --bg-card: #ffffff;
+            --bg-muted: #f1f3f5;
+            --border: #e9ecef;
+            --text: #1a1a2e;
+            --text-secondary: #5a607f;
+            --text-muted: #9ca3b4;
+            --green: #22c55e;
+            --green-bg: #f0fdf4;
+            --yellow: #f59e0b;
+            --yellow-bg: #fffbeb;
+            --red: #ef4444;
+            --red-bg: #fef2f2;
+            --blue: #3b82f6;
+            --blue-bg: #eff6ff;
+            --purple: #8b5cf6;
+            --purple-bg: #f5f3ff;
+            --cyan: #06b6d4;
+            --cyan-bg: #ecfeff;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg); color: var(--text);
+            min-height: 100vh; display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            height: 56px; background: var(--bg-card); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px; flex-shrink: 0; position: sticky; top: 0; z-index: 100;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 12px; }
+        .topbar-logo { width: 32px; height: 32px; background: linear-gradient(135deg, var(--blue), var(--purple)); border-radius: 8px; display: grid; place-items: center; font-size: 14px; color: white; }
+        .topbar-title { font-size: 15px; font-weight: 600; }
+        .topbar-title span { color: var(--text-muted); font-weight: 400; font-size: 13px; margin-left: 8px; }
+        .topbar-center { display: flex; gap: 2px; background: var(--bg-muted); padding: 3px; border-radius: 8px; }
+        .topbar-tab { padding: 6px 14px; font-size: 12px; font-weight: 500; color: var(--text-muted); border-radius: 6px; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+        .topbar-tab:hover { color: var(--text); background: var(--bg-card); }
+        .topbar-tab.active { background: var(--text); color: white; box-shadow: var(--shadow-sm); }
+        .topbar-right { display: flex; align-items: center; gap: 16px; font-size: 12px; color: var(--text-muted); }
+        .live-badge { display: flex; align-items: center; gap: 6px; color: var(--green); font-weight: 600; font-size: 11px; }
+        .live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34,197,94,0.3); } 50% { opacity: 0.7; box-shadow: 0 0 0 4px rgba(34,197,94,0); } }
+
+        /* ===== INFINITE CANVAS ===== */
+        .nerve-viewport {
+            flex: 1; position: relative; overflow: hidden;
+            cursor: grab;
+            /* Dot-grid background for infinite space feel */
+            background:
+                radial-gradient(circle, #dcdfe4 0.8px, transparent 0.8px);
+            background-size: 28px 28px;
+        }
+        .nerve-viewport:active { cursor: grabbing; }
+
+        .nerve-world {
+            position: absolute;
+            top: 0; left: 0;
+            transform-origin: 0 0;
+            will-change: transform;
+        }
+
+        /* SVG for connections */
+        .nerve-svg {
+            position: absolute; top: 0; left: 0;
+            pointer-events: none; z-index: 1;
+            overflow: visible;
+        }
+
+        /* Connection paths */
+        .nerve-path {
+            fill: none;
+            stroke: var(--border);
+            stroke-width: 2;
+            transition: stroke 0.4s, stroke-width 0.4s, opacity 0.4s;
+            opacity: 0.35;
+        }
+
+        .nerve-path.highlight { stroke-width: 3.5; opacity: 1; }
+        .nerve-path.highlight-agent { stroke: var(--purple); }
+        .nerve-path.highlight-app { stroke: var(--cyan); }
+        .nerve-path.highlight-genesys { stroke: var(--blue); }
+
+        .nerve-path.degraded { opacity: 0.85; stroke-width: 2.5; }
+        .nerve-path.degraded-warning { stroke: var(--yellow); }
+        .nerve-path.degraded-critical { stroke: var(--red); }
+
+        /* Animated flow particles */
+        .flow-particle {
+            fill: none; stroke-width: 4; stroke-linecap: round; opacity: 0;
+        }
+        .flow-particle.active { opacity: 0.7; animation: flowPulse 2s ease-in-out infinite; }
+        .flow-particle.fp-agent { stroke: var(--purple); }
+        .flow-particle.fp-app { stroke: var(--cyan); }
+        .flow-particle.fp-genesys { stroke: var(--blue); }
+        .flow-particle.fp-warning { stroke: var(--yellow); }
+        .flow-particle.fp-critical { stroke: var(--red); }
+
+        @keyframes flowPulse {
+            0% { stroke-dashoffset: 60; opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.8; }
+            100% { stroke-dashoffset: -60; opacity: 0; }
+        }
+
+        .domain-link {
+            fill: none; stroke: var(--border);
+            stroke-width: 1; stroke-dasharray: 6 4; opacity: 0.25;
+        }
+
+        /* ===== NODE (shared base) ===== */
+        .node {
+            position: absolute;
+            z-index: 10;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            transform: translate(-50%, -50%);
+        }
+
+        /* ===== DOMAIN NODES — larger ===== */
+        .domain-node {
+            width: 150px; height: 150px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 3px solid var(--border);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            box-shadow: var(--shadow-md);
+            z-index: 20;
+        }
+
+        .domain-node:hover, .domain-node.active {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .domain-node.agent { border-color: rgba(139,92,246,0.3); }
+        .domain-node.app { border-color: rgba(6,182,212,0.3); }
+        .domain-node.genesys { border-color: rgba(59,130,246,0.3); }
+
+        .domain-node.active.agent { border-color: var(--purple); box-shadow: 0 0 0 6px rgba(139,92,246,0.15), var(--shadow-lg); }
+        .domain-node.active.app { border-color: var(--cyan); box-shadow: 0 0 0 6px rgba(6,182,212,0.15), var(--shadow-lg); }
+        .domain-node.active.genesys { border-color: var(--blue); box-shadow: 0 0 0 6px rgba(59,130,246,0.15), var(--shadow-lg); }
+
+        .domain-score { font-size: 34px; font-weight: 800; line-height: 1; }
+        .domain-node.agent .domain-score { color: var(--purple); }
+        .domain-node.app .domain-score { color: var(--cyan); }
+        .domain-node.genesys .domain-score { color: var(--blue); }
+
+        .domain-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-secondary); margin-top: 4px; }
+        .domain-count { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+        /* ===== SIGNAL NODES — larger text ===== */
+        .signal-node {
+            width: 164px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s;
+        }
+
+        .signal-node:hover, .signal-node.active {
+            transform: translate(-50%, -50%) scale(1.06);
+            box-shadow: var(--shadow-lg);
+            z-index: 30;
+        }
+
+        .signal-node.dimmed {
+            opacity: 0.25;
+            transform: translate(-50%, -50%) scale(0.94);
+        }
+
+        .signal-node::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 3px; border-radius: 12px 12px 0 0;
+        }
+        .signal-node.healthy::before { background: var(--green); }
+        .signal-node.warning::before { background: var(--yellow); }
+        .signal-node.critical::before { background: var(--red); }
+
+        .signal-node.warning { border-color: rgba(245,158,11,0.4); }
+        .signal-node.critical { border-color: rgba(239,68,68,0.4); animation: critPulse 2s infinite; }
+
+        @keyframes critPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.1), var(--shadow-sm); }
+            50% { box-shadow: 0 0 0 6px rgba(239,68,68,0.06), var(--shadow-sm); }
+        }
+
+        .sig-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sig-name i { color: var(--text-muted); margin-right: 5px; font-size: 11px; }
+        .sig-val { font-size: 24px; font-weight: 700; line-height: 1; margin-bottom: 3px; }
+        .sig-meta { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+        .sig-meta .up { color: var(--green); }
+        .sig-meta .down { color: var(--red); }
+
+        .sig-tags { display: flex; gap: 4px; margin-top: 6px; }
+        .sig-tag { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; }
+        .sig-tag.agent { background: var(--purple-bg); color: var(--purple); }
+        .sig-tag.app { background: var(--cyan-bg); color: var(--cyan); }
+        .sig-tag.genesys { background: var(--blue-bg); color: var(--blue); }
+
+        /* ===== HUD OVERLAYS (fixed above canvas) ===== */
+        .hud { position: fixed; z-index: 80; pointer-events: auto; }
+
+        /* Hero score — top left */
+        .hero-overlay {
+            top: 72px; left: 20px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 16px 22px;
+            box-shadow: var(--shadow-md);
+        }
+        .hero-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 3px; }
+        .hero-value { font-size: 42px; font-weight: 800; line-height: 1; color: var(--text); }
+        .hero-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        .hero-badges { display: flex; gap: 6px; margin-top: 10px; }
+        .hero-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; }
+        .hero-badge.g { background: var(--green-bg); color: var(--green); }
+        .hero-badge.y { background: var(--yellow-bg); color: var(--yellow); }
+        .hero-badge.r { background: var(--red-bg); color: var(--red); }
+
+        /* Legend — top right */
+        .legend-overlay {
+            top: 72px; right: 20px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 14px 18px;
+            box-shadow: var(--shadow-md); font-size: 12px;
+        }
+        .legend-title { font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; font-size: 12px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; color: var(--text-muted); }
+        .legend-line { width: 24px; height: 3px; border-radius: 2px; }
+        .legend-line.agent { background: var(--purple); }
+        .legend-line.app { background: var(--cyan); }
+        .legend-line.genesys { background: var(--blue); }
+        .legend-line.warn { background: var(--yellow); }
+        .legend-line.crit { background: var(--red); animation: critLine 1.5s infinite; }
+        @keyframes critLine { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .legend-dot.healthy { background: var(--green); }
+        .legend-dot.warning { background: var(--yellow); }
+        .legend-dot.critical { background: var(--red); }
+
+        /* Zoom controls — bottom right */
+        .zoom-controls {
+            bottom: 80px; right: 20px;
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .zoom-btn {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            box-shadow: var(--shadow-md); cursor: pointer;
+            display: grid; place-items: center; font-size: 16px;
+            color: var(--text-secondary); transition: all 0.2s;
+        }
+        .zoom-btn:hover { background: var(--bg-muted); color: var(--text); }
+        .zoom-label { text-align: center; font-size: 10px; color: var(--text-muted); font-weight: 600; padding: 2px 0; }
+
+        /* Info bar (bottom) */
+        .info-bar {
+            bottom: 16px; left: 20px; right: 20px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 12px 18px;
+            box-shadow: var(--shadow-md);
+            display: flex; align-items: center; gap: 16px;
+            font-size: 12px; color: var(--text-muted);
+        }
+        .info-bar .info-label { font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
+        .info-bar .info-detail { flex: 1; }
+        .info-bar .info-hint { font-size: 11px; white-space: nowrap; }
+        .alert-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+        .alert-pill {
+            display: flex; align-items: center; gap: 4px;
+            padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 500;
+        }
+        .alert-pill.crit { background: var(--red-bg); color: var(--red); }
+        .alert-pill.warn { background: var(--yellow-bg); color: var(--yellow); }
+        .alert-pill i { font-size: 9px; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .topbar { padding: 0 16px; }
+            .topbar-center { display: none; }
+            .topbar-title span { display: none; }
+            .hero-overlay { padding: 12px 16px; }
+            .hero-value { font-size: 32px; }
+            .legend-overlay { display: none; }
+            .signal-node { width: 140px; padding: 10px 12px; }
+            .sig-name { font-size: 12px; }
+            .sig-val { font-size: 20px; }
+            .domain-node { width: 120px; height: 120px; }
+            .domain-score { font-size: 28px; }
+            .domain-label { font-size: 10px; }
+        }
+
+        @media (max-width: 480px) {
+            .hero-overlay { top: 62px; left: 10px; }
+            .zoom-controls { bottom: 72px; right: 10px; }
+            .info-bar { left: 10px; right: 10px; bottom: 10px; }
+            .info-bar .info-hint { display: none; }
+            .domain-node { width: 100px; height: 100px; }
+            .domain-score { font-size: 22px; }
+            .signal-node { width: 120px; padding: 8px 10px; }
+            .sig-val { font-size: 16px; }
+            .sig-name { font-size: 11px; }
+            .sig-tags { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="topbar-logo"><i class="fas fa-satellite-dish"></i></div>
+            <div class="topbar-title">Nerve Center <span>Leading Indicators</span></div>
+        </div>
+        <div class="topbar-center">
+            <a class="topbar-tab active" href="leading-indicators-nerve-center.html">Nerve Center</a>
+            <a class="topbar-tab" href="leading-indicators-signal-matrix.html">Matrix</a>
+            <a class="topbar-tab" href="leading-indicators-traffic-light.html">Domains</a>
+            <a class="topbar-tab" href="leading-indicators-predictive-timeline.html">Predict</a>
+            <a class="topbar-tab" href="leading-indicators-hybrid.html">Command</a>
+        </div>
+        <div class="topbar-right">
+            <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+            <span><i class="far fa-clock"></i>&nbsp; <span id="clock">--:--</span></span>
+        </div>
+    </div>
+
+    <!-- Infinite canvas viewport -->
+    <div class="nerve-viewport" id="viewport">
+        <div class="nerve-world" id="nerveWorld">
+            <svg class="nerve-svg" id="nerveSvg">
+                <defs>
+                    <filter id="glowYellow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="3" result="blur"/>
+                        <feFlood flood-color="#f59e0b" flood-opacity="0.4"/>
+                        <feComposite in2="blur" operator="in"/>
+                        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <filter id="glowRed" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="3" result="blur"/>
+                        <feFlood flood-color="#ef4444" flood-opacity="0.5"/>
+                        <feComposite in2="blur" operator="in"/>
+                        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <filter id="glowPurple" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="2" result="blur"/>
+                        <feFlood flood-color="#8b5cf6" flood-opacity="0.3"/>
+                        <feComposite in2="blur" operator="in"/>
+                        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <filter id="glowCyan" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="2" result="blur"/>
+                        <feFlood flood-color="#06b6d4" flood-opacity="0.3"/>
+                        <feComposite in2="blur" operator="in"/>
+                        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <filter id="glowBlue" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="2" result="blur"/>
+                        <feFlood flood-color="#3b82f6" flood-opacity="0.3"/>
+                        <feComposite in2="blur" operator="in"/>
+                        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                </defs>
+                <g id="domainLinks"></g>
+                <g id="nervePaths"></g>
+                <g id="flowParticles"></g>
+            </svg>
+        </div>
+    </div>
+
+    <!-- HUD overlays (fixed, always visible) -->
+    <div class="hud hero-overlay">
+        <div class="hero-label">Enterprise Health</div>
+        <div class="hero-value">94.2</div>
+        <div class="hero-sub">14 signals · 3 domains</div>
+        <div class="hero-badges">
+            <span class="hero-badge g"><i class="fas fa-check"></i> 11</span>
+            <span class="hero-badge y"><i class="fas fa-exclamation"></i> 2</span>
+            <span class="hero-badge r"><i class="fas fa-times"></i> 1</span>
+        </div>
+    </div>
+
+    <div class="hud legend-overlay">
+        <div class="legend-title">Connection Legend</div>
+        <div class="legend-item"><div class="legend-line agent"></div> Agent pathway</div>
+        <div class="legend-item"><div class="legend-line app"></div> Application pathway</div>
+        <div class="legend-item"><div class="legend-line genesys"></div> Genesys pathway</div>
+        <div class="legend-item"><div class="legend-line warn"></div> Warning signal</div>
+        <div class="legend-item"><div class="legend-line crit"></div> Critical — pulsing</div>
+        <div style="margin-top:6px;"></div>
+        <div class="legend-item"><div class="legend-dot healthy"></div> Healthy</div>
+        <div class="legend-item"><div class="legend-dot warning"></div> At risk</div>
+        <div class="legend-item"><div class="legend-dot critical"></div> Degraded</div>
+    </div>
+
+    <div class="hud zoom-controls">
+        <button class="zoom-btn" id="zoomIn" title="Zoom in"><i class="fas fa-plus"></i></button>
+        <div class="zoom-label" id="zoomLevel">100%</div>
+        <button class="zoom-btn" id="zoomOut" title="Zoom out"><i class="fas fa-minus"></i></button>
+        <button class="zoom-btn" id="zoomFit" title="Fit all" style="margin-top:4px;"><i class="fas fa-expand"></i></button>
+    </div>
+
+    <div class="hud info-bar">
+        <div class="info-label"><i class="fas fa-bell"></i>&nbsp; Active Alerts</div>
+        <div class="info-detail">
+            <div class="alert-pills">
+                <span class="alert-pill crit"><i class="fas fa-microphone-alt"></i> Call Quality MOS 3.2</span>
+                <span class="alert-pill warn"><i class="fas fa-phone-slash"></i> LOB SLA -3.8%</span>
+                <span class="alert-pill warn"><i class="fas fa-exclamation-triangle"></i> 7 Incidents (3 P1)</span>
+            </div>
+        </div>
+        <div class="info-hint">Scroll = Zoom · Drag = Pan · Click domain to trace</div>
+    </div>
+
+    <script>
+    (function() {
+        'use strict';
+
+        /* ── Clock ── */
+        function tick() {
+            document.getElementById('clock').textContent =
+                new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+        }
+        setInterval(tick, 1000); tick();
+
+        /* ═══════════════════════════════════════════
+           DATA MODEL
+        ═══════════════════════════════════════════ */
+        const domains = [
+            { id: 'agent',   name: 'Agent',       score: 93.8, color: '#8b5cf6', signals: 7 },
+            { id: 'app',     name: 'Application',  score: 95.4, color: '#06b6d4', signals: 5 },
+            { id: 'genesys', name: 'Genesys',      score: 92.1, color: '#3b82f6', signals: 8 },
+        ];
+
+        const signals = [
+            { id:'s1',  name:'Agent Online',      icon:'fa-users',               value:'95.7%', trend:'+1.2%',  dir:'up',   status:'healthy',  domains:['agent','genesys'] },
+            { id:'s2',  name:'Incidents',          icon:'fa-exclamation-triangle', value:'7',     trend:'+4',     dir:'down', status:'warning',  domains:['app','genesys'] },
+            { id:'s3',  name:'App Health',         icon:'fa-heartbeat',            value:'97.2%', trend:'+0.5%',  dir:'up',   status:'healthy',  domains:['app'] },
+            { id:'s4',  name:'Core Systems',       icon:'fa-server',               value:'99.1%', trend:'Stable', dir:'flat', status:'healthy',  domains:['app','genesys'] },
+            { id:'s5',  name:'Call LOB SLA',       icon:'fa-phone-alt',            value:'81.2%', trend:'-3.8%',  dir:'down', status:'warning',  domains:['agent','genesys'] },
+            { id:'s6',  name:'Queue Sufficiency',  icon:'fa-layer-group',          value:'88.4%', trend:'+2.1%',  dir:'up',   status:'healthy',  domains:['agent'] },
+            { id:'s7',  name:'Presence—Vendor',    icon:'fa-building',             value:'94.7%', trend:'OK',     dir:'flat', status:'healthy',  domains:['agent'] },
+            { id:'s8',  name:'Presence—Location',  icon:'fa-map-marker-alt',       value:'93.1%', trend:'1 low',  dir:'flat', status:'healthy',  domains:['agent'] },
+            { id:'s9',  name:'Connectivity',       icon:'fa-wifi',                 value:'96.3%', trend:'+0.8%',  dir:'up',   status:'healthy',  domains:['agent','genesys'] },
+            { id:'s10', name:'Genesys Platform',   icon:'fa-cloud',                value:'99.8%', trend:'Stable', dir:'flat', status:'healthy',  domains:['genesys'] },
+            { id:'s11', name:'IVR Self-Service',   icon:'fa-robot',                value:'98.1%', trend:'+0.3%',  dir:'up',   status:'healthy',  domains:['app','genesys'] },
+            { id:'s12', name:'Call Quality',       icon:'fa-microphone-alt',       value:'3.2',   trend:'-0.8',   dir:'down', status:'critical', domains:['genesys'] },
+            { id:'s13', name:'Network Latency',    icon:'fa-network-wired',        value:'24ms',  trend:'OK',     dir:'flat', status:'healthy',  domains:['app','genesys'] },
+            { id:'s14', name:'Desktop/Endpoint',   icon:'fa-desktop',              value:'97.6%', trend:'+0.2%',  dir:'up',   status:'healthy',  domains:['agent','app'] },
+        ];
+
+        /* ── References ── */
+        const viewport = document.getElementById('viewport');
+        const world    = document.getElementById('nerveWorld');
+        const svg      = document.getElementById('nerveSvg');
+        const pathsG   = document.getElementById('nervePaths');
+        const flowG    = document.getElementById('flowParticles');
+        const domLinksG= document.getElementById('domainLinks');
+
+        let domainEls = {};
+        let signalEls = {};
+        let pathEls   = [];
+        let activeDomain = null;
+        let locked = false;
+
+        /* ═══════════════════════════════════════════
+           ZOOM & PAN (infinite canvas)
+        ═══════════════════════════════════════════ */
+        let scale = 1;
+        let panX  = 0;
+        let panY  = 0;
+        let dragging = false;
+        let dragStart = { x: 0, y: 0 };
+        const MIN_ZOOM = 0.2;
+        const MAX_ZOOM = 3;
+
+        function applyTransform() {
+            world.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+            document.getElementById('zoomLevel').textContent = Math.round(scale * 100) + '%';
+        }
+
+        // Scroll to zoom
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.08 : 0.08;
+            const newScale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, scale + delta));
+            // Zoom towards cursor
+            const rect = viewport.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            const ratio = newScale / scale;
+            panX = mx - ratio * (mx - panX);
+            panY = my - ratio * (my - panY);
+            scale = newScale;
+            applyTransform();
+        }, { passive: false });
+
+        // Drag to pan
+        viewport.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.node')) return;
+            dragging = true;
+            dragStart = { x: e.clientX - panX, y: e.clientY - panY };
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!dragging) return;
+            panX = e.clientX - dragStart.x;
+            panY = e.clientY - dragStart.y;
+            applyTransform();
+        });
+        window.addEventListener('mouseup', () => { dragging = false; });
+
+        // Touch support
+        let lastTouchDist = 0;
+        let lastTouchMid = { x: 0, y: 0 };
+        viewport.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1 && !e.target.closest('.node')) {
+                dragging = true;
+                dragStart = { x: e.touches[0].clientX - panX, y: e.touches[0].clientY - panY };
+            }
+            if (e.touches.length === 2) {
+                const dx = e.touches[1].clientX - e.touches[0].clientX;
+                const dy = e.touches[1].clientY - e.touches[0].clientY;
+                lastTouchDist = Math.sqrt(dx*dx + dy*dy);
+                lastTouchMid = { x: (e.touches[0].clientX + e.touches[1].clientX)/2, y: (e.touches[0].clientY + e.touches[1].clientY)/2 };
+            }
+        }, { passive: false });
+        viewport.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 1 && dragging) {
+                panX = e.touches[0].clientX - dragStart.x;
+                panY = e.touches[0].clientY - dragStart.y;
+                applyTransform();
+            }
+            if (e.touches.length === 2) {
+                const dx = e.touches[1].clientX - e.touches[0].clientX;
+                const dy = e.touches[1].clientY - e.touches[0].clientY;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                const mid = { x: (e.touches[0].clientX + e.touches[1].clientX)/2, y: (e.touches[0].clientY + e.touches[1].clientY)/2 };
+                const ratio = dist / lastTouchDist;
+                const newScale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, scale * ratio));
+                const rect = viewport.getBoundingClientRect();
+                const mx = mid.x - rect.left;
+                const my = mid.y - rect.top;
+                const r2 = newScale / scale;
+                panX = mx - r2 * (mx - panX);
+                panY = my - r2 * (my - panY);
+                scale = newScale;
+                lastTouchDist = dist;
+                applyTransform();
+            }
+        }, { passive: false });
+        viewport.addEventListener('touchend', () => { dragging = false; });
+
+        // Zoom buttons
+        document.getElementById('zoomIn').addEventListener('click', () => {
+            scale = Math.min(MAX_ZOOM, scale + 0.15);
+            applyTransform();
+        });
+        document.getElementById('zoomOut').addEventListener('click', () => {
+            scale = Math.max(MIN_ZOOM, scale - 0.15);
+            applyTransform();
+        });
+        document.getElementById('zoomFit').addEventListener('click', fitToView);
+
+        function fitToView() {
+            const vw = viewport.clientWidth;
+            const vh = viewport.clientHeight;
+            const WORLD_SIZE = getWorldSize();
+            const fitScale = Math.min(vw / WORLD_SIZE.w, vh / WORLD_SIZE.h) * 0.85;
+            scale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, fitScale));
+            panX = (vw - WORLD_SIZE.w * scale) / 2 - WORLD_SIZE.minX * scale;
+            panY = (vh - WORLD_SIZE.h * scale) / 2 - WORLD_SIZE.minY * scale;
+            applyTransform();
+        }
+
+        function getWorldSize() {
+            const positions = computePositions();
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            Object.values(positions.domainPos).forEach(p => {
+                minX = Math.min(minX, p.x - 100); maxX = Math.max(maxX, p.x + 100);
+                minY = Math.min(minY, p.y - 100); maxY = Math.max(maxY, p.y + 100);
+            });
+            Object.values(positions.sigPos).forEach(p => {
+                minX = Math.min(minX, p.x - 100); maxX = Math.max(maxX, p.x + 100);
+                minY = Math.min(minY, p.y - 100); maxY = Math.max(maxY, p.y + 100);
+            });
+            return { minX, minY, w: maxX - minX, h: maxY - minY };
+        }
+
+        /* ═══════════════════════════════════════════
+           POSITION COMPUTATION
+           (world coordinates — large space)
+        ═══════════════════════════════════════════ */
+        function computePositions() {
+            const sigCount = signals.length;
+            // World-space dimensions — generous for infinite feel
+            const cx = 900;
+            const cy = 700;
+            // Domain triangle
+            const domainR = 140;
+            const domainPos = {
+                agent:   { x: cx, y: cy - domainR },
+                app:     { x: cx - domainR * 1.15, y: cy + domainR * 0.75 },
+                genesys: { x: cx + domainR * 1.15, y: cy + domainR * 0.75 },
+            };
+            // Signals on ellipse — radii grow with count
+            const rx = 340 + sigCount * 6;
+            const ry = 280 + sigCount * 5;
+            const sigPos = {};
+            signals.forEach((s, i) => {
+                const angle = (2 * Math.PI * i / sigCount) - Math.PI / 2;
+                sigPos[s.id] = {
+                    x: cx + rx * Math.cos(angle),
+                    y: cy + ry * Math.sin(angle),
+                };
+            });
+            return { cx, cy, domainPos, sigPos };
+        }
+
+        /* ═══════════════════════════════════════════
+           CREATE DOM ELEMENTS
+        ═══════════════════════════════════════════ */
+        function createDomainNode(d) {
+            const el = document.createElement('div');
+            el.className = `node domain-node ${d.id}`;
+            el.innerHTML = `
+                <div class="domain-score">${d.score}</div>
+                <div class="domain-label">${d.name}</div>
+                <div class="domain-count">${d.signals} signals</div>
+            `;
+            el.addEventListener('mouseenter', () => { if (!locked) highlightDomain(d.id); });
+            el.addEventListener('mouseleave', () => { if (!locked) clearHighlight(); });
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (locked && activeDomain === d.id) { locked = false; clearHighlight(); }
+                else { locked = true; highlightDomain(d.id); }
+            });
+            world.appendChild(el);
+            domainEls[d.id] = el;
+        }
+
+        function createSignalNode(s) {
+            const el = document.createElement('div');
+            el.className = `node signal-node ${s.status}`;
+            el.innerHTML = `
+                <div class="sig-name"><i class="fas ${s.icon}"></i> ${s.name}</div>
+                <div class="sig-val">${s.value}</div>
+                <div class="sig-meta">
+                    <span class="${s.dir === 'up' ? 'up' : s.dir === 'down' ? 'down' : ''}">
+                        ${s.dir === 'up' ? '<i class="fas fa-arrow-up"></i>' : s.dir === 'down' ? '<i class="fas fa-arrow-down"></i>' : '<i class="fas fa-minus"></i>'}
+                        ${s.trend}
+                    </span>
+                </div>
+                <div class="sig-tags">
+                    ${s.domains.map(d => `<span class="sig-tag ${d}">${d}</span>`).join('')}
+                </div>
+            `;
+            el.addEventListener('mouseenter', () => { if (!locked) highlightSignal(s.id); });
+            el.addEventListener('mouseleave', () => { if (!locked) clearHighlight(); });
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (locked && activeDomain === 'sig-' + s.id) { locked = false; clearHighlight(); }
+                else { locked = true; activeDomain = 'sig-' + s.id; highlightSignal(s.id); }
+            });
+            world.appendChild(el);
+            signalEls[s.id] = el;
+        }
+
+        /* ── SVG helpers ── */
+        function curvePath(x1, y1, x2, y2) {
+            const dx = x2 - x1, dy = y2 - y1;
+            const len = Math.sqrt(dx*dx + dy*dy) || 1;
+            const offset = len * 0.15;
+            const nx = -dy / len * offset, ny = dx / len * offset;
+            const mx = (x1+x2)/2 + nx, my = (y1+y2)/2 + ny;
+            return `M ${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`;
+        }
+
+        function createPath(signal, domain) {
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.classList.add('nerve-path');
+            path.dataset.signal = signal.id;
+            path.dataset.domain = domain;
+            if (signal.status === 'warning')  { path.classList.add('degraded','degraded-warning');  path.setAttribute('filter','url(#glowYellow)'); }
+            if (signal.status === 'critical') { path.classList.add('degraded','degraded-critical');  path.setAttribute('filter','url(#glowRed)');    }
+            pathsG.appendChild(path);
+
+            const flow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            flow.classList.add('flow-particle');
+            if (signal.status === 'critical')      flow.classList.add('fp-critical','active');
+            else if (signal.status === 'warning')  flow.classList.add('fp-warning','active');
+            else                                   flow.classList.add(`fp-${domain}`);
+            flow.setAttribute('stroke-dasharray','8 52');
+            flow.style.animationDelay = `${Math.random()*2}s`;
+            flowG.appendChild(flow);
+
+            return { path, flow, signal, domain };
+        }
+
+        /* ═══════════════════════════════════════════
+           LAYOUT
+        ═══════════════════════════════════════════ */
+        function layoutAll() {
+            const { domainPos, sigPos } = computePositions();
+            // Size the SVG to cover all nodes
+            const ws = getWorldSize();
+            const pad = 200;
+            svg.setAttribute('width',  ws.w + pad*2);
+            svg.setAttribute('height', ws.h + pad*2);
+            svg.style.left = (ws.minX - pad) + 'px';
+            svg.style.top  = (ws.minY - pad) + 'px';
+            svg.setAttribute('viewBox', `${ws.minX - pad} ${ws.minY - pad} ${ws.w + pad*2} ${ws.h + pad*2}`);
+
+            // Place domains
+            domains.forEach(d => {
+                const el = domainEls[d.id];
+                const p  = domainPos[d.id];
+                el.style.left = p.x + 'px';
+                el.style.top  = p.y + 'px';
+            });
+            // Place signals
+            signals.forEach(s => {
+                const el = signalEls[s.id];
+                const p  = sigPos[s.id];
+                el.style.left = p.x + 'px';
+                el.style.top  = p.y + 'px';
+            });
+            // Domain-to-domain links
+            domLinksG.innerHTML = '';
+            const dIds = ['agent','app','genesys'];
+            for (let i = 0; i < 3; i++) for (let j = i+1; j < 3; j++) {
+                const p1 = domainPos[dIds[i]], p2 = domainPos[dIds[j]];
+                const ln = document.createElementNS('http://www.w3.org/2000/svg','line');
+                ln.setAttribute('x1',p1.x); ln.setAttribute('y1',p1.y);
+                ln.setAttribute('x2',p2.x); ln.setAttribute('y2',p2.y);
+                ln.classList.add('domain-link');
+                domLinksG.appendChild(ln);
+            }
+            // Update paths
+            pathEls.forEach(pe => {
+                const sp = sigPos[pe.signal.id], dp = domainPos[pe.domain];
+                const d = curvePath(sp.x, sp.y, dp.x, dp.y);
+                pe.path.setAttribute('d', d);
+                pe.flow.setAttribute('d', d);
+            });
+        }
+
+        /* ═══════════════════════════════════════════
+           HIGHLIGHT LOGIC
+        ═══════════════════════════════════════════ */
+        function highlightDomain(domainId) {
+            activeDomain = domainId;
+            Object.values(signalEls).forEach(el => el.classList.add('dimmed'));
+            Object.entries(domainEls).forEach(([id, el]) => el.classList.toggle('active', id === domainId));
+
+            pathEls.forEach(pe => {
+                const ok = pe.domain === domainId;
+                if (ok) {
+                    signalEls[pe.signal.id].classList.remove('dimmed');
+                    signalEls[pe.signal.id].classList.add('active');
+                    pe.path.classList.add('highlight',`highlight-${domainId}`);
+                    pe.path.style.opacity = '1';
+                    const fm = { agent:'url(#glowPurple)', app:'url(#glowCyan)', genesys:'url(#glowBlue)' };
+                    pe.path.setAttribute('filter', pe.signal.status==='critical'?'url(#glowRed)':pe.signal.status==='warning'?'url(#glowYellow)':fm[domainId]);
+                    pe.flow.classList.add('active', `fp-${pe.signal.status==='critical'?'critical':pe.signal.status==='warning'?'warning':domainId}`);
+                } else {
+                    pe.path.classList.remove('highlight','highlight-agent','highlight-app','highlight-genesys');
+                    pe.path.style.opacity = '0.08';
+                    pe.path.removeAttribute('filter');
+                    if (!/warning|critical/.test(pe.signal.status)) pe.flow.classList.remove('active');
+                }
+            });
+        }
+
+        function highlightSignal(sigId) {
+            Object.values(signalEls).forEach(el => el.classList.add('dimmed'));
+            Object.values(domainEls).forEach(el => el.classList.remove('active'));
+            signalEls[sigId].classList.remove('dimmed');
+            signalEls[sigId].classList.add('active');
+
+            pathEls.forEach(pe => {
+                if (pe.signal.id === sigId) {
+                    pe.path.classList.add('highlight',`highlight-${pe.domain}`);
+                    pe.path.style.opacity = '1';
+                    domainEls[pe.domain].classList.add('active');
+                    const fm = { agent:'url(#glowPurple)', app:'url(#glowCyan)', genesys:'url(#glowBlue)' };
+                    pe.path.setAttribute('filter', pe.signal.status==='critical'?'url(#glowRed)':pe.signal.status==='warning'?'url(#glowYellow)':fm[pe.domain]);
+                    pe.flow.classList.add('active');
+                } else {
+                    pe.path.classList.remove('highlight','highlight-agent','highlight-app','highlight-genesys');
+                    pe.path.style.opacity = '0.08';
+                    pe.path.removeAttribute('filter');
+                    if (!/warning|critical/.test(pe.signal.status)) pe.flow.classList.remove('active');
+                }
+            });
+        }
+
+        function clearHighlight() {
+            activeDomain = null;
+            Object.values(signalEls).forEach(el => el.classList.remove('dimmed','active'));
+            Object.values(domainEls).forEach(el => el.classList.remove('active'));
+            pathEls.forEach(pe => {
+                pe.path.classList.remove('highlight','highlight-agent','highlight-app','highlight-genesys');
+                pe.path.style.opacity = '';
+                if (pe.signal.status === 'critical')      { pe.path.setAttribute('filter','url(#glowRed)');    pe.flow.classList.add('active'); }
+                else if (pe.signal.status === 'warning')   { pe.path.setAttribute('filter','url(#glowYellow)'); pe.flow.classList.add('active'); }
+                else                                       { pe.path.removeAttribute('filter'); pe.flow.classList.remove('active'); }
+            });
+        }
+
+        // Background click to unlock
+        viewport.addEventListener('click', (e) => {
+            if (locked && !e.target.closest('.node')) { locked = false; clearHighlight(); }
+        });
+
+        /* ═══════════════════════════════════════════
+           INIT
+        ═══════════════════════════════════════════ */
+        domains.forEach(createDomainNode);
+        signals.forEach(createSignalNode);
+        signals.forEach(s => s.domains.forEach(d => pathEls.push(createPath(s, d))));
+        layoutAll();
+        clearHighlight();
+
+        // Center view on first load
+        requestAnimationFrame(() => { fitToView(); });
+
+        // Re-fit on window resize
+        let rTimer;
+        window.addEventListener('resize', () => { clearTimeout(rTimer); rTimer = setTimeout(() => { layoutAll(); fitToView(); }, 150); });
+
+    })();
+    </script>
+</body>
+</html>
