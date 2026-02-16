@@ -63,32 +63,15 @@
 
         .content { flex: 1; padding: 20px 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
 
-        /* ===== TOP ROW: Score + Prediction + Insights ===== */
+        /* ===== TOP ROW: Prediction Hero + Insights ===== */
         .top-row {
             display: grid;
-            grid-template-columns: 220px 1fr 340px;
+            grid-template-columns: 1fr 340px;
             gap: 16px;
             align-items: stretch;
         }
 
-        /* Enterprise Score */
-        .score-card {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius); box-shadow: var(--shadow-sm);
-            padding: 20px; text-align: center;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-
-        .score-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted); margin-bottom: 6px; }
-        .score-value { font-size: 52px; font-weight: 800; line-height: 1; color: var(--text); }
-        .score-sub { font-size: 11px; color: var(--text-secondary); margin-top: 6px; }
-        .score-badges { display: flex; gap: 8px; margin-top: 10px; }
-        .score-badge { font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 8px; }
-        .score-badge.g { background: var(--green-bg); color: var(--green); }
-        .score-badge.y { background: var(--yellow-bg); color: var(--yellow); }
-        .score-badge.r { background: var(--red-bg); color: var(--red); }
-
-        /* Prediction hero — matches Predict page style */
+        /* Prediction hero — merged with Enterprise Score */
         .predict-card {
             background: var(--bg-card); border: 1px solid var(--border);
             border-radius: var(--radius); box-shadow: var(--shadow-sm);
@@ -96,29 +79,99 @@
             gap: 20px; flex-wrap: wrap;
         }
 
-        .predict-main { text-align: center; min-width: 140px; }
+        /* Enterprise score block (inside predict hero) */
+        .hero-score { text-align: center; min-width: 110px; padding-right: 20px; border-right: 1px solid var(--border); }
+        .hero-score-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted); margin-bottom: 4px; }
+        .hero-score-value { font-size: 40px; font-weight: 800; line-height: 1; color: var(--text); }
+        .hero-score-badges { display: flex; gap: 5px; margin-top: 8px; justify-content: center; }
+        .hero-score-badges span { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 6px; }
+        .hero-score-badges .g { background: var(--green-bg); color: var(--green); }
+        .hero-score-badges .y { background: var(--yellow-bg); color: var(--yellow); }
+        .hero-score-badges .r { background: var(--red-bg); color: var(--red); }
+
+        .predict-main { text-align: center; min-width: 120px; }
         .predict-label {
-            font-size: 10px; font-weight: 600; text-transform: uppercase;
+            font-size: 9px; font-weight: 600; text-transform: uppercase;
             letter-spacing: 1.2px; color: var(--text-muted); margin-bottom: 4px;
         }
-        .predict-value { font-size: 48px; font-weight: 800; line-height: 1; }
+        .predict-value { font-size: 44px; font-weight: 800; line-height: 1; }
         .predict-value.low { color: var(--green); }
         .predict-value.medium { color: var(--yellow); }
         .predict-value.high { color: var(--red); }
-        .predict-sub { font-size: 11px; color: var(--text-secondary); margin-top: 6px; }
+        .predict-sub { font-size: 10px; color: var(--text-secondary); margin-top: 6px; }
 
         .predict-chart-area { flex: 1; min-width: 200px; height: 110px; position: relative; overflow: hidden; }
 
-        .predict-breakdown { display: flex; flex-direction: column; gap: 6px; min-width: 150px; flex-shrink: 0; }
+        .predict-breakdown { display: flex; flex-direction: column; gap: 6px; min-width: 140px; flex-shrink: 0; }
         .predict-item {
             display: flex; align-items: center; gap: 8px;
-            padding: 6px 10px; border-radius: 8px; background: var(--bg-muted);
+            padding: 5px 10px; border-radius: 8px; background: var(--bg-muted);
         }
-        .predict-item .pi-label { font-size: 11px; color: var(--text-secondary); flex: 1; }
-        .predict-item .pi-val { font-size: 13px; font-weight: 700; }
+        .predict-item .pi-label { font-size: 10px; color: var(--text-secondary); flex: 1; }
+        .predict-item .pi-val { font-size: 12px; font-weight: 700; }
         .predict-item.green .pi-val { color: var(--green); }
         .predict-item.yellow .pi-val { color: var(--yellow); }
         .predict-item.red .pi-val { color: var(--red); }
+
+        /* ===== COMPONENTS AT RISK PANEL ===== */
+        .risk-panel {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); box-shadow: var(--shadow-sm);
+            padding: 14px 18px; display: none;
+        }
+        .risk-panel.visible { display: block; }
+        .risk-header {
+            display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; user-select: none;
+        }
+        .risk-header:hover { opacity: 0.85; }
+        .risk-panel.collapsed .risk-grid { display: none; }
+        .risk-toggle {
+            font-size: 10px; color: var(--text-muted); display: flex; align-items: center; gap: 5px;
+            background: none; border: none; cursor: pointer; padding: 0; font-family: inherit;
+        }
+        .risk-toggle i { font-size: 9px; transition: transform 0.3s; }
+        .risk-panel:not(.collapsed) .risk-toggle i { transform: rotate(180deg); }
+        .risk-title {
+            font-size: 12px; font-weight: 700; color: var(--red);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .risk-title i { font-size: 13px; }
+        .risk-count {
+            font-size: 10px; font-weight: 700; padding: 3px 10px;
+            border-radius: 6px; background: var(--red-bg); color: var(--red);
+        }
+        .risk-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px;
+            margin-top: 10px;
+        }
+        .risk-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 12px; border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .risk-item.critical { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.15); }
+        .risk-item.warning { background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.15); }
+        .risk-item-icon {
+            width: 28px; height: 28px; border-radius: 8px;
+            display: grid; place-items: center; font-size: 12px; flex-shrink: 0;
+        }
+        .risk-item.critical .risk-item-icon { background: var(--red-bg); color: var(--red); }
+        .risk-item.warning .risk-item-icon { background: var(--yellow-bg); color: var(--yellow); }
+        .risk-item-body { flex: 1; min-width: 0; }
+        .risk-item-name { font-size: 12px; font-weight: 600; }
+        .risk-item-detail { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+        .risk-item-val {
+            font-size: 14px; font-weight: 800; flex-shrink: 0;
+        }
+        .risk-item.critical .risk-item-val { color: var(--red); }
+        .risk-item.warning .risk-item-val { color: var(--yellow); }
+        .risk-item-status {
+            font-size: 8px; font-weight: 700; padding: 2px 6px; border-radius: 3px;
+            text-transform: uppercase; flex-shrink: 0;
+        }
+        .risk-item.critical .risk-item-status { background: var(--red-bg); color: var(--red); }
+        .risk-item.warning .risk-item-status { background: var(--yellow-bg); color: var(--yellow); }
 
         /* Domain row — horizontal under top row */
         .domain-row {
@@ -132,35 +185,60 @@
 
         .domain-mini {
             background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 18px 20px;
-            box-shadow: var(--shadow-sm); display: flex;
-            align-items: flex-start; gap: 14px; flex: 1; transition: all 0.2s;
-            min-height: 120px;
+            border-radius: var(--radius); padding: 0;
+            box-shadow: var(--shadow-sm); display: flex; flex-direction: column;
+            flex: 1; transition: all 0.2s; overflow: hidden;
         }
-        .domain-mini:hover { box-shadow: var(--shadow-md); }
+        .domain-mini:hover { box-shadow: var(--shadow-md); border-color: #d0d5dd; }
 
-        .dm-score {
-            width: 48px; height: 48px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px; font-weight: 800; flex-shrink: 0;
+        .dm-header {
+            display: flex; align-items: center; gap: 10px;
+            padding: 14px 16px 0;
         }
-        .dm-score.agent { background: var(--purple-bg); color: var(--purple); border: 2px solid rgba(139,92,246,0.2); }
-        .dm-score.app { background: var(--cyan-bg); color: var(--cyan); border: 2px solid rgba(6,182,212,0.2); }
-        .dm-score.genesys { background: var(--blue-bg); color: var(--blue); border: 2px solid rgba(59,130,246,0.2); }
+        .dm-icon {
+            width: 32px; height: 32px; border-radius: 8px;
+            display: grid; place-items: center; font-size: 14px; flex-shrink: 0;
+        }
+        .dm-icon.agent { background: var(--purple-bg); color: var(--purple); }
+        .dm-icon.app { background: var(--cyan-bg); color: var(--cyan); }
+        .dm-icon.genesys { background: var(--blue-bg); color: var(--blue); }
 
-        .dm-info { flex: 1; }
-        .dm-name { font-size: 13px; font-weight: 600; margin-bottom: 1px; }
+        .dm-info { flex: 1; min-width: 0; }
+        .dm-name { font-size: 13px; font-weight: 700; margin-bottom: 0; }
         .dm-detail { font-size: 10px; color: var(--text-muted); }
 
-        .dm-spark { width: 90px; height: 48px; position: relative; overflow: hidden; align-self: center; }
+        .dm-score-row {
+            display: flex; align-items: baseline; gap: 8px;
+            padding: 6px 16px 8px;
+        }
+        .dm-score {
+            font-size: 32px; font-weight: 800; line-height: 1;
+        }
+        .dm-score.agent { color: var(--purple); }
+        .dm-score.app { color: var(--cyan); }
+        .dm-score.genesys { color: var(--blue); }
+        .dm-score-label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+        .dm-spark { width: 100%; height: 40px; position: relative; overflow: hidden;
+            padding: 0 16px; box-sizing: border-box; }
 
         /* Signal-health tags inside domain cards */
-        .dm-signals { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+        .dm-signals-wrap {
+            padding: 8px 16px 12px; border-top: 1px solid var(--border);
+        }
+        .dm-signals { display: flex; flex-wrap: wrap; gap: 4px; }
         .dm-sig-tag {
             font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 4px;
             cursor: pointer; transition: all 0.15s; white-space: nowrap;
         }
         .dm-sig-tag:hover { transform: scale(1.05); }
+        .dm-sig-tag.dm-sig-hidden { display: none; }
+        .dm-sig-overflow {
+            font-size: 8px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+            background: var(--bg-muted); color: var(--text-muted); white-space: nowrap;
+            cursor: pointer; transition: all 0.15s; user-select: none;
+        }
+        .dm-sig-overflow:hover { background: #e2e5ea; }
         .dm-sig-tag.healthy { background: var(--green-bg); color: var(--green); }
         .dm-sig-tag.warning { background: var(--yellow-bg); color: var(--yellow); }
         .dm-sig-tag.critical { background: var(--red-bg); color: var(--red); }
@@ -190,7 +268,7 @@
             content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
             border: 5px solid transparent; border-top-color: var(--text);
         }
-        .tip-anchor:hover .custom-tip { display: block; }
+        .tip-anchor:hover .custom-tip, .tip-anchor.touched .custom-tip { display: block; }
         .tip-title { font-size: 11px; font-weight: 700; margin-bottom: 6px; letter-spacing: 0.3px; }
         .tip-row { display: flex; align-items: center; gap: 6px; font-size: 10px; padding: 2px 0; }
         .tip-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
@@ -200,14 +278,34 @@
         .tip-name { flex: 1; opacity: 0.9; }
         .tip-val { font-weight: 600; opacity: 1; }
 
+        /* ===== SECTION TITLES ===== */
+        .sec-label {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1.2px; color: var(--text-muted);
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 6px;
+        }
+        .sec-label::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+        .sec-label i { font-size: 10px; opacity: 0.6; }
+
         /* ===== MAIN GRID: Signals ===== */
         .signals-section-title {
             font-size: 12px; font-weight: 600; text-transform: uppercase;
             letter-spacing: 1px; color: var(--text-muted);
             display: flex; align-items: center; gap: 8px;
+            cursor: pointer; user-select: none;
         }
         .signals-section-title::after {
             content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+        .signals-section-title .sig-toggle-icon {
+            font-size: 10px; transition: transform 0.3s; color: var(--text-muted);
+        }
+        .signals-section-title.expanded .sig-toggle-icon { transform: rotate(180deg); }
+        .signals-grid.collapsed {
+            display: none;
         }
 
         .signals-grid {
@@ -260,9 +358,7 @@
         .sig-dtag.app { background: var(--cyan-bg); color: var(--cyan); }
         .sig-dtag.genesys { background: var(--blue-bg); color: var(--blue); }
 
-        /* ===== BOTTOM: TIMELINE + ALERTS ===== */
-        .bottom-row { display: grid; grid-template-columns: 1fr 380px; gap: 16px; }
-
+        /* ===== BOTTOM: TIMELINE (full width) ===== */
         .timeline-card {
             background: var(--bg-card); border: 1px solid var(--border);
             border-radius: var(--radius); padding: 16px 20px;
@@ -278,38 +374,7 @@
         .tl-dot.y { background: var(--yellow); }
         .tl-dot.r { background: var(--red); }
 
-        .tl-segments { display: flex; width: 100%; height: 10px; border-radius: 5px; overflow: hidden; gap: 1px; }
-        .tl-seg { flex: 1; border-radius: 2px; cursor: pointer; transition: transform 0.2s; }
-        .tl-seg:hover { transform: scaleY(2); }
-        .tl-seg.g { background: var(--green); opacity: 0.5; }
-        .tl-seg.y { background: var(--yellow); opacity: 0.5; }
-        .tl-seg.r { background: var(--red); opacity: 0.5; }
-
-        .alerts-card {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 16px;
-            box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 8px;
-        }
-
-        .alerts-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
-
-        .alert-row {
-            display: flex; align-items: center; gap: 10px;
-            padding: 8px 10px; border-radius: 8px; background: var(--bg-muted);
-            font-size: 12px;
-        }
-
-        .alert-row .a-icon {
-            width: 24px; height: 24px; border-radius: 6px;
-            display: grid; place-items: center; font-size: 10px; flex-shrink: 0;
-        }
-        .alert-row.crit .a-icon { background: var(--red-bg); color: var(--red); }
-        .alert-row.warn .a-icon { background: var(--yellow-bg); color: var(--yellow); }
-        .alert-row.info .a-icon { background: var(--blue-bg); color: var(--blue); }
-
-        .alert-row .a-text { flex: 1; color: var(--text-secondary); }
-        .alert-row .a-text strong { color: var(--text); }
-        .alert-row .a-time { font-size: 9px; color: var(--text-muted); white-space: nowrap; }
+        .tl-chart-area { height: 60px; position: relative; overflow: hidden; }
 
         /* ===== INSIGHTS PANEL (right column of top row) ===== */
         .insights-section {
@@ -339,7 +404,7 @@
         .insight-row:last-child { margin-bottom: 0; }
         .insight-row:hover { background: var(--bg); box-shadow: var(--shadow-sm); }
         /* Collapsed: hide items beyond 2 */
-        .insights-section.collapsed .insight-row:nth-child(n+3) {
+        .insights-section.collapsed .insight-row:nth-child(n+4) {
             display: none;
         }
         .insights-toggle {
@@ -375,10 +440,8 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1200px) {
-            .top-row { grid-template-columns: 1fr 1fr; }
-            .top-row .insights-section { grid-column: 1 / -1; }
+            .top-row { grid-template-columns: 1fr; }
             .domain-row { grid-template-columns: 1fr 1fr 1fr; }
-            .bottom-row { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 768px) {
@@ -387,14 +450,16 @@
             .topbar-title span { display: none; }
             .content { padding: 12px 16px; gap: 12px; }
             .top-row { grid-template-columns: 1fr; }
+            .predict-card { flex-direction: column; align-items: stretch; }
+            .hero-score { border-right: none; border-bottom: 1px solid var(--border); padding-right: 0; padding-bottom: 16px; }
             .domain-row { grid-template-columns: 1fr; }
             .signals-grid { grid-template-columns: 1fr 1fr; }
-            .bottom-row { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 480px) {
             .topbar { height: 48px; }
-            .score-value { font-size: 36px; }
+            .hero-score-value { font-size: 32px; }
+            .predict-value { font-size: 32px; }
             .signals-grid { grid-template-columns: 1fr; }
         }
     </style>
@@ -421,22 +486,22 @@
 
     <div class="content">
 
-        <!-- TOP ROW: Score + Prediction + Insights -->
-        <div class="top-row">
-            <!-- Enterprise Score -->
-            <div class="score-card">
-                <div class="score-label">Enterprise Health</div>
-                <div class="score-value">94.2</div>
-                <div class="score-sub">14 signals monitored</div>
-                <div class="score-badges">
-                    <span class="score-badge g"><i class="fas fa-check"></i> 11</span>
-                    <span class="score-badge y"><i class="fas fa-exclamation"></i> 2</span>
-                    <span class="score-badge r"><i class="fas fa-times"></i> 1</span>
-                </div>
-            </div>
+        <!-- SECTION: Overview -->
+        <div class="sec-label"><i class="fas fa-tachometer-alt"></i> Overview</div>
 
-            <!-- Prediction Hero -->
+        <!-- TOP ROW: Merged Hero + Insights -->
+        <div class="top-row">
+            <!-- Prediction Hero (with embedded Enterprise Score) -->
             <div class="predict-card">
+                <div class="hero-score">
+                    <div class="hero-score-label">Enterprise Health</div>
+                    <div class="hero-score-value">94.2</div>
+                    <div class="hero-score-badges">
+                        <span class="g"><i class="fas fa-check"></i> 11</span>
+                        <span class="y"><i class="fas fa-exclamation"></i> 2</span>
+                        <span class="r"><i class="fas fa-times"></i> 1</span>
+                    </div>
+                </div>
                 <div class="predict-main">
                     <div class="predict-label">Outage Probability</div>
                     <div class="predict-value low">12%</div>
@@ -462,9 +527,10 @@
             <!-- Insights (right top) -->
             <div class="insights-section collapsed" id="insightsSection">
                 <div class="insights-header">
-                    <div class="insights-title"><i class="fas fa-brain"></i> AI Insights</div>
-                    <span class="insights-badge">3 active</span>
+                    <div class="insights-title"><i class="fas fa-brain"></i> AI Insights & Alerts</div>
+                    <span class="insights-badge">6 active</span>
                 </div>
+                <!-- Critical alert (merged from Alerts card) -->
                 <div class="insight-row">
                     <div class="ins-icon crit"><i class="fas fa-microphone-alt"></i></div>
                     <div class="ins-body">
@@ -475,8 +541,15 @@
                 <div class="insight-row">
                     <div class="ins-icon warn"><i class="fas fa-phone-alt"></i></div>
                     <div class="ins-body">
-                        <div class="ins-text"><strong>SLA + Incidents correlated</strong> — LOB SLA drop in Sales/Billing aligns with P1 incident surge. Agent rebalancing recommended.</div>
+                        <div class="ins-text"><strong>LOB SLA below 85%</strong> in Sales &amp; Billing. Correlated with P1 incident surge. Agent rebalancing recommended.</div>
                         <div class="ins-meta">5 min ago <span class="itag agent">Agent</span> <span class="itag genesys">Genesys</span></div>
+                    </div>
+                </div>
+                <div class="insight-row">
+                    <div class="ins-icon warn"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="ins-body">
+                        <div class="ins-text"><strong>7 Active Incidents</strong> — 3 P1 critical. Incident rate exceeds 4-hr rolling average by 2.3x.</div>
+                        <div class="ins-meta">4 min ago <span class="itag app">App</span> <span class="itag genesys">Genesys</span></div>
                     </div>
                 </div>
                 <div class="insight-row">
@@ -486,57 +559,67 @@
                         <div class="ins-meta">8 min ago <span class="itag app">App</span> <span class="itag genesys">Genesys</span></div>
                     </div>
                 </div>
+                <div class="insight-row">
+                    <div class="ins-icon ok"><i class="fas fa-wifi"></i></div>
+                    <div class="ins-body">
+                        <div class="ins-text"><strong>Connectivity stable</strong> post-APAC dip. All regions recovered to 96%+.</div>
+                        <div class="ins-meta">22 min ago <span class="itag agent">Agent</span></div>
+                    </div>
+                </div>
+                <div class="insight-row">
+                    <div class="ins-icon ok"><i class="fas fa-shield-alt"></i></div>
+                    <div class="ins-body">
+                        <div class="ins-text"><strong>Core Systems, Genesys Platform</strong> — stable for 4+ hrs. No forecast deviation detected.</div>
+                        <div class="ins-meta">12 min ago <span class="itag app">App</span> <span class="itag genesys">Genesys</span></div>
+                    </div>
+                </div>
                 <button class="insights-toggle" id="insightsToggle">
-                    <span>Show 1 more insight</span> <i class="fas fa-chevron-down"></i>
+                    <span>Show 3 more</span> <i class="fas fa-chevron-down"></i>
                 </button>
             </div>
         </div>
 
+        <!-- COMPONENTS AT RISK (auto-populated from signals) -->
+        <div class="risk-panel collapsed" id="riskPanel">
+            <div class="risk-header" id="riskToggle">
+                <div class="risk-title"><i class="fas fa-shield-alt"></i> Components at Risk</div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="risk-count" id="riskCount"></span>
+                    <button class="risk-toggle"><span>Expand</span> <i class="fas fa-chevron-down"></i></button>
+                </div>
+            </div>
+            <div class="risk-grid" id="riskGrid"></div>
+        </div>
+
+        <!-- SECTION: Domain Health -->
+        <div class="sec-label"><i class="fas fa-th-large"></i> Domain Health</div>
+
         <!-- DOMAIN ROW (horizontal) — JS-rendered -->
         <div class="domain-row" id="domainRow"></div>
 
-        <!-- SIGNALS HEADER -->
-        <div class="signals-section-title">14 Signals</div>
+        <!-- SIGNALS HEADER (collapsible) -->
+        <div class="signals-section-title" id="sigToggle">
+            <i class="fas fa-chevron-down sig-toggle-icon"></i>
+            14 Signals
+        </div>
 
-        <!-- SIGNAL GRID -->
-        <div class="signals-grid" id="sigGrid"></div>
+        <!-- SIGNAL GRID (collapsed by default) -->
+        <div class="signals-grid collapsed" id="sigGrid"></div>
 
-        <!-- BOTTOM ROW -->
-        <div class="bottom-row">
-            <div class="timeline-card">
-                <div class="tl-header">
-                    <div class="tl-title"><i class="fas fa-history"></i>&nbsp; Health Timeline — Last 4 Hours</div>
-                    <div class="tl-legend">
-                        <span><div class="tl-dot g"></div> 92%</span>
-                        <span><div class="tl-dot y"></div> 6%</span>
-                        <span><div class="tl-dot r"></div> 2%</span>
-                    </div>
-                </div>
-                <div class="tl-segments" id="tlSegments"></div>
-            </div>
-            <div class="alerts-card">
-                <div class="alerts-title"><i class="fas fa-bell"></i>&nbsp; Active Alerts</div>
-                <div class="alert-row crit">
-                    <div class="a-icon"><i class="fas fa-microphone-alt"></i></div>
-                    <div class="a-text"><strong>Call Quality</strong> MOS 3.2 — degrades fast</div>
-                    <div class="a-time">8m</div>
-                </div>
-                <div class="alert-row warn">
-                    <div class="a-icon"><i class="fas fa-phone-slash"></i></div>
-                    <div class="a-text"><strong>LOB SLA</strong> below 85% in 2 LOBs</div>
-                    <div class="a-time">12m</div>
-                </div>
-                <div class="alert-row warn">
-                    <div class="a-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                    <div class="a-text"><strong>Incidents</strong> 7 active — 3 P1</div>
-                    <div class="a-time">4m</div>
-                </div>
-                <div class="alert-row info">
-                    <div class="a-icon"><i class="fas fa-info-circle"></i></div>
-                    <div class="a-text"><strong>Connectivity</strong> stable post-APAC dip</div>
-                    <div class="a-time">22m</div>
+        <!-- SECTION: Timeline -->
+        <div class="sec-label"><i class="fas fa-history"></i> Health Timeline</div>
+
+        <!-- TIMELINE (full width, no alerts card) -->
+        <div class="timeline-card">
+            <div class="tl-header">
+                <div class="tl-title"><i class="fas fa-history"></i>&nbsp; Health Timeline — Last 4 Hours</div>
+                <div class="tl-legend">
+                    <span><div class="tl-dot g"></div> Healthy (&ge;95)</span>
+                    <span><div class="tl-dot y"></div> Warning (90-95)</span>
+                    <span><div class="tl-dot r"></div> Critical (&lt;90)</span>
                 </div>
             </div>
+            <div class="tl-chart-area"><canvas id="tlChart"></canvas></div>
         </div>
 
     </div>
@@ -641,6 +724,59 @@
               subs: [{name:'Citrix',value:'98.1%',status:'healthy'},{name:'Browser',value:'97.2%',status:'healthy'},{name:'Softphone',value:'97.4%',status:'healthy'}] },
         ];
 
+        // Populate Components at Risk panel
+        (function buildRiskPanel() {
+            const riskItems = [];
+            // Collect at-risk signals (critical first, then warning)
+            signals.forEach(s => {
+                if (s.status === 'critical' || s.status === 'warning') {
+                    const domainTags = s.domains.map(d => {
+                        const cls = d === 'agent' ? 'agent' : d === 'app' ? 'app' : 'genesys';
+                        return `<span class="sig-dtag ${cls}">${d}</span>`;
+                    }).join('');
+                    riskItems.push({
+                        severity: s.status === 'critical' ? 0 : 1,
+                        html: `<div class="risk-item ${s.status}">
+                            <div class="risk-item-icon"><i class="fas ${s.icon}"></i></div>
+                            <div class="risk-item-body">
+                                <div class="risk-item-name">${s.name}</div>
+                                <div class="risk-item-detail">${s.trend} · ${domainTags}</div>
+                            </div>
+                            <div class="risk-item-val">${s.value}</div>
+                            <span class="risk-item-status">${s.status}</span>
+                        </div>`
+                    });
+                }
+                // Also surface at-risk sub-signals
+                if (s.subs) {
+                    s.subs.forEach(sub => {
+                        if (sub.status === 'critical' || sub.status === 'warning') {
+                            riskItems.push({
+                                severity: sub.status === 'critical' ? 0 : 1,
+                                html: `<div class="risk-item ${sub.status}">
+                                    <div class="risk-item-icon"><i class="fas ${s.icon}"></i></div>
+                                    <div class="risk-item-body">
+                                        <div class="risk-item-name">${sub.name}</div>
+                                        <div class="risk-item-detail">Under ${s.name}</div>
+                                    </div>
+                                    <div class="risk-item-val">${sub.value}</div>
+                                    <span class="risk-item-status">${sub.status}</span>
+                                </div>`
+                            });
+                        }
+                    });
+                }
+            });
+            // Sort: critical first
+            riskItems.sort((a, b) => a.severity - b.severity);
+            if (riskItems.length > 0) {
+                const panel = document.getElementById('riskPanel');
+                panel.classList.add('visible');
+                document.getElementById('riskCount').textContent = riskItems.length + ' component' + (riskItems.length > 1 ? 's' : '');
+                document.getElementById('riskGrid').innerHTML = riskItems.map(r => r.html).join('');
+            }
+        })();
+
         // Domain definitions with canvas IDs and colors
         const domains = [
             { key: 'agent', name: 'Agent Health', score: '93.8', cls: 'agent', canvasId: 'dmAgent', color: '#8b5cf6' },
@@ -661,14 +797,26 @@
             ).join('');
             const card = document.createElement('div');
             card.className = 'domain-mini';
+            const overflowCount = domSignals.length - 5;
+            const domIcon = d.key === 'agent' ? 'fa-headset' : d.key === 'app' ? 'fa-cubes' : 'fa-cloud';
             card.innerHTML = `
-                <div class="dm-score ${d.cls}">${d.score}</div>
-                <div class="dm-info">
-                    <div class="dm-name">${d.name}</div>
-                    <div class="dm-detail">${detail}</div>
+                <div class="dm-header">
+                    <div class="dm-icon ${d.cls}"><i class="fas ${domIcon}"></i></div>
+                    <div class="dm-info">
+                        <div class="dm-name">${d.name}</div>
+                        <div class="dm-detail">${detail}</div>
+                    </div>
+                </div>
+                <div class="dm-score-row">
+                    <div class="dm-score ${d.cls}">${d.score}</div>
+                    <span class="dm-score-label">/ 100</span>
+                </div>
+                <div class="dm-spark"><canvas id="${d.canvasId}"></canvas></div>
+                <div class="dm-signals-wrap">
                     <div class="tip-anchor">
                         <div class="dm-signals">
-                            ${domSignals.map(s => `<span class="dm-sig-tag ${s.status}">${s.name}</span>`).join('')}
+                            ${domSignals.map((s, i) => `<span class="dm-sig-tag ${s.status}${i >= 5 ? ' dm-sig-hidden' : ''}">${s.name}</span>`).join('')}
+                            ${overflowCount > 0 ? `<span class="dm-sig-overflow" data-full="${domSignals.length}" data-cap="5">+${overflowCount} more</span>` : ''}
                         </div>
                         <div class="custom-tip">
                             <div class="tip-title">${d.name} — Signals</div>
@@ -676,7 +824,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="dm-spark"><canvas id="${d.canvasId}"></canvas></div>
             `;
             domainRow.appendChild(card);
             // Render domain spark after canvas is in DOM
@@ -719,26 +866,104 @@
                 </div>
             `;
             sigGrid.appendChild(card);
+        });
+        // Signal sparklines are lazy-rendered on expand (see sigToggle handler)
 
-            const color = s.status === 'critical' ? '#ef4444' : s.status === 'warning' ? '#f59e0b' : '#22c55e';
-            miniSpark(`sig${idx}`, color, s.spark);
+        // Timeline — area chart showing enterprise score over 4 hours
+        const tlLabels = [];
+        const tlData = [];
+        for (let i = 0; i < 48; i++) {
+            const mins = -240 + i * 5;
+            tlLabels.push(mins === 0 ? 'Now' : (mins > 0 ? `+${mins}m` : `${mins}m`));
+            // Simulated score data hovering around 92-96
+            tlData.push(94 + Math.sin(i * 0.3) * 2 + (Math.random() - 0.5) * 1.5);
+        }
+        new Chart(document.getElementById('tlChart'), {
+            type: 'line',
+            data: {
+                labels: tlLabels,
+                datasets: [{
+                    data: tlData,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59,130,246,0.06)',
+                    fill: true, tension: 0.4,
+                    pointRadius: 0, borderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1a1a2e', titleFont: { size: 10 }, bodyFont: { size: 10 }, callbacks: { label: ctx => ctx.raw.toFixed(1) + ' score' } } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 9 }, color: '#9ca3b4', maxTicksLimit: 10 }, border: { display: false } },
+                    y: { min: 85, max: 100, grid: { color: '#f1f3f5' }, ticks: { font: { size: 9 }, color: '#9ca3b4' }, border: { display: false } }
+                },
+                interaction: { intersect: false, mode: 'index' }
+            }
         });
 
-        // Timeline
-        const tlContainer = document.getElementById('tlSegments');
-        for (let i = 0; i < 60; i++) {
-            const r = Math.random();
-            const el = document.createElement('div');
-            el.className = 'tl-seg ' + (r < 0.04 ? 'r' : r < 0.12 ? 'y' : 'g');
-            tlContainer.appendChild(el);
-        }
+        // Signal grid toggle (collapsed by default)
+        const sigToggleBtn = document.getElementById('sigToggle');
+        const sigGridEl = document.getElementById('sigGrid');
+        let sigChartsRendered = false;
+        sigToggleBtn.addEventListener('click', () => {
+            const isCollapsed = sigGridEl.classList.toggle('collapsed');
+            sigToggleBtn.classList.toggle('expanded', !isCollapsed);
+            // Lazy-render signal sparklines on first expand
+            if (!isCollapsed && !sigChartsRendered) {
+                sigChartsRendered = true;
+                signals.forEach((s, idx) => {
+                    const color = s.status === 'critical' ? '#ef4444' : s.status === 'warning' ? '#f59e0b' : '#22c55e';
+                    miniSpark(`sig${idx}`, color, s.spark);
+                });
+            }
+        });
 
         // Insights toggle
         const insSection = document.getElementById('insightsSection');
         const insToggle = document.getElementById('insightsToggle');
         insToggle.addEventListener('click', () => {
             const collapsed = insSection.classList.toggle('collapsed');
-            insToggle.querySelector('span').textContent = collapsed ? 'Show 1 more insight' : 'Show less';
+            insToggle.querySelector('span').textContent = collapsed ? 'Show 3 more' : 'Show less';
+        });
+
+        // Risk panel toggle
+        document.getElementById('riskToggle').addEventListener('click', () => {
+            const panel = document.getElementById('riskPanel');
+            const isCollapsed = panel.classList.toggle('collapsed');
+            panel.querySelector('.risk-toggle span').textContent = isCollapsed ? 'Expand' : 'Collapse';
+        });
+
+        // "+N more" tag expand/collapse handler
+        document.addEventListener('click', (e) => {
+            const overflow = e.target.closest('.dm-sig-overflow');
+            if (overflow) {
+                e.stopPropagation();
+                const container = overflow.closest('.dm-signals');
+                const hidden = container.querySelectorAll('.dm-sig-tag.dm-sig-hidden');
+                const isExpanded = overflow.dataset.expanded === 'true';
+                if (isExpanded) {
+                    hidden.forEach(el => el.classList.add('dm-sig-hidden'));
+                    // Re-hide: need to re-select since class was removed
+                    const cap = parseInt(overflow.dataset.cap);
+                    container.querySelectorAll('.dm-sig-tag').forEach((el, i) => {
+                        if (i >= cap) el.classList.add('dm-sig-hidden');
+                    });
+                    overflow.textContent = '+' + (parseInt(overflow.dataset.full) - cap) + ' more';
+                    overflow.dataset.expanded = 'false';
+                } else {
+                    container.querySelectorAll('.dm-sig-tag.dm-sig-hidden').forEach(el => el.classList.remove('dm-sig-hidden'));
+                    overflow.textContent = 'Show less';
+                    overflow.dataset.expanded = 'true';
+                }
+                return;
+            }
+
+            // Touch support for tooltips
+            const anchor = e.target.closest('.tip-anchor');
+            document.querySelectorAll('.tip-anchor.touched').forEach(el => {
+                if (el !== anchor) el.classList.remove('touched');
+            });
+            if (anchor) anchor.classList.toggle('touched');
         });
     </script>
 </body>
