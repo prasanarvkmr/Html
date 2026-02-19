@@ -1,0 +1,787 @@
+<div class="exec-dashboard" id="exec-dashboard">
+  <div class="exec-sticky-header">
+    <div class="header-left">
+      <div id="status-glow" class="glow-dot"></div>
+      <h1 id="header-text">Statistical Risk Analysis</h1>
+    </div>
+    <div class="header-right">
+      <span class="executive-tag">Descriptive · Diagnostic · Predictive · Prescriptive</span>
+      <div id="global-controls"></div>
+    </div>
+  </div>
+
+  <div id="exec-content" class="exec-content">
+    </div>
+</div>
+
+<style>
+:root {
+  --bg-app: #f9fafb;
+  --bg-card: #ffffff;
+  --text-main: #111827;
+  --text-sub: #4b5563;
+  --text-muted: #9ca3af;
+  --border: #e5e7eb;
+  --risk-high: #dc2626;
+  --risk-med: #d97706;
+  --risk-low: #2563eb;
+  --success: #10b981;
+}
+
+.exec-dashboard {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg-app);
+  color: var(--text-main);
+  padding: 15px;
+}
+
+/* STICKY HEADER SYSTEM */
+.exec-sticky-header {
+  position: sticky; top: 0; z-index: 1000;
+  background: rgba(249, 250, 251, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 15px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px;
+}
+
+.header-left { display: flex; align-items: center; gap: 12px; }
+.glow-dot { width: 10px; height: 10px; border-radius: 50%; transition: 0.3s; }
+.glow-success { background: var(--success); box-shadow: 0 0 10px var(--success); }
+.glow-warning { background: var(--risk-med); box-shadow: 0 0 10px var(--risk-med); }
+
+/* CATEGORY BOXES */
+.category-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.category-header {
+  position: sticky; top: 60px; /* Offset for global header */
+  z-index: 900;
+  width: 100%; padding: 14px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  cursor: pointer; background: #fff; border: none;
+  border-bottom: 1px solid transparent;
+}
+
+.category-box.is-open .category-header { border-bottom: 1px solid var(--border); }
+
+/* DATA GRID — ANALYTICS TIERS */
+.item-list { display: none; padding: 0 20px 10px; }
+.category-box.is-open .item-list { display: block; }
+
+/* Tier labels row */
+.tier-labels {
+  display: grid;
+  grid-template-columns: 1.5fr 1.8fr 1.4fr 2.2fr 2.2fr;
+  padding: 8px 0 4px;
+  border-bottom: 2px solid var(--border);
+  gap: 10px;
+}
+.tier-label {
+  font-size: 9px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.5px; padding: 3px 8px; border-radius: 4px;
+}
+.tier-descriptive { background: #eff6ff; color: #1d4ed8; }
+.tier-diagnostic { background: #fef3c7; color: #92400e; }
+.tier-predictive { background: #ede9fe; color: #5b21b6; }
+.tier-prescriptive { background: #ecfdf5; color: #065f46; }
+
+.item-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1.8fr 1.4fr 2.2fr 2.2fr;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+  align-items: start;
+  gap: 10px;
+}
+
+.item-row:last-child { border-bottom: none; }
+
+.item-name { font-size: 13px; font-weight: 600; }
+.m-label { display: block; font-size: 9px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
+.m-value { font-size: 13px; font-weight: 500; }
+
+/* Sub-grid inside each tier cell */
+.tier-cell { display: flex; flex-direction: column; gap: 4px; }
+.tier-cell-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.tier-cell-row > div { min-width: 60px; }
+
+/* RISK & COMMENTARY */
+.sigma-tag {
+  font-size: 11px; font-weight: 800;
+  padding: 2px 6px; border-radius: 4px;
+  background: #f3f4f6;
+}
+
+.commentary-text {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-sub);
+  padding-right: 10px;
+}
+
+.risk-indicator { font-weight: 700; }
+.risk-high { color: var(--risk-high); }
+.risk-med { color: var(--risk-med); }
+.risk-low { color: var(--risk-low); }
+
+/* SPARKLINE */
+.trend-svg { width: 100px; height: 30px; stroke-width: 2; fill: none; }
+.forecast-zone { stroke-dasharray: 4 3; }
+
+/* PREDICTION CARD */
+.prediction-card {
+  background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 6px;
+  padding: 6px 8px; margin-top: 4px;
+}
+.prediction-card.warning { background: #fff7ed; border-color: #fed7aa; }
+.prediction-card.critical { background: #fef2f2; border-color: #fecaca; }
+
+/* PRESCRIPTIVE ACTION */
+.action-card {
+  background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 6px;
+  padding: 6px 8px; margin-top: 4px;
+}
+.action-card.urgent { background: #fef2f2; border-color: #fecaca; }
+.action-card.moderate { background: #fff7ed; border-color: #fed7aa; }
+.action-tag {
+  font-size: 9px; font-weight: 800; text-transform: uppercase;
+  padding: 1px 5px; border-radius: 3px; display: inline-block; margin-bottom: 3px;
+}
+.action-tag.urgent { background: #dc2626; color: #fff; }
+.action-tag.moderate { background: #d97706; color: #fff; }
+.action-tag.monitor { background: #2563eb; color: #fff; }
+
+.confidence-band {
+  font-size: 11px; color: var(--text-sub);
+}
+
+/* ALL OPERATIONAL */
+.success-state {
+  padding: 80px 20px; text-align: center;
+  background: #fff; border: 1px dashed var(--success); border-radius: 12px;
+}
+</style>
+
+<script>
+/**
+ * STATISTICALLY CORRECTED DATA MODEL
+ * ────────────────────────────────────
+ * MetricType:
+ *   'bounded_ratio'  → Apdex [0,1], Self-Serve Rate [0,1] → logit-transform before Z-score
+ *   'bounded_capacity' → Port Usage [0, capacity] → utilization ratio + logit-transform
+ *   'unbounded_count'  → Requests/min → Median + MAD (robust to skew)
+ *
+ * Direction:
+ *   'lower_is_bad'  → Apdex, Self-Serve (drops are anomalies)
+ *   'higher_is_bad' → Port Usage (saturation is the anomaly)
+ *   'both'          → RPM (both spikes and drops are anomalous)
+ *
+ * History: ≥ 20 data points for reliable σ estimation (CLT)
+ * Bonferroni: α_adjusted = 0.05 / n_metrics for multi-metric correction
+ */
+
+const NUM_METRICS = 5;
+const BONFERRONI_ALPHA = 0.05 / NUM_METRICS; // 0.01 per metric
+// σ thresholds adjusted for Bonferroni (from inverse normal CDF)
+const SIGMA_CRITICAL = 3.09;  // p ≈ 0.001 (one-tail) → family p ≈ 0.005
+const SIGMA_ELEVATED = 2.33;  // p ≈ 0.01 (one-tail)  → family p ≈ 0.05
+
+const mockData = [
+  {
+    Category: 'Telephony',
+    Item: 'Nuance Port Usage',
+    MetricType: 'bounded_capacity',
+    Direction: 'higher_is_bad',
+    Capacity: 500,
+    Unit: 'ports',
+    CurrentValue: 472,
+    History: [310, 325, 318, 340, 335, 328, 342, 350, 355, 360, 368, 375, 380, 390, 398, 410, 425, 440, 458, 472]
+  },
+  {
+    Category: 'Application Health',
+    Item: '.NET Apdex Score',
+    MetricType: 'bounded_ratio',
+    Direction: 'lower_is_bad',
+    Unit: '',
+    CurrentValue: 0.78,
+    History: [0.93, 0.92, 0.94, 0.91, 0.93, 0.90, 0.92, 0.91, 0.89, 0.90, 0.88, 0.87, 0.86, 0.85, 0.84, 0.83, 0.82, 0.80, 0.79, 0.78]
+  },
+  {
+    Category: 'Application Health',
+    Item: 'Unified Gateway Apdex',
+    MetricType: 'bounded_ratio',
+    Direction: 'lower_is_bad',
+    Unit: '',
+    CurrentValue: 0.88,
+    History: [0.96, 0.95, 0.96, 0.94, 0.95, 0.94, 0.93, 0.94, 0.93, 0.92, 0.93, 0.92, 0.91, 0.92, 0.91, 0.90, 0.90, 0.89, 0.89, 0.88]
+  },
+  {
+    Category: 'Self Service',
+    Item: 'Self-Serve Rate',
+    MetricType: 'bounded_ratio',
+    Direction: 'lower_is_bad',
+    Unit: '%',
+    CurrentValue: 0.58,
+    History: [0.73, 0.72, 0.74, 0.71, 0.73, 0.72, 0.70, 0.71, 0.69, 0.68, 0.67, 0.66, 0.65, 0.64, 0.63, 0.62, 0.61, 0.60, 0.59, 0.58]
+  },
+  {
+    Category: 'Telephony',
+    Item: 'Requests Per Minute',
+    MetricType: 'unbounded_count',
+    Direction: 'both',
+    Unit: 'rpm',
+    CurrentValue: 1850,
+    History: [1180, 1210, 1195, 1220, 1205, 1215, 1230, 1190, 1225, 1240, 1200, 1235, 1250, 1260, 1310, 1400, 1520, 1650, 1780, 1850]
+  }
+];
+
+/* ──────────────────────────────────────────
+   STATISTICAL FUNCTIONS
+   ────────────────────────────────────────── */
+
+/** Logit transform: maps (0,1) → (-∞, +∞) — required for bounded [0,1] metrics */
+function logit(p) {
+  const clamped = Math.max(0.001, Math.min(0.999, p)); // avoid log(0)
+  return Math.log(clamped / (1 - clamped));
+}
+
+/** Mean of array */
+function mean(arr) { return arr.reduce((s, v) => s + v, 0) / arr.length; }
+
+/** Sample standard deviation (Bessel-corrected, n-1) */
+function sampleSD(arr) {
+  const m = mean(arr);
+  const variance = arr.reduce((s, v) => s + (v - m) ** 2, 0) / (arr.length - 1);
+  return Math.sqrt(variance);
+}
+
+/** Median of array */
+function median(arr) {
+  const sorted = [...arr].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
+/** MAD (Median Absolute Deviation) — robust dispersion measure */
+function mad(arr) {
+  const med = median(arr);
+  const deviations = arr.map(v => Math.abs(v - med));
+  return median(deviations);
+}
+
+/**
+ * Linear regression slope (OLS) — proper trend detection
+ * Returns: { slope, rSquared, slopeNormalized }
+ *   slopeNormalized = slope / SD(y) → comparable across metrics
+ */
+function linearTrend(arr) {
+  const n = arr.length;
+  const xMean = (n - 1) / 2;
+  const yMean = mean(arr);
+  let num = 0, denX = 0, ssTot = 0;
+  for (let i = 0; i < n; i++) {
+    num += (i - xMean) * (arr[i] - yMean);
+    denX += (i - xMean) ** 2;
+    ssTot += (arr[i] - yMean) ** 2;
+  }
+  const slope = num / denX;
+  const ssRes = arr.reduce((s, y, i) => s + (y - (yMean + slope * (i - xMean))) ** 2, 0);
+  const rSquared = ssTot > 0 ? 1 - ssRes / ssTot : 0;
+  const sd = sampleSD(arr);
+  return { slope, rSquared, slopeNormalized: sd > 0 ? slope / sd : 0 };
+}
+
+/* ──────────────────────────────────────────
+   PREDICTIVE ANALYTICS: HOLT-WINTERS
+   Double Exponential Smoothing (additive trend, no seasonality)
+   ────────────────────────────────────────── */
+
+/**
+ * Holt-Winters Double Exponential Smoothing
+ * @param {number[]} data - Historical time series
+ * @param {number} alpha - Level smoothing (0-1). Higher = more reactive. Default 0.3
+ * @param {number} beta  - Trend smoothing (0-1). Higher = faster trend adaptation. Default 0.1
+ * @param {number} horizon - Number of periods to forecast
+ * @returns {{ fitted: number[], forecast: number[], level: number, trend: number, residuals: number[] }}
+ */
+function holtWinters(data, alpha = 0.3, beta = 0.1, horizon = 5) {
+  const n = data.length;
+  if (n < 3) return { fitted: [...data], forecast: Array(horizon).fill(data[n - 1]), level: data[n - 1], trend: 0, residuals: [] };
+
+  // Initialize: level = first value, trend = average of first 3 differences
+  let level = data[0];
+  let trend = (data[Math.min(2, n - 1)] - data[0]) / Math.min(2, n - 1);
+
+  const fitted = [level];
+  const residuals = [];
+
+  for (let i = 1; i < n; i++) {
+    const prevLevel = level;
+    const prevTrend = trend;
+    // Update level
+    level = alpha * data[i] + (1 - alpha) * (prevLevel + prevTrend);
+    // Update trend
+    trend = beta * (level - prevLevel) + (1 - beta) * prevTrend;
+    fitted.push(level + trend);
+    residuals.push(data[i] - (prevLevel + prevTrend));
+  }
+
+  // Forecast h steps ahead
+  const forecast = [];
+  for (let h = 1; h <= horizon; h++) {
+    forecast.push(level + h * trend);
+  }
+
+  return { fitted, forecast, level, trend, residuals };
+}
+
+/**
+ * Compute confidence intervals for Holt-Winters forecast
+ * Uses residual standard error scaled by √h (prediction interval widens over time)
+ * @returns {{ upper95: number[], lower95: number[], upper80: number[], lower80: number[], residualSE: number }}
+ */
+function forecastConfidence(residuals, forecast) {
+  if (residuals.length < 2) {
+    return {
+      upper95: forecast.map(f => f), lower95: forecast.map(f => f),
+      upper80: forecast.map(f => f), lower80: forecast.map(f => f), residualSE: 0
+    };
+  }
+  const se = Math.sqrt(residuals.reduce((s, r) => s + r * r, 0) / (residuals.length - 1));
+
+  return {
+    upper95: forecast.map((f, i) => f + 1.96 * se * Math.sqrt(i + 1)),
+    lower95: forecast.map((f, i) => f - 1.96 * se * Math.sqrt(i + 1)),
+    upper80: forecast.map((f, i) => f + 1.28 * se * Math.sqrt(i + 1)),
+    lower80: forecast.map((f, i) => f - 1.28 * se * Math.sqrt(i + 1)),
+    residualSE: se
+  };
+}
+
+/**
+ * Estimate time-to-breach: how many periods until forecast crosses the threshold
+ * For bounded_ratio: threshold is 0.7 (lower) or N/A
+ * For bounded_capacity: threshold is capacity × 0.95 (95% utilization)
+ * For unbounded_count: threshold is baseline median × 2 (double)
+ * @returns {{ periodsToBreak: number|null, breachValue: number, threshold: number, breachLabel: string }}
+ */
+function timeToBreachEstimate(metric, hwResult, baseline) {
+  const { forecast, level, trend } = hwResult;
+  let threshold, breachLabel;
+
+  if (metric.MetricType === 'bounded_ratio') {
+    if (metric.Direction === 'lower_is_bad') {
+      threshold = 0.70; // Industry-standard Apdex "poor" threshold
+      breachLabel = 'Apdex drops below 0.70 (Poor)';
+    } else {
+      threshold = 0.95;
+      breachLabel = 'Ratio exceeds 95%';
+    }
+  } else if (metric.MetricType === 'bounded_capacity') {
+    threshold = metric.Capacity * 0.95; // 95% utilization
+    breachLabel = `Utilization exceeds 95% (${Math.round(metric.Capacity * 0.95)}/${metric.Capacity})`;
+  } else {
+    // unbounded_count: 2× baseline median
+    const med = median(baseline);
+    threshold = med * 2;
+    breachLabel = `RPM exceeds 2× baseline (${Math.round(threshold)})`;
+  }
+
+  // Walk forward through forecast to find breach
+  // For 'lower_is_bad': breach when forecast DROPS below threshold
+  // For 'higher_is_bad' or 'both': breach when forecast EXCEEDS threshold
+  let periodsToBreak = null;
+
+  // Also extrapolate beyond the 5-step forecast using level + h*trend
+  const maxLookahead = 50; // up to 50 periods
+  for (let h = 1; h <= maxLookahead; h++) {
+    const projected = level + h * trend;
+    if (metric.Direction === 'lower_is_bad') {
+      if (projected < threshold) { periodsToBreak = h; break; }
+    } else {
+      if (projected > threshold) { periodsToBreak = h; break; }
+    }
+  }
+
+  // Already breached?
+  const currentlyBreached = metric.Direction === 'lower_is_bad'
+    ? metric.CurrentValue < threshold
+    : metric.CurrentValue > threshold;
+
+  return { periodsToBreak, threshold, breachLabel, currentlyBreached, forecastAtBreach: periodsToBreak ? level + periodsToBreak * trend : null };
+}
+
+/* ──────────────────────────────────────────
+   PRESCRIPTIVE ANALYTICS: ACTION ENGINE
+   Maps diagnostic + predictive results → recommended actions
+   ────────────────────────────────────────── */
+
+const ACTION_LIBRARY = {
+  'Nuance Port Usage': [
+    { condition: (a) => a.breach && a.breach.currentlyBreached, urgency: 'urgent', action: 'IMMEDIATE: Request emergency port capacity expansion from Nuance. Current utilization exceeds 95%. Engage vendor support hotline.', impact: 'Prevents call routing failures and customer abandonment.' },
+    { condition: (a) => a.breach && a.breach.periodsToBreak && a.breach.periodsToBreak <= 3, urgency: 'urgent', action: `ESCALATE: Port saturation projected within ${3} intervals. Initiate capacity expansion request. Reroute overflow to backup carrier.`, impact: 'Avoids saturation-induced call drops.' },
+    { condition: (a) => a.breach && a.breach.periodsToBreak && a.breach.periodsToBreak <= 10, urgency: 'moderate', action: 'PLAN: Schedule port capacity review with Nuance. Analyze peak-hour patterns. Consider dynamic port allocation policy.', impact: 'Proactive capacity management reduces incident risk by ~60%.' },
+    { condition: (a) => a.riskLevel !== 'Nominal', urgency: 'moderate', action: 'MONITOR: Port usage trending upward. Set up automated alerts at 85% and 90% utilization thresholds.', impact: 'Early warning enables proactive intervention.' },
+    { condition: () => true, urgency: 'monitor', action: 'MAINTAIN: Port usage within normal range. Continue monitoring cadence.', impact: 'No action required.' }
+  ],
+  '.NET Apdex Score': [
+    { condition: (a) => a.anomalyScore > SIGMA_CRITICAL && a.breach && a.breach.currentlyBreached, urgency: 'urgent', action: 'IMMEDIATE: .NET application performance critically degraded. Trigger APM deep-dive. Check for memory leaks, thread pool exhaustion, or downstream dependency failures. Engage .NET platform team.', impact: 'Prevents user-facing SLA breach.' },
+    { condition: (a) => a.anomalyScore > SIGMA_CRITICAL, urgency: 'urgent', action: 'ESCALATE: Apdex in critical zone. Run Dynatrace root-cause analysis. Isolate top 3 slowest transactions. Consider service restart if GC pressure is elevated.', impact: 'Direct correlation with customer satisfaction scores.' },
+    { condition: (a) => a.anomalyScore > SIGMA_ELEVATED, urgency: 'moderate', action: 'INVESTIGATE: Apdex declining steadily. Review recent deployment changes. Check infrastructure metrics (CPU, memory, I/O). Correlate with release calendar.', impact: 'Catch regression before it becomes customer-impacting.' },
+    { condition: (a) => a.trend && a.trend.slope < 0 && a.trend.rSquared > 0.5, urgency: 'moderate', action: 'PLAN: Negative trend detected in Apdex. Schedule performance profiling session. Review code-level hotspots in Dynatrace.', impact: 'Trend reversal at this stage is 3× cheaper than post-incident remediation.' },
+    { condition: () => true, urgency: 'monitor', action: 'MAINTAIN: .NET Apdex healthy. Continue standard APM monitoring.', impact: 'No action required.' }
+  ],
+  'Unified Gateway Apdex': [
+    { condition: (a) => a.anomalyScore > SIGMA_CRITICAL, urgency: 'urgent', action: 'IMMEDIATE: Unified Gateway performance degradation. Check gateway pod health, connection pool limits, and upstream SSL certificate status. Engage platform infrastructure team.', impact: 'Gateway is a single point of failure for all API traffic.' },
+    { condition: (a) => a.anomalyScore > SIGMA_ELEVATED, urgency: 'moderate', action: 'INVESTIGATE: Gateway Apdex declining. Review request queue depth, backend timeout rates, and TLS handshake latency. Check for certificate expiry warnings.', impact: 'Gateway issues cascade to all downstream services.' },
+    { condition: (a) => a.trend && a.trend.slope < 0 && a.trend.rSquared > 0.5, urgency: 'moderate', action: 'PLAN: Steady degradation trend. Evaluate gateway scaling policy. Review connection pool recycling intervals.', impact: 'Proactive scaling prevents cascading failures.' },
+    { condition: () => true, urgency: 'monitor', action: 'MAINTAIN: Gateway Apdex within bounds. Continue monitoring.', impact: 'No action required.' }
+  ],
+  'Self-Serve Rate': [
+    { condition: (a) => a.anomalyScore > SIGMA_CRITICAL && a.breach && a.breach.currentlyBreached, urgency: 'urgent', action: 'IMMEDIATE: Self-serve rate below 70% — high live-agent load. Check IVR menu availability, speech recognition accuracy, and knowledge base freshness. Alert workforce management for staffing adjustment.', impact: 'Every 1% drop in self-serve ≈ 200+ additional live agent calls/day.' },
+    { condition: (a) => a.anomalyScore > SIGMA_CRITICAL, urgency: 'urgent', action: 'ESCALATE: Self-serve rate critically low. Audit top 10 IVR exit points. Review NLU confidence scores. Check if recent FAQ/KB changes misrouted intents.', impact: 'Agent queue times increase exponentially below 65% self-serve.' },
+    { condition: (a) => a.anomalyScore > SIGMA_ELEVATED, urgency: 'moderate', action: 'INVESTIGATE: Self-serve declining. Analyze intent-level containment rates. Identify which user journeys are falling out to agents. A/B test IVR prompt changes.', impact: 'Targeted IVR fixes can recover 5-10% containment within a week.' },
+    { condition: (a) => a.trend && a.trend.slope < 0 && a.trend.rSquared > 0.5, urgency: 'moderate', action: 'PLAN: Consistent downward trend. Schedule CX team review of self-serve funnel. Update knowledge base articles for top 20 call drivers.', impact: 'Improving self-serve is the highest-ROI capacity lever.' },
+    { condition: () => true, urgency: 'monitor', action: 'MAINTAIN: Self-serve rate nominal. Continue monitoring containment rates by intent.', impact: 'No action required.' }
+  ],
+  'Requests Per Minute': [
+    { condition: (a) => a.anomalyScore > SIGMA_CRITICAL && a.trend && a.trend.slope > 0, urgency: 'urgent', action: 'IMMEDIATE: RPM spike detected with aggressive upward trend. Rule out DDoS/bot traffic. Check rate limiters. If legitimate, prepare horizontal auto-scaling. Alert NOC.', impact: 'Uncontrolled RPM growth causes cascading failures across all services.' },
+    { condition: (a) => a.anomalyScore > SIGMA_CRITICAL && a.trend && a.trend.slope < 0, urgency: 'urgent', action: 'IMMEDIATE: RPM critically low — potential outage upstream. Verify load balancer health, DNS resolution, and client-side connectivity. Check for ongoing incident.', impact: 'RPM drop may indicate customer-impacting outage.' },
+    { condition: (a) => a.anomalyScore > SIGMA_ELEVATED, urgency: 'moderate', action: 'INVESTIGATE: RPM outside normal band. Correlate with marketing campaigns, seasonal patterns, or infrastructure changes. Update baseline if organic growth confirmed.', impact: 'Distinguishing organic growth from anomalous traffic prevents false alerts.' },
+    { condition: () => true, urgency: 'monitor', action: 'MAINTAIN: RPM within expected range. Continue baseline calibration.', impact: 'No action required.' }
+  ]
+};
+
+/**
+ * Prescriptive engine: evaluate all conditions for a metric, return the FIRST matching action
+ * (conditions are ordered by severity — first match wins)
+ */
+function getPrescription(metricName, analysisContext) {
+  const actions = ACTION_LIBRARY[metricName];
+  if (!actions) return { urgency: 'monitor', action: 'No prescriptive rules configured for this metric.', impact: 'N/A' };
+
+  for (const rule of actions) {
+    if (rule.condition(analysisContext)) {
+      return { urgency: rule.urgency, action: rule.action, impact: rule.impact };
+    }
+  }
+  return actions[actions.length - 1]; // fallback to last (always-true) rule
+}
+
+/**
+ * Compute anomaly Z-score based on metric type
+ * Uses the BASELINE PERIOD (first 70% of history) to establish μ and σ,
+ * then evaluates the CURRENT value against that baseline.
+ */
+function computeAnomaly(metric) {
+  const hist = metric.History;
+  const baselineEnd = Math.floor(hist.length * 0.7);
+  const baseline = hist.slice(0, baselineEnd);
+  const current = metric.CurrentValue;
+
+  let zScore, baselineMu, baselineSigma, method;
+
+  if (metric.MetricType === 'bounded_ratio') {
+    // Logit-transform: map [0,1] → ℝ, then standard Z-score
+    const transformed = baseline.map(logit);
+    baselineMu = mean(transformed);
+    baselineSigma = sampleSD(transformed);
+    const currentTransformed = logit(current);
+    zScore = baselineSigma > 0 ? (currentTransformed - baselineMu) / baselineSigma : 0;
+    method = 'Logit-Z';
+  }
+  else if (metric.MetricType === 'bounded_capacity') {
+    // Convert to utilization ratio, then logit-transform
+    const cap = metric.Capacity;
+    const ratios = baseline.map(v => v / cap);
+    const transformed = ratios.map(logit);
+    baselineMu = mean(transformed);
+    baselineSigma = sampleSD(transformed);
+    const currentTransformed = logit(current / cap);
+    zScore = baselineSigma > 0 ? (currentTransformed - baselineMu) / baselineSigma : 0;
+    method = 'Capacity-Logit-Z';
+  }
+  else if (metric.MetricType === 'unbounded_count') {
+    // Median + MAD (robust to skew / outliers)
+    const med = median(baseline);
+    const madVal = mad(baseline);
+    const consistencyConst = 1.4826; // for normal equivalence
+    const adjustedMAD = consistencyConst * madVal;
+    baselineMu = med;
+    baselineSigma = adjustedMAD;
+    zScore = adjustedMAD > 0 ? (current - med) / adjustedMAD : 0;
+    method = 'Median-MAD';
+  }
+
+  // Apply directionality — only flag anomalies in the "bad" direction
+  if (metric.Direction === 'lower_is_bad') {
+    zScore = -zScore; // flip: negative Z (drop) becomes positive anomaly score
+  } else if (metric.Direction === 'both') {
+    zScore = Math.abs(zScore); // both tails
+  }
+  // 'higher_is_bad' → keep zScore as-is (positive = bad)
+
+  const trend = linearTrend(hist);
+
+  // ── PREDICTIVE: Holt-Winters Forecast ──
+  const hw = holtWinters(hist, 0.3, 0.1, 5);
+  const confidence = forecastConfidence(hw.residuals, hw.forecast);
+  const breach = timeToBreachEstimate(metric, hw, baseline);
+
+  // ── PRESCRIPTIVE: Action Recommendation ──
+  const prescriptionContext = {
+    anomalyScore: Math.abs(zScore),
+    riskLevel: Math.abs(zScore) > SIGMA_CRITICAL ? 'Critical' : Math.abs(zScore) > SIGMA_ELEVATED ? 'Elevated' : 'Nominal',
+    trend,
+    breach,
+    currentValue: current
+  };
+  const prescription = getPrescription(metric.Item, prescriptionContext);
+
+  return { zScore, baselineMu, baselineSigma, method, trend, hw, confidence, breach, prescription };
+}
+
+/* ──────────────────────────────────────────
+   RISK COMMENTARY (direction-aware)
+   ────────────────────────────────────────── */
+
+function getRiskCommentary(metric, analysis) {
+  const { zScore, trend } = analysis;
+  const absZ = Math.abs(zScore);
+  let risk;
+
+  if (absZ > SIGMA_CRITICAL) {
+    risk = { level: 'Critical', class: 'risk-high', text: `Extreme anomaly (Bonferroni-adjusted p < ${BONFERRONI_ALPHA.toFixed(3)}).` };
+  } else if (absZ > SIGMA_ELEVATED) {
+    risk = { level: 'Elevated', class: 'risk-med', text: `Significant deviation beyond adjusted threshold.` };
+  } else {
+    risk = { level: 'Nominal', class: 'risk-low', text: `Within expected statistical range.` };
+  }
+
+  // Trend commentary from regression
+  let trendText;
+  const slopeDir = trend.slope > 0 ? 'increasing' : 'decreasing';
+  if (trend.rSquared > 0.85) {
+    trendText = `Strong linear trend ${slopeDir} (R²=${trend.rSquared.toFixed(2)}).`;
+  } else if (trend.rSquared > 0.5) {
+    trendText = `Moderate ${slopeDir} trend (R²=${trend.rSquared.toFixed(2)}).`;
+  } else {
+    trendText = `No significant trend pattern (R²=${trend.rSquared.toFixed(2)}).`;
+  }
+
+  // Directionality context
+  let dirText = '';
+  if (metric.Direction === 'lower_is_bad' && metric.CurrentValue < mean(metric.History.slice(0, Math.floor(metric.History.length * 0.7)))) {
+    dirText = ' ▼ Value is below baseline (degradation).';
+  } else if (metric.Direction === 'higher_is_bad' && metric.CurrentValue > mean(metric.History.slice(0, Math.floor(metric.History.length * 0.7)))) {
+    dirText = ' ▲ Value exceeds baseline (approaching capacity).';
+  }
+
+  return `<span class="risk-indicator ${risk.class}">${risk.level}:</span> ${risk.text} ${trendText}${dirText}`;
+}
+
+/* ──────────────────────────────────────────
+   SPARKLINE (color-coded by risk)
+   ────────────────────────────────────────── */
+
+function generateSparklineWithForecast(data, forecast, confidence, riskClass) {
+  const allValues = [...data, ...forecast, ...(confidence.upper95 || [])];
+  const min = Math.min(...allValues); const max = Math.max(...allValues);
+  const range = max - min; const totalLen = data.length + forecast.length;
+  const width = 100; const height = 30;
+
+  const scale = (v, i) => `${(i / (totalLen - 1)) * width},${height - ((v - min) / (range || 1)) * height}`;
+
+  // Historical path (solid)
+  const histPoints = data.map((v, i) => scale(v, i)).join(' L ');
+  const color = riskClass === 'risk-high' ? '#dc2626' : riskClass === 'risk-med' ? '#d97706' : '#6b7280';
+
+  // Forecast path (dashed)
+  const fStart = scale(data[data.length - 1], data.length - 1);
+  const forecastPoints = forecast.map((v, i) => scale(v, data.length + i)).join(' L ');
+
+  // Confidence band (shaded area)
+  const upper = (confidence.upper95 || forecast).map((v, i) => scale(v, data.length + i));
+  const lower = (confidence.lower95 || forecast).map((v, i) => scale(v, data.length + i)).reverse();
+  const bandPoints = [scale(data[data.length - 1], data.length - 1), ...upper, ...lower, scale(data[data.length - 1], data.length - 1)].join(' L ');
+
+  // Divider line at forecast start
+  const divX = ((data.length - 1) / (totalLen - 1)) * width;
+
+  return `<svg class="trend-svg" viewBox="0 0 ${width} ${height}" style="stroke:${color}">
+    <path d="M ${bandPoints}" fill="${color}" fill-opacity="0.08" stroke="none" />
+    <path d="M ${histPoints}" />
+    <path d="M ${fStart} L ${forecastPoints}" class="forecast-zone" />
+    <line x1="${divX}" y1="0" x2="${divX}" y2="${height}" stroke="#d1d5db" stroke-width="1" stroke-dasharray="2 2" />
+  </svg>`;
+}
+
+/** Format value for display based on metric type */
+function formatValue(val, metric) {
+  if (metric.MetricType === 'bounded_ratio' && metric.Unit === '%') return (val * 100).toFixed(1) + '%';
+  if (metric.MetricType === 'bounded_ratio') return val.toFixed(3);
+  if (metric.MetricType === 'bounded_capacity') return `${val} / ${metric.Capacity}`;
+  return val.toLocaleString();
+}
+
+/* ──────────────────────────────────────────
+   RENDER UI
+   ────────────────────────────────────────── */
+
+function renderUI(data) {
+  const content = document.getElementById('exec-content');
+  const glow = document.getElementById('status-glow');
+  const headerText = document.getElementById('header-text');
+  const controls = document.getElementById('global-controls');
+
+  // Compute anomalies for all metrics
+  const results = data.map(m => ({ metric: m, analysis: computeAnomaly(m) }));
+  const anomalies = results.filter(r => Math.abs(r.analysis.zScore) > SIGMA_ELEVATED);
+
+  if (anomalies.length === 0) {
+    glow.className = "glow-dot glow-success";
+    headerText.innerText = "Systems Health: Optimal";
+    content.innerHTML = `<div class="success-state"><h2 style="color:var(--success)">✓ All Systems Operational</h2><p>All ${data.length} metrics within Bonferroni-adjusted thresholds (α = ${BONFERRONI_ALPHA.toFixed(3)} per metric).</p></div>`;
+    return;
+  }
+
+  const hasCritical = anomalies.some(r => Math.abs(r.analysis.zScore) > SIGMA_CRITICAL);
+  glow.className = `glow-dot ${hasCritical ? 'glow-warning' : 'glow-warning'}`;
+  headerText.innerText = `${anomalies.length} of ${data.length} Metrics Anomalous`;
+  controls.innerHTML = `
+    <span style="font-size:10px; color:var(--text-muted); margin-right:10px;">Bonferroni α=${BONFERRONI_ALPHA.toFixed(3)} | σ_crit=${SIGMA_CRITICAL} | σ_elev=${SIGMA_ELEVATED}</span>
+    <button onclick="toggleAll()" style="color:var(--risk-low); background:none; border:none; cursor:pointer; font-size:12px; font-weight:700;">Expand All</button>`;
+
+  // Group by category
+  const grouped = results.reduce((acc, r) => {
+    const cat = r.metric.Category;
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(r);
+    return acc;
+  }, {});
+
+  content.innerHTML = Object.entries(grouped).map(([cat, items]) => {
+    const catAnomalyCount = items.filter(r => Math.abs(r.analysis.zScore) > SIGMA_ELEVATED).length;
+    const catBreachCount = items.filter(r => r.analysis.breach && (r.analysis.breach.currentlyBreached || (r.analysis.breach.periodsToBreak && r.analysis.breach.periodsToBreak <= 5))).length;
+    return `
+    <div class="category-box" id="cat-${cat.replace(/\s+/g, '')}">
+      <button class="category-header" onclick="toggleCat('${cat.replace(/\s+/g, '')}')">
+        <span style="font-weight:700; font-size:15px">${cat}</span>
+        <span style="font-size:11px; color:${catAnomalyCount > 0 ? 'var(--risk-high)' : 'var(--text-muted)'}; font-weight:700;">
+          ${items.length} METRIC${items.length > 1 ? 'S' : ''}
+          ${catAnomalyCount > 0 ? `· ${catAnomalyCount} ANOMAL${catAnomalyCount > 1 ? 'IES' : 'Y'}` : '· ALL NOMINAL'}
+          ${catBreachCount > 0 ? `· ${catBreachCount} BREACH WARNING${catBreachCount > 1 ? 'S' : ''}` : ''}
+        </span>
+      </button>
+      <div class="item-list">
+        <!-- TIER LABELS -->
+        <div class="tier-labels">
+          <div></div>
+          <div><span class="tier-label tier-descriptive">Descriptive</span> <span class="tier-label tier-diagnostic">Diagnostic</span></div>
+          <div><span class="tier-label tier-diagnostic">Diagnostic</span></div>
+          <div><span class="tier-label tier-predictive">Predictive</span></div>
+          <div><span class="tier-label tier-prescriptive">Prescriptive</span></div>
+        </div>
+        ${items.map(({ metric: m, analysis: a }) => {
+          const absZ = Math.abs(a.zScore);
+          const riskClass = absZ > SIGMA_CRITICAL ? 'risk-high' : absZ > SIGMA_ELEVATED ? 'risk-med' : 'risk-low';
+          const dirArrow = m.Direction === 'lower_is_bad' ? '▼' : m.Direction === 'higher_is_bad' ? '▲' : '↕';
+
+          // Prediction card styling
+          const predClass = a.breach.currentlyBreached ? 'critical' : (a.breach.periodsToBreak && a.breach.periodsToBreak <= 5) ? 'warning' : '';
+
+          // Format forecast display value
+          const fmtForecast = (v) => {
+            if (m.MetricType === 'bounded_ratio' && m.Unit === '%') return (Math.max(0, Math.min(1, v)) * 100).toFixed(1) + '%';
+            if (m.MetricType === 'bounded_ratio') return Math.max(0, Math.min(1, v)).toFixed(3);
+            if (m.MetricType === 'bounded_capacity') return Math.round(Math.max(0, v)).toLocaleString();
+            return Math.round(Math.max(0, v)).toLocaleString();
+          };
+
+          // Prescription display
+          const rx = a.prescription;
+
+          return `
+            <div class="item-row">
+              <!-- COL 1: METRIC NAME -->
+              <div class="item-name">
+                ${m.Item}
+                <span style="font-size:9px; color:var(--text-muted); display:block; margin-top:2px;">
+                  ${a.method} | ${dirArrow} ${m.Direction.replace(/_/g, ' ')}
+                </span>
+              </div>
+
+              <!-- COL 2: DESCRIPTIVE + DIAGNOSTIC (Current, Baseline, Trend) -->
+              <div class="tier-cell">
+                <div class="tier-cell-row">
+                  <div><span class="m-label">Current</span><span class="m-value">${formatValue(m.CurrentValue, m)}</span></div>
+                  <div><span class="m-label">Baseline μ</span><span class="m-value">${a.method.includes('Logit') ? 'logit:' + a.baselineMu.toFixed(2) : a.baselineMu.toFixed(1)}</span></div>
+                </div>
+                <div><span class="m-label">Trend (n=${m.History.length})</span>
+                ${generateSparklineWithForecast(m.History, a.hw.forecast, a.confidence, riskClass)}
+                </div>
+              </div>
+
+              <!-- COL 3: DIAGNOSTIC (Risk Score + Commentary) -->
+              <div class="tier-cell">
+                <div><span class="m-label">Anomaly Score</span><span class="sigma-tag ${riskClass}">${a.zScore.toFixed(2)}σ</span></div>
+                <div class="commentary-text" style="margin-top:4px;">
+                  <span class="m-label">Risk</span>
+                  ${getRiskCommentary(m, a)}
+                </div>
+              </div>
+
+              <!-- COL 4: PREDICTIVE (Forecast, Confidence, Time-to-Breach) -->
+              <div class="tier-cell">
+                <div class="prediction-card ${predClass}">
+                  <span class="m-label" style="color:#5b21b6;">Holt-Winters Forecast (5 periods)</span>
+                  <div style="font-size:12px; font-weight:600;">
+                    Next: ${fmtForecast(a.hw.forecast[0])} → ${fmtForecast(a.hw.forecast[4])}
+                  </div>
+                  <div class="confidence-band">
+                    95% CI: [${fmtForecast(a.confidence.lower95[4])}, ${fmtForecast(a.confidence.upper95[4])}]
+                  </div>
+                  <div style="font-size:11px; margin-top:3px; font-weight:600; color:${a.breach.currentlyBreached ? 'var(--risk-high)' : a.breach.periodsToBreak && a.breach.periodsToBreak <= 5 ? 'var(--risk-med)' : 'var(--text-sub)'}">
+                    ${a.breach.currentlyBreached
+                      ? '⚠ ALREADY BREACHED: ' + a.breach.breachLabel
+                      : a.breach.periodsToBreak
+                        ? '⏱ Breach in ~' + a.breach.periodsToBreak + ' periods: ' + a.breach.breachLabel
+                        : '✓ No breach projected within forecast horizon'
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- COL 5: PRESCRIPTIVE (Recommended Action) -->
+              <div class="tier-cell">
+                <div class="action-card ${rx.urgency === 'urgent' ? 'urgent' : rx.urgency === 'moderate' ? 'moderate' : ''}">
+                  <span class="action-tag ${rx.urgency}">${rx.urgency}</span>
+                  <div style="font-size:11px; line-height:1.4; font-weight:500;">${rx.action}</div>
+                  <div style="font-size:10px; color:var(--text-muted); margin-top:3px;"><strong>Impact:</strong> ${rx.impact}</div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+  }).join('');
+}
+
+function toggleCat(id) { document.getElementById(`cat-${id}`).classList.toggle('is-open'); }
+function toggleAll() {
+  const boxes = document.querySelectorAll('.category-box');
+  const anyOpen = Array.from(boxes).some(b => b.classList.contains('is-open'));
+  boxes.forEach(b => anyOpen ? b.classList.remove('is-open') : b.classList.add('is-open'));
+}
+
+renderUI(mockData);
+</script>

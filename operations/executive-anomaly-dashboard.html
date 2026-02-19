@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operations Health — Executive Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   EXECUTIVE LIGHT THEME — DESIGN TOKENS
+   ═══════════════════════════════════════════════════════════ */
+:root {
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Surfaces */
+  --bg-page:    #f8f9fb;
+  --bg-card:    #ffffff;
+  --bg-header:  #ffffff;
+  --bg-hover:   #f3f4f8;
+  --bg-inset:   #f1f3f7;
+
+  /* Borders */
+  --border:        #e4e7ec;
+  --border-light:  #f0f1f4;
+  --border-focus:  #94a3b8;
+
+  /* Text */
+  --text-primary:    #0f172a;
+  --text-secondary:  #475569;
+  --text-tertiary:   #94a3b8;
+  --text-inverse:    #ffffff;
+
+  /* Status Colors */
+  --critical:       #dc2626;
+  --critical-bg:    #fef2f2;
+  --critical-border:#fecaca;
+  --critical-text:  #991b1b;
+
+  --elevated:       #d97706;
+  --elevated-bg:    #fffbeb;
+  --elevated-border:#fde68a;
+  --elevated-text:  #92400e;
+
+  --nominal:        #059669;
+  --nominal-bg:     #ecfdf5;
+  --nominal-border: #a7f3d0;
+  --nominal-text:   #065f46;
+
+  --info:           #2563eb;
+  --info-bg:        #eff6ff;
+  --info-border:    #bfdbfe;
+  --info-text:      #1e40af;
+
+  /* Accent */
+  --accent:         #4f46e5;
+  --accent-light:   #eef2ff;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+
+  /* Spacing */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESET & BASE
+   ═══════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font);
+  background: var(--bg-page);
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PAGE LAYOUT
+   ═══════════════════════════════════════════════════════════ */
+.dashboard {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 28px 32px 60px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HEADER
+   ═══════════════════════════════════════════════════════════ */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.page-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+}
+.page-header .subtitle {
+  font-size: 0.82rem;
+  color: var(--text-tertiary);
+  margin-top: 3px;
+  font-weight: 400;
+}
+.header-meta {
+  text-align: right;
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+}
+.header-meta .timestamp { font-weight: 600; color: var(--text-secondary); }
+
+/* ═══════════════════════════════════════════════════════════
+   EXECUTIVE SUMMARY BANNER
+   ═══════════════════════════════════════════════════════════ */
+.summary-banner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 24px;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px 28px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-card);
+}
+
+.summary-status {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.status-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.status-dot.critical { background: var(--critical); box-shadow: 0 0 0 4px var(--critical-bg), 0 0 12px rgba(220,38,38,0.3); }
+.status-dot.elevated { background: var(--elevated); box-shadow: 0 0 0 4px var(--elevated-bg), 0 0 12px rgba(217,119,6,0.3); }
+.status-dot.nominal  { background: var(--nominal);  box-shadow: 0 0 0 4px var(--nominal-bg),  0 0 12px rgba(5,150,105,0.3); }
+
+.status-text { font-size: 1.15rem; font-weight: 700; }
+.status-sub  { font-size: 0.78rem; color: var(--text-secondary); margin-top: 1px; }
+
+.summary-counts {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+.count-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+.count-pill .count-num {
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.count-pill.critical-pill { background: var(--critical-bg); color: var(--critical-text); }
+.count-pill.elevated-pill { background: var(--elevated-bg); color: var(--elevated-text); }
+.count-pill.nominal-pill  { background: var(--nominal-bg);  color: var(--nominal-text); }
+
+.summary-top-risk {
+  text-align: right;
+  max-width: 300px;
+}
+.top-risk-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  margin-bottom: 3px;
+}
+.top-risk-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+.top-risk-text strong { color: var(--text-primary); }
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION: TWO-COLUMN LAYOUT
+   ═══════════════════════════════════════════════════════════ */
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   METRIC CARDS
+   ═══════════════════════════════════════════════════════════ */
+.metric-cards { display: flex; flex-direction: column; gap: 16px; }
+
+.metric-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.metric-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-focus);
+}
+
+/* Card Header */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 22px 14px;
+  border-bottom: 1px solid var(--border-light);
+}
+.card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.card-category {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  margin-top: 2px;
+}
+.risk-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+.risk-badge.critical { background: var(--critical-bg); color: var(--critical-text); border: 1px solid var(--critical-border); }
+.risk-badge.elevated { background: var(--elevated-bg); color: var(--elevated-text); border: 1px solid var(--elevated-border); }
+.risk-badge.nominal  { background: var(--nominal-bg);  color: var(--nominal-text);  border: 1px solid var(--nominal-border); }
+
+/* Card Body */
+.card-body { padding: 16px 22px 8px; }
+
+/* KPI Row */
+.kpi-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 160px;
+  gap: 16px;
+  align-items: end;
+}
+.kpi-block { min-width: 0; }
+.kpi-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  margin-bottom: 3px;
+}
+.kpi-value {
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+.kpi-value.critical { color: var(--critical); }
+.kpi-value.elevated { color: var(--elevated); }
+.kpi-value.nominal  { color: var(--nominal); }
+
+.kpi-context {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* Sparkline Container */
+.sparkline-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.sparkline-label {
+  font-size: 0.62rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.sparkline-svg {
+  width: 160px;
+  height: 48px;
+}
+
+/* Narrative Block */
+.narrative-block {
+  padding: 14px 22px 16px;
+  border-top: 1px solid var(--border-light);
+}
+.narrative-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.narrative-item:last-child { margin-bottom: 0; }
+.narrative-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  margin-top: 1px;
+}
+.narrative-icon.trend  { background: var(--info-bg);     color: var(--info); }
+.narrative-icon.forecast { background: var(--accent-light); color: var(--accent); }
+.narrative-icon.breach { background: var(--critical-bg); color: var(--critical); }
+.narrative-icon.ok     { background: var(--nominal-bg);  color: var(--nominal); }
+.narrative-icon.warn   { background: var(--elevated-bg); color: var(--elevated); }
+
+.narrative-text {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+.narrative-text strong { color: var(--text-primary); font-weight: 600; }
+
+/* Forecast Row */
+.forecast-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 12px 22px 14px;
+  background: var(--bg-inset);
+  border-top: 1px solid var(--border-light);
+}
+.forecast-chip {
+  text-align: center;
+}
+.forecast-chip-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: var(--text-tertiary);
+}
+.forecast-chip-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-top: 1px;
+}
+.forecast-chip-ci {
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  margin-top: 1px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ACTION PANEL (Right Column)
+   ═══════════════════════════════════════════════════════════ */
+.action-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  position: sticky;
+  top: 28px;
+}
+
+.action-panel-header {
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.action-panel-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.action-panel-subtitle {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+.action-group { padding: 14px 18px; }
+.action-group + .action-group { border-top: 1px solid var(--border-light); }
+
+.action-group-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+.action-group-label.urgent  { color: var(--critical-text); }
+.action-group-label.moderate { color: var(--elevated-text); }
+.action-group-label.monitor  { color: var(--info-text); }
+
+.urgency-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.urgency-dot.urgent   { background: var(--critical); }
+.urgency-dot.moderate  { background: var(--elevated); }
+.urgency-dot.monitor   { background: var(--info); }
+
+.action-item {
+  background: var(--bg-page);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  transition: border-color 0.15s;
+}
+.action-item:last-child { margin-bottom: 0; }
+.action-item:hover { border-color: var(--border-focus); }
+.action-item.urgent  { border-left: 3px solid var(--critical); }
+.action-item.moderate { border-left: 3px solid var(--elevated); }
+.action-item.monitor  { border-left: 3px solid var(--info); }
+
+.action-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.action-item-metric {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.action-item-value {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+.action-item-text {
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+.action-item-impact {
+  font-size: 0.7rem;
+  line-height: 1.45;
+  color: var(--text-tertiary);
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border-light);
+}
+.action-item-impact strong { color: var(--text-secondary); font-weight: 600; }
+
+/* Breach tag */
+.breach-tag {
+  display: inline-block;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-bottom: 5px;
+}
+.breach-tag.imminent  { background: var(--critical-bg); color: var(--critical-text); }
+.breach-tag.projected { background: var(--elevated-bg); color: var(--elevated-text); }
+.breach-tag.breached  { background: var(--critical);    color: var(--text-inverse); }
+
+/* ═══════════════════════════════════════════════════════════
+   ALL-CLEAR STATE
+   ═══════════════════════════════════════════════════════════ */
+.all-clear {
+  text-align: center;
+  padding: 80px 40px;
+  background: var(--bg-card);
+  border: 1px dashed var(--nominal-border);
+  border-radius: var(--radius-xl);
+}
+.all-clear-icon { font-size: 3rem; margin-bottom: 12px; }
+.all-clear h2 { font-size: 1.2rem; font-weight: 700; color: var(--nominal); }
+.all-clear p { font-size: 0.85rem; color: var(--text-secondary); margin-top: 6px; }
+
+/* ═══════════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════════ */
+.dashboard-footer {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+}
+.footer-method-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+.method-tag {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.65rem;
+}
+.method-tag.descriptive  { background: #eff6ff; color: #1d4ed8; }
+.method-tag.diagnostic   { background: #fef3c7; color: #92400e; }
+.method-tag.predictive   { background: #ede9fe; color: #5b21b6; }
+.method-tag.prescriptive { background: #ecfdf5; color: #065f46; }
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .content-grid { grid-template-columns: 1fr; }
+  .action-panel { position: static; }
+  .summary-banner { grid-template-columns: 1fr; gap: 16px; }
+  .summary-top-risk { text-align: left; max-width: none; }
+}
+@media (max-width: 640px) {
+  .dashboard { padding: 16px; }
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+  .sparkline-container { align-items: flex-start; grid-column: span 2; }
+  .forecast-row { grid-template-columns: 1fr; }
+  .summary-counts { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<div class="dashboard" id="dashboard"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   DATA MODEL — Same mock data as sticky_component.html
+   ═══════════════════════════════════════════════════════════ */
+
+const NUM_METRICS = 5;
+const BONFERRONI_ALPHA = 0.05 / NUM_METRICS;
+const SIGMA_CRITICAL = 3.09;
+const SIGMA_ELEVATED = 2.33;
+
+const metrics = [
+  {
+    id: 'nuance_port_usage',
+    name: 'Nuance Port Usage',
+    category: 'Telephony',
+    type: 'bounded_capacity',
+    direction: 'higher_is_bad',
+    capacity: 500,
+    unit: 'ports',
+    current: 472,
+    history: [310,325,318,340,335,328,342,350,355,360,368,375,380,390,398,410,425,440,458,472]
+  },
+  {
+    id: 'net_apdex',
+    name: '.NET Apdex Score',
+    category: 'Application Health',
+    type: 'bounded_ratio',
+    direction: 'lower_is_bad',
+    unit: 'apdex',
+    current: 0.78,
+    history: [0.93,0.92,0.94,0.91,0.93,0.90,0.92,0.91,0.89,0.90,0.88,0.87,0.86,0.85,0.84,0.83,0.82,0.80,0.79,0.78]
+  },
+  {
+    id: 'ugw_apdex',
+    name: 'Unified Gateway Apdex',
+    category: 'Application Health',
+    type: 'bounded_ratio',
+    direction: 'lower_is_bad',
+    unit: 'apdex',
+    current: 0.88,
+    history: [0.96,0.95,0.96,0.94,0.95,0.94,0.93,0.94,0.93,0.92,0.93,0.92,0.91,0.92,0.91,0.90,0.90,0.89,0.89,0.88]
+  },
+  {
+    id: 'self_serve_rate',
+    name: 'Self-Serve Rate',
+    category: 'Self Service',
+    type: 'bounded_ratio',
+    direction: 'lower_is_bad',
+    unit: '%',
+    current: 0.58,
+    history: [0.73,0.72,0.74,0.71,0.73,0.72,0.70,0.71,0.69,0.68,0.67,0.66,0.65,0.64,0.63,0.62,0.61,0.60,0.59,0.58]
+  },
+  {
+    id: 'rpm',
+    name: 'Requests Per Minute',
+    category: 'Telephony',
+    type: 'unbounded_count',
+    direction: 'both',
+    unit: 'rpm',
+    current: 1850,
+    history: [1180,1210,1195,1220,1205,1215,1230,1190,1225,1240,1200,1235,1250,1260,1310,1400,1520,1650,1780,1850]
+  }
+];
+
+/* ═══════════════════════════════════════════════════════════
+   STATISTICAL ENGINE (identical to §15 PySpark logic)
+   ═══════════════════════════════════════════════════════════ */
+
+function logit(p) {
+  const c = Math.max(0.001, Math.min(0.999, p));
+  return Math.log(c / (1 - c));
+}
+function mean(a) { return a.reduce((s, v) => s + v, 0) / a.length; }
+function sampleSD(a) {
+  const m = mean(a);
+  return Math.sqrt(a.reduce((s, v) => s + (v - m) ** 2, 0) / (a.length - 1));
+}
+function median(a) {
+  const s = [...a].sort((x, y) => x - y);
+  const m = Math.floor(s.length / 2);
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+}
+function mad(a) {
+  const med = median(a);
+  return median(a.map(v => Math.abs(v - med)));
+}
+
+function linearTrend(arr) {
+  const n = arr.length, xm = (n - 1) / 2, ym = mean(arr);
+  let num = 0, den = 0, ssTot = 0;
+  for (let i = 0; i < n; i++) {
+    num += (i - xm) * (arr[i] - ym);
+    den += (i - xm) ** 2;
+    ssTot += (arr[i] - ym) ** 2;
+  }
+  const slope = den > 0 ? num / den : 0;
+  const ssRes = arr.reduce((s, y, i) => s + (y - (ym + slope * (i - xm))) ** 2, 0);
+  const r2 = ssTot > 0 ? 1 - ssRes / ssTot : 0;
+  const sd = sampleSD(arr);
+  return { slope, rSquared: r2, slopeNorm: sd > 0 ? slope / sd : 0 };
+}
+
+function holtWinters(data, alpha = 0.3, beta = 0.1, horizon = 5) {
+  const n = data.length;
+  if (n < 3) return { fitted: [...data], forecast: Array(horizon).fill(data[n - 1]), level: data[n - 1], trend: 0, residuals: [] };
+  let level = data[0];
+  let trend = (data[Math.min(2, n - 1)] - data[0]) / Math.min(2, n - 1);
+  const fitted = [level], residuals = [];
+  for (let i = 1; i < n; i++) {
+    const pL = level, pT = trend;
+    level = alpha * data[i] + (1 - alpha) * (pL + pT);
+    trend = beta * (level - pL) + (1 - beta) * pT;
+    fitted.push(level + trend);
+    residuals.push(data[i] - (pL + pT));
+  }
+  const forecast = [];
+  for (let h = 1; h <= horizon; h++) forecast.push(level + h * trend);
+  return { fitted, forecast, level, trend, residuals };
+}
+
+function forecastCI(residuals, forecast) {
+  if (residuals.length < 2) return { u95: [...forecast], l95: [...forecast], u80: [...forecast], l80: [...forecast], se: 0 };
+  const se = Math.sqrt(residuals.reduce((s, r) => s + r * r, 0) / (residuals.length - 1));
+  return {
+    u95: forecast.map((f, i) => f + 1.96 * se * Math.sqrt(i + 1)),
+    l95: forecast.map((f, i) => f - 1.96 * se * Math.sqrt(i + 1)),
+    u80: forecast.map((f, i) => f + 1.28 * se * Math.sqrt(i + 1)),
+    l80: forecast.map((f, i) => f - 1.28 * se * Math.sqrt(i + 1)),
+    se
+  };
+}
+
+function timeToBreach(metric, hw, baseline) {
+  let threshold, label;
+  if (metric.type === 'bounded_ratio') {
+    if (metric.direction === 'lower_is_bad') { threshold = 0.70; label = 'Below "Poor" threshold (0.70)'; }
+    else { threshold = 0.95; label = 'Exceeds 95%'; }
+  } else if (metric.type === 'bounded_capacity') {
+    threshold = metric.capacity * 0.95;
+    label = `Exceeds 95% capacity (${Math.round(threshold)}/${metric.capacity})`;
+  } else {
+    const med = median(baseline);
+    threshold = med * 2;
+    label = `Exceeds 2× baseline (${Math.round(threshold)} rpm)`;
+  }
+  let periods = null;
+  for (let h = 1; h <= 50; h++) {
+    const proj = hw.level + h * hw.trend;
+    if (metric.direction === 'lower_is_bad' ? proj < threshold : proj > threshold) { periods = h; break; }
+  }
+  const breached = metric.direction === 'lower_is_bad' ? metric.current < threshold : metric.current > threshold;
+  return { periods, threshold, label, breached, forecastAtBreach: periods ? hw.level + periods * hw.trend : null };
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PRESCRIPTIVE ACTION LIBRARY
+   ═══════════════════════════════════════════════════════════ */
+
+const ACTIONS = {
+  nuance_port_usage: [
+    { cond: c => c.breach.breached, urg: 'urgent', act: 'Request emergency port capacity expansion from Nuance. Current utilization exceeds 95%. Engage vendor support hotline.', impact: 'Prevents call routing failures and customer abandonment.' },
+    { cond: c => c.breach.periods && c.breach.periods <= 3, urg: 'urgent', act: 'Port saturation projected imminently. Initiate capacity expansion. Reroute overflow to backup carrier.', impact: 'Avoids saturation-induced call drops.' },
+    { cond: c => c.breach.periods && c.breach.periods <= 10, urg: 'moderate', act: 'Schedule port capacity review with Nuance. Analyze peak-hour patterns. Consider dynamic port allocation.', impact: 'Proactive capacity management reduces incident risk by ~60%.' },
+    { cond: c => c.risk !== 'Nominal', urg: 'moderate', act: 'Set up automated alerts at 85% and 90% utilization thresholds.', impact: 'Early warning enables proactive intervention.' },
+    { cond: () => true, urg: 'monitor', act: 'Port usage within normal range. Continue standard monitoring.', impact: 'No action required.' }
+  ],
+  net_apdex: [
+    { cond: c => c.absZ > SIGMA_CRITICAL && c.breach.breached, urg: 'urgent', act: 'Trigger APM deep-dive. Check memory leaks, thread pool exhaustion. Engage .NET platform team.', impact: 'Prevents user-facing SLA breach.' },
+    { cond: c => c.absZ > SIGMA_CRITICAL, urg: 'urgent', act: 'Run Dynatrace root-cause analysis. Isolate top 3 slowest transactions. Consider service restart.', impact: 'Direct correlation with customer satisfaction scores.' },
+    { cond: c => c.absZ > SIGMA_ELEVATED, urg: 'moderate', act: 'Review recent deployments. Check infrastructure metrics. Correlate with release calendar.', impact: 'Catch regression before customer impact.' },
+    { cond: c => c.trend.slope < 0 && c.trend.rSquared > 0.5, urg: 'moderate', act: 'Schedule performance profiling. Review code-level hotspots in Dynatrace.', impact: 'Trend reversal now is 3× cheaper than post-incident.' },
+    { cond: () => true, urg: 'monitor', act: '.NET Apdex healthy. Continue standard APM monitoring.', impact: 'No action required.' }
+  ],
+  ugw_apdex: [
+    { cond: c => c.absZ > SIGMA_CRITICAL, urg: 'urgent', act: 'Check gateway pod health, connection pool limits, SSL certificate status. Engage platform team.', impact: 'Gateway is single point of failure for all API traffic.' },
+    { cond: c => c.absZ > SIGMA_ELEVATED, urg: 'moderate', act: 'Review request queue depth, backend timeouts, TLS handshake latency.', impact: 'Gateway issues cascade to all downstream services.' },
+    { cond: c => c.trend.slope < 0 && c.trend.rSquared > 0.5, urg: 'moderate', act: 'Evaluate gateway scaling policy. Review connection pool recycling.', impact: 'Proactive scaling prevents cascading failures.' },
+    { cond: () => true, urg: 'monitor', act: 'Gateway performance nominal. Continue monitoring.', impact: 'No action required.' }
+  ],
+  self_serve_rate: [
+    { cond: c => c.absZ > SIGMA_CRITICAL && c.breach.breached, urg: 'urgent', act: 'Check IVR menu, speech recognition, knowledge base freshness. Alert workforce management.', impact: 'Every 1% drop ≈ 200+ additional live agent calls/day.' },
+    { cond: c => c.absZ > SIGMA_CRITICAL, urg: 'urgent', act: 'Audit top 10 IVR exit points. Review NLU confidence scores.', impact: 'Agent queue times increase exponentially below 65% self-serve.' },
+    { cond: c => c.absZ > SIGMA_ELEVATED, urg: 'moderate', act: 'Analyze intent-level containment rates. A/B test IVR prompt changes.', impact: 'Targeted fixes can recover 5–10% containment in a week.' },
+    { cond: c => c.trend.slope < 0 && c.trend.rSquared > 0.5, urg: 'moderate', act: 'Schedule CX team review. Update knowledge base for top 20 call drivers.', impact: 'Improving self-serve is the highest-ROI capacity lever.' },
+    { cond: () => true, urg: 'monitor', act: 'Self-serve rate nominal. Continue monitoring by intent.', impact: 'No action required.' }
+  ],
+  rpm: [
+    { cond: c => c.absZ > SIGMA_CRITICAL && c.trend.slope > 0, urg: 'urgent', act: 'Rule out DDoS/bot traffic. Check rate limiters. Prepare auto-scaling. Alert NOC.', impact: 'Uncontrolled growth causes cascading failures.' },
+    { cond: c => c.absZ > SIGMA_CRITICAL && c.trend.slope < 0, urg: 'urgent', act: 'RPM critically low — verify LB health, DNS, client connectivity. Check for incident.', impact: 'RPM drop may indicate customer-impacting outage.' },
+    { cond: c => c.absZ > SIGMA_ELEVATED, urg: 'moderate', act: 'Correlate with marketing campaigns, seasonal patterns. Update baseline if organic.', impact: 'Distinguishing growth from anomaly prevents false alerts.' },
+    { cond: () => true, urg: 'monitor', act: 'RPM within expected range. Continue baseline calibration.', impact: 'No action required.' }
+  ]
+};
+
+function getPrescription(id, ctx) {
+  const rules = ACTIONS[id];
+  if (!rules) return { urg: 'monitor', act: 'No rules configured.', impact: 'N/A' };
+  for (const r of rules) if (r.cond(ctx)) return r;
+  return rules[rules.length - 1];
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FULL ANALYSIS PIPELINE
+   ═══════════════════════════════════════════════════════════ */
+
+function analyze(m) {
+  const hist = m.history;
+  const baselineEnd = Math.floor(hist.length * 0.7);
+  const baseline = hist.slice(0, baselineEnd);
+  let z, mu, sigma, method;
+
+  if (m.type === 'bounded_ratio') {
+    const t = baseline.map(logit);
+    mu = mean(t); sigma = sampleSD(t);
+    z = sigma > 0 ? (logit(m.current) - mu) / sigma : 0;
+    method = 'Logit-Z';
+  } else if (m.type === 'bounded_capacity') {
+    const t = baseline.map(v => logit(v / m.capacity));
+    mu = mean(t); sigma = sampleSD(t);
+    z = sigma > 0 ? (logit(m.current / m.capacity) - mu) / sigma : 0;
+    method = 'Capacity-Logit-Z';
+  } else {
+    const med = median(baseline);
+    const madVal = 1.4826 * mad(baseline);
+    mu = med; sigma = madVal;
+    z = madVal > 0 ? (m.current - med) / madVal : 0;
+    method = 'Median-MAD';
+  }
+
+  // Directionality
+  if (m.direction === 'lower_is_bad') z = -z;
+  else if (m.direction === 'both') z = Math.abs(z);
+
+  const absZ = Math.abs(z);
+  const risk = absZ > SIGMA_CRITICAL ? 'Critical' : absZ > SIGMA_ELEVATED ? 'Elevated' : 'Nominal';
+  const trend = linearTrend(hist);
+  const hw = holtWinters(hist);
+  const ci = forecastCI(hw.residuals, hw.forecast);
+  const breach = timeToBreach(m, hw, baseline);
+
+  const ctx = { absZ, risk, trend, breach, current: m.current };
+  const rx = getPrescription(m.id, ctx);
+
+  // Compute descriptive baseline in original space
+  let baselineDisplay;
+  if (m.type === 'bounded_capacity') baselineDisplay = mean(baseline);
+  else if (m.type === 'bounded_ratio') baselineDisplay = mean(baseline);
+  else baselineDisplay = median(baseline);
+
+  return { z, absZ, mu, sigma, method, risk, trend, hw, ci, breach, rx, baselineDisplay };
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DISPLAY FORMATTERS
+   ═══════════════════════════════════════════════════════════ */
+
+function fmtVal(v, m) {
+  if (m.type === 'bounded_ratio' && m.unit === '%') return (v * 100).toFixed(1) + '%';
+  if (m.type === 'bounded_ratio') return v.toFixed(3);
+  if (m.type === 'bounded_capacity') return `${Math.round(v)} / ${m.capacity}`;
+  return Math.round(v).toLocaleString();
+}
+
+function fmtForecast(v, m) {
+  if (m.type === 'bounded_ratio' && m.unit === '%') return (Math.max(0, Math.min(1, v)) * 100).toFixed(1) + '%';
+  if (m.type === 'bounded_ratio') return Math.max(0, Math.min(1, v)).toFixed(3);
+  if (m.type === 'bounded_capacity') return Math.round(Math.max(0, v)).toLocaleString();
+  return Math.round(Math.max(0, v)).toLocaleString();
+}
+
+function fmtPct(v, cap) { return ((v / cap) * 100).toFixed(1) + '%'; }
+
+function fmtBaseline(v, m) {
+  if (m.type === 'bounded_ratio' && m.unit === '%') return (v * 100).toFixed(1) + '%';
+  if (m.type === 'bounded_ratio') return v.toFixed(3) + ' avg';
+  if (m.type === 'bounded_capacity') return Math.round(v) + ' avg (' + fmtPct(v, m.capacity) + ')';
+  return Math.round(v).toLocaleString() + ' median';
+}
+
+function fmtThreshold(v, m) {
+  if (m.type === 'bounded_ratio' && m.unit === '%') return (v * 100).toFixed(0) + '%';
+  if (m.type === 'bounded_ratio') return v.toFixed(2);
+  if (m.type === 'bounded_capacity') return Math.round(v).toLocaleString() + ' (' + fmtPct(v, m.capacity) + ')';
+  return Math.round(v).toLocaleString();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SPARKLINE RENDERER
+   ═══════════════════════════════════════════════════════════ */
+
+function renderSparkline(hist, forecast, ci, riskClass) {
+  const all = [...hist, ...forecast, ...(ci.u95 || []), ...(ci.l95 || [])];
+  const min = Math.min(...all), max = Math.max(...all);
+  const range = max - min || 1;
+  const W = 160, H = 48;
+  const total = hist.length + forecast.length;
+
+  const x = i => (i / (total - 1)) * W;
+  const y = v => H - 4 - ((v - min) / range) * (H - 8);
+
+  // Confidence band
+  const bandUp = forecast.map((_, i) => `${x(hist.length + i)},${y(ci.u95[i])}`);
+  const bandDn = [...forecast.map((_, i) => `${x(hist.length + i)},${y(ci.l95[i])}`)].reverse();
+  const bandPath = [`${x(hist.length - 1)},${y(hist[hist.length - 1])}`, ...bandUp, ...bandDn, `${x(hist.length - 1)},${y(hist[hist.length - 1])}`].join(' L ');
+
+  // History polyline
+  const histPath = hist.map((v, i) => `${x(i)},${y(v)}`).join(' L ');
+  // Forecast polyline
+  const fcPath = [`${x(hist.length - 1)},${y(hist[hist.length - 1])}`, ...forecast.map((v, i) => `${x(hist.length + i)},${y(v)}`)].join(' L ');
+  // Divider
+  const dx = x(hist.length - 1);
+
+  const color = riskClass === 'critical' ? '#dc2626' : riskClass === 'elevated' ? '#d97706' : '#64748b';
+  const bandColor = riskClass === 'critical' ? '#dc2626' : riskClass === 'elevated' ? '#d97706' : '#4f46e5';
+
+  return `<svg class="sparkline-svg" viewBox="0 0 ${W} ${H}">
+    <path d="M ${bandPath}" fill="${bandColor}" fill-opacity="0.08" stroke="none"/>
+    <line x1="${dx}" y1="2" x2="${dx}" y2="${H - 2}" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 2"/>
+    <path d="M ${histPath}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M ${fcPath}" fill="none" stroke="${bandColor}" stroke-width="1.5" stroke-dasharray="5 3" stroke-linecap="round"/>
+    <circle cx="${x(hist.length - 1)}" cy="${y(hist[hist.length - 1])}" r="3" fill="${color}"/>
+  </svg>`;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NARRATIVE GENERATOR (plain-language for stakeholders)
+   ═══════════════════════════════════════════════════════════ */
+
+function getNarrative(m, a) {
+  const items = [];
+
+  // Trend
+  const dir = a.trend.slope > 0 ? 'increasing' : 'decreasing';
+  if (a.trend.rSquared > 0.85) {
+    items.push({ icon: 'trend', text: `<strong>Strong ${dir} trend</strong> over the last ${m.history.length} periods (R² = ${a.trend.rSquared.toFixed(2)}).` });
+  } else if (a.trend.rSquared > 0.5) {
+    items.push({ icon: 'trend', text: `<strong>Moderate ${dir} trend</strong> detected (R² = ${a.trend.rSquared.toFixed(2)}).` });
+  } else {
+    items.push({ icon: 'ok', text: `No significant trend pattern (R² = ${a.trend.rSquared.toFixed(2)}). Values are stable.` });
+  }
+
+  // Forecast summary
+  const fh5 = fmtForecast(a.hw.forecast[4], m);
+  const ciLow = fmtForecast(a.ci.l95[4], m);
+  const ciHigh = fmtForecast(a.ci.u95[4], m);
+  items.push({ icon: 'forecast', text: `Forecast at +5 periods: <strong>${fh5}</strong> (95% CI: ${ciLow} – ${ciHigh}).` });
+
+  // Breach
+  if (a.breach.breached) {
+    items.push({ icon: 'breach', text: `<strong>Already breached:</strong> ${a.breach.label}. Current value has crossed the threshold of ${fmtThreshold(a.breach.threshold, m)}.` });
+  } else if (a.breach.periods && a.breach.periods <= 5) {
+    items.push({ icon: 'warn', text: `<strong>Breach projected in ~${a.breach.periods} periods</strong> — ${a.breach.label}. Threshold: ${fmtThreshold(a.breach.threshold, m)}.` });
+  } else if (a.breach.periods) {
+    items.push({ icon: 'forecast', text: `Breach projected in ~${a.breach.periods} periods (${a.breach.label}). Threshold: ${fmtThreshold(a.breach.threshold, m)}.` });
+  } else {
+    items.push({ icon: 'ok', text: `No breach projected within the forecast horizon.` });
+  }
+
+  return items;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RENDER
+   ═══════════════════════════════════════════════════════════ */
+
+function render() {
+  const root = document.getElementById('dashboard');
+  const results = metrics.map(m => ({ m, a: analyze(m) }));
+
+  const criticals = results.filter(r => r.a.risk === 'Critical');
+  const elevateds = results.filter(r => r.a.risk === 'Elevated');
+  const nominals  = results.filter(r => r.a.risk === 'Nominal');
+
+  // Sort: critical first, then elevated, then nominal
+  results.sort((a, b) => {
+    const order = { Critical: 0, Elevated: 1, Nominal: 2 };
+    return (order[a.a.risk] ?? 3) - (order[b.a.risk] ?? 3) || b.a.absZ - a.a.absZ;
+  });
+
+  const now = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+
+  // Overall status
+  let overallClass, overallLabel, overallSub;
+  if (criticals.length > 0) {
+    overallClass = 'critical';
+    overallLabel = 'Critical';
+    overallSub = `${criticals.length + elevateds.length} of ${results.length} metrics require attention`;
+  } else if (elevateds.length > 0) {
+    overallClass = 'elevated';
+    overallLabel = 'Elevated';
+    overallSub = `${elevateds.length} of ${results.length} metrics outside normal range`;
+  } else {
+    overallClass = 'nominal';
+    overallLabel = 'All Nominal';
+    overallSub = `All ${results.length} metrics within expected range`;
+  }
+
+  // Top risk
+  const topRisk = results.find(r => r.a.risk !== 'Nominal');
+  let topRiskHTML = '';
+  if (topRisk) {
+    const tr = topRisk;
+    let breachText = '';
+    if (tr.a.breach.breached) breachText = 'Currently breached.';
+    else if (tr.a.breach.periods) breachText = `Breach in ~${tr.a.breach.periods} periods.`;
+    topRiskHTML = `
+      <div class="summary-top-risk">
+        <div class="top-risk-label">Top Risk</div>
+        <div class="top-risk-text"><strong>${tr.m.name}</strong> at ${fmtVal(tr.m.current, tr.m)}. ${breachText}</div>
+      </div>`;
+  }
+
+  // Action items (only non-monitor)
+  const actionItems = results.filter(r => r.a.rx.urg !== 'monitor');
+  const urgentActions = actionItems.filter(r => r.a.rx.urg === 'urgent');
+  const moderateActions = actionItems.filter(r => r.a.rx.urg === 'moderate');
+  const monitorItems = results.filter(r => r.a.rx.urg === 'monitor');
+
+  root.innerHTML = `
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div>
+        <h1>Operations Health Dashboard</h1>
+        <div class="subtitle">Statistical Risk Analysis — Descriptive · Diagnostic · Predictive · Prescriptive</div>
+      </div>
+      <div class="header-meta">
+        <div class="timestamp">${now}</div>
+        <div>Bonferroni-adjusted (α = ${BONFERRONI_ALPHA.toFixed(3)})</div>
+      </div>
+    </div>
+
+    <!-- EXECUTIVE SUMMARY BANNER -->
+    <div class="summary-banner">
+      <div class="summary-status">
+        <div class="status-dot ${overallClass}"></div>
+        <div>
+          <div class="status-text">${overallLabel}</div>
+          <div class="status-sub">${overallSub}</div>
+        </div>
+      </div>
+      <div class="summary-counts">
+        <div class="count-pill critical-pill"><span class="count-num">${criticals.length}</span> Critical</div>
+        <div class="count-pill elevated-pill"><span class="count-num">${elevateds.length}</span> Elevated</div>
+        <div class="count-pill nominal-pill"><span class="count-num">${nominals.length}</span> Nominal</div>
+      </div>
+      ${topRiskHTML}
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="content-grid">
+
+      <!-- LEFT: METRIC CARDS -->
+      <div class="metric-cards">
+        ${results.map(({ m, a }) => {
+          const rc = a.risk.toLowerCase();
+          const narrative = getNarrative(m, a);
+
+          return `
+          <div class="metric-card">
+            <!-- Card Header -->
+            <div class="card-header">
+              <div>
+                <div class="card-title">${m.name}</div>
+                <div class="card-category">${m.category}</div>
+              </div>
+              <span class="risk-badge ${rc}">${a.risk}</span>
+            </div>
+
+            <!-- KPI Row -->
+            <div class="card-body">
+              <div class="kpi-row">
+                <div class="kpi-block">
+                  <div class="kpi-label">Current Value</div>
+                  <div class="kpi-value ${rc}">${fmtVal(m.current, m)}</div>
+                  ${m.type === 'bounded_capacity' ? `<div class="kpi-context">${fmtPct(m.current, m.capacity)} utilization</div>` : ''}
+                </div>
+                <div class="kpi-block">
+                  <div class="kpi-label">Baseline</div>
+                  <div class="kpi-value" style="font-size:1.1rem; color:var(--text-secondary);">${fmtBaseline(a.baselineDisplay, m)}</div>
+                  <div class="kpi-context">${a.absZ.toFixed(1)}σ ${a.z > 0 === (m.direction === 'higher_is_bad') ? 'above' : m.direction === 'lower_is_bad' ? 'below' : 'from'} baseline</div>
+                </div>
+                <div class="sparkline-container">
+                  <div class="sparkline-label">Trend + Forecast</div>
+                  ${renderSparkline(m.history, a.hw.forecast, a.ci, rc)}
+                </div>
+              </div>
+            </div>
+
+            <!-- Forecast Chips -->
+            <div class="forecast-row">
+              <div class="forecast-chip">
+                <div class="forecast-chip-label">Next period</div>
+                <div class="forecast-chip-value">${fmtForecast(a.hw.forecast[0], m)}</div>
+              </div>
+              <div class="forecast-chip">
+                <div class="forecast-chip-label">+3 Periods</div>
+                <div class="forecast-chip-value">${fmtForecast(a.hw.forecast[2], m)}</div>
+              </div>
+              <div class="forecast-chip">
+                <div class="forecast-chip-label">+5 Periods</div>
+                <div class="forecast-chip-value">${fmtForecast(a.hw.forecast[4], m)}</div>
+                <div class="forecast-chip-ci">95% CI: ${fmtForecast(a.ci.l95[4], m)} – ${fmtForecast(a.ci.u95[4], m)}</div>
+              </div>
+            </div>
+
+            <!-- Narrative -->
+            <div class="narrative-block">
+              ${narrative.map(n => `
+                <div class="narrative-item">
+                  <div class="narrative-icon ${n.icon}">
+                    ${n.icon === 'trend' ? '↗' : n.icon === 'forecast' ? '◎' : n.icon === 'breach' ? '!' : n.icon === 'warn' ? '⏱' : '✓'}
+                  </div>
+                  <div class="narrative-text">${n.text}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          `;
+        }).join('')}
+      </div>
+
+      <!-- RIGHT: ACTION PANEL -->
+      <div class="action-panel">
+        <div class="action-panel-header">
+          <div class="action-panel-title">Action Items</div>
+          <div class="action-panel-subtitle">${actionItems.length} actions required · sorted by urgency</div>
+        </div>
+
+        ${urgentActions.length > 0 ? `
+        <div class="action-group">
+          <div class="action-group-label urgent">
+            <span class="urgency-dot urgent"></span> Urgent — respond within 15 min
+          </div>
+          ${urgentActions.map(({ m, a }) => `
+            <div class="action-item urgent">
+              ${a.breach.breached
+                ? '<span class="breach-tag breached">BREACHED</span>'
+                : a.breach.periods && a.breach.periods <= 5
+                  ? `<span class="breach-tag imminent">BREACH IN ~${a.breach.periods}p</span>`
+                  : ''
+              }
+              <div class="action-item-header">
+                <span class="action-item-metric">${m.name}</span>
+                <span class="action-item-value">${fmtVal(m.current, m)}</span>
+              </div>
+              <div class="action-item-text">${a.rx.act}</div>
+              <div class="action-item-impact"><strong>Impact:</strong> ${a.rx.impact}</div>
+            </div>
+          `).join('')}
+        </div>
+        ` : ''}
+
+        ${moderateActions.length > 0 ? `
+        <div class="action-group">
+          <div class="action-group-label moderate">
+            <span class="urgency-dot moderate"></span> Moderate — respond within 1 hour
+          </div>
+          ${moderateActions.map(({ m, a }) => `
+            <div class="action-item moderate">
+              ${a.breach.periods && a.breach.periods <= 10
+                ? `<span class="breach-tag projected">BREACH IN ~${a.breach.periods}p</span>`
+                : ''
+              }
+              <div class="action-item-header">
+                <span class="action-item-metric">${m.name}</span>
+                <span class="action-item-value">${fmtVal(m.current, m)}</span>
+              </div>
+              <div class="action-item-text">${a.rx.act}</div>
+              <div class="action-item-impact"><strong>Impact:</strong> ${a.rx.impact}</div>
+            </div>
+          `).join('')}
+        </div>
+        ` : ''}
+
+        ${monitorItems.length > 0 ? `
+        <div class="action-group">
+          <div class="action-group-label monitor">
+            <span class="urgency-dot monitor"></span> Monitoring — next scheduled review
+          </div>
+          ${monitorItems.map(({ m, a }) => `
+            <div class="action-item monitor">
+              <div class="action-item-header">
+                <span class="action-item-metric">${m.name}</span>
+                <span class="action-item-value">${fmtVal(m.current, m)}</span>
+              </div>
+              <div class="action-item-text">${a.rx.act}</div>
+            </div>
+          `).join('')}
+        </div>
+        ` : ''}
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="dashboard-footer">
+      <div class="footer-method-tags">
+        <span class="method-tag descriptive">Descriptive</span>
+        <span class="method-tag diagnostic">Diagnostic</span>
+        <span class="method-tag predictive">Predictive</span>
+        <span class="method-tag prescriptive">Prescriptive</span>
+        <span style="margin-left:4px;">Logit-Z · Median-MAD · Bonferroni · OLS Trend · Holt-Winters · Action Engine</span>
+      </div>
+      <div>5 metrics · ${metrics[0].history.length}-point history · 70/30 baseline split</div>
+    </div>
+  `;
+}
+
+render();
+</script>
+</body>
+</html>
