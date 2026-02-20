@@ -3,265 +3,521 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Operations Gist — Sticky Summary</title>
+<title>Operations Gist — Dynamic Island</title>
 <style>
 /* ═══════════════════════════════════════════════════════════
-   GRAFANA BUSINESS TEXT COMPATIBLE — NO CSS CUSTOM PROPERTIES
-   Ultra-compact sticky gist panel — <20% screen width (~280px)
-   Purely business insights, collapsible categories
+   DYNAMIC ISLAND — Horizontal top-bar gist panel
+   Apple-inspired pill shape, expand/collapse animation
    ═══════════════════════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-.gp {
+body {
+  background: #f1f5f9;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  padding-top: 20px;
+}
+
+/* ── Island Container ───────────────────────────── */
+.di-wrap {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+}
+
+.di {
   background: #ffffff;
   color: #1e293b;
-  width: 280px;
-  max-height: 100vh;
-  overflow-y: auto;
-  font-size: 11px;
+  border-radius: 28px;
+  font-size: 12px;
   line-height: 1.4;
-  border-right: 1px solid #e2e8f0;
-  -webkit-font-smoothing: antialiased;
-  position: sticky;
-  top: 0;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.06),
+    0 4px 24px rgba(0,0,0,0.08),
+    0 1px 6px rgba(0,0,0,0.04);
+  transition: all 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 360px;
+  max-width: 1200px;
+  cursor: default;
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
 }
 
-/* ── Scrollbar ──────────────────────────────────── */
-.gp::-webkit-scrollbar { width: 3px; }
-.gp::-webkit-scrollbar-track { background: transparent; }
-.gp::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-
-/* ── Health Banner (always visible, pinned) ─────── */
-.gp-banner {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: #ffffff;
-  padding: 8px 12px;
-  border-bottom: 1px solid #e2e8f0;
+.di.collapsed {
+  min-width: 360px;
+  max-width: 700px;
+  border-radius: 28px;
 }
-.gp-banner-row {
+
+.di.expanded {
+  min-width: 700px;
+  max-width: 1200px;
+  border-radius: 22px;
+}
+
+/* ── Collapsed Bar (always visible) ─────────────── */
+.di-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-.gp-status {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-.gp-dot {
-  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-}
-.gp-dot.r { background: #dc2626; box-shadow: 0 0 0 2px #fef2f2; }
-.gp-dot.y { background: #d97706; box-shadow: 0 0 0 2px #fffbeb; }
-.gp-dot.g { background: #059669; box-shadow: 0 0 0 2px #ecfdf5; }
-.gp-title {
-  font-size: 12px; font-weight: 700; letter-spacing: -0.01em;
-}
-.gp-pills { display: flex; gap: 4px; }
-.gp-p {
-  font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 8px;
-}
-.gp-p.r { background: #fef2f2; color: #991b1b; }
-.gp-p.y { background: #fffbeb; color: #92400e; }
-.gp-p.g { background: #ecfdf5; color: #065f46; }
-.gp-sub {
-  font-size: 9px; color: #94a3b8; margin-top: 3px;
-}
-
-/* ── Category Section ───────────────────────────── */
-.gp-cat {
-  border-bottom: 1px solid #f1f5f9;
-}
-
-/* Category header — clickable toggle */
-.gp-ch {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 7px 12px;
+  padding: 8px 16px 8px 14px;
+  gap: 12px;
   cursor: pointer;
   user-select: none;
-  transition: background 0.12s;
+  min-height: 44px;
 }
-.gp-ch:hover { background: #f8fafc; }
-.gp-ch-left {
+
+.di-bar:hover { background: #f8fafc; }
+
+.di-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.di-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+}
+.di-dot.r { background: #dc2626; box-shadow: 0 0 0 3px #fef2f2; }
+.di-dot.y { background: #d97706; box-shadow: 0 0 0 3px #fffbeb; }
+.di-dot.g { background: #059669; box-shadow: 0 0 0 3px #ecfdf5; }
+
+.di-label {
+  font-size: 13px; font-weight: 700; letter-spacing: -0.01em;
+  color: #1e293b;
+  white-space: nowrap;
+}
+
+.di-center {
   display: flex;
   align-items: center;
   gap: 6px;
-  min-width: 0;
+  flex: 1;
+  justify-content: center;
+  overflow: hidden;
 }
-.gp-ch-arrow {
-  font-size: 8px;
-  color: #94a3b8;
-  transition: transform 0.2s;
-  flex-shrink: 0;
-  width: 10px;
-  text-align: center;
-  display: inline-block;
-}
-.gp-cat.open .gp-ch-arrow { transform: rotate(90deg); }
-.gp-ch-name {
+
+/* Category pills in collapsed mode */
+.di-cpill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 14px;
   font-size: 10px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #475569;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: 1px solid transparent;
 }
-.gp-ch-right {
-  display: flex; align-items: center; gap: 5px; flex-shrink: 0;
+.di-cpill:hover {
+  border-color: #e2e8f0;
+  background: #f8fafc;
 }
-.gp-badge {
-  font-size: 8px; font-weight: 800; padding: 1px 6px; border-radius: 6px;
-  letter-spacing: 0.02em; text-transform: uppercase;
+.di-cpill .cdot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
 }
-.gp-badge.r { background: #fef2f2; color: #991b1b; }
-.gp-badge.y { background: #fffbeb; color: #92400e; }
-.gp-badge.g { background: #ecfdf5; color: #065f46; }
-.gp-ch-count {
-  font-size: 8px; color: #94a3b8; font-weight: 600;
+.di-cpill .cdot.r { background: #ef4444; }
+.di-cpill .cdot.y { background: #f59e0b; }
+.di-cpill .cdot.g { background: #10b981; }
+.di-cpill .cname { color: #64748b; }
+.di-cpill .cbadge {
+  font-size: 8px; font-weight: 800; padding: 1px 5px; border-radius: 6px;
+  letter-spacing: 0.03em; text-transform: uppercase;
+}
+.di-cpill .cbadge.r { background: #fef2f2; color: #991b1b; }
+.di-cpill .cbadge.y { background: #fffbeb; color: #92400e; }
+.di-cpill .cbadge.g { background: #ecfdf5; color: #065f46; }
+
+.di-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
-/* Category insight (always visible, below header) */
-.gp-insight {
-  padding: 0 12px 6px 28px;
-  font-size: 10px;
-  line-height: 1.4;
-  color: #475569;
+.di-pills { display: flex; gap: 4px; }
+.di-p {
+  font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 8px;
+  font-variant-numeric: tabular-nums;
 }
-.gp-insight strong { color: #1e293b; font-weight: 600; }
-.gp-insight .hi { font-weight: 700; }
-.gp-insight .hi.r { color: #dc2626; }
-.gp-insight .hi.y { color: #b45309; }
-.gp-insight .hi.g { color: #059669; }
+.di-p.r { background: #fef2f2; color: #991b1b; }
+.di-p.y { background: #fffbeb; color: #92400e; }
+.di-p.g { background: #ecfdf5; color: #065f46; }
 
-/* Category body — expand/collapse */
-.gp-body {
+.di-time {
+  font-size: 9px; color: #64748b; white-space: nowrap;
+}
+
+.di-toggle {
+  width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: #f1f5f9;
+  color: #64748b; font-size: 10px;
+  transition: transform 0.3s, background 0.2s;
+  flex-shrink: 0;
+}
+.di.expanded .di-toggle { transform: rotate(180deg); }
+.di-toggle:hover { background: #e2e8f0; }
+
+/* ── Expanded Content ───────────────────────────── */
+.di-content {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.25s ease;
-}
-.gp-cat.open .gp-body {
-  max-height: 800px;
+  transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s ease,
+              padding 0.3s ease;
+  opacity: 0;
+  padding: 0 16px;
 }
 
-/* Metric row inside expanded body */
-.gp-row {
+.di.expanded .di-content {
+  max-height: 600px;
+  opacity: 1;
+  padding: 0 16px 14px 16px;
+}
+
+/* Category grid — horizontal layout */
+.di-grid {
   display: grid;
-  grid-template-columns: 6px 1fr auto 32px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 6px;
+}
+
+/* Each category card */
+.di-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 10px 12px;
+  transition: all 0.2s;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+.di-card:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.di-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.di-card-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.di-card-title .cdot {
+  width: 7px; height: 7px; border-radius: 50%;
+}
+.di-card-title .cdot.r { background: #dc2626; }
+.di-card-title .cdot.y { background: #d97706; }
+.di-card-title .cdot.g { background: #059669; }
+.di-card-name {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.04em; color: #475569;
+}
+.di-card-badge {
+  font-size: 7px; font-weight: 800; padding: 2px 6px; border-radius: 6px;
+  letter-spacing: 0.03em; text-transform: uppercase;
+}
+.di-card-badge.r { background: #fef2f2; color: #991b1b; }
+.di-card-badge.y { background: #fffbeb; color: #92400e; }
+.di-card-badge.g { background: #ecfdf5; color: #065f46; }
+
+/* Insight text in card */
+.di-card-insight {
+  font-size: 10px; line-height: 1.45; color: #475569;
+  margin-bottom: 8px;
+}
+.di-card-insight strong { color: #1e293b; font-weight: 600; }
+.di-card-insight .hi { font-weight: 700; }
+.di-card-insight .hi.r { color: #dc2626; }
+.di-card-insight .hi.y { color: #b45309; }
+.di-card-insight .hi.g { color: #059669; }
+
+/* Metric rows inside card */
+.di-mrow {
+  display: grid;
+  grid-template-columns: 5px 1fr auto;
   gap: 5px;
   align-items: center;
-  padding: 4px 12px 4px 28px;
+  padding: 3px 0;
+  border-radius: 4px;
 }
-.gp-row:hover { background: #f8fafc; }
-.gp-rd {
-  width: 6px; height: 6px; border-radius: 50%;
+.di-mrow:hover { background: #f1f5f9; }
+
+.di-md {
+  width: 5px; height: 5px; border-radius: 50%;
 }
-.gp-rd.r { background: #dc2626; }
-.gp-rd.y { background: #d97706; }
-.gp-rd.g { background: #16a34a; }
-.gp-rn {
+.di-md.r { background: #dc2626; }
+.di-md.y { background: #d97706; }
+.di-md.g { background: #16a34a; }
+
+.di-mn {
   font-size: 10px; font-weight: 600; color: #334155;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.gp-rv {
+.di-mv {
   font-size: 10px; font-weight: 700; text-align: right;
   font-variant-numeric: tabular-nums;
 }
-.gp-rv.r { color: #dc2626; }
-.gp-rv.y { color: #b45309; }
-.gp-rv.g { color: #334155; }
-.gp-sp svg { width: 32px; height: 12px; }
+.di-mv.r { color: #dc2626; }
+.di-mv.y { color: #b45309; }
+.di-mv.g { color: #334155; }
 
-/* Breach micro-tag */
-.gp-bt {
+/* Breach tags */
+.di-bt {
   display: inline-block;
   font-size: 7px; font-weight: 800; padding: 0 3px; border-radius: 2px;
   margin-left: 3px; vertical-align: middle; letter-spacing: 0.02em;
 }
-.gp-bt.br { background: #dc2626; color: #fff; }
-.gp-bt.im { background: #fef2f2; color: #991b1b; }
-.gp-bt.pj { background: #fffbeb; color: #92400e; }
+.di-bt.br { background: #dc2626; color: #fff; }
+.di-bt.im { background: #fef2f2; color: #991b1b; }
+.di-bt.pj { background: #fffbeb; color: #92400e; }
 
-/* In-category action recommendation */
-.gp-bact {
-  padding: 4px 12px 6px 28px;
+/* Action bar */
+.di-act {
+  margin-top: 6px;
+  padding: 5px 8px;
   font-size: 9px;
   color: #475569;
   line-height: 1.4;
   border-top: 1px dashed #e2e8f0;
-  margin-top: 2px;
+  border-radius: 0 0 8px 8px;
 }
-.gp-bact .gp-urg {
+.di-act .di-urg {
   display: inline-block;
-  font-weight: 800;
-  font-size: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  padding: 1px 4px;
-  border-radius: 3px;
-  margin-right: 4px;
-  vertical-align: middle;
+  font-weight: 800; font-size: 8px;
+  text-transform: uppercase; letter-spacing: 0.03em;
+  padding: 1px 5px; border-radius: 3px;
+  margin-right: 4px; vertical-align: middle;
 }
-.gp-bact .gp-urg.urgent  { background: #dc2626; color: #fff; }
-.gp-bact .gp-urg.moderate { background: #d97706; color: #fff; }
+.di-act .di-urg.urgent  { background: #dc2626; color: #fff; }
+.di-act .di-urg.moderate { background: #d97706; color: #fff; }
 
-/* ── Footer ────────────────────────────────────── */
-.gp-foot {
-  padding: 5px 12px;
-  font-size: 8px;
-  color: #94a3b8;
+/* ── Footer inside island ──────────────────────── */
+.di-foot {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: 8px;
+  padding-top: 8px;
   border-top: 1px solid #e2e8f0;
+  font-size: 9px;
+  color: #94a3b8;
 }
-.gp-tags { display: flex; gap: 3px; }
-.gp-tag {
-  padding: 1px 4px; border-radius: 2px; font-weight: 700;
+.di-tags { display: flex; gap: 4px; }
+.di-tag {
+  padding: 1px 5px; border-radius: 3px; font-weight: 700; font-size: 8px;
 }
-.gp-tag.a { background: #eff6ff; color: #1d4ed8; }
-.gp-tag.b { background: #fef3c7; color: #92400e; }
-.gp-tag.c { background: #ede9fe; color: #5b21b6; }
-.gp-tag.d { background: #ecfdf5; color: #065f46; }
+.di-tag.a { background: #eff6ff; color: #1d4ed8; }
+.di-tag.b { background: #fef3c7; color: #92400e; }
+.di-tag.c { background: #ede9fe; color: #5b21b6; }
+.di-tag.d { background: #ecfdf5; color: #065f46; }
 
-/* Pulsing dot for critical */
+/* ── Pulsing critical dot ──────────────────────── */
 @keyframes gpp {
-  0%,100% { opacity:1; }
-  50% { opacity:0.4; }
+  0%,100% { opacity:1; transform: scale(1); }
+  50% { opacity:0.5; transform: scale(0.85); }
 }
-.gp-dot.r { animation: gpp 2s ease-in-out infinite; }
+.di-dot.r { animation: gpp 2s ease-in-out infinite; }
+
+/* ── Glow effect for critical state ─────────────── */
+.di.crit {
+  box-shadow:
+    0 0 0 1px rgba(220,38,38,0.15),
+    0 0 20px rgba(220,38,38,0.06),
+    0 4px 24px rgba(0,0,0,0.08),
+    0 1px 6px rgba(0,0,0,0.04);
+}
+.di.warn {
+  box-shadow:
+    0 0 0 1px rgba(217,119,6,0.12),
+    0 0 16px rgba(217,119,6,0.04),
+    0 4px 24px rgba(0,0,0,0.08),
+    0 1px 6px rgba(0,0,0,0.04);
+}
+
+/* ── Scenario Switcher ───────────────────────────── */
+.scenario-bar {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 80px auto 20px;
+  padding: 0 24px;
+}
+.scenario-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  background: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.scenario-btn:hover { border-color: #cbd5e1; background: #f8fafc; }
+.scenario-btn.active-neg {
+  border-color: #fca5a5;
+  background: #fef2f2;
+  color: #991b1b;
+}
+.scenario-btn.active-pos {
+  border-color: #6ee7b7;
+  background: #ecfdf5;
+  color: #065f46;
+}
+.scenario-btn .sdot {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+.scenario-btn .sdot.neg { background: #dc2626; }
+.scenario-btn .sdot.pos { background: #059669; }
+
+/* ── Detail Panel ───────────────────────────────── */
+.detail-panel {
+  max-width: 1100px;
+  margin: 0 auto 40px;
+  padding: 0 24px;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.det-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.det-card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px; padding-bottom: 8px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.det-card-title {
+  display: flex; align-items: center; gap: 6px;
+}
+.det-card-title .cdot { width: 8px; height: 8px; border-radius: 50%; }
+.det-card-title .cdot.r { background: #dc2626; }
+.det-card-title .cdot.y { background: #d97706; }
+.det-card-title .cdot.g { background: #059669; }
+.det-card-name {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.04em; color: #475569;
+}
+.det-badge {
+  font-size: 8px; font-weight: 800; padding: 2px 7px; border-radius: 6px;
+  letter-spacing: 0.03em; text-transform: uppercase;
+}
+.det-badge.r { background: #fef2f2; color: #991b1b; }
+.det-badge.y { background: #fffbeb; color: #92400e; }
+.det-badge.g { background: #ecfdf5; color: #065f46; }
+
+.det-metrics {
+  font-size: 11px; line-height: 1.6; color: #475569;
+  margin-bottom: 8px;
+}
+.det-metrics .mv { font-weight: 700; font-variant-numeric: tabular-nums; }
+.det-metrics .mv.r { color: #dc2626; }
+.det-metrics .mv.y { color: #b45309; }
+.det-metrics .mv.g { color: #334155; }
+.det-metrics .mn { font-weight: 600; color: #334155; }
+
+.det-act {
+  margin-top: 10px; padding: 8px 10px;
+  font-size: 10px; color: #475569; line-height: 1.5;
+  background: #f8fafc; border-radius: 8px;
+}
+.det-act .det-urg {
+  display: inline-block; font-weight: 800; font-size: 8px;
+  text-transform: uppercase; letter-spacing: 0.03em;
+  padding: 1px 5px; border-radius: 3px;
+  margin-right: 4px; vertical-align: middle;
+}
+.det-act .det-urg.urgent { background: #dc2626; color: #fff; }
+.det-act .det-urg.moderate { background: #d97706; color: #fff; }
+
+.det-insight {
+  font-size: 11px; line-height: 1.5; color: #475569; margin-bottom: 10px;
+}
+.det-insight strong { color: #1e293b; }
+.det-insight .hi { font-weight: 700; }
+.det-insight .hi.r { color: #dc2626; }
+.det-insight .hi.y { color: #b45309; }
+.det-insight .hi.g { color: #059669; }
+
+@media (max-width: 900px) {
+  .detail-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .detail-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Responsive ─────────────────────────────────── */
+@media (max-width: 900px) {
+  .di.expanded .di-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .di.expanded {
+    min-width: 90vw;
+  }
+}
+@media (max-width: 600px) {
+  .di.expanded .di-grid {
+    grid-template-columns: 1fr;
+  }
+  .di-center { display: none; }
+}
 </style>
 </head>
-<body style="background:#f1f5f9; display:flex; gap:0; min-height:100vh;">
+<body>
 
-<!-- ═══ THE STICKY PANEL ═══ Paste CSS + div#gp + JS into Grafana Business Text -->
-<div class="gp" id="gp"></div>
-
-<!-- Demo placeholder for the rest of the Grafana dashboard -->
-<div style="flex:1; padding:40px; color:#64748b; font-family:Inter,sans-serif;">
-  <div style="background:#fff; border-radius:12px; padding:32px; box-shadow:0 1px 3px rgba(0,0,0,0.05); max-width:640px;">
-    <h2 style="font-size:16px; margin-bottom:8px; color:#1e293b;">Main Dashboard Area (80%+ of screen)</h2>
-    <p style="font-size:13px; line-height:1.6;">The gist panel on the left takes <strong>280px</strong> — that's <strong>14.6%</strong> of a 1920px display. It stays sticky as you scroll.</p>
-    <ul style="font-size:12px; margin-top:12px; padding-left:20px; line-height:1.8; color:#475569;">
-      <li>Categories <strong>auto-expand</strong> when they have issues; collapse when healthy</li>
-      <li>Click any category header to manually expand/collapse</li>
-      <li>Business insights update in plain English — no technical jargon</li>
-      <li>Each category shows a single recommended action when needed</li>
-    </ul>
-  </div>
+<!-- ═══ Dynamic Island ═══ -->
+<div class="di-wrap">
+  <div class="di collapsed" id="di"></div>
 </div>
+
+<!-- Scenario toggle -->
+<div class="scenario-bar">
+  <button class="scenario-btn active-neg" id="btn-neg" onclick="switchScenario('neg')">
+    <span class="sdot neg"></span> Negative Scenario
+  </button>
+  <button class="scenario-btn" id="btn-pos" onclick="switchScenario('pos')">
+    <span class="sdot pos"></span> Positive Scenario
+  </button>
+</div>
+
+<!-- Detail panels -->
+<div class="detail-panel" id="detail-panel"></div>
 
 <script>
 /* ═══════════════════════════════════════════════════════════
    DATA — 14 metrics, 4 categories
    ═══════════════════════════════════════════════════════════ */
-const M = [
+/* ═══════════════════════════════════════════════════════════
+   DATASETS — Negative (issues) and Positive (all healthy)
+   ═══════════════════════════════════════════════════════════ */
+const M_NEG = [
   {id:'np1',nm:'Port Group 1',sh:'Grp 1',cat:'Nuance Telephony',tp:'cap',dr:'hi',cap:500,v:472,h:[310,325,318,340,335,328,342,350,355,360,368,375,380,390,398,410,425,440,458,472]},
   {id:'np2',nm:'Port Group 2',sh:'Grp 2',cat:'Nuance Telephony',tp:'cap',dr:'hi',cap:400,v:312,h:[220,228,235,230,240,245,250,248,255,260,262,268,274,278,282,288,292,298,305,312]},
   {id:'np3',nm:'Port Group 3',sh:'Grp 3',cat:'Nuance Telephony',tp:'cap',dr:'hi',cap:300,v:185,h:[150,155,148,160,158,162,165,170,168,172,175,178,174,176,180,178,182,180,183,185]},
@@ -277,6 +533,25 @@ const M = [
   {id:'a7',nm:'Reporting Engine',sh:'Reports',cat:'App Health (.NET)',tp:'ratio',dr:'lo',v:.89,h:[.92,.93,.92,.91,.92,.91,.91,.90,.91,.90,.90,.90,.89,.90,.89,.89,.90,.89,.89,.89]},
   {id:'rp',nm:'Call Requests/Min',sh:'RPM',cat:'Genesys Calls',tp:'count',dr:'both',v:1850,h:[1180,1210,1195,1220,1205,1215,1230,1190,1225,1240,1200,1235,1250,1260,1310,1400,1520,1650,1780,1850]}
 ];
+
+const M_POS = [
+  {id:'np1',nm:'Port Group 1',sh:'Grp 1',cat:'Nuance Telephony',tp:'cap',dr:'hi',cap:500,v:310,h:[280,285,290,288,295,298,300,302,305,308,306,304,308,310,305,308,312,310,308,310]},
+  {id:'np2',nm:'Port Group 2',sh:'Grp 2',cat:'Nuance Telephony',tp:'cap',dr:'hi',cap:400,v:220,h:[195,200,205,198,202,208,210,212,215,218,216,214,218,220,215,218,222,220,218,220]},
+  {id:'np3',nm:'Port Group 3',sh:'Grp 3',cat:'Nuance Telephony',tp:'cap',dr:'hi',cap:300,v:155,h:[140,142,145,148,150,148,146,150,152,154,152,150,153,155,152,154,156,155,154,155]},
+  {id:'ss1',nm:'Server 1',sh:'Srv 1',cat:'Self Service',tp:'ratio',dr:'lo',v:.82,h:[.80,.81,.80,.82,.81,.80,.82,.83,.81,.82,.80,.81,.82,.81,.82,.81,.82,.82,.81,.82]},
+  {id:'ss2',nm:'Server 2',sh:'Srv 2',cat:'Self Service',tp:'ratio',dr:'lo',v:.85,h:[.83,.84,.85,.84,.83,.84,.85,.84,.85,.84,.85,.84,.85,.84,.85,.84,.85,.85,.85,.85]},
+  {id:'ss3',nm:'Server 3',sh:'Srv 3',cat:'Self Service',tp:'ratio',dr:'lo',v:.88,h:[.86,.87,.86,.88,.87,.86,.87,.88,.87,.88,.87,.88,.87,.88,.87,.88,.88,.88,.88,.88]},
+  {id:'a1',nm:'CRM Service',sh:'CRM',cat:'App Health (.NET)',tp:'ratio',dr:'lo',v:.96,h:[.95,.96,.95,.96,.95,.96,.95,.96,.96,.96,.95,.96,.96,.96,.95,.96,.96,.96,.96,.96]},
+  {id:'a2',nm:'Auth Service',sh:'Auth',cat:'App Health (.NET)',tp:'ratio',dr:'lo',v:.97,h:[.96,.97,.96,.97,.96,.97,.97,.96,.97,.97,.96,.97,.97,.97,.96,.97,.97,.97,.97,.97]},
+  {id:'a3',nm:'Payment Gateway',sh:'Payment',cat:'App Health (.NET)',tp:'ratio',dr:'lo',v:.95,h:[.94,.95,.94,.95,.95,.94,.95,.95,.95,.95,.94,.95,.95,.95,.95,.95,.95,.95,.95,.95]},
+  {id:'a4',nm:'Search API',sh:'Search',cat:'App Health (.NET)',tp:'ratio',dr:'lo',v:.96,h:[.95,.96,.95,.96,.96,.95,.96,.96,.96,.96,.95,.96,.96,.96,.96,.96,.96,.96,.96,.96]},
+  {id:'a5',nm:'Unified Gateway',sh:'UGW',cat:'App Health (.NET)',tp:'ratio',dr:'lo',v:.97,h:[.96,.97,.96,.97,.97,.96,.97,.97,.97,.97,.96,.97,.97,.97,.97,.97,.97,.97,.97,.97]},
+  {id:'a6',nm:'Notification Svc',sh:'Notify',cat:'App Health (.NET)',tp:'ratio',dr:'lo',v:.95,h:[.94,.95,.94,.95,.95,.94,.95,.95,.95,.95,.94,.95,.95,.95,.95,.95,.95,.95,.95,.95]},
+  {id:'a7',nm:'Reporting Engine',sh:'Reports',cat:'App Health (.NET)',tp:'ratio',dr:'lo',v:.96,h:[.95,.95,.96,.95,.96,.96,.95,.96,.96,.96,.95,.96,.96,.96,.96,.96,.96,.96,.96,.96]},
+  {id:'rp',nm:'Call Requests/Min',sh:'RPM',cat:'Genesys Calls',tp:'count',dr:'both',v:1220,h:[1180,1190,1200,1195,1205,1200,1210,1205,1215,1210,1220,1215,1225,1220,1210,1215,1220,1218,1222,1220]}
+];
+
+let M = M_NEG;
 
 const SC=3.09, SE=2.33;
 
@@ -404,100 +679,160 @@ function fv(m){
 function spark(h,c){
   const W=32,H=12,lo=Math.min(...h),hi=Math.max(...h),rg=hi-lo||1;
   const pts=h.map((v,i)=>(i/(h.length-1))*W+','+(H-1-((v-lo)/rg)*(H-2)));
-  const cl=c==='r'?'#dc2626':c==='y'?'#d97706':'#64748b';
+  const cl=c==='r'?'#fca5a5':c==='y'?'#fcd34d':'#64748b';
   return '<svg viewBox="0 0 '+W+' '+H+'"><polyline points="'+pts.join(' ')+'" fill="none" stroke="'+cl+'" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 }
 
 /* ═══════════════════════════════════════════════════════════
-   RENDER
+   RENDER — Dynamic Island
    ═══════════════════════════════════════════════════════════ */
+let isExpanded = false;
+
+function toggleIsland(){
+  const el = document.getElementById('di');
+  isExpanded = !isExpanded;
+  el.classList.toggle('collapsed', !isExpanded);
+  el.classList.toggle('expanded', isExpanded);
+}
+
 function render(){
-  const p=document.getElementById('gp');
+  const p=document.getElementById('di');
   const all=M.map(m=>({m,a:run(m)}));
   const cr=all.filter(r=>r.a.rk==='r').length;
   const wr=all.filter(r=>r.a.rk==='y').length;
   const ok=all.length-cr-wr;
   const oc=cr?'r':wr?'y':'g';
   const ol=cr?'Critical':wr?'Elevated':'All Clear';
-  const os=(cr+wr)?(cr+wr)+'/'+all.length+' need attention':'All '+all.length+' healthy';
   const now=new Date();
-  const ts=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})+' · '+now.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const ts=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+
+  // Glow class
+  p.classList.toggle('crit', cr > 0);
+  p.classList.toggle('warn', cr === 0 && wr > 0);
 
   // Group by category
   const cats={}; all.forEach(r=>{if(!cats[r.m.cat])cats[r.m.cat]=[];cats[r.m.cat].push(r);});
   const order=['Nuance Telephony','Self Service','App Health (.NET)','Genesys Calls'];
+  const shortNames = {'Nuance Telephony':'Telephony','Self Service':'Self Svc','App Health (.NET)':'App Health','Genesys Calls':'Calls'};
 
   let o='';
 
-  // Banner
-  o+='<div class="gp-banner">';
-  o+='<div class="gp-banner-row">';
-  o+='<div class="gp-status"><div class="gp-dot '+oc+'"></div><span class="gp-title">'+ol+'</span></div>';
-  o+='<div class="gp-pills"><span class="gp-p r">'+cr+'</span><span class="gp-p y">'+wr+'</span><span class="gp-p g">'+ok+'</span></div>';
-  o+='</div>';
-  o+='<div class="gp-sub">'+os+' · '+ts+'</div>';
+  // ── Top Bar (always visible) ──
+  o+='<div class="di-bar" onclick="toggleIsland()">';
+
+  // Left: status dot + label
+  o+='<div class="di-left">';
+  o+='<div class="di-dot '+oc+'"></div>';
+  o+='<span class="di-label">'+ol+'</span>';
   o+='</div>';
 
-  // Categories
+  // Center: category pills (collapsed quick view)
+  o+='<div class="di-center">';
+  order.forEach(cat=>{
+    const arr=cats[cat]; if(!arr) return;
+    const worst=arr.some(r=>r.a.rk==='r')?'r':arr.some(r=>r.a.rk==='y')?'y':'g';
+    o+='<div class="di-cpill">';
+    o+='<span class="cdot '+worst+'"></span>';
+    o+='<span class="cname">'+(shortNames[cat]||cat)+'</span>';
+    o+='<span class="cbadge '+worst+'">'+(worst==='r'?'CRIT':worst==='y'?'ELEV':'OK')+'</span>';
+    o+='</div>';
+  });
+  o+='</div>';
+
+  // Right: count pills + time + toggle arrow
+  o+='<div class="di-right">';
+  o+='<div class="di-pills">';
+  o+='<span class="di-p r">'+cr+'</span>';
+  o+='<span class="di-p y">'+wr+'</span>';
+  o+='<span class="di-p g">'+ok+'</span>';
+  o+='</div>';
+  o+='<span class="di-time">'+ts+'</span>';
+  o+='<div class="di-toggle">&#9660;</div>';
+  o+='</div>';
+
+  o+='</div>'; // di-bar
+
+  // ── Expanded Content ──
+  o+='<div class="di-content">';
+  o+='<div class="di-grid">';
+
   order.forEach((cat,ci)=>{
     const arr=cats[cat]; if(!arr) return;
     const worst=arr.some(r=>r.a.rk==='r')?'r':arr.some(r=>r.a.rk==='y')?'y':'g';
-    // Auto-open categories with issues; healthy ones start collapsed
-    const open=worst!=='g';
 
-    o+='<div class="gp-cat'+(open?' open':'')+'" data-c="'+ci+'">';
+    o+='<div class="di-card">';
 
-    // Clickable header
-    o+='<div class="gp-ch" onclick="tc('+ci+')">';
-    o+='<div class="gp-ch-left"><span class="gp-ch-arrow">&#9654;</span><span class="gp-ch-name">'+cat+'</span></div>';
-    o+='<div class="gp-ch-right"><span class="gp-badge '+worst+'">'+(worst==='r'?'CRIT':worst==='y'?'ELEV':'OK')+'</span><span class="gp-ch-count">'+arr.length+'</span></div>';
+    // Card header
+    o+='<div class="di-card-head">';
+    o+='<div class="di-card-title"><span class="cdot '+worst+'"></span><span class="di-card-name">'+(shortNames[cat]||cat)+'</span></div>';
+    o+='<span class="di-card-badge '+worst+'">'+(worst==='r'?'CRIT':worst==='y'?'ELEV':'OK')+'</span>';
     o+='</div>';
 
-    // Business insight (always visible even when collapsed)
-    o+='<div class="gp-insight">'+insight(cat,arr)+'</div>';
+    // Insight
+    o+='<div class="di-card-insight">'+insight(cat,arr)+'</div>';
 
-    // Expandable detail body
-    o+='<div class="gp-body">';
-
-    arr.forEach(({m,a})=>{
-      let bt='';
-      if(a.br.br) bt='<span class="gp-bt br">!</span>';
-      else if(a.br.pr&&a.br.pr<=5) bt='<span class="gp-bt im">'+a.br.pr+'p</span>';
-      else if(a.br.pr&&a.br.pr<=15) bt='<span class="gp-bt pj">'+a.br.pr+'p</span>';
-
-      o+='<div class="gp-row">';
-      o+='<div class="gp-rd '+a.rk+'"></div>';
-      o+='<div class="gp-rn">'+m.sh+bt+'</div>';
-      o+='<div class="gp-rv '+a.rk+'">'+fv(m)+'</div>';
-      o+='<div class="gp-sp">'+spark(m.h,a.rk)+'</div>';
-      o+='</div>';
-    });
-
-    // Category-level action
+    // Action
     const act=catAct(cat,arr);
     if(act){
-      o+='<div class="gp-bact"><span class="gp-urg '+act.u+'">'+(act.u==='urgent'?'ACT NOW':'REVIEW')+'</span>'+act.t+'</div>';
+      o+='<div class="di-act"><span class="di-urg '+act.u+'">'+(act.u==='urgent'?'ACT NOW':'REVIEW')+'</span>'+act.t+'</div>';
     }
 
-    o+='</div>'; // body
-    o+='</div>'; // cat
+    o+='</div>'; // di-card
   });
 
+  o+='</div>'; // di-grid
+
   // Footer
-  o+='<div class="gp-foot">';
-  o+='<div class="gp-tags"><span class="gp-tag a">D</span><span class="gp-tag b">Dx</span><span class="gp-tag c">P</span><span class="gp-tag d">Rx</span></div>';
-  o+='<span>'+M.length+' metrics · 4-tier</span>';
+  o+='<div class="di-foot">';
+  o+='<div class="di-tags"><span class="di-tag a">D</span><span class="di-tag b">Dx</span><span class="di-tag c">P</span><span class="di-tag d">Rx</span></div>';
+  o+='<span>'+M.length+' metrics · 4‑tier anomaly</span>';
   o+='</div>';
+
+  o+='</div>'; // di-content
 
   p.innerHTML=o;
 }
 
-function tc(i){
-  const el=document.querySelector('.gp-cat[data-c="'+i+'"]');
-  if(el) el.classList.toggle('open');
+function renderDetail(){
+  const dp=document.getElementById('detail-panel');
+  const all=M.map(m=>({m,a:run(m)}));
+  const cats={}; all.forEach(r=>{if(!cats[r.m.cat])cats[r.m.cat]=[];cats[r.m.cat].push(r);});
+  const order=['Nuance Telephony','Self Service','App Health (.NET)','Genesys Calls'];
+  const shortNames = {'Nuance Telephony':'Telephony','Self Service':'Self Svc','App Health (.NET)':'App Health','Genesys Calls':'Calls'};
+
+  let o='<div class="detail-grid">';
+  order.forEach(cat=>{
+    const arr=cats[cat]; if(!arr) return;
+    const worst=arr.some(r=>r.a.rk==='r')?'r':arr.some(r=>r.a.rk==='y')?'y':'g';
+    o+='<div class="det-card">';
+    o+='<div class="det-card-head">';
+    o+='<div class="det-card-title"><span class="cdot '+worst+'"></span><span class="det-card-name">'+(shortNames[cat]||cat)+'</span></div>';
+    o+='<span class="det-badge '+worst+'">'+(worst==='r'?'CRIT':worst==='y'?'ELEV':'OK')+'</span>';
+    o+='</div>';
+    o+='<div class="det-insight">'+insight(cat,arr)+'</div>';
+    o+='<div class="det-metrics">';
+    o+=arr.map(({m,a})=>'<span class="mn">'+m.nm+'</span> <span class="mv '+a.rk+'">'+fv(m)+'</span>').join(', ');
+    o+='</div>';
+    const act=catAct(cat,arr);
+    if(act){
+      o+='<div class="det-act"><span class="det-urg '+act.u+'">'+(act.u==='urgent'?'ACT NOW':'REVIEW')+'</span>'+act.t+'</div>';
+    }
+    o+='</div>';
+  });
+  o+='</div>';
+  dp.innerHTML=o;
+}
+
+function switchScenario(mode){
+  M = mode==='pos' ? M_POS : M_NEG;
+  document.getElementById('btn-neg').className = 'scenario-btn' + (mode==='neg'?' active-neg':'');
+  document.getElementById('btn-pos').className = 'scenario-btn' + (mode==='pos'?' active-pos':'');
+  render();
+  renderDetail();
 }
 
 render();
+renderDetail();
 </script>
 </body>
 </html>
