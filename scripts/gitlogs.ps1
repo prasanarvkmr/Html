@@ -1,52 +1,53 @@
+
 param(
-    [string]$RepoPath = ".",
+    [string[]]$RepoPaths = @("."),
     [string]$Since = "",
     [string]$Until = ""
 )
 
-# Change to the repo directory
-Set-Location $RepoPath
 
-# Get repo name from folder
-$repoName = Split-Path -Leaf (Get-Location)
-
-# Get timestamp
+# Get timestamp for output file
 $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$outputFile = "gitlog-summary-$timestamp.csv"
 
-# Output file name
-$outputFile = "$repoName-gitlog-$timestamp.txt"
+# Prepare CSV header
+$csv = @()
+$csv += "Repo,Author,Added,Deleted,Net,Since,Until"
 
-
-# Build date filter args as array
-$dateArgs = @()
-if ($Since -ne "") { $dateArgs += "--since=$Since" }
-if ($Until -ne "") { $dateArgs += "--until=$Until" }
-
-# Get unique authors
-$authors = git log @dateArgs --pretty=format:"%an <%ae>" | Sort-Object | Get-Unique
-
-# Prepare output
-$output = @()
-foreach ($author in $authors) {
-    $output += $author
-    $stats = git log --author="$author" @dateArgs --pretty=tformat: --numstat |
-        ForEach-Object {
-            $fields = $_ -split "\s+"
-            if ($fields.Length -ge 2) {
-                [int]$fields[0], [int]$fields[1]
-            }
-        }
-    $added = 0
-    $deleted = 0
-    foreach ($stat in $stats) {
-        $added += $stat[0]
-        $deleted += $stat[1]
+foreach ($RepoPath in $RepoPaths) {
+    if (!(Test-Path $RepoPath)) {
+        Write-Host "Repo path not found: $RepoPath"
+        continue
     }
-    $output += "Added: $added Deleted: $deleted Net: $(($added - $deleted))"
-    $output += ""
+    Push-Location $RepoPath
+    $repoName = Split-Path -Leaf (Get-Location)
+
+    # Build date filter args as array
+    $dateArgs = @()
+    if ($Since -ne "") { $dateArgs += "--since=$Since" }
+    if ($Until -ne "") { $dateArgs += "--until=$Until" }
+
+    # Get unique authors
+    $authors = git log @dateArgs --pretty=format:"%an <%ae>" | Sort-Object | Get-Unique
+
+    foreach ($author in $authors) {
+        $added = 0
+        $deleted = 0
+        git log --author="$author" @dateArgs --pretty=tformat: --numstat |
+            ForEach-Object {
+                $fields = $_ -split "\s+"
+                if ($fields.Length -ge 2) {
+                    $added += [int]$fields[0]
+                    $deleted += [int]$fields[1]
+                }
+            }
+        $net = $added - $deleted
+        $csv += "$repoName,`"$author`",$added,$deleted,$net,$Since,$Until"
+    }
+    Pop-Location
 }
 
-# Write to file
-$output | Set-Content $outputFile
+# Write to CSV file
+$csv | Set-Content $outputFile
 
-Write-Host "Output written to $outputFile"
+Write-Host "CSV output written to $outputFile"
