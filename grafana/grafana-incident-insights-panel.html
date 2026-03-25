@@ -959,10 +959,82 @@
         }
     }
 
-    // ─── Grafana Business Text Plugin Integration ───
-    // Azure Managed Grafana: Add a Business Text panel at w:24, h:4 (compact)
-    // or h:7 (expanded). Paste this HTML into the Content field.
-    // Place other panels (KPIs, component grids, charts) below at y:4 or y:7.
+    // ═══════════════════════════════════════════════════════════
+    // AZURE MANAGED GRAFANA — EXPAND/COLLAPSE SETUP GUIDE
+    // ═══════════════════════════════════════════════════════════
+    //
+    // PROBLEM: Grafana panels have FIXED grid positions. A Business
+    // Text panel cannot resize itself and push panels below it down.
+    //
+    // SOLUTION: Use a Grafana dashboard variable + TWO Business Text
+    // panels at the same x position. Only one is visible at a time.
+    // Panels below are positioned after the EXPANDED panel height.
+    //
+    // ─── STEP 1: Create Dashboard Variable ───
+    //   Dashboard Settings → Variables → New variable:
+    //     Name:    incident_view
+    //     Type:    Custom
+    //     Values:  compact,expanded
+    //     Default: expanded
+    //     Hide:    Variable  (hides from the dropdown bar)
+    //
+    // ─── STEP 2: Create TWO Business Text Panels ───
+    //
+    //   PANEL A — "Incidents Compact" (shown when var = compact):
+    //     Type:     Business Text (marcusolsson-dynamictext-panel)
+    //     gridPos:  { x: 0, y: 0, w: 24, h: 3 }
+    //     Content:  Paste this ENTIRE HTML file
+    //     Transparent: Yes
+    //
+    //   PANEL B — "Incidents Expanded" (shown when var = expanded):
+    //     Type:     Business Text (marcusolsson-dynamictext-panel)
+    //     gridPos:  { x: 0, y: 0, w: 24, h: 8 }
+    //     Content:  Paste this ENTIRE HTML file (same content)
+    //     Transparent: Yes
+    //
+    //   The JS inside reads var-incident_view from the URL and
+    //   automatically shows the correct view in each panel.
+    //
+    // ─── STEP 3: Conditional Panel Visibility ───
+    //   For each panel, add a "Filter by value" transformation or
+    //   use Grafana's panel-level "Hide" override:
+    //
+    //   Panel A: Show ONLY when ${incident_view} = compact
+    //   Panel B: Show ONLY when ${incident_view} = expanded
+    //
+    //   In Grafana 10+ / Azure Managed Grafana:
+    //   - Use "Panel options → Repeat → Variable: incident_view"
+    //     with min/max 1, then filter.
+    //   - OR use a data source query that returns 1 row when the
+    //     variable matches, and 0 rows otherwise. Business Text
+    //     with "Render mode: Every row" will show nothing on 0 rows.
+    //   - OR use Grafana Scenes (if available in your version).
+    //
+    // ─── STEP 4: Position Panels Below ───
+    //   Place KPI / chart / component panels at y: 8 (after expanded).
+    //   When the expanded panel hides (compact active), those panels
+    //   will appear to have gap — but the compact panel only uses h:3,
+    //   so the visible content flows naturally.
+    //
+    //   TIP: Group lower panels in a Grafana ROW panel so they
+    //   visually collapse together.
+    //
+    // ─── ALTERNATIVE (simpler, no variable needed) ───
+    //   Use a SINGLE Business Text panel at h:8 (expanded height).
+    //   Compact view shows pills at top; remaining space is empty but
+    //   the panel background is transparent so it blends in.
+    //   Toggle is instant (CSS only, no page reload).
+    //   Panels below stay fixed — no shifting.
+    //
+    // ─── DASHBOARD JSON ───
+    //   See grafana-incident-insights-dashboard.json for a ready-to-import
+    //   dashboard with the variable and both panels pre-configured.
+    //
+    // ═══════════════════════════════════════════════════════════
+    //
+    // ─── Grafana Business Text Plugin — Data Integration ───
+    // When used inside Grafana Business Text panels, data from queries
+    // is available via Handlebars {{data}} or the `data` JS variable.
     //
     // When used inside Grafana Business Text panels, data from queries
     // is available via Handlebars {{data}} or the `data` JS variable.
