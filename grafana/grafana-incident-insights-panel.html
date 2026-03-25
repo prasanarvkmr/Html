@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpsCenter — Incidents &amp; Insights</title>
+    <style>
+        /* ─── Grafana Business Text Compatible Styles ─── */
+        /* No external CDN dependencies — all styles inline for plugin compatibility */
+        /*
+         * GRAFANA SUB-NAV PANEL — Azure Managed Grafana Compatible
+         *
+         * EXPAND/COLLAPSE STRATEGY:
+         * Grafana panels have FIXED grid positions — one panel cannot push
+         * others down dynamically. To achieve expand/collapse:
+         *
+         * 1. Create a dashboard variable: incident_view (compact | expanded)
+         * 2. Place TWO Business Text panels at the SAME x/y position (x:0, y:1):
+         *    - Panel A «Incidents Compact»  → w:24, h:2  (shown when var = compact)
+         *    - Panel B «Incidents Expanded» → w:24, h:7  (shown when var = expanded)
+         * 3. All panels below are placed at TWO positions via Grafana Rows or
+         *    separate dashboards linked by the variable.
+         *
+         * This SINGLE HTML works in BOTH panels. On load it reads the
+         * var-incident_view URL param; shows compact or expanded view.
+         * Toggle buttons set window.location.search → Grafana reloads
+         * the dashboard with the new variable value.
+         *
+         * ALTERNATIVE (simpler): Use a single panel at h:7 (expanded height).
+         * Compact view shows pills at the top with empty space below.
+         * No need for two panels or variables. Panels below stay fixed.
+         *
+         * No height:100%, no overflow:hidden, no flex:1 nesting.
+         * Works in Business Text, iframe, or standalone browser.
+         */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --g-font: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --g-bg: #f8f9fb;
+            --g-surface: #ffffff;
+            --g-border: #e2e5ea;
+            --g-text: #1a1d23;
+            --g-text-secondary: #5f6776;
+            --g-text-muted: #8b92a0;
+            --g-brand: #2563eb;
+            --g-brand-light: #eff4ff;
+            --g-red: #dc2626;
+            --g-red-light: #fef2f2;
+            --g-red-border: #fecaca;
+            --g-amber: #d97706;
+            --g-amber-light: #fffbeb;
+            --g-amber-border: #fde68a;
+            --g-green: #059669;
+            --g-green-light: #ecfdf5;
+            --g-green-border: #a7f3d0;
+            --g-blue: #2563eb;
+            --g-blue-light: #eff6ff;
+            --g-blue-border: #bfdbfe;
+            --g-radius: 8px;
+            --g-radius-sm: 6px;
+            --g-radius-lg: 12px;
+        }
+
+        body, html {
+            font-family: var(--g-font);
+            background: var(--g-bg);
+            color: var(--g-text);
+            font-size: 13px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Sub-nav panel root — auto height, no overflow clipping */
+        .ops-subnav {
+            width: 100%;
+        }
+
+        /* ─── NAVBAR ─── */
+        .ops-navbar {
+            background: var(--g-surface);
+            border-bottom: 1px solid var(--g-border);
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            height: 40px;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+
+        .ops-navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .ops-navbar-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--g-radius-sm);
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .ops-navbar-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--g-text);
+            letter-spacing: -0.3px;
+        }
+
+        .ops-navbar-sep {
+            color: var(--g-text-muted);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* Nav tabs */
+        .ops-nav-tabs {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            margin-left: 12px;
+        }
+
+        .ops-nav-tab {
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--g-text-secondary);
+            border: none;
+            background: transparent;
+            border-radius: var(--g-radius-sm);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+
+        .ops-nav-tab:hover { background: #f1f3f5; color: var(--g-text); }
+        .ops-nav-tab.active { background: #f1f3f5; color: var(--g-text); }
+
+        /* Nav right actions */
+        .ops-nav-actions {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ops-incident-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--g-red);
+            background: var(--g-red-light);
+            border: 1px solid var(--g-red-border);
+            border-radius: var(--g-radius-sm);
+            cursor: pointer;
+            position: relative;
+            transition: background 0.15s;
+            font-family: inherit;
+        }
+
+        .ops-incident-toggle:hover { background: #fee2e2; }
+
+        .ops-incident-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 16px;
+            height: 16px;
+            background: var(--g-red);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ops-live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--g-green);
+            background: var(--g-green-light);
+            border: 1px solid var(--g-green-border);
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ops-live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--g-green);
+            animation: livePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .ops-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #1e293b;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ─── INCIDENT SUB-NAV AREA ─── */
+        /* Toggle swaps compact (pill summary) and expanded (cards) views.
+           Auto height — content determines panel size. */
+        .ops-incident-panel {
+            background: linear-gradient(135deg, var(--g-red-light) 0%, #fff 40%, var(--g-amber-light) 100%);
+            border-bottom: 1px solid var(--g-red-border);
+        }
+
+        /* ── Expanded view — incident cards + insights below ── */
+        .ops-incident-expanded {
+            display: block;
+        }
+
+        .ops-incident-panel.compact .ops-incident-expanded {
+            display: none;
+        }
+
+        /* ── Compact view — single-row pill summary + inline insights ── */
+        .ops-incident-compact {
+            display: none;
+            padding: 8px 20px;
+        }
+
+        .ops-incident-panel.compact .ops-incident-compact {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ops-compact-items {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            overflow-x: auto;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .ops-compact-items::-webkit-scrollbar { display: none; }
+
+        .ops-compact-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 50px;
+            border: 1px solid;
+            white-space: nowrap;
+            flex-shrink: 0;
+            cursor: default;
+        }
+
+        .ops-compact-pill.critical {
+            color: #991b1b;
+            background: var(--g-red-light);
+            border-color: var(--g-red-border);
+        }
+
+        .ops-compact-pill.major {
+            color: #92400e;
+            background: var(--g-amber-light);
+            border-color: var(--g-amber-border);
+        }
+
+        .ops-compact-pill.resolved {
+            color: #065f46;
+            background: var(--g-green-light);
+            border-color: var(--g-green-border);
+        }
+
+        .ops-compact-pill-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .ops-compact-expand {
+            flex-shrink: 0;
+            padding: 4px 12px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--g-text-secondary);
+            background: transparent;
+            border: 1px solid var(--g-border);
+            border-radius: var(--g-radius-sm);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+
+        .ops-compact-expand:hover {
+            background: rgba(0,0,0,0.04);
+            color: var(--g-text);
+        }
+
+        .ops-incident-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 20px;
+            flex-shrink: 0;
+        }
+
+        .ops-incident-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ops-pulse-ring {
+            position: relative;
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ops-pulse-ring::before {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--g-red);
+            opacity: 0.25;
+            animation: pulseRing 1.8s ease infinite;
+        }
+
+        .ops-pulse-ring::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--g-red);
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes pulseRing {
+            0% { transform: scale(1); opacity: 0.25; }
+            50% { transform: scale(1.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
+        .ops-incident-label {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--g-red);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .ops-incident-timestamp {
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--g-text-muted);
+        }
+
+        .ops-incident-header-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .ops-icon-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: transparent;
+            border-radius: var(--g-radius-sm);
+            cursor: pointer;
+            color: var(--g-text-muted);
+            transition: all 0.15s;
+        }
+
+        .ops-icon-btn:hover { background: rgba(0,0,0,0.06); color: var(--g-text-secondary); }
+
+        /* Scrollable incident cards row */
+        .ops-incident-scroll {
+            display: flex;
+            gap: 12px;
+            padding: 0 20px 10px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .ops-incident-scroll::-webkit-scrollbar { display: none; }
+
+        /* Individual incident card — sized to fit within compact panel height */
+        .ops-inc-card {
+            display: flex;
+            min-width: 320px;
+            max-width: 380px;
+            background: var(--g-surface);
+            border-radius: var(--g-radius);
+            border: 1px solid var(--g-border);
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+
+        .ops-inc-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateY(-1px); }
+
+        .ops-inc-card-stripe {
+            width: 5px;
+            flex-shrink: 0;
+        }
+
+        .ops-inc-card-stripe.critical { background: var(--g-red); }
+        .ops-inc-card-stripe.major { background: var(--g-amber); }
+        .ops-inc-card-stripe.resolved { background: var(--g-green); }
+        .ops-inc-card-stripe.info { background: var(--g-blue); }
+
+        .ops-inc-card-body {
+            flex: 1;
+            padding: 10px 14px;
+        }
+
+        .ops-inc-card-top {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .ops-severity {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            font-size: 9px;
+            font-weight: 800;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #fff;
+        }
+
+        .ops-severity.p1 { background: var(--g-red); }
+        .ops-severity.p2 { background: var(--g-amber); }
+        .ops-severity.resolved { background: var(--g-green); }
+        .ops-severity.info { background: var(--g-blue); }
+
+        .ops-inc-id {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--g-text-muted);
+        }
+
+        .ops-inc-ago {
+            margin-left: auto;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--g-red);
+        }
+
+        .ops-inc-ago.amber { color: var(--g-amber); }
+        .ops-inc-ago.green { color: var(--g-green); }
+
+        .ops-inc-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--g-text);
+            line-height: 1.3;
+            margin-bottom: 6px;
+        }
+
+        .ops-inc-desc {
+            font-size: 11px;
+            color: var(--g-text-secondary);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .ops-inc-meta {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 10px;
+        }
+
+        .ops-inc-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: var(--g-text-secondary);
+        }
+
+        .ops-inc-meta-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .ops-inc-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .ops-inc-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            font-size: 9px;
+            font-weight: 600;
+            border-radius: 50px;
+            border: 1px solid;
+        }
+
+        .ops-inc-tag.amber { color: #92400e; background: var(--g-amber-light); border-color: var(--g-amber-border); }
+        .ops-inc-tag.green { color: #065f46; background: var(--g-green-light); border-color: var(--g-green-border); }
+        .ops-inc-tag.red { color: #991b1b; background: var(--g-red-light); border-color: var(--g-red-border); }
+        .ops-inc-tag.blue { color: #1e40af; background: var(--g-blue-light); border-color: var(--g-blue-border); }
+        .ops-inc-tag.slate { color: #475569; background: #f8fafc; border-color: #e2e8f0; }
+
+        /* ─── PAGE INSIGHTS STRIP ─── */
+        .ops-insights-strip {
+            background: var(--g-surface);
+            border-top: 1px solid var(--g-border);
+            padding: 6px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        /* Inline insights — shown inside compact view row */
+        .ops-insights-inline {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            overflow-x: auto;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .ops-insights-inline::-webkit-scrollbar { display: none; }
+
+        .ops-subnav-divider {
+            width: 1px;
+            height: 20px;
+            background: var(--g-border);
+            flex-shrink: 0;
+        }
+
+        .ops-insights-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--g-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            flex-shrink: 0;
+            padding-right: 12px;
+            border-right: 1px solid var(--g-border);
+        }
+
+        .ops-insights-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .ops-insight-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: var(--g-radius-sm);
+            border: 1px solid var(--g-border);
+            background: var(--g-surface);
+            color: var(--g-text);
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: all 0.15s;
+            cursor: default;
+        }
+
+        .ops-insight-chip.degraded {
+            border-color: var(--g-red-border);
+            background: var(--g-red-light);
+            color: #991b1b;
+        }
+
+        .ops-insight-chip.warning {
+            border-color: var(--g-amber-border);
+            background: var(--g-amber-light);
+            color: #92400e;
+        }
+
+        .ops-insight-chip.healthy {
+            border-color: var(--g-green-border);
+            background: var(--g-green-light);
+            color: #065f46;
+        }
+
+        .ops-insight-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* (Component grid, KPI, healthy strip, and footer styles removed —
+           those sections live in separate native Grafana panels below this sub-nav.) */
+
+        /* ─── Grafana Dark Theme Support ─── */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --g-bg: #111217;
+                --g-surface: #1a1d24;
+                --g-border: #2c3038;
+                --g-text: #e8eaed;
+                --g-text-secondary: #9ca3af;
+                --g-text-muted: #6b7280;
+                --g-red-light: #1f1215;
+                --g-red-border: #5a2028;
+                --g-amber-light: #1f1a0f;
+                --g-amber-border: #5a4520;
+                --g-green-light: #0f1f17;
+                --g-green-border: #1a5a3a;
+                --g-blue-light: #0f1520;
+                --g-blue-border: #1a3a5a;
+            }
+
+            .ops-nav-tab:hover { background: #2c3038; }
+            .ops-nav-tab.active { background: #2c3038; }
+            .ops-icon-btn:hover { background: rgba(255,255,255,0.08); }
+            .ops-incident-panel { background: linear-gradient(135deg, #1f1215 0%, #1a1d24 40%, #1f1a0f 100%); }
+            .ops-compact-pill.critical { color: #fca5a5; background: #1f1215; border-color: #5a2028; }
+            .ops-compact-pill.major { color: #fcd34d; background: #1f1a0f; border-color: #5a4520; }
+            .ops-compact-pill.resolved { color: #6ee7b7; background: #0f1f17; border-color: #1a5a3a; }
+            .ops-compact-expand { border-color: #2c3038; color: #9ca3af; }
+            .ops-compact-expand:hover { background: rgba(255,255,255,0.06); color: #e8eaed; }
+            .ops-severity.p1 { background: #dc2626; }
+            .ops-severity.p2 { background: #d97706; }
+            .ops-inc-card { background: var(--g-surface); border-color: var(--g-border); }
+            .ops-insight-chip.degraded { background: #1f1215; color: #fca5a5; }
+            .ops-insight-chip.warning { background: #1f1a0f; color: #fcd34d; }
+            .ops-insight-chip.healthy { background: #0f1f17; color: #6ee7b7; }
+            .ops-inc-tag.amber { color: #fcd34d; background: #1f1a0f; }
+            .ops-inc-tag.green { color: #6ee7b7; background: #0f1f17; }
+            .ops-inc-tag.red { color: #fca5a5; background: #1f1215; }
+            .ops-inc-tag.blue { color: #93c5fd; background: #0f1520; }
+            .ops-inc-tag.slate { color: #94a3b8; background: #1e293b; border-color: #334155; }
+            .ops-subnav-divider { background: #2c3038; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .ops-navbar { padding: 0 12px; gap: 6px; height: 36px; }
+            .ops-nav-tabs { display: none; }
+            .ops-incident-header { padding: 6px 12px; }
+            .ops-incident-scroll { padding: 0 12px 8px; }
+            .ops-inc-card { min-width: 260px; }
+            .ops-incident-compact { padding: 0 12px; }
+            .ops-insights-strip { padding: 6px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="ops-subnav">
+
+    <!-- ═══════════════════════════════════════
+         NAVBAR (40px fixed)
+    ═══════════════════════════════════════ -->
+    <nav class="ops-navbar">
+        <div class="ops-navbar-brand">
+            <div class="ops-navbar-logo">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3"/></svg>
+            </div>
+            <span class="ops-navbar-title">OpsCenter</span>
+            <span class="ops-navbar-sep">/ Incidents &amp; Insights</span>
+        </div>
+
+        <div class="ops-nav-tabs">
+            <button class="ops-nav-tab active">Overview</button>
+            <button class="ops-nav-tab">Vendors</button>
+            <button class="ops-nav-tab">Analytics</button>
+            <button class="ops-nav-tab">Reports</button>
+        </div>
+
+        <div class="ops-nav-actions">
+            <button class="ops-incident-toggle" onclick="toggleIncidentPanel()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg>
+                <span id="incidentToggleLabel">2 Active</span>
+                <span class="ops-incident-badge" id="incidentBadgeCount">2</span>
+            </button>
+            <span class="ops-live-badge"><span class="ops-live-dot"></span>Live</span>
+            <div class="ops-avatar">PS</div>
+        </div>
+    </nav>
+
+    <!-- ═══════════════════════════════════════
+         INCIDENT / OUTAGE SUB-NAV AREA
+    ═══════════════════════════════════════ -->
+    <div class="ops-incident-panel" id="incidentPanel">
+
+        <!-- ── COMPACT VIEW: incident pills + divider + inline insights ── -->
+        <div class="ops-incident-compact">
+            <div class="ops-pulse-ring" style="transform:scale(0.7)"></div>
+            <div class="ops-compact-items">
+                <span class="ops-compact-pill critical">
+                    <span class="ops-compact-pill-dot" style="background:#dc2626"></span>
+                    P1 · Vendor C Gateway Outage — EU-Central · 42m
+                </span>
+                <span class="ops-compact-pill major">
+                    <span class="ops-compact-pill-dot" style="background:#d97706"></span>
+                    P2 · Checkout API Latency — US-East · 28m
+                </span>
+                <span class="ops-compact-pill resolved">
+                    <span class="ops-compact-pill-dot" style="background:#059669"></span>
+                    Resolved · Compute Auto-Scale — 1h ago
+                </span>
+            </div>
+            <div class="ops-subnav-divider"></div>
+            <div class="ops-insights-inline">
+                <span class="ops-insight-chip degraded">
+                    <span class="ops-insight-dot" style="background:#dc2626"></span>
+                    Avail ↓ 94.2%
+                </span>
+                <span class="ops-insight-chip warning">
+                    <span class="ops-insight-dot" style="background:#d97706"></span>
+                    Latency ↑ 284ms
+                </span>
+                <span class="ops-insight-chip healthy">
+                    <span class="ops-insight-dot" style="background:#059669"></span>
+                    6/10 OK
+                </span>
+            </div>
+            <button class="ops-compact-expand" onclick="toggleIncidentPanel()">▾ Details</button>
+        </div>
+
+        <!-- ── EXPANDED VIEW (full incident cards) ── -->
+        <div class="ops-incident-expanded">
+
+        <!-- Panel header row -->
+        <div class="ops-incident-header">
+            <div class="ops-incident-header-left">
+                <div class="ops-pulse-ring"></div>
+                <span class="ops-incident-label">Active Incidents &amp; Outages</span>
+                <span class="ops-incident-timestamp">Updated just now</span>
+            </div>
+            <div class="ops-incident-header-right">
+                <button class="ops-icon-btn" onclick="scrollIncidents(-1)" title="Previous">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+                </button>
+                <button class="ops-icon-btn" onclick="scrollIncidents(1)" title="Next">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                </button>
+                <button class="ops-icon-btn" onclick="toggleIncidentPanel()" title="Collapse">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.5 15.75l7.5-7.5 7.5 7.5"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Scrollable incident cards -->
+        <div class="ops-incident-scroll" id="incidentScroll">
+
+            <!-- INC-001 — P1 Critical -->
+            <div class="ops-inc-card">
+                <div class="ops-inc-card-stripe critical"></div>
+                <div class="ops-inc-card-body">
+                    <div class="ops-inc-card-top">
+                        <span class="ops-severity p1">P1 — Critical</span>
+                        <span class="ops-inc-id">INC-20260325-001</span>
+                        <span class="ops-inc-ago">12m ago</span>
+                    </div>
+                    <div class="ops-inc-title">Vendor C — Network Gateway Outage (EU-Central)</div>
+                    <div class="ops-inc-desc">Packet loss at 4.2% causing intermittent failures across EU-Central region. Failover actively rerouting 18% of traffic to US-East.</div>
+                    <div class="ops-inc-meta">
+                        <span class="ops-inc-meta-item"><span class="ops-inc-meta-dot" style="background:#dc2626"></span>Impact: <strong style="color:#dc2626;margin-left:3px">High</strong></span>
+                        <span class="ops-inc-meta-item">Duration: <strong style="margin-left:3px">42 min</strong></span>
+                        <span class="ops-inc-meta-item">Affected: <strong style="margin-left:3px">~2.4K users</strong></span>
+                    </div>
+                    <div class="ops-inc-tags">
+                        <span class="ops-inc-tag amber">NOC Engaged</span>
+                        <span class="ops-inc-tag red">Failover Active</span>
+                        <span class="ops-inc-tag slate">Vendor C</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INC-002 — P2 Major -->
+            <div class="ops-inc-card">
+                <div class="ops-inc-card-stripe major"></div>
+                <div class="ops-inc-card-body">
+                    <div class="ops-inc-card-top">
+                        <span class="ops-severity p2">P2 — Major</span>
+                        <span class="ops-inc-id">INC-20260325-002</span>
+                        <span class="ops-inc-ago amber">28m ago</span>
+                    </div>
+                    <div class="ops-inc-title">Checkout API — Elevated Latency (US-East)</div>
+                    <div class="ops-inc-desc">P99 latency at 1,240ms (threshold 800ms). Database lock contention on write-heavy queries during sustained 4M+ req/s load.</div>
+                    <div class="ops-inc-meta">
+                        <span class="ops-inc-meta-item"><span class="ops-inc-meta-dot" style="background:#d97706"></span>Impact: <strong style="color:#d97706;margin-left:3px">Medium</strong></span>
+                        <span class="ops-inc-meta-item">Duration: <strong style="margin-left:3px">28 min</strong></span>
+                        <span class="ops-inc-meta-item">Error Rate: <strong style="margin-left:3px">2.8%</strong></span>
+                    </div>
+                    <div class="ops-inc-tags">
+                        <span class="ops-inc-tag amber">Engineering</span>
+                        <span class="ops-inc-tag slate">Checkout API</span>
+                        <span class="ops-inc-tag slate">Payment GW</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INC-003 — Resolved -->
+            <div class="ops-inc-card">
+                <div class="ops-inc-card-stripe resolved"></div>
+                <div class="ops-inc-card-body">
+                    <div class="ops-inc-card-top">
+                        <span class="ops-severity resolved">Resolved</span>
+                        <span class="ops-inc-id">INC-20260325-003</span>
+                        <span class="ops-inc-ago green">1h ago</span>
+                    </div>
+                    <div class="ops-inc-title">Auto-Scale Event — Compute Cluster (US-East)</div>
+                    <div class="ops-inc-desc">Peak traffic triggered auto-scale from 12 to 18 nodes. Cluster stabilized within 4 minutes. No user impact detected.</div>
+                    <div class="ops-inc-meta">
+                        <span class="ops-inc-meta-item"><span class="ops-inc-meta-dot" style="background:#059669"></span>Impact: <strong style="color:#059669;margin-left:3px">None</strong></span>
+                        <span class="ops-inc-meta-item">Duration: <strong style="margin-left:3px">4 min</strong></span>
+                        <span class="ops-inc-meta-item">Scale: <strong style="margin-left:3px">12→18 nodes</strong></span>
+                    </div>
+                    <div class="ops-inc-tags">
+                        <span class="ops-inc-tag green">Auto-resolved</span>
+                        <span class="ops-inc-tag slate">Compute</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Insights strip at bottom of expanded view -->
+        <div class="ops-insights-strip">
+            <span class="ops-insights-label">Insights</span>
+            <div class="ops-insights-items">
+                <span class="ops-insight-chip degraded">
+                    <span class="ops-insight-dot" style="background:#dc2626"></span>
+                    Availability ↓ 94.2% — Vendor C outage
+                </span>
+                <span class="ops-insight-chip warning">
+                    <span class="ops-insight-dot" style="background:#d97706"></span>
+                    Latency ↑ 284ms — Checkout API P99 breach
+                </span>
+                <span class="ops-insight-chip warning">
+                    <span class="ops-insight-dot" style="background:#d97706"></span>
+                    Payment GW timeouts 12/min
+                </span>
+                <span class="ops-insight-chip healthy">
+                    <span class="ops-insight-dot" style="background:#059669"></span>
+                    6 of 10 components operational
+                </span>
+            </div>
+        </div>
+
+        </div><!-- /.ops-incident-expanded -->
+    </div><!-- /.ops-incident-panel -->
+
+</div><!-- /.ops-subnav -->
+
+<!-- ═══════════════════════════════════════
+     JAVASCRIPT — Grafana Business Text Compatible
+     No external dependencies; uses var for IE/legacy compat
+═══════════════════════════════════════ -->
+<script>
+    // ─── Grafana Variable Detection ───
+    // Read var-incident_view from URL (Grafana injects dashboard variables as query params)
+    (function initView() {
+        var params = new URLSearchParams(window.location.search);
+        var view = params.get('var-incident_view') || 'expanded';
+        var panel = document.getElementById('incidentPanel');
+        if (panel && view === 'compact') {
+            panel.classList.add('compact');
+        }
+    })();
+
+    // Toggle between compact and expanded views.
+    // In Grafana: updates the dashboard variable via URL → triggers dashboard reload.
+    // Standalone: toggles the CSS class directly (instant, no reload).
+    function toggleIncidentPanel() {
+        var panel = document.getElementById('incidentPanel');
+        if (!panel) return;
+
+        var isCompact = panel.classList.contains('compact');
+        var newView = isCompact ? 'expanded' : 'compact';
+
+        // Detect if running inside Grafana (Business Text plugin sets grafanaBootData or similar)
+        var inGrafana = typeof window.grafanaBootData !== 'undefined'
+            || window.location.pathname.indexOf('/d/') !== -1
+            || window.location.pathname.indexOf('/d-solo/') !== -1;
+
+        if (inGrafana) {
+            // Update the dashboard variable — Grafana reloads with new panel visibility
+            var params = new URLSearchParams(window.location.search);
+            params.set('var-incident_view', newView);
+            window.location.search = params.toString();
+        } else {
+            // Standalone mode — toggle CSS class directly
+            panel.classList.toggle('compact');
+        }
+    }
+
+    // Scroll incident cards horizontally
+    function scrollIncidents(direction) {
+        var el = document.getElementById('incidentScroll');
+        if (el) {
+            el.scrollBy({ left: direction * 400, behavior: 'smooth' });
+        }
+    }
+
+    // ─── Grafana Business Text Plugin Integration ───
+    // Azure Managed Grafana: Add a Business Text panel at w:24, h:4 (compact)
+    // or h:7 (expanded). Paste this HTML into the Content field.
+    // Place other panels (KPIs, component grids, charts) below at y:4 or y:7.
+    //
+    // When used inside Grafana Business Text panels, data from queries
+    // is available via Handlebars {{data}} or the `data` JS variable.
+    //
+    // Example: Populate incident cards + compact pills dynamically
+    //
+    // if (typeof data !== 'undefined' && Array.isArray(data)) {
+    //     var scrollContainer = document.getElementById('incidentScroll');
+    //     if (scrollContainer) {
+    //         scrollContainer.innerHTML = '';
+    //         var activeCount = 0;
+    //
+    //         data.forEach(function(row) {
+    //             var severity = row.severity || 'P2';
+    //             var stripeClass = severity === 'P1' ? 'critical' : severity === 'P2' ? 'major' : 'resolved';
+    //             var sevClass = severity === 'P1' ? 'p1' : severity === 'P2' ? 'p2' : 'resolved';
+    //
+    //             if (severity !== 'Resolved') activeCount++;
+    //
+    //             var card = document.createElement('div');
+    //             card.className = 'ops-inc-card';
+    //             card.innerHTML =
+    //                 '<div class="ops-inc-card-stripe ' + stripeClass + '"></div>' +
+    //                 '<div class="ops-inc-card-body">' +
+    //                     '<div class="ops-inc-card-top">' +
+    //                         '<span class="ops-severity ' + sevClass + '">' + severity + '</span>' +
+    //                         '<span class="ops-inc-id">' + (row.incident_id || '') + '</span>' +
+    //                         '<span class="ops-inc-ago">' + (row.time_ago || '') + '</span>' +
+    //                     '</div>' +
+    //                     '<div class="ops-inc-title">' + (row.title || '') + '</div>' +
+    //                     '<div class="ops-inc-desc">' + (row.description || '') + '</div>' +
+    //                 '</div>';
+    //             scrollContainer.appendChild(card);
+    //         });
+    //
+    //         // Update badge count
+    //         var badge = document.getElementById('incidentBadgeCount');
+    //         var label = document.getElementById('incidentToggleLabel');
+    //         if (badge) badge.textContent = activeCount;
+    //         if (label) label.textContent = activeCount + ' Active';
+    //     }
+    // }
+    //
+    // ─── Grafana Query Example (SQL) ───
+    // SELECT
+    //   incident_id,
+    //   severity,
+    //   title,
+    //   description,
+    //   impact_level,
+    //   duration_minutes,
+    //   affected_users,
+    //   status,
+    //   CASE
+    //     WHEN created_at > NOW() - INTERVAL '1 hour' THEN
+    //       EXTRACT(MINUTE FROM NOW() - created_at)::TEXT || 'm ago'
+    //     ELSE
+    //       EXTRACT(HOUR FROM NOW() - created_at)::TEXT || 'h ago'
+    //   END AS time_ago
+    // FROM incidents
+    // WHERE status IN ('active', 'investigating', 'resolved')
+    //   AND created_at > NOW() - INTERVAL '24 hours'
+    // ORDER BY
+    //   CASE severity WHEN 'P1' THEN 1 WHEN 'P2' THEN 2 WHEN 'P3' THEN 3 ELSE 4 END,
+    //   created_at DESC;
+
+</script>
+
+</body>
+</html>
