@@ -5,6 +5,9 @@ param(
     [string]$Until = ""
 )
 
+# Get timestamp once for all output files
+$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+
 # --- Developer LOC per Branch ---
 $devLocCsv = @("Repo,Branch,Author,Added,Deleted,Net,Since,Until")
 foreach ($RepoPath in $RepoPaths) {
@@ -33,7 +36,7 @@ foreach ($RepoPath in $RepoPaths) {
             git log $branch --author="$author" @dateArgs --pretty=tformat: --numstat |
                 ForEach-Object {
                     $fields = $_ -split "\s+"
-                    if ($fields.Length -ge 2) {
+                    if ($fields.Length -ge 2 -and $fields[0] -match '^\d+$' -and $fields[1] -match '^\d+$') {
                         $added += [int]$fields[0]
                         $deleted += [int]$fields[1]
                     }
@@ -70,11 +73,13 @@ foreach ($RepoPath in $RepoPaths) {
             $branches += $branch
         }
     }
+    $originalBranch = git symbolic-ref --short HEAD 2>$null
     foreach ($branch in $branches) {
-        git checkout $branch | Out-Null
+        git checkout $branch 2>$null | Out-Null
         $loc = Get-ChildItem -Recurse -File | Where-Object { $_.FullName -notmatch '\.git\\' } | Get-Content | Measure-Object -Line
         $locCsv += "$repoName,`"$branch`",$($loc.Lines)"
     }
+    if ($originalBranch) { git checkout $originalBranch 2>$null | Out-Null }
     Pop-Location
 }
 $locFile = "branch-loc-$timestamp.csv"
@@ -84,7 +89,6 @@ Write-Host "Branch LOC CSV output written to $locFile"
 
 
 # --- User-Branch Contribution Map ---
-$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $userBranchCsv = @("Repo,Author,Branches")
 
 foreach ($RepoPath in $RepoPaths) {
@@ -97,6 +101,9 @@ foreach ($RepoPath in $RepoPaths) {
 
     $allBranches = git for-each-ref --format="%(refname:short)" refs/heads/
     $branches = @()
+    $dateArgs = @()
+    if ($Since -ne "") { $dateArgs += "--since=$Since" }
+    if ($Until -ne "") { $dateArgs += "--until=$Until" }
     foreach ($branch in $allBranches) {
         $commitCount = git log $branch @dateArgs --oneline | Measure-Object -Line
         if ($commitCount.Lines -gt 0) {
@@ -106,7 +113,7 @@ foreach ($RepoPath in $RepoPaths) {
     $userBranchMap = @{}
 
     foreach ($branch in $branches) {
-        $authors = git log $branch --pretty=format:"%an <%ae>" | Sort-Object | Get-Unique
+        $authors = git log $branch @dateArgs --pretty=format:"%an <%ae>" | Sort-Object | Get-Unique
         foreach ($author in $authors) {
             if (-not $userBranchMap.ContainsKey($author)) {
                 $userBranchMap[$author] = @()
@@ -125,56 +132,3 @@ foreach ($RepoPath in $RepoPaths) {
 $userBranchFile = "user-branch-map-$timestamp.csv"
 $userBranchCsv | Set-Content $userBranchFile
 Write-Host "User-branch CSV output written to $userBranchFile"
-
-
-# Get timestamp for output file
-$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$outputFile = "gitlog-summary-$timestamp.csv"
-
-# Prepare CSV header
-
-$csv = @()
-$csv += "Repo,Branch,Author,Added,Deleted,Net,Since,Until"
-
-foreach ($RepoPath in $RepoPaths) {
-    if (!(Test-Path $RepoPath)) {
-        Write-Host "Repo path not found: $RepoPath"
-        continue
-    }
-    Push-Location $RepoPath
-    $repoName = Split-Path -Leaf (Get-Location)
-
-    # Build date filter args as array
-    $dateArgs = @()
-    if ($Since -ne "") { $dateArgs += "--since=$Since" }
-    if ($Until -ne "") { $dateArgs += "--until=$Until" }
-
-    # Get all branches
-    $branches = git for-each-ref --format="%(refname:short)" refs/heads/
-
-    foreach ($branch in $branches) {
-        # Get unique authors for this branch
-        $authors = git log $branch @dateArgs --pretty=format:"%an <%ae>" | Sort-Object | Get-Unique
-
-        foreach ($author in $authors) {
-            $added = 0
-            $deleted = 0
-            git log $branch --author="$author" @dateArgs --pretty=tformat: --numstat |
-                ForEach-Object {
-                    $fields = $_ -split "\s+"
-                    if ($fields.Length -ge 2) {
-                        $added += [int]$fields[0]
-                        $deleted += [int]$fields[1]
-                    }
-                }
-            $net = $added - $deleted
-            $csv += "$repoName,`"$branch`",`"$author`",$added,$deleted,$net,$Since,$Until"
-        }
-    }
-    Pop-Location
-}
-
-# Write to CSV file
-$csv | Set-Content $outputFile
-
-Write-Host "CSV output written to $outputFile"
